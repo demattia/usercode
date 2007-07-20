@@ -1,7 +1,7 @@
 //massimiliano.chiorboli@cern.ch
 
 #include "EventFilter/SiStripChannelChargeFilter/interface/MTCCHLTrigger.h"
-#include "DataFormats/Common/interface/Handle.h"
+#include "FWCore/Framework/interface/Handle.h"
 #include "DataFormats/SiStripCluster/interface/SiStripCluster.h"
 #include "DataFormats/SiStripDigi/interface/SiStripDigi.h"
 #include "DataFormats/Common/interface/DetSetVector.h"
@@ -9,8 +9,8 @@
 
 #include "RecoLocalTracker/SiStripRecHitConverter/test/ValHit.h"
  
-#include "DataFormats/GeometryVector/interface/LocalPoint.h"
-#include "DataFormats/GeometryVector/interface/GlobalPoint.h"
+#include "Geometry/Vector/interface/LocalPoint.h"
+#include "Geometry/Vector/interface/GlobalPoint.h"
 
 #include "Geometry/CommonDetUnit/interface/GeomDetType.h"
 #include "Geometry/CommonDetUnit/interface/GeomDetUnit.h"
