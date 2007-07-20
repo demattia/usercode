@@ -1,0 +1,8 @@
+# AnaSiStripClusters
+module modAnaSiStripClusters = AnaSiStripClusters {
+  untracked bool   bMTCCMode            = true
+  untracked string oLabelSiStripCluster = "siStripClusters"
+  untracked string oOutputFileName	= "AnaSiStripClusters_out.root"
+  untracked string oLabelSiStripDigi    = "modMTCCAmplifyDigis"
+  untracked string oProdInstNameDigi    = ""
+}
