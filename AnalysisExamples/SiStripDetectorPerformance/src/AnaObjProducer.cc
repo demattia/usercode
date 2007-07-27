@@ -557,9 +557,9 @@ void AnaObjProducer::produce(edm::Event& e, const edm::EventSetup& es) {
       std::vector<std::pair<const TrackingRecHit *,float> >::iterator recHitsIter;
       for( recHitsIter=hitangle.begin(); recHitsIter!=hitangle.end(); ++recHitsIter ){
 
-	std::pair<const TrackingRecHit*, float> hitangleXZ( (*hitangleXZ)[nHitNum] );
-	std::pair<const TrackingRecHit*, float> hitangleYZ( (*hitangleYZ)[nHitNum] );
-	std::pair<const TrackingRecHit*, float> hitangle3D( (*hit3dangle)[nHitNum] );
+	std::pair<const TrackingRecHit*, float> hitAngleXZ( (*hitangleXZ)[nHitNum] );
+	std::pair<const TrackingRecHit*, float> hitAngleYZ( (*hitangleYZ)[nHitNum] );
+	std::pair<const TrackingRecHit*, float> hitAngle3D( (*hit3dangle)[nHitNum] );
 	std::pair<const TrackingRecHit *, LocalVector> hitLclDir( (*hitLclVector)[nHitNum] );
 	std::pair<const TrackingRecHit *, GlobalVector> hitGlbDir( (*hitGlbVector)[nHitNum] );
 
@@ -606,9 +606,9 @@ void AnaObjProducer::produce(edm::Event& e, const edm::EventSetup& es) {
 	    clusterTKcounter++;
 
 	    float angle = recHitsIter->second;
-	    float angleXZ = hitangleXZ.second;
-	    float angleYZ = hitangleYZ.second;
-	    float angle3D = hitangle3D.second;
+	    float angleXZ = hitAngleXZ.second;
+	    float angleYZ = hitAngleYZ.second;
+	    float angle3D = hitAngle3D.second;
 
 	    float LclDir_X = hitLclDir.second.x();
 	    float LclDir_Y = hitLclDir.second.y();
