@@ -1,0 +1,16 @@
+module L1PixelAna = L1PixelAnalyzer {
+
+  untracked string OutputName = "L1PixelAna.root"
+
+  // Labels for L1Extra digis
+  untracked InputTag l1eCentralJetsSource = fastL1CaloSim:CenJets
+  untracked InputTag l1eForwardJetsSource = fastL1CaloSim:ForJets
+  untracked InputTag l1eTauJetsSource     = fastL1CaloSim:TauJets
+  untracked InputTag l1eEtMissSource      = fastL1CaloSim:MET
+  untracked InputTag l1eIsoEmSource       = fastL1CaloSim:isoEgammas
+  untracked InputTag l1eNonIsoEmSource    = fastL1CaloSim:Egammas
+
+  // Labesl for L1Pixel
+  untracked string l1PixelTrackSource     = "pixelTracks"
+  untracked string l1PixelHitSource       = "siPixelRecHits"
+}
