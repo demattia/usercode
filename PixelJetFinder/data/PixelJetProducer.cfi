@@ -1,0 +1,8 @@
+module 
+PixelJetFinder = PixelJetProducer {
+  string fileName = "PixelJet.root"
+  string pixeljet = "PixelJets"
+
+  // Objects Labels
+  string PixelTracksLabel = "pixelTracks"
+}
