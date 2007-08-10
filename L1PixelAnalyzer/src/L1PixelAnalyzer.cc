@@ -33,8 +33,6 @@ L1PixelAnalyzer::L1PixelAnalyzer(const edm::ParameterSet& iConfig) :
 
   float first_bin_tke = 0.;
   float last_bin_tke = 100.;
-  float first_bin_tket = 0.;
-  float last_bin_tket = 50.;
   float first_bin_zip = -5.;
   float last_bin_zip = 5.;
   float first_bin_tip = -0.5;
@@ -49,6 +47,14 @@ L1PixelAnalyzer::L1PixelAnalyzer(const edm::ParameterSet& iConfig) :
   float last_bin_xy = 11.;
   float first_bin_z = -30.;
   float last_bin_z = 30.;
+  float first_bin_pt = 0.;
+  float last_bin_pt = 50.;
+
+  float first_bin_numtk = 0.;
+  float last_bin_numtk = 0.;
+
+  float first_bin_eta_ext = -6.;
+  float last_bin_eta_ext = 6.;
 
   L1ExtraCenJetsEt_ = new TH1F( "L1ExtraCenJetsEt", "L1 Central Jets Et", binning, first_bin_et, last_bin_et );
   L1ExtraCenJetsEta_ = new TH1F( "L1ExtraCenJetsEta", "L1 Central Jets Eta", binning, first_bin_eta, last_bin_eta );
@@ -80,7 +86,7 @@ L1PixelAnalyzer::L1PixelAnalyzer(const edm::ParameterSet& iConfig) :
   PixelTrack_P_X_ = new TH1F( "PixelTrack_P_X", "PixelTrack momentum along X", binning, first_bin_tke, last_bin_tke );
   PixelTrack_P_Y_ = new TH1F( "PixelTrack_P_Y", "PixelTrack momentum along Y", binning, first_bin_tke, last_bin_tke );
   PixelTrack_P_Z_ = new TH1F( "PixelTrack_P_Z", "PixelTrack momentum along Z", binning, first_bin_tke, last_bin_tke );
-  PixelTrack_Pt_ = new TH1F( "PixelTrack_Pt", "PixelTrack Pt", binning, first_bin_tket, last_bin_tket );
+  PixelTrack_Pt_ = new TH1F( "PixelTrack_Pt", "PixelTrack Pt", binning, first_bin_pt, last_bin_pt );
   PixelTrack_Eta_ = new TH1F( "PixelTrack_Eta", "PixelTrack Eta", binning, first_bin_eta, last_bin_eta );
   PixelTrack_Phi_ = new TH1F( "PixelTrack_Phi", "PixelTrack Phi", binning, first_bin_phi, last_bin_phi );
   PixelTrack_Charge_ = new TH1F( "PixelTrack_Charge", "PixelTrack Charge", binning, -1.1, 1.1 );
@@ -95,6 +101,21 @@ L1PixelAnalyzer::L1PixelAnalyzer(const edm::ParameterSet& iConfig) :
   PixelHit_Y_ = new TH1F( "PixelHit_Y", "PixelHit Y", binning, first_bin_xy, last_bin_xy );
   PixelHit_Z_ = new TH1F( "PixelHit_Z", "PixelHit Z", binning, first_bin_z, last_bin_z );
   PixelHit_XY_ = new TH2F( "PixelHit_XY", "PixelHit XY", binning, first_bin_xy, last_bin_xy, binning, first_bin_xy, last_bin_xy );
+
+  // PixelJet
+  PixelJet_Pt_ = new TH1F( "PixelJet_Pt", "PixelJet Pt", binning, first_bin_pt, last_bin_pt );
+  PixelJet_Eta_ = new TH1F( "PixelJet_Eta", "PixelJet Eta", binning, first_bin_eta, last_bin_eta );
+  PixelJet_Phi_ = new TH1F( "PixelJet_Phi", "PixelJet Phi", binning, first_bin_phi, last_bin_phi );
+  PixelJet_NumTk_ = new TH1F( "PixelJet_NumTk", "PixelJet number of tracks", binning , first_bin_numtk, last_bin_numtk );
+  PixelJet_Vertex_Z_ = new TH1F( "PixelJet_Vertex_Z", "PixelJet Vertex Z", binning, first_bin_vz, last_bin_vz );
+
+  // GenJet
+  GenJet_Pt_ = new TH1F( "GenJet_Pt", "GenJet Pt", binning, first_bin_et, last_bin_et );
+  GenJet_Eta_ = new TH1F( "GenJet_Eta", "GenJet Eta", binning, first_bin_eta_ext, last_bin_eta_ext );
+  GenJet_Phi_ = new TH1F( "GenJet_Phi", "GenJet Phi", binning, first_bin_phi, last_bin_phi );
+
+  //PixelJet vs GenJets Pt
+  PJ_PtRes_ = new TProfile( "PJ_PtRes", "PixelJet vs GenJet Pt", binning, first_bin_et, last_bin_et, first_bin_et, last_bin_et );
 
   eventcounter = 0;
 }
@@ -133,6 +154,12 @@ L1PixelAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
   edm::Handle<reco::TrackCollection> pixeltracks;
   edm::Handle<SiPixelRecHitCollection> pixelhits;
 
+  // Pixel jets
+  edm::Handle<PixelJetCollection> pixeljets;
+
+  // GenJets
+  edm::Handle<reco::GenJetCollection> genJets;
+
   // should get rid of this try/catch?
   try {
     edm::InputTag L1CJetLabel = conf_.getUntrackedParameter<edm::InputTag>("l1eCentralJetsSource");
@@ -151,11 +178,18 @@ L1PixelAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
 
     // L1 Pixel
     // --------
-    std::string PixelTracksLabel = conf_.getUntrackedParameter<std::string>("l1PixelTrackSource");
-    std::string PixelHitsLabel = conf_.getUntrackedParameter<std::string>("l1PixelHitSource");
+    std::string PixelTracksLabel = conf_.getUntrackedParameter<std::string>("PixelTrackSource");
+    std::string PixelHitsLabel = conf_.getUntrackedParameter<std::string>("PixelHitSource");
     iEvent.getByLabel(PixelTracksLabel, pixeltracks);
     iEvent.getByLabel(PixelHitsLabel, pixelhits);
 
+    // PixelJets
+    edm::InputTag PixelJetsLabel = conf_.getUntrackedParameter<edm::InputTag>("PixelJetSource");
+    iEvent.getByLabel(PixelJetsLabel, pixeljets);
+
+    // GenJets
+    std::string GenJetsLabel = conf_.getUntrackedParameter<std::string>("GenJetSource");
+    iEvent.getByLabel( GenJetsLabel, genJets );
   }
   catch (...) {
     std::cerr << "L1TGCT: could not find one of the classes?" << std::endl;
@@ -323,12 +357,57 @@ L1PixelAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
 
 
 
+  // PixelJets
+  // ---------
+  typedef PixelJetCollection::const_iterator PJ_IT;
+  const PixelJetCollection pjs = *(pixeljets.product());
+#ifdef DEBUG
+  std::cout << "Number of pixel-jets: "<< pjs.size() << " pixel-jets" << std::endl;
+#endif
+  for (PJ_IT pj_it=pjs.begin(); pj_it!=pjs.end(); ++pj_it) {
+    PixelJet_Pt_->Fill(pj_it->pt());
+    PixelJet_Eta_->Fill(pj_it->eta());
+    PixelJet_Phi_->Fill(pj_it->phi());
+    PixelJet_NumTk_->Fill(pj_it->NumTk());
+    PixelJet_Vertex_Z_->Fill(pj_it->z());
+  }
+
+
+  if( genJets->size() != 0 ) { 
+    for( reco::GenJetCollection::const_iterator genjet_it=genJets->begin(); genjet_it!=genJets->end(); ++genjet_it ) {
+      GenJet_Pt_->Fill( genjet_it->pt() );
+      GenJet_Eta_->Fill( genjet_it->eta() );
+      GenJet_Phi_->Fill( genjet_it->phi() );
+    }
+  }
+
+  const reco::GenJetCollection genjets = *(genJets.product());
+
+  // Associate PixelJets with themselves
+//  Associator<PixelJet, reco::Track> associator( 0.5 );
+//  std::auto_ptr<std::map<const PixelJet*, const reco::Track*> > AssocMap( associator.Associate( pjs, tracks ) );
+
+  Associator<PixelJet, reco::GenJet> associator( 0.5 );
+  std::auto_ptr<std::map<const PixelJet*, const reco::GenJet*> > AssocMap( associator.Associate( pjs, genjets ) );
+
+#ifdef DEBUG
+  std::cout << "AssocMap ptr = " << AssocMap.get() << std::endl;
+#endif
+
+  std::map<const PixelJet*, const reco::GenJet*>::const_iterator assoc_it = (*AssocMap).begin();
+  for( ; assoc_it != (*AssocMap).end(); ++assoc_it ) {
+    PJ_PtRes_->Fill( assoc_it->first->pt(), assoc_it->second->pt() );
+#ifdef DEBUG
+    std::cout << "PJ_pt = " << assoc_it->first->pt() << " , GenJet_pt = " << assoc_it->second->pt() << std::endl;
+#endif
+  }
+
+
 #ifdef THIS_IS_AN_EVENTSETUP_EXAMPLE
       ESHandle<SetupData> pSetup;
       iSetup.get<SetupRecord>().get(pSetup);
 #endif
 }
-
 
 // ------------ method called once each job just before starting event loop  ------------
 void 

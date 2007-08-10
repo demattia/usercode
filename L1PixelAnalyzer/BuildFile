@@ -16,6 +16,7 @@
 <use name=Geometry/TrackerGeometryBuilder>
 <use name=Geometry/CommonDetUnit>
 <use name=Geometry/Records>
+<use name=DataFormats/JetReco>
 <use name=clhep>
 <use name=boost>
 <use name=root>
@@ -40,6 +41,7 @@
    <use name=Geometry/TrackerGeometryBuilder>
    <use name=Geometry/CommonDetUnit>
    <use name=Geometry/Records>
+   <use name=DataFormats/JetReco>
    <use name=clhep>
    <use name=root>
    <use name=boost>

@@ -78,7 +78,11 @@ class PixelJetProducer : public edm::EDProducer
   edm::ParameterSet conf_;
   std::string filename_;
   std::string pixeljet_;
-
+  double eta_cut_;
+  double ConeR_cut_;
+  int NumTk_cut_;
+  float Eta_cut_Eff_;
+  unsigned int eventcounter_;
 };
 
 #endif // AnalysisExamples_PixelJetFinder_h

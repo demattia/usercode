@@ -10,7 +10,13 @@ module L1PixelAna = L1PixelAnalyzer {
   untracked InputTag l1eIsoEmSource       = fastL1CaloSim:isoEgammas
   untracked InputTag l1eNonIsoEmSource    = fastL1CaloSim:Egammas
 
-  // Labesl for L1Pixel
-  untracked string l1PixelTrackSource     = "pixelTracks"
-  untracked string l1PixelHitSource       = "siPixelRecHits"
+  // Labels for L1Pixel
+  untracked string PixelTrackSource     = "pixelTracks"
+  untracked string PixelHitSource       = "siPixelRecHits"
+
+  // Label for PixelJets
+  untracked InputTag PixelJetSource       = PixelJetFinder:PixelJets
+
+  // Label for GenJets
+  untracked string GenJetSource         = "iterativeCone7GenJets"
 }

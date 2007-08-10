@@ -1,7 +1,12 @@
-module 
-PixelJetFinder = PixelJetProducer {
+module PixelJetFinder = PixelJetProducer {
   string fileName = "PixelJet.root"
   string pixeljet = "PixelJets"
+
+  double Eta_cut = 1.6
+  double ConeR_cut = 0.7
+
+  // Mimimum number of pixeltracks to form a pixeljet. The cut is NumTk >= Minimum_PixelTracks
+  int32 Minimum_PixelTracks = 2
 
   // Objects Labels
   string PixelTracksLabel = "pixelTracks"

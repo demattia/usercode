@@ -34,6 +34,7 @@
 // -------------
 #include "TH1F.h"
 #include "TH2F.h"
+#include "TProfile.h"
 #include "TFile.h"
 
 // Data includes
@@ -76,6 +77,14 @@
 #include "DataFormats/TrackReco/interface/TrackFwd.h"
 #include "DataFormats/TrackReco/interface/Track.h"
 
+#include "AnalysisExamples/PixelJet/interface/PixelJet.h"
+
+// GenJets
+#include "DataFormats/JetReco/interface/GenJetfwd.h"
+#include "DataFormats/JetReco/interface/GenJet.h"
+
+// Associator for the jets
+#include "/data/demattia/PJVERTEX_CMSSW/Classes/Associator/Associator.h"
 
 //
 // class declaration
@@ -140,6 +149,18 @@ class L1PixelAnalyzer : public edm::EDAnalyzer {
   TH1F* PixelHit_Y_;
   TH1F* PixelHit_Z_;
   TH2F* PixelHit_XY_;
+
+  TH1F* PixelJet_Pt_;
+  TH1F* PixelJet_Eta_;
+  TH1F* PixelJet_Phi_;
+  TH1F* PixelJet_NumTk_;
+  TH1F* PixelJet_Vertex_Z_; 
+
+  TH1F* GenJet_Pt_;
+  TH1F* GenJet_Eta_;
+  TH1F* GenJet_Phi_;
+
+  TProfile* PJ_PtRes_;
 
   // ----------member data ---------------------------
 };
