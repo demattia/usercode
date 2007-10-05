@@ -159,6 +159,7 @@ class AnaObjProducer : public edm::EDProducer
   bool     shared;
   int      sign;
   int      bwfw;
+  int      ring;
   int      wheel;
   int      monostereo;
   float    stereocorrection;

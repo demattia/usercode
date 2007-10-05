@@ -1,4 +1,4 @@
-// #define DEBUG
+//#define DEBUG
 #define SIM
 
 #include <memory>
@@ -11,6 +11,7 @@
 #include "AnalysisExamples/SiStripDetectorPerformance/interface/AnaObjProducer.h"
 // General stuff
 // -------------
+#include "FWCore/Utilities/interface/Exception.h"
 #include "FWCore/Framework/interface/Handle.h"
 #include "FWCore/Framework/interface/ESHandle.h"
 #include "FWCore/Framework/interface/EventSetup.h"
@@ -126,6 +127,10 @@ void AnaObjProducer::produce(edm::Event& e, const edm::EventSetup& es) {
 
   using namespace edm;
 
+  // To avoid unhandled exceptions, skip tracking when the track or trackinfo collection cannot be opened
+  // (this can happen for example in fnal processing, where the tracking is not done for events  with too many clusters).
+  bool do_tracking = true;
+
   std::vector<SiStripClusterInfo>                   oClusterInfos;
 
   // Vector to store the AnalyzedCluster structs:
@@ -156,15 +161,34 @@ void AnaObjProducer::produce(edm::Event& e, const edm::EventSetup& es) {
   // TrackCollection
   // -------------------
   edm::Handle<reco::TrackCollection> trackCollection;
-  e.getByLabel( conf_.getParameter<std::string>( "TracksLabel"), 
-		trackCollection);
+  try {
+    e.getByLabel( conf_.getParameter<std::string>( "TracksLabel"), 
+		  trackCollection);
+  }
+  catch ( cms::Exception& er ) {
+    LogTrace( "AnaObjProducer" ) << "caught std::exception for track collection - skip tracks" << er.what() << std::endl;
+    do_tracking = false;
+  }
+  catch ( ... ) {
+    LogTrace( "AnaObjProducer" ) << "track collection - caught exeption - skip tracks" << std::endl;
+    do_tracking = false;
+  }
 
   // Trackinfocollection --> 7/2/2007
   // --------------------------------
   edm::InputTag TkiTag = conf_.getParameter<edm::InputTag>("TrackInfoLabel");
   edm::Handle<reco::TrackInfoTrackAssociationCollection> TItkassociatorCollection;
-  e.getByLabel(TkiTag,TItkassociatorCollection);
-
+  try {
+    e.getByLabel(TkiTag,TItkassociatorCollection);
+  }
+  catch ( cms::Exception& er ) {
+    LogTrace( "AnaObjProducer" ) << "caught std::exception for trackinfo collection - skip tracks" << er.what() << std::endl;
+    do_tracking = false;
+  }
+  catch ( ... ) {
+    LogTrace( "AnaObjProducer" ) << "trackinfo collection - caught exeption - skip tracks" << std::endl;
+    do_tracking = false;
+  }
 
   // DetSetVector SiStripClusterInfos
   // --------------------------------
@@ -205,13 +229,17 @@ void AnaObjProducer::produce(edm::Event& e, const edm::EventSetup& es) {
 #endif
   }
 
-  // TrackCollection
-  // ---------------
-  const reco::TrackCollection *tracks=trackCollection.product();
-  // Take the number of tracks in the event
-  // --------------------------------------
-  numberoftracks = tracks->size();
-
+  numberoftracks = 0;
+  // do the tracking only if the collections were found.
+  // The other tracking parts will be skipped because there are 0 tracks.
+  if ( do_tracking ) {
+    // TrackCollection
+    // ---------------
+    const reco::TrackCollection *tracks=trackCollection.product();
+    // Take the number of tracks in the event
+    // --------------------------------------
+    numberoftracks = tracks->size();
+  }
 
   // Initializations per event
   // -------------------------
@@ -225,7 +253,7 @@ void AnaObjProducer::produce(edm::Event& e, const edm::EventSetup& es) {
   nTrackClusters  = 0;
   run       = e.id().run();
   event     = e.id().event();
-  
+
   eventcounter++;
 #ifdef DEBUG
   std::cout << "Event number " << eventcounter << std::endl;
@@ -268,6 +296,7 @@ void AnaObjProducer::produce(edm::Event& e, const edm::EventSetup& es) {
       extint           = -99;
       string           = -99;
       wheel            = -99;
+      ring             = -99;
       rod              = -99;
       size             = -99;
       clusterpos       = -99.;
@@ -362,6 +391,7 @@ void AnaObjProducer::produce(edm::Event& e, const edm::EventSetup& es) {
       analyzedCluster.layer            = layer; 
       analyzedCluster.bwfw             = bwfw;
       analyzedCluster.rod              = rod;
+      analyzedCluster.ring             = ring;
       analyzedCluster.wheel            = wheel;
       analyzedCluster.extint           = extint;
       analyzedCluster.string           = string;
@@ -553,6 +583,7 @@ void AnaObjProducer::produce(edm::Event& e, const edm::EventSetup& es) {
       // ------------------------------------
 #ifdef DEBUG
       std::cout << "Starting to loop on all the track hits" << std::endl;
+      std::cout << "TrackingRecHit number = " << hitangle.size() << std::endl; 
 #endif
       std::vector<std::pair<const TrackingRecHit *,float> >::iterator recHitsIter;
       for( recHitsIter=hitangle.begin(); recHitsIter!=hitangle.end(); ++recHitsIter ){
@@ -799,6 +830,7 @@ void AnaObjProducer::produce(edm::Event& e, const edm::EventSetup& es) {
     layer            = tmpAnaClu.layer;
     bwfw             = tmpAnaClu.bwfw;
     rod              = tmpAnaClu.rod;
+    ring             = tmpAnaClu.ring;
     wheel            = tmpAnaClu.wheel;
     extint           = tmpAnaClu.extint;
     string           = tmpAnaClu.string;
@@ -954,6 +986,7 @@ void AnaObjProducer::GetSubDetInfo(StripSubdetector oStripSubdet){
     {
       if(conf_.getParameter<bool>("TID_ON")){
 	TIDDetId oTIDDetId( oStripSubdet);
+	ring    = oTIDDetId.ring();
 	wheel   = oTIDDetId.wheel();
 	bwfw    = oTIDDetId.module()[0];
 
@@ -979,6 +1012,7 @@ void AnaObjProducer::GetSubDetInfo(StripSubdetector oStripSubdet){
     {
       if(conf_.getParameter<bool>("TEC_ON")) {
 	TECDetId oTECDetId( oStripSubdet);
+	ring    = oTECDetId.ring();
 	wheel   = oTECDetId.wheel();
 	bwfw    = oTECDetId.petal()[0];
 

@@ -22,6 +22,7 @@ namespace anaobj {
     int rod;
     int extint;
     int bwfw;
+    int ring;
     int wheel;
     int type;
     int layer;
@@ -96,6 +97,7 @@ namespace anaobj {
       rod          = -99;
       extint       = -99;
       bwfw         = -99;
+      ring         = -99;
       wheel        = -99;
       type         = -99;
       layer        = -99;
