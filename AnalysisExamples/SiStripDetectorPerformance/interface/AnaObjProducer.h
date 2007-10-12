@@ -121,7 +121,7 @@ class AnaObjProducer : public edm::EDProducer
   void GetSubDetInfo(StripSubdetector oStripSubdet);
 
 //  double moduleThickness( const TrackingRecHit* hit );
-  double moduleThickness( const unsigned int detid );
+  std::pair<double, double> moduleThicknessAndPitch( const unsigned int detid );
 
   edm::ParameterSet conf_;
   std::string filename_;
@@ -145,6 +145,7 @@ class AnaObjProducer : public edm::EDProducer
   int      run;                     
   int      event;
   int      eventcounter;
+  int      rawId;
   int      module;
   int      type;
   int      layer;

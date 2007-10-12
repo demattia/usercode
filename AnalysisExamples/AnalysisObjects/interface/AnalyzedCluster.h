@@ -17,6 +17,7 @@ namespace anaobj {
     int run;
     int event;
     int size;
+    int rawId;
     int module;
     int string;
     int rod;
@@ -43,6 +44,7 @@ namespace anaobj {
     float    clusterbarycenter;
     float    clusterseednoise;
     double   thickness;
+    double   pitch;
     std::vector<float> clusterstripnoises;
 
     // Cluster position
@@ -92,6 +94,7 @@ namespace anaobj {
       run          = -99;
       event        = -99;
       size         = -99;
+      rawId        = -99;
       module       = -99;
       string       = -99;
       rod          = -99;

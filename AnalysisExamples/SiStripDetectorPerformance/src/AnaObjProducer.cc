@@ -288,6 +288,7 @@ void AnaObjProducer::produce(edm::Event& e, const edm::EventSetup& es) {
       
       // Initialization
       // --------------
+      rawId            = -99;
       module           = -99;
       type             = -99;
       monostereo       = -99;
@@ -385,10 +386,11 @@ void AnaObjProducer::produce(edm::Event& e, const edm::EventSetup& es) {
       // --------------------
       analyzedCluster.run          = run;
       analyzedCluster.event        = event;
-      analyzedCluster.module           = module;    
-      analyzedCluster.type             = type;      
+      analyzedCluster.rawId           = rawId;
+      analyzedCluster.module           = module;
+      analyzedCluster.type             = type;
       analyzedCluster.monostereo       = monostereo;
-      analyzedCluster.layer            = layer; 
+      analyzedCluster.layer            = layer;
       analyzedCluster.bwfw             = bwfw;
       analyzedCluster.rod              = rod;
       analyzedCluster.ring             = ring;
@@ -406,8 +408,9 @@ void AnaObjProducer::produce(edm::Event& e, const edm::EventSetup& es) {
       analyzedCluster.clustercrosstalk = clustercrosstalk;
       analyzedCluster.geoId            = geoId;
 
-      double thickness = moduleThickness( geoId );
-      analyzedCluster.thickness        = thickness;
+      std::pair<double, double> thickness_and_pitch = moduleThicknessAndPitch( geoId );
+      analyzedCluster.thickness        = thickness_and_pitch.first;
+      analyzedCluster.pitch            = thickness_and_pitch.second;
 
       // Cluster position
       analyzedCluster.LclPos_X = LclPos_X;
@@ -417,7 +420,7 @@ void AnaObjProducer::produce(edm::Event& e, const edm::EventSetup& es) {
       analyzedCluster.GlbPos_Y = GlbPos_Y;
       analyzedCluster.GlbPos_Z = GlbPos_Z;
 
-      analyzedCluster.firstStrip       = firstStrip;
+      analyzedCluster.firstStrip         = firstStrip;
       analyzedCluster.clusterstripnoises = clusterstripnoises;
       analyzedCluster.clusterbarycenter  = clusterbarycenter;
       analyzedCluster.clusterseednoise   = clusterseednoise;
@@ -824,6 +827,7 @@ void AnaObjProducer::produce(edm::Event& e, const edm::EventSetup& es) {
 
     run              = tmpAnaClu.run;
     event            = tmpAnaClu.event;
+    rawId            = tmpAnaClu.rawId;
     module           = tmpAnaClu.module;
     type             = tmpAnaClu.type;
     monostereo       = tmpAnaClu.monostereo;
@@ -959,7 +963,7 @@ void AnaObjProducer::endJob(){
 void AnaObjProducer::GetSubDetInfo(StripSubdetector oStripSubdet){
 
   std::string cSubDet;
-  module     = oStripSubdet.rawId();
+  rawId      = oStripSubdet.rawId();
   type       = oStripSubdet.subdetId();
   monostereo = oStripSubdet.stereo();
 
@@ -976,6 +980,7 @@ void AnaObjProducer::GetSubDetInfo(StripSubdetector oStripSubdet){
 	bwfw    = oTIBDetId.string()[0];
 	extint  = oTIBDetId.string()[1];
 	string  = oTIBDetId.string()[2];
+        module  = oTIBDetId.module();
 
 	nTotClustersTIB++;
 	cSubDet = "TIB";
@@ -989,6 +994,7 @@ void AnaObjProducer::GetSubDetInfo(StripSubdetector oStripSubdet){
 	ring    = oTIDDetId.ring();
 	wheel   = oTIDDetId.wheel();
 	bwfw    = oTIDDetId.module()[0];
+        module  = oTIDDetId.module()[1];
 
 	nTotClustersTID++;
 	cSubDet = "TID";
@@ -1002,6 +1008,7 @@ void AnaObjProducer::GetSubDetInfo(StripSubdetector oStripSubdet){
 	layer   = oTOBDetId.layer();
 	bwfw    = oTOBDetId.rod()[0];
 	rod     = oTOBDetId.rod()[1];
+        module  = oTOBDetId.module();
 
 	nTotClustersTOB++;
 	cSubDet = "TOB";
@@ -1015,6 +1022,7 @@ void AnaObjProducer::GetSubDetInfo(StripSubdetector oStripSubdet){
 	ring    = oTECDetId.ring();
 	wheel   = oTECDetId.wheel();
 	bwfw    = oTECDetId.petal()[0];
+        module  = oTECDetId.module();
 
 	nTotClustersTEC++;
 	cSubDet = "TEC";
@@ -1242,11 +1250,13 @@ double AnaObjProducer::calculateClusterCrossTalk(  const double &rdADC_STRIPL,
 }
 
 // double AnaObjProducer::moduleThickness(const TrackingRecHit* hit)
-double AnaObjProducer::moduleThickness(const uint32_t detid)
+std::pair<double, double> AnaObjProducer::moduleThicknessAndPitch(const uint32_t detid)
 {
   double t=0.;
 
   const GeomDetUnit* it = tracker->idToDetUnit(DetId(detid));
+  // From MTCCNtupleMaker in CMSSW_1_3_5
+  double pitch = ((StripTopology&)it->topology()).pitch();
   //FIXME throw exception (taken from RecoLocalTracker/SiStripClusterizer/src/SiStripNoiseService.cc)
   if (dynamic_cast<const StripGeomDetUnit*>(it)==0 && dynamic_cast<const PixelGeomDetUnit*>(it)==0) {
     cout << "\t\t this detID doesn't seem to belong to the Tracker" << endl;
@@ -1255,5 +1265,5 @@ double AnaObjProducer::moduleThickness(const uint32_t detid)
   }
   //cout << "\t\t thickness = " << t << endl;
 
-  return t;
+  return (std::make_pair( t, pitch ) );
 }
