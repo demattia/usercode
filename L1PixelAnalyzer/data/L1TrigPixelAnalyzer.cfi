@@ -1,0 +1,15 @@
+module L1TrigPixelAna = L1TrigPixelAnalyzer {
+
+  untracked string OutputName = "L1TrigPixelAna.root"
+
+  // Labels for L1Extra digis
+  untracked InputTag l1eCentralJetsSource = fastL1CaloSim:CenJets
+  untracked InputTag l1eForwardJetsSource = fastL1CaloSim:ForJets
+  untracked InputTag l1eTauJetsSource     = fastL1CaloSim:TauJets
+
+  untracked string HiVarName              = "HiVariables"
+  untracked string CaloJetAlgorithm       = "iterativeCone5CaloJets"
+  untracked string JetCorrectionService   = "MCJetCorrectorIcone5"
+
+  untracked string OutputEffFileName         = "Efficiency_file.txt"
+}

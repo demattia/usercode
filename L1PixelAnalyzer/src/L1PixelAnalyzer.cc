@@ -2,6 +2,29 @@
 
 #include "AnalysisExamples/L1PixelAnalyzer/interface/L1PixelAnalyzer.h"
 
+// Add a simple Jet class to allow merging of CenJets and TauJets to be used with the Associator.
+class SimpleJet {
+ public:
+  SimpleJet( double PT, double ETA, double PHI ) {
+    pt_ = PT;
+    eta_ = ETA;
+    phi_ = PHI;
+  }
+  double pt() const {
+    return pt_;
+  }
+  double eta() const {
+    return eta_;
+  }
+  double phi() const {
+    return phi_;
+  }
+ private:
+  double pt_;
+  double eta_;
+  double phi_;
+};
+
 
 //
 // constants, enums and typedefs
@@ -116,6 +139,7 @@ L1PixelAnalyzer::L1PixelAnalyzer(const edm::ParameterSet& iConfig) :
 
   //PixelJet vs GenJets Pt
   PJ_PtRes_ = new TProfile( "PJ_PtRes", "PixelJet vs GenJet Pt", binning, first_bin_et, last_bin_et, first_bin_et, last_bin_et );
+  PJ_L1J_PtRes_ = new TProfile( "PJ_L1J_PtRes", "PixelJet vs L1Jet Pt", binning, first_bin_et, last_bin_et, first_bin_et, last_bin_et );
 
   eventcounter = 0;
 }
@@ -401,6 +425,34 @@ L1PixelAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
     std::cout << "PJ_pt = " << assoc_it->first->pt() << " , GenJet_pt = " << assoc_it->second->pt() << std::endl;
 #endif
   }
+
+  // Create a new collection starting from L1 Calo Central and Tau jets
+  // this is done because tau jets have many fakes and are more numerous than calo central.
+
+  vector<SimpleJet> vec_Jet;
+
+  for ( L1JetParticleCollection::const_iterator cj = l1eCenJets->begin(); cj != l1eCenJets->end(); ++cj ) {
+    vec_Jet.push_back( SimpleJet( cj->et(), cj->eta(), cj->phi() ) );
+  }
+  // Tau jets
+  for (L1JetParticleCollection::const_iterator tj = l1eTauJets->begin(); tj != l1eTauJets->end(); ++tj) {
+    double tjeta = tj->eta();
+// Use a cut in eta, for |eta| > 1.6 the endcaps start (same cut used for pixeljets)
+    if ( fabs(tjeta) < 1.6 ) {
+      vec_Jet.push_back( SimpleJet( tj->et(), tj->eta(), tj->phi() ) );
+    }
+  }
+  Associator<PixelJet, SimpleJet> PJ_L1J_associator( 0.5 );
+  std::auto_ptr<std::map<const PixelJet*, const SimpleJet*> > PJ_L1J_AssocMap( PJ_L1J_associator.Associate( pjs, vec_Jet ) );
+
+
+  std::map<const PixelJet*, const SimpleJet*>::const_iterator PJ_L1J_assoc_it = (*PJ_L1J_AssocMap).begin();
+  for( ; PJ_L1J_assoc_it != (*PJ_L1J_AssocMap).end(); ++PJ_L1J_assoc_it ) {
+    PJ_L1J_PtRes_->Fill( PJ_L1J_assoc_it->first->pt(), PJ_L1J_assoc_it->second->pt() );
+    std::cout << "PJ_pt = " << PJ_L1J_assoc_it->first->pt() << " , SimpleJet_pt = " << PJ_L1J_assoc_it->second->pt() << std::endl;
+  }
+
+  
 
 
 #ifdef THIS_IS_AN_EVENTSETUP_EXAMPLE

@@ -1,9 +1,9 @@
 // -*- C++ -*-
 //
-// Package:    L1PixelAnalyzer
-// Class:      L1PixelAnalyzer
+// Package:    L1TrigPixelAnalyzer
+// Class:      L1TrigPixelAnalyzer
 // 
-/**\class L1PixelAnalyzer L1PixelAnalyzer.cc AnalysisExamples/L1PixelAnalyzer/src/L1PixelAnalyzer.cc
+/**\class L1TrigPixelAnalyzer L1TrigPixelAnalyzer.cc AnalysisExamples/L1TrigPixelAnalyzer/src/L1TrigPixelAnalyzer.cc
 
  Description: <one line class summary>
 
@@ -13,7 +13,7 @@
 //
 // Original Author:  Marco De Mattia
 //         Created:  Tue May  8 13:05:37 CEST 2007
-// $Id: L1PixelAnalyzer.h,v 1.2 2007/07/23 14:57:30 demattia Exp $
+// $Id: L1TrigPixelAnalyzer.h,v 1.2 2007/07/23 14:57:30 demattia Exp $
 //
 //
 
@@ -86,14 +86,18 @@
 // Associator for the jets
 #include "/data/demattia/PJVERTEX_CMSSW/Classes/Associator/Associator.h"
 
+// L1Trigger evaluator
+#include "/data/demattia/PJVERTEX_CMSSW/Classes/L1Trig/L1Trig.C"
+#include "/data/demattia/PJVERTEX_CMSSW/Classes/HiVariables/HiVariables.cc"
+
 //
 // class declaration
 //
 
-class L1PixelAnalyzer : public edm::EDAnalyzer {
+class L1TrigPixelAnalyzer : public edm::EDAnalyzer {
  public:
-  explicit L1PixelAnalyzer(const edm::ParameterSet&);
-  ~L1PixelAnalyzer();
+  explicit L1TrigPixelAnalyzer(const edm::ParameterSet&);
+  ~L1TrigPixelAnalyzer();
 
 
  private:
@@ -101,67 +105,33 @@ class L1PixelAnalyzer : public edm::EDAnalyzer {
   virtual void analyze(const edm::Event&, const edm::EventSetup&);
   virtual void endJob() ;
 
-  int eventcounter;
+  int eventcounter_;
+
+  // Declare as static so that only one exists, even if more
+  // than one L1TrigPixelAnalyzer object is created
+  static L1Trig L1Trigger;
 
   edm::ParameterSet conf_;
   TFile* OutputFile;
 
-  TH1F* L1ExtraCenJetsEt_;
-  TH1F* L1ExtraCenJetsEta_;
-  TH1F* L1ExtraCenJetsPhi_;
+  // Declare here, since it does not have a default constructor
+  // it will be initialized with an initialization list ( in
+  // the L1TrigPixelAnalyzer constructor ).
+  //  HiVariables HiVar;
 
-  TH1F* L1ExtraForJetsEt_;
-  TH1F* L1ExtraForJetsEta_;
-  TH1F* L1ExtraForJetsPhi_;
+  // Use a dynamic construction, or the TFile problem will crash the job
+  // when moving from one input file to another.
+  // The histograms must be created after the TFile is opened.
+  HiVariables * HiVar;
 
-  TH1F* L1ExtraTauJetsEt_;
-  TH1F* L1ExtraTauJetsEta_;
-  TH1F* L1ExtraTauJetsPhi_;
+  std::string CaloJetAlgorithm, JetCorrectionService;
+  std::string OutputEffFileName;
 
-  TH1F* L1ExtraIsoEmEt_;
-  TH1F* L1ExtraIsoEmEta_;
-  TH1F* L1ExtraIsoEmPhi_;
+  TH1F * uncorr_JetPt_IC5_;
+  TH1F * corr_JetPt_IC5_;
+  TH1F * JetNumber_IC5_;
 
-  TH1F* L1ExtraNonIsoEmEt_;
-  TH1F* L1ExtraNonIsoEmEta_;
-  TH1F* L1ExtraNonIsoEmPhi_;
-
-  TH1F* L1ExtraEtMiss_;
-  TH1F* L1ExtraEtMissPhi_;
-  TH1F* L1ExtraEtTotal_;
-  TH1F* L1ExtraEtHad_;
-
-  TH1F* PixelTrack_P_X_;
-  TH1F* PixelTrack_P_Y_;
-  TH1F* PixelTrack_P_Z_;
-  TH1F* PixelTrack_Pt_;
-  TH1F* PixelTrack_Eta_;
-  TH1F* PixelTrack_Phi_;
-  TH1F* PixelTrack_Charge_;
-  TH1F* PixelTrack_Chi2_;
-  TH1F* PixelTrack_Zip_;
-  TH1F* PixelTrack_Tip_;
-  TH1F* PixelTrack_Vertex_X_; 
-  TH1F* PixelTrack_Vertex_Y_; 
-  TH1F* PixelTrack_Vertex_Z_; 
-
-  TH1F* PixelHit_X_;
-  TH1F* PixelHit_Y_;
-  TH1F* PixelHit_Z_;
-  TH2F* PixelHit_XY_;
-
-  TH1F* PixelJet_Pt_;
-  TH1F* PixelJet_Eta_;
-  TH1F* PixelJet_Phi_;
-  TH1F* PixelJet_NumTk_;
-  TH1F* PixelJet_Vertex_Z_; 
-
-  TH1F* GenJet_Pt_;
-  TH1F* GenJet_Eta_;
-  TH1F* GenJet_Phi_;
-
-  TProfile* PJ_PtRes_;
-  TProfile* PJ_L1J_PtRes_;
+  int Eff_;
 
   // ----------member data ---------------------------
 };
