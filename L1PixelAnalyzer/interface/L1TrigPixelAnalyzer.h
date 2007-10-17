@@ -8,7 +8,18 @@
  Description: <one line class summary>
 
  Implementation:
-     <Notes on implementation>
+ This class shows how to access:
+ - level 1 calorimetric quantities
+ - offline corrected jets (calibration performed here)
+ - offline corrected MET, depending on jets corrections
+ - MC informations         <---------------------------------- to do
+ - B tagging               <---------------------------------- to do
+
+ Evaluates:
+ - DPhimin between MET and closest (in phi) offline jet
+ - association of MC partons to offline jets            <----- to do
+ - association of btags to offline jets                 <----- to do
+
 */
 //
 // Original Author:  Marco De Mattia
@@ -105,6 +116,8 @@ class L1TrigPixelAnalyzer : public edm::EDAnalyzer {
   virtual void analyze(const edm::Event&, const edm::EventSetup&);
   virtual void endJob() ;
 
+//   double PI_;
+
   int eventcounter_;
 
   // Declare as static so that only one exists, even if more
@@ -124,12 +137,20 @@ class L1TrigPixelAnalyzer : public edm::EDAnalyzer {
   // The histograms must be created after the TFile is opened.
   HiVariables * HiVar;
 
-  std::string CaloJetAlgorithm, JetCorrectionService;
+  std::string CaloJetAlgorithm, JetCorrectionService, METCollection;
+  std::string genParticleCandidates;
   std::string OutputEffFileName;
 
   TH1F * uncorr_JetPt_IC5_;
   TH1F * corr_JetPt_IC5_;
   TH1F * JetNumber_IC5_;
+
+  TH1F * MEt_CorrIC5_Pt_;
+  TH1F * MEt_CorrIC5_Phi_;
+  TH1F * MEt_CorrIC5_SumEt_;
+  TH1F * MEt_CorrIC5_mEtSig_;
+
+  TH1F * DPhimin_;
 
   int Eff_;
 

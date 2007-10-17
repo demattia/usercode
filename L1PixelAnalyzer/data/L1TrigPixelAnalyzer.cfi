@@ -11,5 +11,11 @@ module L1TrigPixelAna = L1TrigPixelAnalyzer {
   untracked string CaloJetAlgorithm       = "iterativeCone5CaloJets"
   untracked string JetCorrectionService   = "MCJetCorrectorIcone5"
 
+  untracked string genParticleCandidates   = "genParticleCandidates"
+
+  //  untracked string METCollection          = "met"
+  // Corrected MET using IC5 jets corrected with MCJets.
+  untracked string METCollection          = "corMetType1Icone5"
+
   untracked string OutputEffFileName         = "Efficiency_file.txt"
 }
