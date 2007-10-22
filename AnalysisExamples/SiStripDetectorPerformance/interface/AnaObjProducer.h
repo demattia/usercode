@@ -205,6 +205,8 @@ class AnaObjProducer : public edm::EDProducer
   const std::vector<short> * rawDigiAmplitudesR_ptr_;
 
   // Tracking particle quantities
+  float    trackingparticleE;
+  float    trackingparticleEt;
   float    trackingparticleP;
   float    trackingparticlePt;
   float    trackingparticleEta;
@@ -218,6 +220,15 @@ class AnaObjProducer : public edm::EDProducer
   float vy;
   float vz;
   float outerPt;
+  float innermostPoint_X;
+  float innermostPoint_Y;
+  float innermostPoint_Z;
+  float outermostPoint_X;
+  float outermostPoint_Y;
+  float outermostPoint_Z;
+  int   nrprojectedHits;
+  int   nrmatchedHits;
+  int   nrsingleHits;
   short found;
   short lost;
 

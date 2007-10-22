@@ -50,16 +50,30 @@ class TrackLocalAngleTIF
   typedef std::vector<std::pair<const TrackingRecHit *, float> > HitAngleAssociation;
   typedef std::vector<std::pair<const TrackingRecHit *, LocalVector > > HitLclDirAssociation;
   typedef std::vector<std::pair<const TrackingRecHit *, GlobalVector> > HitGlbDirAssociation;
+  typedef std::vector<std::pair<const TrackingRecHit *, LocalPoint > > LclPosAssociation;
+  typedef std::vector<std::pair<int, int > > HitValidationAssociation;
   
  private:
 
   std::auto_ptr<HitAngleAssociation> oXZHitAngle;
   std::auto_ptr<HitAngleAssociation> oYZHitAngle;
+  std::auto_ptr<HitAngleAssociation> oTrackLocalPitch;
 
   std::auto_ptr<HitLclDirAssociation> oLocalDir;
   std::auto_ptr<HitGlbDirAssociation> oGlobalDir;
 
+  std::auto_ptr<LclPosAssociation> oLocalHitPos;
+  std::auto_ptr<LclPosAssociation> oLocalTrackPos;
+
   std::auto_ptr<HitAngleAssociation> Hit3DAngle;
+  std::auto_ptr<HitAngleAssociation> HitPhiAngle;
+
+  std::auto_ptr<HitValidationAssociation> HitValidation;
+  std::auto_ptr<HitAngleAssociation> HitType;
+
+  int numberProjectedRecHits;
+  int numberMatchedRecHits;
+  int numberSingleRecHits;
 
   const TrackerGeometry * _tracker;
   reco::TrackInfo::TrajectoryInfo::const_iterator _tkinfoiter;
@@ -72,6 +86,8 @@ class TrackLocalAngleTIF
   void init ( const edm::EventSetup& es  );
 
   std::vector<std::pair<const TrackingRecHit*,float> > SeparateHits(reco::TrackInfoRef & trackinforef);
+
+  LocalPoint project(const GeomDet *det,const GeomDet* projdet,LocalPoint position,LocalVector trackdirection)const;
 
 /*   inline HitAngleAssociation getXZHitAngle() const throw() {  */
 /*     return (oXZHitAngle); } */
@@ -90,14 +106,35 @@ class TrackLocalAngleTIF
     return oXZHitAngle; }
   inline std::auto_ptr<HitAngleAssociation> getYZHitAngle() { 
     return (oYZHitAngle); }
+  inline std::auto_ptr<HitAngleAssociation> getTrackLocalPitch() { 
+    return (oTrackLocalPitch); }
 
   inline std::auto_ptr<HitLclDirAssociation> getLocalDir() {
     return (oLocalDir); }
   inline std::auto_ptr<HitGlbDirAssociation> getGlobalDir() {
     return (oGlobalDir); }
 
+  inline std::auto_ptr<LclPosAssociation> getLocalHitPos() {
+    return (oLocalHitPos); }
+  inline std::auto_ptr<LclPosAssociation> getLocalTrackPos() {
+    return (oLocalTrackPos); }
+
   inline std::auto_ptr<HitAngleAssociation> getHit3DAngle() {
     return (Hit3DAngle); }
+  inline std::auto_ptr<HitAngleAssociation> getHitPhiAngle() {
+    return (HitPhiAngle); }
+
+  inline std::auto_ptr<HitValidationAssociation> getHitValidation() {
+    return (HitValidation); }
+  inline std::auto_ptr<HitAngleAssociation> getHitType() { 
+    return HitType; }
+
+  inline int getNrProjectedRecHits() {
+    return numberProjectedRecHits; }
+  inline int getNrMatchedRecHits() {
+    return numberMatchedRecHits; }
+  inline int getNrSingleRecHits() {
+    return numberSingleRecHits; }
 };
 
 

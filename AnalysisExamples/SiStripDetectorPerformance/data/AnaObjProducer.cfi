@@ -16,7 +16,7 @@ module modAnaObjProducer = AnaObjProducer {
 
 // This uses all the information (also the rechits)
 // Set updatedState to combinedState to exclude rechits (usefull to evaluate pulls and residuals)
-InputTag TrackInfoLabel=trackinfo:updatedState
+InputTag TrackInfoLabel=trackinfo:combinedState
 
   // Objects Labels
   string TracksLabel = "cosmictrackfinder"

@@ -478,22 +478,28 @@ void AnaObjProducer::produce(edm::Event& e, const edm::EventSetup& es) {
       ++nTrackNum;
       ++trackcounter;  // only count processed tracks (not tracks->size())
 
-      momentum     = trackIter->p();
-      pt           = trackIter->pt();
-      charge       = trackIter->charge();
-      eta          = trackIter->eta();
-      phi          = trackIter->phi();
-      hitspertrack = trackIter->recHitsSize();
-      normchi2     = trackIter->normalizedChi2();
-      chi2         = trackIter->chi2();
-      ndof         = trackIter->ndof();
-      d0           = trackIter->d0();
-      vx           = trackIter->vx();
-      vy           = trackIter->vy();
-      vz           = trackIter->vz();
-      outerPt      = trackIter->outerPt();
-      found        = trackIter->found();
-      lost         = trackIter->lost();
+      momentum         = trackIter->p();
+      pt               = trackIter->pt();
+      charge           = trackIter->charge();
+      eta              = trackIter->eta();
+      phi              = trackIter->phi();
+      hitspertrack     = trackIter->recHitsSize();
+      normchi2         = trackIter->normalizedChi2();
+      chi2             = trackIter->chi2();
+      ndof             = trackIter->ndof();
+      d0               = trackIter->d0();
+      vx               = trackIter->vx();
+      vy               = trackIter->vy();
+      vz               = trackIter->vz();
+      outerPt          = trackIter->outerPt();
+      innermostPoint_X = trackIter->innerPosition().x();
+      innermostPoint_Y = trackIter->innerPosition().y();
+      innermostPoint_Z = trackIter->innerPosition().z();
+      outermostPoint_X = trackIter->outerPosition().x();
+      outermostPoint_Y = trackIter->outerPosition().y();
+      outermostPoint_Z = trackIter->outerPosition().z();
+      found            = trackIter->found();
+      lost             = trackIter->lost();
 
       // Set the id here, so that tk_id = 0 if not on track
       //                            and > 0 for track index
@@ -523,12 +529,14 @@ void AnaObjProducer::produce(edm::Event& e, const edm::EventSetup& es) {
 	       it != myTrackingParticleRefMap1.end(); ++it) {
 	    TrackingParticleRef tpr = it->first;
 
-	    trackingparticleP = tpr->p();
-	    trackingparticlePt = tpr->pt();
-	    trackingparticleEta = tpr->eta();
-	    trackingparticlePhi = tpr->phi();
+	    trackingparticleE         = tpr->energy();
+	    trackingparticleEt        = tpr->et();
+	    trackingparticleP         = tpr->p();
+	    trackingparticlePt        = tpr->pt();
+	    trackingparticleEta       = tpr->eta();
+	    trackingparticlePhi       = tpr->phi();
 	    trackingparticleAssocChi2 = it->second;
-	    trackingparticlepdgId = tpr->pdgId();
+	    trackingparticlepdgId     = tpr->pdgId();
 
 	    // Loop on simtracks
 	    TrackingParticle::g4t_iterator g4T = tpr->g4Track_begin();
@@ -572,14 +580,29 @@ void AnaObjProducer::produce(edm::Event& e, const edm::EventSetup& es) {
       std::auto_ptr<std::vector<std::pair<const TrackingRecHit *,float> > > hitangleXZ;
       std::auto_ptr<std::vector<std::pair<const TrackingRecHit *,float> > > hitangleYZ;
       std::auto_ptr<std::vector<std::pair<const TrackingRecHit *,float> > > hit3dangle;
+      std::auto_ptr<std::vector<std::pair<const TrackingRecHit *,float> > > hitphiangle;
       std::auto_ptr<std::vector<std::pair<const TrackingRecHit *,LocalVector> > > hitLclVector;
       std::auto_ptr<std::vector<std::pair<const TrackingRecHit *,GlobalVector> > > hitGlbVector;
-      hitangle   = Anglefinder->SeparateHits(trackinforef);
-      hitangleXZ = Anglefinder->getXZHitAngle();
-      hitangleYZ = Anglefinder->getYZHitAngle();
-      hit3dangle = Anglefinder->getHit3DAngle();
-      hitLclVector = Anglefinder->getLocalDir();
-      hitGlbVector = Anglefinder->getGlobalDir();
+      std::auto_ptr<std::vector<std::pair<const TrackingRecHit *,LocalPoint> > > hitLclPoint;
+      std::auto_ptr<std::vector<std::pair<const TrackingRecHit *,LocalPoint> > > trackLclPoint;
+      std::auto_ptr<std::vector<std::pair<const TrackingRecHit *,float> > > trackLclPitch;
+      std::auto_ptr<std::vector<std::pair<const TrackingRecHit *,float> > > hittype;
+      std::auto_ptr<std::vector<std::pair<int ,int > > > hitValidation;
+      hitangle        = Anglefinder->SeparateHits(trackinforef);
+      hitangleXZ      = Anglefinder->getXZHitAngle();
+      hitangleYZ      = Anglefinder->getYZHitAngle();
+      hit3dangle      = Anglefinder->getHit3DAngle();
+      hitphiangle     = Anglefinder->getHitPhiAngle();
+      hitLclVector    = Anglefinder->getLocalDir();
+      hitGlbVector    = Anglefinder->getGlobalDir();
+      hitLclPoint     = Anglefinder->getLocalHitPos();
+      trackLclPoint   = Anglefinder->getLocalTrackPos();
+      trackLclPitch   = Anglefinder->getTrackLocalPitch();
+      hittype         = Anglefinder->getHitType();
+      hitValidation   = Anglefinder->getHitValidation();
+      nrprojectedHits = Anglefinder->getNrProjectedRecHits();
+      nrmatchedHits   = Anglefinder->getNrMatchedRecHits();
+      nrsingleHits    = Anglefinder->getNrSingleRecHits();
 
       int nHitNum = 0;
       // Loop on hits belonging to this track
@@ -594,8 +617,13 @@ void AnaObjProducer::produce(edm::Event& e, const edm::EventSetup& es) {
 	std::pair<const TrackingRecHit*, float> hitAngleXZ( (*hitangleXZ)[nHitNum] );
 	std::pair<const TrackingRecHit*, float> hitAngleYZ( (*hitangleYZ)[nHitNum] );
 	std::pair<const TrackingRecHit*, float> hitAngle3D( (*hit3dangle)[nHitNum] );
-	std::pair<const TrackingRecHit *, LocalVector> hitLclDir( (*hitLclVector)[nHitNum] );
-	std::pair<const TrackingRecHit *, GlobalVector> hitGlbDir( (*hitGlbVector)[nHitNum] );
+	std::pair<const TrackingRecHit*, float> hitAnglePhi( (*hitphiangle)[nHitNum] );
+	std::pair<const TrackingRecHit*, LocalVector> hitLclDir( (*hitLclVector)[nHitNum] );
+	std::pair<const TrackingRecHit*, GlobalVector> hitGlbDir( (*hitGlbVector)[nHitNum] );
+	std::pair<const TrackingRecHit*, LocalPoint> hitLclPos( (*hitLclPoint)[nHitNum] );
+	std::pair<const TrackingRecHit*, LocalPoint> trackLclPos( (*trackLclPoint)[nHitNum] );
+	std::pair<const TrackingRecHit*, float> trackLclPit( (*trackLclPitch)[nHitNum] );
+	std::pair<const TrackingRecHit*, float> hitType( (*hittype)[nHitNum] );
 
 
 	// Taking the hits previously separated by TrackLocalAngleTIF
@@ -639,10 +667,11 @@ void AnaObjProducer::produce(edm::Event& e, const edm::EventSetup& es) {
 	    ++nHitNum;
 	    clusterTKcounter++;
 
-	    float angle = recHitsIter->second;
-	    float angleXZ = hitAngleXZ.second;
-	    float angleYZ = hitAngleYZ.second;
-	    float angle3D = hitAngle3D.second;
+	    float angle    = recHitsIter->second;
+	    float angleXZ  = hitAngleXZ.second;
+	    float angleYZ  = hitAngleYZ.second;
+	    float angle3D  = hitAngle3D.second;
+	    float anglePhi = hitAnglePhi.second;
 
 	    float LclDir_X = hitLclDir.second.x();
 	    float LclDir_Y = hitLclDir.second.y();
@@ -651,6 +680,59 @@ void AnaObjProducer::produce(edm::Event& e, const edm::EventSetup& es) {
 	    float GlbDir_X = hitGlbDir.second.x();
 	    float GlbDir_Y = hitGlbDir.second.y();
 	    float GlbDir_Z = hitGlbDir.second.z();
+
+	    float TrackLclPitch = trackLclPit.second;
+	    int   HitType       = (int)hitType.second;
+
+	    DetId detectorId = DetId(hit->geographicalId());
+	    int subdetid = detectorId.subdetId();
+
+	    float HitLclPos_X = -9999;
+	    float HitLclPos_Y = -9999;
+	    float HitLclPos_Z = -9999;
+
+	    float TrackLclPos_X = -9999;
+	    float TrackLclPos_Y = -9999;
+	    float TrackLclPos_Z = -9999;
+
+	    if (subdetid==3 || subdetid==5) // this is for TIB or TOB (in local frame)
+	      {
+		HitLclPos_X = hitLclPos.second.x();
+		HitLclPos_Y = hitLclPos.second.y();
+		HitLclPos_Z = hitLclPos.second.z();
+
+		TrackLclPos_X = trackLclPos.second.x();
+		TrackLclPos_Y = trackLclPos.second.y();
+		TrackLclPos_Z = trackLclPos.second.z();
+	      }
+	    else if (subdetid==4 || subdetid==6) // this if for TID or TEC (in measurement frame)
+	      {
+		const StripGeomDetUnit*  theStripDet = dynamic_cast<const StripGeomDetUnit*>( (tracker->idToDet(detectorId)) );
+		if (theStripDet)
+		  {
+		    const StripTopology* theStripTopol = dynamic_cast<const StripTopology*>( &(theStripDet->specificTopology()) );
+		    MeasurementPoint measposition      = theStripTopol->measurementPosition(hitLclPos.second);
+		    MeasurementPoint measstateposition = theStripTopol->measurementPosition(trackLclPos.second);
+
+		    HitLclPos_X = measposition.x();
+		    HitLclPos_Y = measposition.y();
+		    HitLclPos_Z = -9999; // z is not available for a measurement point
+
+		    TrackLclPos_X = measstateposition.x();
+		    TrackLclPos_Y = measstateposition.y();
+		    TrackLclPos_Z = -9999; // z is not available for a measurement point
+		  }
+		else
+		  {
+		    HitLclPos_X = -9999;
+		    HitLclPos_Y = -9999;
+		    HitLclPos_Z = -9999;
+
+		    TrackLclPos_X = -9999;
+		    TrackLclPos_Y = -9999;
+		    TrackLclPos_Z = -9999;
+		  }
+	      }
 
 	    // Local Magnetic Field
 	    // --------------------
@@ -732,6 +814,16 @@ void AnaObjProducer::produce(edm::Event& e, const edm::EventSetup& es) {
 	    tmpAnaClu->GlbDir_Y.insert( make_pair( tk_id, GlbDir_Y ) );
 	    tmpAnaClu->GlbDir_Z.insert( make_pair( tk_id, GlbDir_Z ) );
 
+	    tmpAnaClu->HitLclPos_X.insert( make_pair( tk_id, HitLclPos_X ) );
+	    tmpAnaClu->HitLclPos_Y.insert( make_pair( tk_id, HitLclPos_Y ) );
+	    tmpAnaClu->HitLclPos_Z.insert( make_pair( tk_id, HitLclPos_Z ) );
+	    tmpAnaClu->TrackLclPos_X.insert( make_pair( tk_id, TrackLclPos_X ) );
+	    tmpAnaClu->TrackLclPos_Y.insert( make_pair( tk_id, TrackLclPos_Y ) );
+	    tmpAnaClu->TrackLclPos_Z.insert( make_pair( tk_id, TrackLclPos_Z ) );
+
+	    tmpAnaClu->TrackLclPitch.insert( make_pair( tk_id, TrackLclPitch ) );
+	    tmpAnaClu->HitType.insert( make_pair( tk_id, HitType ) );
+
 	    tmpAnaClu->tk_id.push_back( tk_id );
 
 	    tmpAnaClu->tk_phi.insert( make_pair( tk_id, tk_phi) );
@@ -742,6 +834,7 @@ void AnaObjProducer::produce(edm::Event& e, const edm::EventSetup& es) {
 	    tmpAnaClu->angleXZ.insert( make_pair( tk_id, angleXZ) );
 	    tmpAnaClu->angleYZ.insert( make_pair( tk_id, angleYZ) );
 	    tmpAnaClu->angle3D.insert( make_pair( tk_id, angle3D) );
+	    tmpAnaClu->anglePhi.insert( make_pair( tk_id, anglePhi) );
 
 	    tmpAnaClu->stereocorrection.insert( make_pair( tk_id, stereocorrection ) );
 	    tmpAnaClu->localmagfield.insert( make_pair( tk_id, localmagfield ) );
@@ -775,31 +868,43 @@ void AnaObjProducer::produce(edm::Event& e, const edm::EventSetup& es) {
       
       // Fill AnalyzedTrack
       // ------------------
-      analyzedTrack.momentum     = momentum;
-      analyzedTrack.pt           = pt;
-      analyzedTrack.charge       = charge;
-      analyzedTrack.eta          = eta;
-      analyzedTrack.phi          = phi;
-      analyzedTrack.hitspertrack = hitspertrack;
-      analyzedTrack.normchi2     = normchi2;
-      analyzedTrack.chi2         = chi2;
-      analyzedTrack.ndof         = ndof;
-      analyzedTrack.d0           = d0;
-      analyzedTrack.vx           = vx;
-      analyzedTrack.vy           = vy;
-      analyzedTrack.vz           = vz;
-      analyzedTrack.outerPt      = outerPt;
-      analyzedTrack.tk_id        = tk_id;
-      analyzedTrack.found        = found;
-      analyzedTrack.lost         = lost;
+      analyzedTrack.momentum           = momentum;
+      analyzedTrack.pt                 = pt;
+      analyzedTrack.charge             = charge;
+      analyzedTrack.eta                = eta;
+      analyzedTrack.phi                = phi;
+      analyzedTrack.hitspertrack       = hitspertrack;
+      analyzedTrack.normchi2           = normchi2;
+      analyzedTrack.chi2               = chi2;
+      analyzedTrack.ndof               = ndof;
+      analyzedTrack.d0                 = d0;
+      analyzedTrack.vx                 = vx;
+      analyzedTrack.vy                 = vy;
+      analyzedTrack.vz                 = vz;
+      analyzedTrack.outerPt            = outerPt;
+      analyzedTrack.innermostPoint_X   = innermostPoint_X;
+      analyzedTrack.innermostPoint_Y   = innermostPoint_Y;
+      analyzedTrack.innermostPoint_Z   = innermostPoint_Z;
+      analyzedTrack.outermostPoint_X   = outermostPoint_X;
+      analyzedTrack.outermostPoint_Y   = outermostPoint_Y;
+      analyzedTrack.outermostPoint_Z   = outermostPoint_Z;
+      analyzedTrack.nrProjectedRecHits = nrprojectedHits;
+      analyzedTrack.nrMatchedRecHits   = nrmatchedHits;
+      analyzedTrack.nrSingleRecHits    = nrsingleHits;
+      analyzedTrack.tk_id              = tk_id;
+      analyzedTrack.found              = found;
+      analyzedTrack.lost               = lost;
+      analyzedTrack.hitvalidation      = *hitValidation;
 
 #ifdef SIM
-      analyzedTrack.simP = trackingparticleP;
-      analyzedTrack.simPt = trackingparticlePt;
-      analyzedTrack.simEta = trackingparticleEta;
-      analyzedTrack.simPhi = trackingparticlePhi;
+      analyzedTrack.simE         = trackingparticleE;
+      analyzedTrack.simEt        = trackingparticleEt;
+      analyzedTrack.simP         = trackingparticleP;
+      analyzedTrack.simPt        = trackingparticlePt;
+      analyzedTrack.simEta       = trackingparticleEta;
+      analyzedTrack.simPhi       = trackingparticlePhi;
       analyzedTrack.simAssocChi2 = trackingparticleAssocChi2;
-      analyzedTrack.simpdgId = trackingparticlepdgId;
+      analyzedTrack.simpdgId     = trackingparticlepdgId;
 #endif
 
       v_anatk_ptr->push_back(analyzedTrack);
@@ -914,19 +1019,28 @@ void AnaObjProducer::produce(edm::Event& e, const edm::EventSetup& es) {
     
     AnalyzedTrack tmpAnaTrk = (*v_anatk_ptr)[AnaTrkIter];
 
-    momentum     = tmpAnaTrk.momentum;
-    pt           = tmpAnaTrk.pt;
-    charge       = tmpAnaTrk.charge;
-    eta          = tmpAnaTrk.eta;
-    phi          = tmpAnaTrk.phi;
-    hitspertrack = tmpAnaTrk.hitspertrack;
-    normchi2     = tmpAnaTrk.normchi2;
-    ndof         = tmpAnaTrk.ndof;
-    d0           = tmpAnaTrk.d0;
-    vx           = tmpAnaTrk.vx;
-    vy           = tmpAnaTrk.vy;
-    vz           = tmpAnaTrk.vz;
-    outerPt      = tmpAnaTrk.outerPt;
+    momentum         = tmpAnaTrk.momentum;
+    pt               = tmpAnaTrk.pt;
+    charge           = tmpAnaTrk.charge;
+    eta              = tmpAnaTrk.eta;
+    phi              = tmpAnaTrk.phi;
+    hitspertrack     = tmpAnaTrk.hitspertrack;
+    normchi2         = tmpAnaTrk.normchi2;
+    ndof             = tmpAnaTrk.ndof;
+    d0               = tmpAnaTrk.d0;
+    vx               = tmpAnaTrk.vx;
+    vy               = tmpAnaTrk.vy;
+    vz               = tmpAnaTrk.vz;
+    outerPt          = tmpAnaTrk.outerPt;
+    innermostPoint_X = tmpAnaTrk.innermostPoint_X;
+    innermostPoint_Y = tmpAnaTrk.innermostPoint_Y;
+    innermostPoint_Z = tmpAnaTrk.innermostPoint_Z;
+    outermostPoint_X = tmpAnaTrk.outermostPoint_X;
+    outermostPoint_Y = tmpAnaTrk.outermostPoint_Y;
+    outermostPoint_Z = tmpAnaTrk.outermostPoint_Z;
+    nrprojectedHits  = tmpAnaTrk.nrProjectedRecHits;
+    nrmatchedHits    = tmpAnaTrk.nrMatchedRecHits;
+    nrsingleHits     = tmpAnaTrk.nrSingleRecHits;
   }
 
   // Fill the event with the analyzed objects collections
