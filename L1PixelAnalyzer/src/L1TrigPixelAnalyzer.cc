@@ -5,6 +5,7 @@
 #include "/data/demattia/PJVERTEX_CMSSW/Classes/SimpleJet/SimpleJet.h"
 #include "/data/demattia/PJVERTEX_CMSSW/Classes/Associator/Associator.h"
 #include "/data/demattia/PJVERTEX_CMSSW/Classes/DeltaPhi/DeltaPhi.h"
+#include "/data/demattia/PJVERTEX_CMSSW/Classes/L1PixelTrig/L1PixelTrig.h"
 
 // For the offline jets and corrections
 #include "DataFormats/JetReco/interface/CaloJetCollection.h"
@@ -229,12 +230,19 @@ L1TrigPixelAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
     mother_3 = &*Mothers;
   }
 
+  std::vector<const Candidate*> vec_Partons;
   int counter = 0;
   ofstream Partons( "Partons.txt", ios::app );
   Partons << std::endl;
   for( CandidateCollection::const_iterator MCp = MCpartons->begin()+8; MCp != MCpartons->end(); ++MCp, ++counter ) {
     const Candidate* temp_mother = MCp->mother();
     if ( temp_mother != 0 ) {
+
+      // Store the status = 3 partons
+      if ( MCp->status() == 3 ) {
+        vec_Partons.push_back( &*MCp );
+      }
+
       if ( MCp->status() == 3 && ( temp_mother == mother_1 || temp_mother == mother_2 || temp_mother == mother_3 ) ){
 #ifdef DEBUG
         std::cout << "For parton number = " << counter << std::endl;
@@ -260,6 +268,31 @@ L1TrigPixelAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
     }
   }
   Partons.close();
+
+  // Reverse the Partons, this we start from the last and we can exclude the mothers
+  reverse( vec_Partons.begin(), vec_Partons.end() );
+
+  vector<const Candidate*> vec_Mothers;
+  for( vector<const Candidate*>::const_iterator Par_it = vec_Partons.begin(); Par_it != vec_Partons.end(); ++Par_it ) {
+
+    vec_Mothers.push_back( (*Par_it)->mother() );
+
+  }
+
+  // Pixel jets
+  edm::Handle<PixelJetCollection> pixeljetshandle;
+  edm::InputTag PixelJetsLabel = conf_.getUntrackedParameter<edm::InputTag>("PixelJetSource");
+  iEvent.getByLabel(PixelJetsLabel, pixeljetshandle);
+
+  const PixelJetCollection pixeljets = *(pixeljetshandle.product());
+
+  // Pixel trigger requiring at least 5 pixel jets coming from the primary vertex
+  // (constructed from pixel jets, and taken as the vertex with the highest ptsum)
+  L1PixelTrig<PixelJet> PJtrig(2);
+
+  PJtrig.Fill( pixeljets );
+
+  std::cout << "Pixel trigger response = " << PJtrig.Response() << std::endl;
 
 #ifdef THIS_IS_AN_EVENTSETUP_EXAMPLE
       ESHandle<SetupData> pSetup;

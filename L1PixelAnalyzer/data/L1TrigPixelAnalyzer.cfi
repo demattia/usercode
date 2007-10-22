@@ -17,5 +17,8 @@ module L1TrigPixelAna = L1TrigPixelAnalyzer {
   // Corrected MET using IC5 jets corrected with MCJets.
   untracked string METCollection          = "corMetType1Icone5"
 
+  // Label for PixelJets
+  untracked InputTag PixelJetSource       = PixelJetFinder:PixelJets
+
   untracked string OutputEffFileName         = "Efficiency_file.txt"
 }
