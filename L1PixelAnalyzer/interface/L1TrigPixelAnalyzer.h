@@ -30,6 +30,7 @@
 
 // system include files
 #include <memory>
+#include <vector>
 
 // user include files
 #include "FWCore/Framework/interface/Frameworkfwd.h"
@@ -95,11 +96,12 @@
 #include "DataFormats/JetReco/interface/GenJet.h"
 
 // Associator for the jets
-#include "/data/demattia/PJVERTEX_CMSSW/Classes/Associator/Associator.h"
+#include "../../PJVERTEX_CMSSW/Classes/Associator/Associator.h"
 
 // L1Trigger evaluator
-#include "/data/demattia/PJVERTEX_CMSSW/Classes/L1Trig/L1Trig.C"
-#include "/data/demattia/PJVERTEX_CMSSW/Classes/HiVariables/HiVariables.cc"
+#include "../../PJVERTEX_CMSSW/Classes/L1Trig/L1Trig.C"
+#include "../../PJVERTEX_CMSSW/Classes/HiVariables/HiVariables.cc"
+#include "../../PJVERTEX_CMSSW/Classes/MultiTH1F/MultiTH1F.h"
 
 //
 // class declaration
@@ -139,6 +141,7 @@ class L1TrigPixelAnalyzer : public edm::EDAnalyzer {
 
   std::string CaloJetAlgorithm, JetCorrectionService, METCollection;
   std::string genParticleCandidates;
+  unsigned int numTkCut;
   std::string OutputEffFileName;
 
   TH1F * uncorr_JetPt_IC5_;
@@ -150,9 +153,60 @@ class L1TrigPixelAnalyzer : public edm::EDAnalyzer {
   TH1F * MEt_CorrIC5_SumEt_;
   TH1F * MEt_CorrIC5_mEtSig_;
 
+  TH1F * PixelJet_dz_;
+  TH1F * PixelJet_Num_;
+  TH1F * PixelJet_Track_Num_;
+
+  std::vector<TH1F *> Vertex_Dz_;
+  std::vector<TH1F *> Vertex_Num_;
+  std::vector<TH1F *> Prim_Second_Vertex_Dz_;
+
+  std::vector<TH1F *> PrimVNum_;
+  std::vector<TH1F *> PrimVPt_;
+  std::vector<TH1F *> PrimVEta_;
+  std::vector<TH1F *> PrimVPhi_;
+
+  std::vector<TH1F *> SecVNum_;
+  std::vector<TH1F *> SecVPt_;
+  std::vector<TH1F *> SecVEta_;
+  std::vector<TH1F *> SecVPhi_;
+
+  std::vector<TH1F *> AllSecVNum_;
+  std::vector<TH1F *> AllSecVPt_;
+  std::vector<TH1F *> AllSecVEta_;
+  std::vector<TH1F *> AllSecVPhi_;
+
+  // Means
+  TH1F * Vertex_Dz_Mean_;
+  TH1F * Vertex_Num_Mean_;
+  TH1F * Prim_Second_Vertex_Dz_Mean_;
+
+  MultiTH1F * Multi_Vertex_Dz_;
+
+  TH1F * PrimVNum_Mean_;
+  TH1F * PrimVPt_Mean_;
+  TH1F * PrimVEta_Mean_;
+  TH1F * PrimVPhi_Mean_;
+
+  TH1F * SecVNum_Mean_;
+  TH1F * SecVPt_Mean_;
+  TH1F * SecVEta_Mean_;
+  TH1F * SecVPhi_Mean_;
+
+  TH1F * AllSecVNum_Mean_;
+  TH1F * AllSecVPt_Mean_;
+  TH1F * AllSecVEta_Mean_;
+  TH1F * AllSecVPhi_Mean_;
+
   TH1F * DPhimin_;
 
   int Eff_;
+  double dz_;
+  double dzmax_;
+  int bins_;
+
+  // Directory in the root file to hold the multiple histograms
+  TDirectory *DirVertexDz_;
 
   // ----------member data ---------------------------
 };
