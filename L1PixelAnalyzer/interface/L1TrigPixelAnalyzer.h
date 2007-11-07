@@ -58,9 +58,25 @@
 // #include "DataFormats/L1CaloTrigger/interface/L1CaloCollections.h"
 
 // L1Extra
+// #include "DataFormats/CaloTowers/interface/CaloTowerCollection.h"
+#include "DataFormats/Candidate/interface/Candidate.h"
+#include "DataFormats/Candidate/interface/CandidateFwd.h"
+
 #include "DataFormats/L1Trigger/interface/L1EmParticle.h"
 #include "DataFormats/L1Trigger/interface/L1JetParticle.h"
+#include "DataFormats/L1Trigger/interface/L1MuonParticle.h"
 #include "DataFormats/L1Trigger/interface/L1EtMissParticle.h"
+#include "DataFormats/L1Trigger/interface/L1ParticleMap.h"
+
+#include "DataFormats/EcalDigi/interface/EcalDigiCollections.h"
+#include "DataFormats/HcalDigi/interface/HcalDigiCollections.h"
+
+#include "FastSimulation/L1CaloTriggerProducer/interface/FastL1Region.h"
+// No BitInfos for release versions
+#include "FastSimDataFormats/External/interface/FastL1BitInfo.h"
+
+#include "Geometry/CaloTopology/interface/CaloTowerConstituentsMap.h"
+#include "DataFormats/Math/interface/Vector3D.h"
 
 // L1 Pixel
 // #include "DataFormats/TrackerRecHit2D/interface/SiPixelRecHit.h"
@@ -92,8 +108,12 @@
 #include "AnalysisExamples/PixelJet/interface/PixelJet.h"
 
 // GenJets
-#include "DataFormats/JetReco/interface/GenJetfwd.h"
+#include "DataFormats/JetReco/interface/GenJetCollection.h"
 #include "DataFormats/JetReco/interface/GenJet.h"
+
+// Calo MEt
+#include "DataFormats/METReco/interface/CaloMET.h"
+
 
 // Associator for the jets
 #include "../../PJVERTEX_CMSSW/Classes/Associator/Associator.h"
@@ -157,53 +177,55 @@ class L1TrigPixelAnalyzer : public edm::EDAnalyzer {
   TH1F * PixelJet_Num_;
   TH1F * PixelJet_Track_Num_;
 
-  std::vector<TH1F *> Vertex_Dz_;
-  std::vector<TH1F *> Vertex_Num_;
-  std::vector<TH1F *> Prim_Second_Vertex_Dz_;
-
-  std::vector<TH1F *> PrimVNum_;
-  std::vector<TH1F *> PrimVPt_;
-  std::vector<TH1F *> PrimVEta_;
-  std::vector<TH1F *> PrimVPhi_;
-
-  std::vector<TH1F *> SecVNum_;
-  std::vector<TH1F *> SecVPt_;
-  std::vector<TH1F *> SecVEta_;
-  std::vector<TH1F *> SecVPhi_;
-
-  std::vector<TH1F *> AllSecVNum_;
-  std::vector<TH1F *> AllSecVPt_;
-  std::vector<TH1F *> AllSecVEta_;
-  std::vector<TH1F *> AllSecVPhi_;
-
   // Means
-  TH1F * Vertex_Dz_Mean_;
-  TH1F * Vertex_Num_Mean_;
-  TH1F * Prim_Second_Vertex_Dz_Mean_;
-
   MultiTH1F * Multi_Vertex_Dz_;
+  MultiTH1F * Multi_Prim_Second_Vertex_Dz_;
+  MultiTH1F * Multi_Vertex_Num_;
 
-  TH1F * PrimVNum_Mean_;
-  TH1F * PrimVPt_Mean_;
-  TH1F * PrimVEta_Mean_;
-  TH1F * PrimVPhi_Mean_;
+  MultiTH1F * Multi_PrimVNum_;
+  MultiTH1F * Multi_PrimVPt_;
+  MultiTH1F * Multi_PrimVEta_;
+  MultiTH1F * Multi_PrimVPhi_;
 
-  TH1F * SecVNum_Mean_;
-  TH1F * SecVPt_Mean_;
-  TH1F * SecVEta_Mean_;
-  TH1F * SecVPhi_Mean_;
+  MultiTH1F * Multi_SecVNum_;
+  MultiTH1F * Multi_SecVPt_;
+  MultiTH1F * Multi_SecVEta_;
+  MultiTH1F * Multi_SecVPhi_;
 
-  TH1F * AllSecVNum_Mean_;
-  TH1F * AllSecVPt_Mean_;
-  TH1F * AllSecVEta_Mean_;
-  TH1F * AllSecVPhi_Mean_;
+  MultiTH1F * Multi_AllSecVNum_;
+  MultiTH1F * Multi_AllSecVPt_;
+  MultiTH1F * Multi_AllSecVEta_;
+  MultiTH1F * Multi_AllSecVPhi_;
 
   TH1F * DPhimin_;
 
+  // Trigger efficiency counters
+  // Multijet
   int Eff_;
+  int Eff_cen_;
+  int Eff_tau_;
+  int Eff_for_;
+  int Eff_nofor_;
+  // MEt+Jet
+  int Eff_MEtJet_;
+  int Eff_MEtJet_cen_;
+  int Eff_MEtJet_tau_;
+  int Eff_MEtJet_for_;
+  int Eff_MEtJet_nofor_;
+  // Tau
+  int Eff_tautrig_;
+
   double dz_;
   double dzmax_;
   int bins_;
+
+  // Pixel trigger efficiency
+  TH1F ** EffMultijetPixel_;
+  TH1F ** EffMEtJetPixel_;
+  int EffMultijetPixelSize_;
+  int EffMEtJetPixelSize_;
+  int ** EffMultijetPixelArray_;
+  int ** EffMEtJetPixelArray_;
 
   // Directory in the root file to hold the multiple histograms
   TDirectory *DirVertexDz_;

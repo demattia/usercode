@@ -49,8 +49,6 @@ L1TrigPixelAnalyzer::L1TrigPixelAnalyzer(const edm::ParameterSet& iConfig) :
   OutputFile = new TFile((conf_.getUntrackedParameter<std::string>("OutputName")).c_str() ,"RECREATE","L1TrigPixelAnaOutput");
   // The file must be opened first, so that becomes the default position for all the histograms
   OutputFile->cd();
-  // Create directory to hold the multiple histograms
-  DirVertexDz_ = OutputFile->mkdir("Vertex_dz");
 
   // White background for the canvases
   gROOT->SetStyle("Plain");
@@ -70,113 +68,83 @@ L1TrigPixelAnalyzer::L1TrigPixelAnalyzer(const edm::ParameterSet& iConfig) :
   PixelJet_Num_ = new TH1F( "PixelJet_Num", "Number of pixeljets", 30, 0, 30 );
   PixelJet_Track_Num_ = new TH1F( "PixelJet_Track_Num", "Number of pixeltracks in pixeljets", 15, 0, 15 );
 
+  // Pixel trigger efficiency
+  EffMultijetPixelSize_ = 10000;
+  EffMEtJetPixelSize_ = 100;
+  TString EffMultijetName("EffMultijetPixel");
+  TString EffMultijetTitle("Efficiency of multijet + pixel trigger for PVnum = ");
+  TString EffMEtJetName("EffMEtJetPixel");
+  TString EffMEtJetTitle("Efficiency of MEt + Jet + pixel trigger for PVnum = ");
+  TString PVnumString[4];
+  PVnumString[0] = "3";
+  PVnumString[1] = "4";
+  PVnumString[2] = "5";
+  PVnumString[3] = "6";
+  EffMultijetPixelArray_ = new int*[4];
+  EffMEtJetPixelArray_ = new int*[4];
+  EffMultijetPixel_ = new TH1F*[4];
+  EffMEtJetPixel_ = new TH1F*[4];
+  for ( int PVnum=0; PVnum<4; ++PVnum ) {
+    EffMultijetPixelArray_[PVnum] = new int[EffMultijetPixelSize_];
+    EffMEtJetPixelArray_[PVnum]= new int[EffMEtJetPixelSize_];
+    // Initialize the efficiency counters
+    for ( int iEffMultijetNum=0; iEffMultijetNum<EffMultijetPixelSize_; ++iEffMultijetNum ) {
+      (EffMultijetPixelArray_[PVnum])[iEffMultijetNum] = 0;
+    }
+    for ( int iEffMEtJetNum=0; iEffMEtJetNum<EffMEtJetPixelSize_; ++iEffMEtJetNum ) {
+      (EffMEtJetPixelArray_[PVnum])[iEffMEtJetNum] = 0;
+    }
+
+    EffMultijetPixel_[PVnum] = new TH1F( EffMultijetName + PVnumString[PVnum], EffMultijetTitle + PVnumString[PVnum], EffMultijetPixelSize_, 0, EffMultijetPixelSize_ );
+    EffMEtJetPixel_[PVnum] = new TH1F( EffMEtJetName + PVnumString[PVnum], EffMEtJetTitle + PVnumString[PVnum], EffMEtJetPixelSize_, 0, EffMEtJetPixelSize_ );
+  }
 
   // Generate histograms for the verteces
   // ------------------------------------
   dz_ = 0.04;
   bins_ = 20;
 
-  TString Vertex_Dz_Name("Vertex_Dz_");
-  TString Vertex_Dz_Title("Minimum distance between verteces for dz = ");
-  TString Vertex_Num_Name("Vertex_Num_");
-  TString Vertex_Num_Title("Number of verteces for dz = ");
-  TString Prim_Second_Vertex_Dz_Name("Prim_Second_Vertex_Dz_");
-  TString Prim_Second_Vertex_Dz_Title("Minimum distance between primary and secondary vertex for dz = ");
-
-  TString PrimVNum_Name( "PrimVNum" );
-  TString PrimVNum_Title( "Number of pixeljets in primary vertex for dz = " );
-  TString PrimVPt_Name( "PrimVPt" );
-  TString PrimVPt_Title( "Pt of primary vertex" );
-  TString PrimVEta_Name( "PrimVEta" );
-  TString PrimVEta_Title( "Eta of primary vertex" );
-  TString PrimVPhi_Name( "PrimVPhi" );
-  TString PrimVPhi_Title( "Phi of primary vertex" );
-
-  TString SecVNum_Name( "SecVNum" );
-  TString SecVNum_Title( "Number of pixeljets in secondary vertex for dz = " );
-  TString SecVPt_Name( "SecVPt" );
-  TString SecVPt_Title( "Pt of secondary vertex" );
-  TString SecVEta_Name( "SecVEta" );
-  TString SecVEta_Title( "Eta of secondary vertex" );
-  TString SecVPhi_Name( "SecVPhi" );
-  TString SecVPhi_Title( "Phi of secondary vertex" );
-
-  TString AllSecVNum_Name( "AllSecVNum" );
-  TString AllSecVNum_Title( "Number of pixeljets in all secondary verteces for dz = " );
-  TString AllSecVPt_Name( "AllSecVPt" );
-  TString AllSecVPt_Title( "Pt of all secondary verteces" );
-  TString AllSecVEta_Name( "AllSecVEta" );
-  TString AllSecVEta_Title( "Eta of all secondary verteces" );
-  TString AllSecVPhi_Name( "AllSecVPhi" );
-  TString AllSecVPhi_Title( "Phi of all secondary verteces" );
-
-  TString Mean("Mean");
-
   dzmax_ = dz_ + dz_*(bins_);
+
+  // Multiple histograms, including mean and stacked histograms
   Multi_Vertex_Dz_ = new MultiTH1F( "Vertex_Dz", "Minimum distance between verteces", 100, 0., 10., bins_, dz_, dzmax_, OutputFile );
+  Multi_Prim_Second_Vertex_Dz_ = new MultiTH1F( "Prim_Second_Vertex_Dz", "Minimum distance between primary and secondary verteces", 100, 0., 10., bins_, dz_, dzmax_, OutputFile );
+  Multi_Vertex_Num_ = new MultiTH1F( "Vertex_Num", "Number of verteces", 30, 0., 30., bins_, dz_, dzmax_, OutputFile );
 
-  Vertex_Dz_Mean_ = new TH1F( Vertex_Dz_Name + Mean, Vertex_Dz_Title + Mean, bins_, dz_, dzmax_ );
-  Vertex_Num_Mean_ = new TH1F( Vertex_Num_Name + Mean, Vertex_Num_Title + Mean, bins_, dz_, dzmax_ );
-  Prim_Second_Vertex_Dz_Mean_ = new TH1F( Prim_Second_Vertex_Dz_Name + Mean, Prim_Second_Vertex_Dz_Title + Mean, bins_, dz_, dzmax_ );
+  Multi_PrimVNum_ = new MultiTH1F( "PrimVNum", "Number of pixeljets in primary vertex", 30, 0, 30, bins_, dz_, dzmax_, OutputFile );
+  Multi_PrimVPt_ = new MultiTH1F( "PrimVPt" , "Pt of primary vertex", 100, 0, 1000, bins_, dz_, dzmax_, OutputFile );
+  Multi_PrimVEta_ = new MultiTH1F( "PrimVEta", "Eta of primary vertex", 100, -3, 3, bins_, dz_, dzmax_, OutputFile );
+  Multi_PrimVPhi_ = new MultiTH1F( "PrimVPhi", "Phi of primary vertex", 100, -3.15, 3.15, bins_, dz_, dzmax_, OutputFile );
 
-  PrimVNum_Mean_ = new TH1F( PrimVNum_Name + Mean, PrimVNum_Title + Mean, bins_, dz_, dzmax_ );
-  PrimVPt_Mean_ = new TH1F( PrimVPt_Name + Mean, PrimVPt_Title + Mean, bins_, dz_, dzmax_ );
-  PrimVEta_Mean_ = new TH1F( PrimVEta_Name + Mean, PrimVEta_Title + Mean, bins_, dz_, dzmax_ );
-  PrimVPhi_Mean_ = new TH1F( PrimVPhi_Name + Mean, PrimVPhi_Title + Mean, bins_, dz_, dzmax_ );
+  Multi_SecVNum_ = new MultiTH1F( "SecVNum", "Number of pixeljets in secondary vertex" , 30, 0, 30, bins_, dz_, dzmax_, OutputFile );
+  Multi_SecVPt_ = new MultiTH1F( "SecVPt", "Pt of secondary vertex", 100, 0, 1000, bins_, dz_, dzmax_, OutputFile );
+  Multi_SecVEta_ = new MultiTH1F( "SecVEta", "Eta of secondary vertex", 100, -3, 3, bins_, dz_, dzmax_, OutputFile );
+  Multi_SecVPhi_ = new MultiTH1F( "SecVPhi", "Phi of secondary vertex", 100, -3.15, 3.15, bins_, dz_, dzmax_, OutputFile );
 
-  SecVNum_Mean_ = new TH1F( SecVNum_Name + Mean, SecVNum_Title + Mean, bins_, dz_, dzmax_ );
-  SecVPt_Mean_ = new TH1F( SecVPt_Name + Mean, SecVPt_Title + Mean, bins_, dz_, dzmax_ );
-  SecVEta_Mean_ = new TH1F( SecVEta_Name + Mean, SecVEta_Title + Mean, bins_, dz_, dzmax_ );
-  SecVPhi_Mean_ = new TH1F( SecVPhi_Name + Mean, SecVPhi_Title + Mean, bins_, dz_, dzmax_ );
+  Multi_AllSecVNum_ = new MultiTH1F( "AllSecVNum", "Number of pixeljets in all secondary verteces", 30, 0, 30, bins_, dz_, dzmax_, OutputFile );
+  Multi_AllSecVPt_ = new MultiTH1F( "AllSecVPt_Name", "Pt of all secondary verteces", 100, 0, 1000, bins_, dz_, dzmax_, OutputFile );
+  Multi_AllSecVEta_ = new MultiTH1F( "AllSecVEta_Name", "Eta of all secondary verteces", 100, -3., 3, bins_, dz_, dzmax_, OutputFile );
+  Multi_AllSecVPhi_ = new MultiTH1F( "AllSecVPhi_Name", "Phi of all secondary verteces", 100, -3.15, 3.15, bins_, dz_, dzmax_, OutputFile );
 
-  AllSecVNum_Mean_ = new TH1F( AllSecVNum_Name + Mean, AllSecVNum_Title + Mean, bins_, dz_, dzmax_ );
-  AllSecVPt_Mean_ = new TH1F( AllSecVPt_Name + Mean, AllSecVPt_Title + Mean, bins_, dz_, dzmax_ );
-  AllSecVEta_Mean_ = new TH1F( AllSecVEta_Name + Mean, AllSecVEta_Title + Mean, bins_, dz_, dzmax_ );
-  AllSecVPhi_Mean_ = new TH1F( AllSecVPhi_Name + Mean, AllSecVPhi_Title + Mean, bins_, dz_, dzmax_ );
-
-  // Generate the multiple histograms
-  ostringstream snum;
-  // Put these histograms in the subdir
-  DirVertexDz_->cd();
-  for ( int num = 0; num < bins_; ++num ) {
-    double dz_for_name = dz_ + dz_*(num);
-    snum << dz_for_name;
-
-//     string teststring("test");
-//     string temp = (teststring + snum.str()).c_str();
-
-    Vertex_Dz_.push_back( new TH1F( Vertex_Dz_Name + snum.str(), Vertex_Dz_Title + snum.str(), 100, 0, 10 ) );
-    Vertex_Num_.push_back( new TH1F( Vertex_Num_Name + snum.str(), Vertex_Num_Title + snum.str(), 30, 0, 30 ) );
-    Prim_Second_Vertex_Dz_.push_back( new TH1F( Prim_Second_Vertex_Dz_Name + snum.str(), Prim_Second_Vertex_Dz_Title + snum.str(), 100, 0, 10 ) );
-
-    // Use big values for pt or the means will be biased (underflow and overflow are not used)
-
-    PrimVNum_.push_back( new TH1F( PrimVNum_Name + snum.str(), PrimVNum_Title + snum.str(), 30, 0, 30 ) );
-    PrimVPt_.push_back( new TH1F( PrimVPt_Name + snum.str(), PrimVPt_Title + snum.str(), 100, 0, 1000 ) );
-    PrimVEta_.push_back( new TH1F( PrimVEta_Name + snum.str(), PrimVEta_Title + snum.str(), 100, -3, 3 ) );
-    PrimVPhi_.push_back( new TH1F( PrimVPhi_Name + snum.str(), PrimVPhi_Title + snum.str(), 100, -3.15, 3.15 ) );
-
-    SecVNum_.push_back( new TH1F( SecVNum_Name + snum.str(), SecVNum_Title + snum.str(), 30, 0, 30 ) );
-    SecVPt_.push_back( new TH1F( SecVPt_Name + snum.str(), SecVPt_Title + snum.str(), 100, 0, 1000 ) );
-    SecVEta_.push_back( new TH1F( SecVEta_Name + snum.str(), SecVEta_Title + snum.str(), 100, -3, 3 ) );
-    SecVPhi_.push_back( new TH1F( SecVPhi_Name + snum.str(), SecVPhi_Title + snum.str(), 100, -3.15, 3.15 ) );
-
-    AllSecVNum_.push_back( new TH1F( AllSecVNum_Name + snum.str(), AllSecVNum_Title + snum.str(), 30, 0, 30 ) );
-    AllSecVPt_.push_back( new TH1F( AllSecVPt_Name + snum.str(), AllSecVPt_Title + snum.str(), 100, 0, 1000 ) );
-    AllSecVEta_.push_back( new TH1F( AllSecVEta_Name + snum.str(), AllSecVEta_Title + snum.str(), 100, -3, 3 ) );
-    AllSecVPhi_.push_back( new TH1F( AllSecVPhi_Name + snum.str(), AllSecVPhi_Title + snum.str(), 100, -3.15, 3.15 ) );
-
-    // Empty the ostringstream
-    snum.str("");
-  }
-  // ---------------------------
-
-  // Go back to the main file
-  OutputFile->cd();
 
   DPhimin_ = new TH1F( "DPhimin", "Minimum distance in (R,Phi) between MEt and closest jet", 100, 0, 3.15 );
 
+  // Trigger efficiency counters
+  // Multijet
   Eff_ = 0;
+  Eff_cen_ = 0;
+  Eff_tau_ = 0;
+  Eff_for_ = 0;
+  Eff_nofor_ = 0;
+  // MEt+Jet
+  Eff_MEtJet_ = 0;
+  Eff_MEtJet_cen_ = 0;
+  Eff_MEtJet_tau_ = 0;
+  Eff_MEtJet_for_ = 0;
+  Eff_MEtJet_nofor_ = 0;
+  // Tau
+  Eff_tautrig_ = 0;
+
   eventcounter_ = 0;
 //  PI_ = 3.141593;
 }
@@ -191,7 +159,12 @@ L1TrigPixelAnalyzer::~L1TrigPixelAnalyzer()
   //  HiVar->Plot();
 
   OutputFile->Write();
-
+  for (int i=0; i<4; ++i) {
+    delete[] EffMultijetPixelArray_[i];
+    delete[] EffMEtJetPixelArray_[i];
+  }
+  delete[] EffMultijetPixelArray_;
+  delete[] EffMEtJetPixelArray_;
 }
 
 //
@@ -210,6 +183,7 @@ L1TrigPixelAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
   edm::Handle < L1JetParticleCollection > l1eCenJets;
   edm::Handle < L1JetParticleCollection > l1eForJets;
   edm::Handle < L1JetParticleCollection > l1eTauJets;
+  edm::Handle < L1EtMissParticle > l1eEtMiss;
 
 
   // should get rid of this try/catch?
@@ -217,10 +191,12 @@ L1TrigPixelAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
     edm::InputTag L1CJetLabel = conf_.getUntrackedParameter<edm::InputTag>("l1eCentralJetsSource");
     edm::InputTag L1FJetLabel = conf_.getUntrackedParameter<edm::InputTag>("l1eForwardJetsSource");
     edm::InputTag L1TauJetLabel = conf_.getUntrackedParameter<edm::InputTag>("l1eTauJetsSource");
+    edm::InputTag L1EtMissLabel = conf_.getUntrackedParameter<edm::InputTag>("l1eEtMissSource");
 
     iEvent.getByLabel(L1CJetLabel, l1eCenJets);
     iEvent.getByLabel(L1FJetLabel, l1eForJets);
     iEvent.getByLabel(L1TauJetLabel, l1eTauJets);
+    iEvent.getByLabel(L1EtMissLabel, l1eEtMiss);
 
   }
   catch (...) {
@@ -233,34 +209,367 @@ L1TrigPixelAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
     std::cout << "Event number " << eventcounter_ << std::endl;
   }
 
+
+
+  // Pixel jets
+  // ----------
+
+  edm::Handle<PixelJetCollection> pixeljetshandle;
+  edm::InputTag PixelJetsLabel = conf_.getUntrackedParameter<edm::InputTag>("PixelJetSource");
+  iEvent.getByLabel(PixelJetsLabel, pixeljetshandle);
+
+  const PixelJetCollection pixeljets = *(pixeljetshandle.product());
+
+  // Pixel trigger requiring at least 2 pixel jets coming from the primary vertex
+  // (constructed from pixel jets, and taken as the vertex with the highest ptsum)
+
+  for( int numdz = 0; numdz < bins_; ++numdz ) {
+
+    double dz = dz_ + dz_*(numdz);
+
+#ifdef DEBUG
+    std::cout << "numTkCut = " << numTkCut << std::endl;
+#endif
+
+    L1PixelTrig<PixelJet> PJtrig(2, dz, numTkCut);
+
+    PJtrig.Fill( pixeljets );
+
+#ifdef DEBUG
+    std::cout << "Pixel trigger response = " << PJtrig.Response() << std::endl;
+#endif
+
+    // The vector of verteces is already sorted in ascending Pt
+    auto_ptr<vector<Vertex<PixelJet> > > vec_vertex_aptr( PJtrig.VevVertex() );
+
+    // Number of verteces
+    int numVertex = 0;
+    if ( vec_vertex_aptr.get() != 0 ) {
+      numVertex = vec_vertex_aptr->size();
+    }
+    Multi_Vertex_Num_->Fill( numVertex, numdz );
+
+#ifdef DEBUG
+    std::cout << "Loop on primary vertex" << std::endl;
+#endif
+    if ( numVertex > 0 ) {
+      //Primary vertex characteristics
+      Vertex<PixelJet> prim_vertex( vec_vertex_aptr->back() );
+
+      Multi_PrimVNum_->Fill( prim_vertex.number(), numdz );
+      Multi_PrimVPt_->Fill( prim_vertex.pt(), numdz );
+      Multi_PrimVEta_->Fill( prim_vertex.eta(), numdz );
+      Multi_PrimVPhi_->Fill( prim_vertex.phi(), numdz );
+
+      // Loop on the remaining verteces and fill their characteristics
+      if ( numVertex > 1 ) {
+        // End returns just just after the last element, to take the one before the last go two times back
+        vector<Vertex<PixelJet> >::const_iterator svec_it = (vec_vertex_aptr->end()-2);
+        Multi_SecVNum_->Fill( svec_it->number(), numdz );
+        Multi_SecVPt_->Fill( svec_it->pt(), numdz );
+        Multi_SecVEta_->Fill( svec_it->eta(), numdz );
+        Multi_SecVPhi_->Fill( svec_it->phi(), numdz );
+
+        vector<Vertex<PixelJet> >::const_iterator all_svec_it = (vec_vertex_aptr->begin());
+        for ( ; all_svec_it != vec_vertex_aptr->end()-1; ++all_svec_it ) {
+          Multi_AllSecVNum_->Fill( all_svec_it->number(), numdz );
+          Multi_AllSecVPt_->Fill( all_svec_it->pt(), numdz );
+          Multi_AllSecVEta_->Fill( all_svec_it->eta(), numdz );
+          Multi_AllSecVPhi_->Fill( all_svec_it->phi(), numdz );
+        }
+      }
+
+#ifdef DEBUG
+      std::cout << "Verteces minimum distance in z" << std::endl;
+#endif
+
+      // Now sort the vertex in z and evaluate closest distance
+      sort( vec_vertex_aptr->begin(), vec_vertex_aptr->end(), Sort_Greater_Z<Vertex<PixelJet> >() );
+
+      if ( numVertex > 1 ) {
+        vector<Vertex<PixelJet> >::const_iterator svec_z_it = (vec_vertex_aptr->begin());
+        for ( ; svec_z_it != vec_vertex_aptr->end()-1; ++svec_z_it ) {
+          Multi_Vertex_Dz_->Fill( fabs(svec_z_it->z() - (svec_z_it-1)->z()), numdz );
+        }
+      }
+
+      // Evaluate the distance between primary and secondary vertex
+      if ( numVertex > 1 ) {
+        // Take the last and the one before
+        vector<Vertex<PixelJet> >::const_iterator primV_secondV_z_it = (vec_vertex_aptr->end()-1);
+        Multi_Prim_Second_Vertex_Dz_->Fill( fabs(primV_secondV_z_it->z() - (primV_secondV_z_it-1)->z()), numdz );      
+      }
+    }
+  }
+
+#ifdef DEBUG
+  std::cout << "PixelJet minimum distance in z" << std::endl;
+#endif
+
+  // Take another pixeljet vector and evaluate the minimum dz distance
+  const PixelJetCollection temp_pixeljets = *(pixeljetshandle.product());
+  int numPixelJet = temp_pixeljets.size();
+  PixelJet_Num_->Fill( numPixelJet );
+  if ( numPixelJet > 1 ) {
+    vector<PixelJet>::const_iterator pj_z_it (temp_pixeljets.begin()+1);
+    PixelJet_Track_Num_->Fill(temp_pixeljets.begin()->NumTk());
+    for ( ; pj_z_it != temp_pixeljets.end(); ++pj_z_it ) {
+      PixelJet_Track_Num_->Fill(pj_z_it->NumTk());
+      PixelJet_dz_->Fill( fabs(pj_z_it->z() - (pj_z_it-1)->z()) );
+    }
+  }
+
   // Level 1 trigger
   // ---------------
 
   // All the jets together fot the L1Trigger
-  vector<SimpleJet> vec_TriggerJet;
+  vector<SimpleJet> vec_TriggerCenJet;
+  vector<SimpleJet> vec_TriggerForJet;
+  vector<SimpleJet> vec_TriggerTauJet;
   for ( L1JetParticleCollection::const_iterator tcj = l1eCenJets->begin(); tcj != l1eCenJets->end(); ++tcj ) {
-    vec_TriggerJet.push_back( SimpleJet( tcj->et(), tcj->eta(), tcj->phi() ) );
+    vec_TriggerCenJet.push_back( SimpleJet( tcj->et(), tcj->eta(), tcj->phi() ) );
   }
+  int fjcount = 0;
   for ( L1JetParticleCollection::const_iterator tfj = l1eForJets->begin(); tfj != l1eForJets->end(); ++tfj ) {
-    vec_TriggerJet.push_back( SimpleJet( tfj->et(), tfj->eta(), tfj->phi() ) );
+    vec_TriggerForJet.push_back( SimpleJet( tfj->et(), tfj->eta(), tfj->phi() ) );
+    std::cout << "ForwardJet Et["<<fjcount<<"] = " << tfj->et() << std::endl;
+    std::cout << "ForwardJet Eta["<<fjcount<<"] = " << tfj->eta() << std::endl;
+    std::cout << "ForwardJet Phi["<<fjcount<<"] = " << tfj->phi() << std::endl;
+    ++fjcount;
   }
   // Tau jets
   for ( L1JetParticleCollection::const_iterator ttj = l1eTauJets->begin(); ttj != l1eTauJets->end(); ++ttj ) {
-    vec_TriggerJet.push_back( SimpleJet( ttj->et(), ttj->eta(), ttj->phi() ) );
+    vec_TriggerTauJet.push_back( SimpleJet( ttj->et(), ttj->eta(), ttj->phi() ) );
   }
 
-  L1Trigger.Fill( vec_TriggerJet );
+  // Multijet
+  // --------
+  // Central
+  bool response_cen = false;
+  L1Trigger.Fill( vec_TriggerCenJet );
+  response_cen = L1Trigger.Response();
+  // Forward
+  bool response_for = false;
+  L1Trigger.Fill( vec_TriggerForJet );
+  response_for = L1Trigger.Response();
+  // Tau
+  bool response_tau = false;
+  L1Trigger.Fill( vec_TriggerTauJet );
+  response_tau = L1Trigger.Response();
+  // Full and no-forward
+  bool response = ( response_cen || response_tau || response_for );
+  bool response_nofor = ( response_cen || response_tau );
+
+  // MEt + Jet
+  // ---------
+  // Central
+  bool response_MEtJet_cen = false;
+  sort( vec_TriggerCenJet.begin(), vec_TriggerCenJet.end() );
+  reverse( vec_TriggerCenJet.begin(), vec_TriggerCenJet.end() );
+  if ( vec_TriggerCenJet.size() != 0 ) {
+    if ( (vec_TriggerCenJet[0].pt() >= 80.) && (l1eEtMiss->et() >= 100.) ) {
+      response_MEtJet_cen = true;
+    }
+  }
+  // Tau
+  bool response_MEtJet_tau = false;
+  sort( vec_TriggerTauJet.begin(), vec_TriggerTauJet.end() );
+  reverse( vec_TriggerTauJet.begin(), vec_TriggerTauJet.end() );
+  if ( vec_TriggerTauJet.size() != 0 ) {
+    if ( (vec_TriggerTauJet[0].pt() >= 80.) && (l1eEtMiss->et() >= 100.) ) {
+      response_MEtJet_tau = true;
+    }
+  }
+  // Forward
+  bool response_MEtJet_for = false;
+  sort( vec_TriggerForJet.begin(), vec_TriggerForJet.end() );
+  reverse( vec_TriggerForJet.begin(), vec_TriggerForJet.end() );
+  if ( vec_TriggerForJet.size() != 0 ) {
+    if ( (vec_TriggerForJet[0].pt() >= 80.) && (l1eEtMiss->et() >= 100.) ) {
+      response_MEtJet_for = true;
+    }
+  }
+  // Full and no-forward
+  bool response_MEtJet = ( response_MEtJet_cen || response_MEtJet_tau || response_MEtJet_for );
+  bool response_MEtJet_nofor = ( response_MEtJet_cen || response_MEtJet_tau );
+
+  // Tau trigger
+  // -----------
+  bool response_tautrig = false;
+  // Already sorted for the previous case
+//   sort( vec_TriggerTauJet.begin(), vec_TriggerTauJet.end() );
+//   reverse( vec_TriggerTauJet.begin(), vec_TriggerTauJet.end() );
+
+  // Single tau trigger
+  if ( vec_TriggerTauJet.size() != 0 ) {
+    if ( vec_TriggerTauJet[0].pt() >= 150. ) {
+      response_tautrig = true;
+    }
+  }
+  // Di-tau trigger
+  if ( vec_TriggerTauJet.size() >= 1 ) {
+    if ( vec_TriggerTauJet[1].pt() >= 80. ) {
+      response_tautrig = true;
+    }
+  }
 
 #ifdef DEBUG
-  std::cout << "Number of L1Jets = " << vec_TriggerJet.size() << std::endl;
-  std::cout << "L1Trigger response = " << L1Trigger.Response() << std::endl;
+  std::cout << "L1Trigger response cen = " << response_cen << std::endl;
+  std::cout << "L1Trigger response for = " << response_for << std::endl;
+  std::cout << "L1Trigger response tau = " << response_tau << std::endl;
+  std::cout << "L1Trigger response = " << response << std::endl;
+
+  std::cout << "Number of L1Jets central = " << vec_TriggerJetCen.size() << std::endl;
+  std::cout << "Number of L1Jets forward = " << vec_TriggerJetFor.size() << std::endl;
+  std::cout << "Number of L1Jets tau = " << vec_TriggerJetTau.size() << std::endl;
 #endif
 
   // Count the trigger efficiency
-  if ( L1Trigger.Response() ) {
+  // ----------------------------
+
+  // Multijet
+  if ( response_cen ) {
+    ++Eff_cen_;
+  }
+  if ( response_tau ) {
+    ++Eff_tau_;
+  }
+  if ( response_for ) {
+    ++Eff_for_;
+  }
+  if ( response ) {
     ++Eff_;
   }
+  if ( response_nofor ) {
+    ++Eff_nofor_;
+  }
+  // MEt+jet
+  if ( response_MEtJet_cen ) {
+    ++Eff_MEtJet_cen_;
+  }
+  if ( response_MEtJet_tau ) {
+    ++Eff_MEtJet_tau_;
+  }
+  if ( response_MEtJet_for ) {
+    ++Eff_MEtJet_for_;
+  }
+  if ( response_MEtJet ) {
+    ++Eff_MEtJet_;
+  }
+  if ( response_MEtJet_nofor ) {
+    ++Eff_MEtJet_nofor_;
+  }
 
+  // Tau trigger
+  if ( response_tautrig ) {
+    ++Eff_tautrig_;
+  }
+
+  // PixelTrigger
+  // ------------
+  // dz = 0.4 and numtk = 3
+  L1PixelTrig<PixelJet> Pixeltrig_3(3, 0.4, 3);
+  L1PixelTrig<PixelJet> Pixeltrig_4(4, 0.4, 3);
+  L1PixelTrig<PixelJet> Pixeltrig_5(5, 0.4, 3);
+  L1PixelTrig<PixelJet> Pixeltrig_6(6, 0.4, 3);
+
+  Pixeltrig_3.Fill( pixeljets );
+  Pixeltrig_4.Fill( pixeljets );
+  Pixeltrig_5.Fill( pixeljets );
+  Pixeltrig_6.Fill( pixeljets );
+
+  bool pixelTrigResponse[4];
+
+  pixelTrigResponse[0] = Pixeltrig_3.Response();
+  pixelTrigResponse[1] = Pixeltrig_4.Response();
+  pixelTrigResponse[2] = Pixeltrig_5.Response();
+  pixelTrigResponse[3] = Pixeltrig_6.Response();
+
+  // Multijet initializations
+  // ------------------------
+  bool Response_cen = false;
+  bool Response_tau = false;
+
+  sort( vec_TriggerCenJet.begin(), vec_TriggerCenJet.end() );
+  reverse( vec_TriggerCenJet.begin(), vec_TriggerCenJet.end() );
+
+  float cenJet1 = 0.;
+  float cenJet2 = 0.;
+  float cenJet3 = 0.;
+  float cenJet4 = 0.;
+  int cenSize = vec_TriggerCenJet.size();
+  if ( cenSize != 0 ) cenJet1 = vec_TriggerCenJet[0].pt();
+  if ( cenSize > 1 ) cenJet2 = vec_TriggerCenJet[1].pt();
+  if ( cenSize > 2 ) cenJet3 = vec_TriggerCenJet[2].pt();
+  if ( cenSize > 3 ) cenJet4 = vec_TriggerCenJet[3].pt();
+
+  sort( vec_TriggerTauJet.begin(), vec_TriggerTauJet.end() );
+  reverse( vec_TriggerTauJet.begin(), vec_TriggerTauJet.end() );
+
+  float tauJet1 = 0.;
+  float tauJet2 = 0.;
+  float tauJet3 = 0.;
+  float tauJet4 = 0.;
+  int tauSize = vec_TriggerTauJet.size();
+  if ( tauSize != 0 ) tauJet1 = vec_TriggerTauJet[0].pt();
+  if ( tauSize > 1 ) tauJet2 = vec_TriggerTauJet[1].pt();
+  if ( tauSize > 2 ) tauJet3 = vec_TriggerTauJet[2].pt();
+  if ( tauSize > 3 ) tauJet4 = vec_TriggerTauJet[3].pt();
+
+  // MEt + Jet initializations
+  // -------------------------
+  bool Response_MEtJet_cen = false;
+  bool Response_MEtJet_tau = false;
+  float L1MEt = l1eEtMiss->et();
+
+  // Loop on all the values
+  // ----------------------
+
+  // Do it for the different PV cut values for the pixel trigger
+  for ( int PVnum=0; PVnum<4; ++PVnum ) {
+
+    // Loop on all the cut values
+    int multijetCount = 0;
+    for ( int Et1=160; Et1<260; Et1+=10 ) {
+      for ( int Et2=110; Et2<210; Et2+=10 ) {
+        for ( int Et3=55; Et3<105; Et3+=5 ) {
+          for ( int Et4=35; Et4<85; Et4+=5 ) {
+            Response_cen = false;
+            Response_tau = false;
+            // Central
+            if ( (cenJet1 >= Et1) || (cenJet2 >= Et2) || (cenJet3 >= Et3) || (cenJet4 >= Et4) ) Response_cen = true;
+            // Tau
+            if ( (tauJet1 >= Et1) || (tauJet2 >= Et2) || (tauJet3 >= Et3) || (tauJet4 >= Et4) ) Response_tau = true;
+            // Full and no-forward
+            if ( (Response_cen || Response_tau) && pixelTrigResponse[PVnum] ) ++((EffMultijetPixelArray_[PVnum])[multijetCount]);
+            // increase the index, in the inner loop
+            ++multijetCount;
+          }
+        }
+      }
+    }
+
+    // MEt + Jet
+    // ---------
+    int mEtJetCount = 0;
+    for ( int MEt=35; MEt<85; MEt+=5 ) {
+      for ( int Jet=55; Jet<105; Jet+=5 ) {
+        Response_MEtJet_cen = false;
+        Response_MEtJet_tau = false;
+        // Central
+        if ( ( L1MEt >= float(MEt) ) && ( cenJet1 >= float(Jet) ) ) Response_MEtJet_cen = true;
+        // Tau
+        if ( ( L1MEt >= float(MEt) ) && ( tauJet1 >= float(Jet) ) ) Response_MEtJet_tau = true;
+        // Full and no-forward
+        if ( (Response_MEtJet_cen || Response_MEtJet_tau) && pixelTrigResponse[PVnum] ) ++((EffMEtJetPixelArray_[PVnum])[mEtJetCount]);
+        ++mEtJetCount;
+      }
+    }
+  } // end loop on PV cuts
+
+  // ------- //
+  // Offline //
+  // ------- //
 
   // MEt
   // ---
@@ -404,116 +713,6 @@ L1TrigPixelAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
 
   }
 
-  // Pixel jets
-  edm::Handle<PixelJetCollection> pixeljetshandle;
-  edm::InputTag PixelJetsLabel = conf_.getUntrackedParameter<edm::InputTag>("PixelJetSource");
-  iEvent.getByLabel(PixelJetsLabel, pixeljetshandle);
-
-  const PixelJetCollection pixeljets = *(pixeljetshandle.product());
-
-  // Pixel trigger requiring at least 2 pixel jets coming from the primary vertex
-  // (constructed from pixel jets, and taken as the vertex with the highest ptsum)
-
-  for( int numdz = 0; numdz < bins_; ++numdz ) {
-
-    double dz = dz_ + dz_*(numdz);
-
-#ifdef DEBUG
-    std::cout << "numTkCut = " << numTkCut << std::endl;
-#endif
-
-    L1PixelTrig<PixelJet> PJtrig(2, dz, numTkCut);
-
-    PJtrig.Fill( pixeljets );
-
-#ifdef DEBUG
-    std::cout << "Pixel trigger response = " << PJtrig.Response() << std::endl;
-#endif
-
-    // The vector of verteces is already sorted in ascending Pt
-    auto_ptr<vector<Vertex<PixelJet> > > vec_vertex_aptr( PJtrig.VevVertex() );
-
-    // Number of verteces
-    int numVertex = 0;
-    if ( vec_vertex_aptr.get() != 0 ) {
-      numVertex = vec_vertex_aptr->size();
-    }
-    Vertex_Num_[numdz]->Fill( numVertex );
-
-#ifdef DEBUG
-    std::cout << "Loop on primary vertex" << std::endl;
-#endif
-    if ( numVertex > 0 ) {
-      //Primary vertex characteristics
-      Vertex<PixelJet> prim_vertex( vec_vertex_aptr->back() );
-
-      PrimVNum_[numdz]->Fill( prim_vertex.number() );
-      PrimVPt_[numdz]->Fill( prim_vertex.pt() );
-      PrimVEta_[numdz]->Fill( prim_vertex.eta() );
-      PrimVPhi_[numdz]->Fill( prim_vertex.phi() );
-
-      // Loop on the remaining verteces and fill their characteristics
-      if ( numVertex > 1 ) {
-        // End returns just just after the last element, to take the one before the last go two times back
-        vector<Vertex<PixelJet> >::const_iterator svec_it = (vec_vertex_aptr->end()-2);
-        SecVNum_[numdz]->Fill( svec_it->number() );
-        SecVPt_[numdz]->Fill( svec_it->pt() );
-        SecVEta_[numdz]->Fill( svec_it->eta() );
-        SecVPhi_[numdz]->Fill( svec_it->phi() );
-
-        vector<Vertex<PixelJet> >::const_iterator all_svec_it = (vec_vertex_aptr->begin());
-        for ( ; all_svec_it != vec_vertex_aptr->end()-1; ++all_svec_it ) {
-          AllSecVNum_[numdz]->Fill( all_svec_it->number() );
-          AllSecVPt_[numdz]->Fill( all_svec_it->pt() );
-          AllSecVEta_[numdz]->Fill( all_svec_it->eta() );
-          AllSecVPhi_[numdz]->Fill( all_svec_it->phi() );
-        }
-      }
-
-#ifdef DEBUG
-      std::cout << "Verteces minimum distance in z" << std::endl;
-#endif
-
-      // Now sort the vertex in z and evaluate closest distance
-      sort( vec_vertex_aptr->begin(), vec_vertex_aptr->end(), Sort_Greater_Z<Vertex<PixelJet> >() );
-
-      if ( numVertex > 1 ) {
-        vector<Vertex<PixelJet> >::const_iterator svec_z_it = (vec_vertex_aptr->begin());
-        for ( ; svec_z_it != vec_vertex_aptr->end()-1; ++svec_z_it ) {
-          Vertex_Dz_[numdz]->Fill( fabs(svec_z_it->z() - (svec_z_it-1)->z()) );      
-          Multi_Vertex_Dz_->Fill( fabs(svec_z_it->z() - (svec_z_it-1)->z()), numdz );
-        }
-      }
-
-      // Evaluate the distance between primary and secondary vertex
-      if ( numVertex > 1 ) {
-        // Take the last and the one before
-        vector<Vertex<PixelJet> >::const_iterator primV_secondV_z_it = (vec_vertex_aptr->end()-1);
-        Prim_Second_Vertex_Dz_[numdz]->Fill( fabs(primV_secondV_z_it->z() - (primV_secondV_z_it-1)->z()) );      
-      }
-    }
-  }
-
-#ifdef DEBUG
-  std::cout << "PixelJet minimum distance in z" << std::endl;
-#endif
-
-  // Take another pixeljet vector and evaluate the minimum dz distance
-  const PixelJetCollection temp_pixeljets = *(pixeljetshandle.product());
-  int numPixelJet = temp_pixeljets.size();
-  PixelJet_Num_->Fill( numPixelJet );
-  if ( numPixelJet > 1 ) {
-    vector<PixelJet>::const_iterator pj_z_it (temp_pixeljets.begin()+1);
-    PixelJet_Track_Num_->Fill(temp_pixeljets.begin()->NumTk());
-    for ( ; pj_z_it != temp_pixeljets.end(); ++pj_z_it ) {
-      PixelJet_Track_Num_->Fill(pj_z_it->NumTk());
-      PixelJet_dz_->Fill( fabs(pj_z_it->z() - (pj_z_it-1)->z()) );
-    }
-  }
-
-
-
-
 #ifdef THIS_IS_AN_EVENTSETUP_EXAMPLE
       ESHandle<SetupData> pSetup;
       iSetup.get<SetupRecord>().get(pSetup);
@@ -535,81 +734,67 @@ void L1TrigPixelAnalyzer::beginJob(const edm::EventSetup&) {
 void L1TrigPixelAnalyzer::endJob() {
 
   Multi_Vertex_Dz_->Write();
+  Multi_Vertex_Num_->Write();
+  Multi_Prim_Second_Vertex_Dz_->Write();
 
-  Vertex_Dz_Mean_->GetXaxis()->CenterLabels();
-  Vertex_Dz_Mean_->GetXaxis()->SetNdivisions(Vertex_Dz_Mean_->GetSize()-2, false);
-  Vertex_Num_Mean_->GetXaxis()->CenterLabels();
-  Vertex_Num_Mean_->GetXaxis()->SetNdivisions(Vertex_Num_Mean_->GetSize()-2, false);
-  Prim_Second_Vertex_Dz_Mean_->GetXaxis()->CenterLabels();
-  Prim_Second_Vertex_Dz_Mean_->GetXaxis()->SetNdivisions(Prim_Second_Vertex_Dz_Mean_->GetSize()-2, false);
+  Multi_PrimVPt_->Write();
+  Multi_PrimVNum_->Write();
+  Multi_PrimVEta_->Write();
+  Multi_PrimVPhi_->Write();
 
-  PrimVNum_Mean_->GetXaxis()->CenterLabels();
-  PrimVPt_Mean_->GetXaxis()->CenterLabels();
-  PrimVNum_Mean_->GetXaxis()->SetNdivisions(PrimVPt_Mean_->GetSize()-2, false);
-  PrimVEta_Mean_->GetXaxis()->CenterLabels();
-  PrimVEta_Mean_->GetXaxis()->SetNdivisions(PrimVEta_Mean_->GetSize()-2, false);
-  PrimVPhi_Mean_->GetXaxis()->CenterLabels();
-  PrimVPhi_Mean_->GetXaxis()->SetNdivisions(PrimVPhi_Mean_->GetSize()-2, false);
+  Multi_SecVPt_->Write();
+  Multi_SecVNum_->Write();
+  Multi_SecVEta_->Write();
+  Multi_SecVPhi_->Write();
 
-  SecVNum_Mean_->GetXaxis()->CenterLabels();
-  SecVNum_Mean_->GetXaxis()->SetNdivisions(SecVNum_Mean_->GetSize()-2, false);
-  SecVPt_Mean_->GetXaxis()->CenterLabels();
-  SecVPt_Mean_->GetXaxis()->SetNdivisions(SecVNum_Mean_->GetSize()-2, false);
-  SecVEta_Mean_->GetXaxis()->CenterLabels();
-  SecVEta_Mean_->GetXaxis()->SetNdivisions(SecVNum_Mean_->GetSize()-2, false);
-  SecVPhi_Mean_->GetXaxis()->CenterLabels();
-  SecVPhi_Mean_->GetXaxis()->SetNdivisions(SecVNum_Mean_->GetSize()-2, false);
+  Multi_AllSecVPt_->Write();
+  Multi_AllSecVNum_->Write();
+  Multi_AllSecVEta_->Write();
+  Multi_AllSecVPhi_->Write();
 
-  AllSecVNum_Mean_->GetXaxis()->CenterLabels();
-  AllSecVNum_Mean_->GetXaxis()->SetNdivisions(AllSecVNum_Mean_->GetSize()-2, false);
-  AllSecVPt_Mean_->GetXaxis()->CenterLabels();
-  AllSecVPt_Mean_->GetXaxis()->SetNdivisions(AllSecVNum_Mean_->GetSize()-2, false);
-  AllSecVEta_Mean_->GetXaxis()->CenterLabels();
-  AllSecVEta_Mean_->GetXaxis()->SetNdivisions(AllSecVNum_Mean_->GetSize()-2, false);
-  AllSecVPhi_Mean_->GetXaxis()->CenterLabels();
-  AllSecVPhi_Mean_->GetXaxis()->SetNdivisions(AllSecVNum_Mean_->GetSize()-2, false);
-
-  // Take the means of the Vertex_dz histograms
-  for( int numdz = 0; numdz < bins_; ++numdz ) {
-
-    Vertex_Dz_Mean_->SetBinContent( numdz+1, Vertex_Dz_[numdz]->GetMean() );
-    Vertex_Dz_Mean_->SetBinError( numdz+1, Vertex_Dz_[numdz]->GetMeanError() );
-    Vertex_Num_Mean_->SetBinContent( numdz+1, Vertex_Num_[numdz]->GetMean() );;
-    Vertex_Num_Mean_->SetBinError( numdz+1, Vertex_Num_[numdz]->GetMeanError() );;
-    Prim_Second_Vertex_Dz_Mean_->SetBinContent( numdz+1, Prim_Second_Vertex_Dz_[numdz]->GetMean() );
-    Prim_Second_Vertex_Dz_Mean_->SetBinError( numdz+1, Prim_Second_Vertex_Dz_[numdz]->GetMeanError() );
-
-    PrimVNum_Mean_->SetBinContent( numdz+1, PrimVNum_[numdz]->GetMean() );
-    PrimVNum_Mean_->SetBinError( numdz+1, PrimVNum_[numdz]->GetMeanError() );
-    PrimVPt_Mean_->SetBinContent( numdz+1, PrimVPt_[numdz]->GetMean() );
-    PrimVPt_Mean_->SetBinError( numdz+1, PrimVPt_[numdz]->GetMeanError() );
-    PrimVEta_Mean_->SetBinContent( numdz+1, PrimVEta_[numdz]->GetMean() );
-    PrimVEta_Mean_->SetBinError( numdz+1, PrimVEta_[numdz]->GetMeanError() );
-    PrimVPhi_Mean_->SetBinContent( numdz+1, PrimVPhi_[numdz]->GetMean() );
-    PrimVPhi_Mean_->SetBinError( numdz+1, PrimVPhi_[numdz]->GetMeanError() );
-
-    SecVNum_Mean_->SetBinContent( numdz+1, SecVNum_[numdz]->GetMean() );
-    SecVNum_Mean_->SetBinError( numdz+1, SecVNum_[numdz]->GetMeanError() );
-    SecVPt_Mean_->SetBinContent( numdz+1, SecVPt_[numdz]->GetMean() );
-    SecVPt_Mean_->SetBinError( numdz+1, SecVPt_[numdz]->GetMeanError() );
-    SecVEta_Mean_->SetBinContent( numdz+1, SecVEta_[numdz]->GetMean() );
-    SecVEta_Mean_->SetBinError( numdz+1, SecVEta_[numdz]->GetMeanError() );
-    SecVPhi_Mean_->SetBinContent( numdz+1, SecVPhi_[numdz]->GetMean() );
-    SecVPhi_Mean_->SetBinError( numdz+1, SecVPhi_[numdz]->GetMeanError() );
-
-    AllSecVNum_Mean_->SetBinContent( numdz+1, AllSecVNum_[numdz]->GetMean() );
-    AllSecVNum_Mean_->SetBinError( numdz+1, AllSecVNum_[numdz]->GetMeanError() );
-    AllSecVPt_Mean_->SetBinContent( numdz+1, AllSecVPt_[numdz]->GetMean() );
-    AllSecVPt_Mean_->SetBinError( numdz+1, AllSecVPt_[numdz]->GetMeanError() );
-    AllSecVEta_Mean_->SetBinContent( numdz+1, AllSecVEta_[numdz]->GetMean() );
-    AllSecVEta_Mean_->SetBinError( numdz+1, AllSecVEta_[numdz]->GetMeanError() );
-    AllSecVPhi_Mean_->SetBinContent( numdz+1, AllSecVPhi_[numdz]->GetMean() );
-    AllSecVPhi_Mean_->SetBinError( numdz+1, AllSecVPhi_[numdz]->GetMeanError() );
+  // Pixel trigger efficiency
+  ofstream multijetPixelEffFile( "multijetPixelEff.txt" );
+  ofstream mEtJetPixelEffFile( "mEtJetPixelEff.txt" );
+  for ( int PVnum=0; PVnum<4; ++PVnum ) {
+    for ( int multijetCount=0; multijetCount<EffMultijetPixelSize_; ++multijetCount ) {
+      float multijetPixelEff = float((EffMultijetPixelArray_[PVnum])[multijetCount])/float(eventcounter_);
+      float multijetPixelEffErr = sqrt(float((EffMultijetPixelArray_[PVnum])[multijetCount]))/float(eventcounter_);
+      EffMultijetPixel_[PVnum]->SetBinContent( multijetCount+1, multijetPixelEff );
+      EffMultijetPixel_[PVnum]->SetBinError( multijetCount+1, multijetPixelEffErr );
+      multijetPixelEffFile << "For PVnum ="<<PVnum<<" and i = "<< multijetCount <<" Eff = " << multijetPixelEff << " +- " << multijetPixelEffErr << endl;
+    }
+    for ( int mEtJetCount=0; mEtJetCount<EffMEtJetPixelSize_; ++mEtJetCount ) {
+      float mEtJetPixelEff = float((EffMEtJetPixelArray_[PVnum])[mEtJetCount])/float(eventcounter_);
+      float mEtJetPixelEffErr = sqrt(float((EffMEtJetPixelArray_[PVnum])[mEtJetCount]))/float(eventcounter_);
+      EffMEtJetPixel_[PVnum]->SetBinContent( mEtJetCount+1, mEtJetPixelEff );
+      EffMEtJetPixel_[PVnum]->SetBinError( mEtJetCount+1, mEtJetPixelEffErr );
+      mEtJetPixelEffFile << "For PVnum = "<<PVnum<<" and i = "<< mEtJetCount <<" Eff = " << mEtJetPixelEff << " +- " << mEtJetPixelEffErr << endl;
+    }
   }
 
   ofstream Effoutputfile( OutputEffFileName.c_str() );
 
-  Effoutputfile << float(Eff_)/float(eventcounter_);
+  Effoutputfile << "Multijet trigger" << endl;
+  Effoutputfile << "----------------" << endl;
+  Effoutputfile << "Eff multijet = " << float(Eff_)/float(eventcounter_) << endl;
+  Effoutputfile << "Eff multijet no-forward = " <<  float(Eff_nofor_)/float(eventcounter_) << endl;
+  Effoutputfile << "Eff central jet = " << float(Eff_cen_)/float(eventcounter_) << endl;
+  Effoutputfile << "Eff tau jet = " << float(Eff_tau_)/float(eventcounter_) << endl;
+  Effoutputfile << "Eff for jet = " << float(Eff_for_)/float(eventcounter_) << endl;
+  Effoutputfile << endl;
+  Effoutputfile << "MEt + Jet trigger" << endl;
+  Effoutputfile << "-----------------" << endl;
+  Effoutputfile << "Eff MEt + Jet = " << float(Eff_MEtJet_)/float(eventcounter_) << endl;
+  Effoutputfile << "Eff MEt + Jet no-forward = " << float(Eff_MEtJet_nofor_)/float(eventcounter_) << endl;
+  Effoutputfile << "Eff MEt + central jet = " << float(Eff_MEtJet_cen_)/float(eventcounter_) << endl;
+  Effoutputfile << "Eff MEt + tau jet = " << float(Eff_MEtJet_tau_)/float(eventcounter_) << endl;
+  Effoutputfile << "Eff MEt + forward jet = " << float(Eff_MEtJet_for_)/float(eventcounter_) << endl;
+  Effoutputfile << endl;
+  Effoutputfile << "Tau trigger" << endl;
+  Effoutputfile << "-----------" << endl;
+  Effoutputfile << "Eff tau trigger = " << float(Eff_tautrig_)/float(eventcounter_) << endl;
+  Effoutputfile << endl;
+  Effoutputfile << "Total events = " << eventcounter_ << endl;
   Effoutputfile.close();
 
 }

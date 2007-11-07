@@ -17,6 +17,7 @@
 <use name=Geometry/CommonDetUnit>
 <use name=Geometry/Records>
 <use name=DataFormats/JetReco>
+<use name=FastSimDataFormats/External>
 
   <use name=DataFormats/Candidate>
   <use name=Geometry/CaloGeometry>
@@ -56,6 +57,7 @@
    <use name=Geometry/CommonDetUnit>
    <use name=Geometry/Records>
    <use name=DataFormats/JetReco>
+   <use name=FastSimDataFormats/External>
 
      <use name=DataFormats/Candidate>
      <use name=Geometry/CaloGeometry>
@@ -95,6 +97,7 @@
    <use name=Geometry/CommonDetUnit>
    <use name=Geometry/Records>
    <use name=DataFormats/JetReco>
+   <use name=FastSimDataFormats/External>
 
      <use name=DataFormats/Candidate>
      <use name=Geometry/CaloGeometry>

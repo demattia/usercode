@@ -46,9 +46,25 @@
 // #include "DataFormats/L1CaloTrigger/interface/L1CaloCollections.h"
 
 // L1Extra
+// #include "DataFormats/CaloTowers/interface/CaloTowerCollection.h"
+#include "DataFormats/Candidate/interface/Candidate.h"
+#include "DataFormats/Candidate/interface/CandidateFwd.h"
+
 #include "DataFormats/L1Trigger/interface/L1EmParticle.h"
 #include "DataFormats/L1Trigger/interface/L1JetParticle.h"
+#include "DataFormats/L1Trigger/interface/L1MuonParticle.h"
 #include "DataFormats/L1Trigger/interface/L1EtMissParticle.h"
+#include "DataFormats/L1Trigger/interface/L1ParticleMap.h"
+
+#include "DataFormats/EcalDigi/interface/EcalDigiCollections.h"
+#include "DataFormats/HcalDigi/interface/HcalDigiCollections.h"
+
+#include "FastSimulation/L1CaloTriggerProducer/interface/FastL1Region.h"
+// No BitInfos for release versions
+#include "FastSimDataFormats/External/interface/FastL1BitInfo.h"
+
+#include "Geometry/CaloTopology/interface/CaloTowerConstituentsMap.h"
+#include "DataFormats/Math/interface/Vector3D.h"
 
 // L1 Pixel
 // #include "DataFormats/TrackerRecHit2D/interface/SiPixelRecHit.h"
@@ -80,11 +96,11 @@
 #include "AnalysisExamples/PixelJet/interface/PixelJet.h"
 
 // GenJets
-#include "DataFormats/JetReco/interface/GenJetfwd.h"
+#include "DataFormats/JetReco/interface/GenJetCollection.h"
 #include "DataFormats/JetReco/interface/GenJet.h"
 
 // Associator for the jets
-#include "/data/demattia/PJVERTEX_CMSSW/Classes/Associator/Associator.h"
+#include "../../PJVERTEX_CMSSW/Classes/Associator/Associator.h"
 
 //
 // class declaration
