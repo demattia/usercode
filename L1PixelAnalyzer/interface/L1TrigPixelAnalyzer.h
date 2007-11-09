@@ -116,12 +116,12 @@
 
 
 // Associator for the jets
-#include "../../PJVERTEX_CMSSW/Classes/Associator/Associator.h"
+#include "AnalysisExamples/AnalysisClasses/interface/Associator.h"
 
 // L1Trigger evaluator
-#include "../../PJVERTEX_CMSSW/Classes/L1Trig/L1Trig.C"
-#include "../../PJVERTEX_CMSSW/Classes/HiVariables/HiVariables.cc"
-#include "../../PJVERTEX_CMSSW/Classes/MultiTH1F/MultiTH1F.h"
+#include "AnalysisExamples/AnalysisClasses/interface/L1Trig.h"
+#include "AnalysisExamples/AnalysisClasses/interface/HiVariables.h"
+#include "AnalysisExamples/AnalysisClasses/interface/MultiTH1F.h"
 
 //
 // class declaration
@@ -202,10 +202,35 @@ class L1TrigPixelAnalyzer : public edm::EDAnalyzer {
   // Trigger efficiency counters
   // Multijet
   int Eff_;
+  int Eff_et1_;
+  int Eff_et2_;
+  int Eff_et3_;
+  int Eff_et4_;
+
   int Eff_cen_;
+  int Eff_cen_et1_;
+  int Eff_cen_et2_;
+  int Eff_cen_et3_;
+  int Eff_cen_et4_;
+
   int Eff_tau_;
+  int Eff_tau_et1_;
+  int Eff_tau_et2_;
+  int Eff_tau_et3_;
+  int Eff_tau_et4_;
+
   int Eff_for_;
+  int Eff_for_et1_;
+  int Eff_for_et2_;
+  int Eff_for_et3_;
+  int Eff_for_et4_;
+
   int Eff_nofor_;
+  int Eff_nofor_et1_;
+  int Eff_nofor_et2_;
+  int Eff_nofor_et3_;
+  int Eff_nofor_et4_;
+
   // MEt+Jet
   int Eff_MEtJet_;
   int Eff_MEtJet_cen_;
@@ -214,6 +239,13 @@ class L1TrigPixelAnalyzer : public edm::EDAnalyzer {
   int Eff_MEtJet_nofor_;
   // Tau
   int Eff_tautrig_;
+  int Eff_tautrig_single_;
+  int Eff_tautrig_ditau_;
+
+  // Offline
+  int offlineEffMultijet_;
+  int offlineEffMEtJet_;
+  int offlineEffTauTrig_;
 
   double dz_;
   double dzmax_;
@@ -221,11 +253,31 @@ class L1TrigPixelAnalyzer : public edm::EDAnalyzer {
 
   // Pixel trigger efficiency
   TH1F ** EffMultijetPixel_;
+  TH1F ** EffMultijetPixelEt1_;
+  TH1F ** EffMultijetPixelEt2_;
+  TH1F ** EffMultijetPixelEt3_;
+  TH1F ** EffMultijetPixelEt4_;
   TH1F ** EffMEtJetPixel_;
   int EffMultijetPixelSize_;
+  int EffMultijetPixelSizeEt1_;
+  int EffMultijetPixelSizeEt2_;
+  int EffMultijetPixelSizeEt3_;
+  int EffMultijetPixelSizeEt4_;
   int EffMEtJetPixelSize_;
   int ** EffMultijetPixelArray_;
+  int ** EffMultijetPixelArrayEt1_;
+  int ** EffMultijetPixelArrayEt2_;
+  int ** EffMultijetPixelArrayEt3_;
+  int ** EffMultijetPixelArrayEt4_;
   int ** EffMEtJetPixelArray_;
+
+  // Offline efficiency
+  TH1F ** offlineEffMultijetPixel_;
+  TH1F ** offlineEffMEtJetPixel_;
+  int offlineEffMultijetPixelSize_;
+  int offlineEffMEtJetPixelSize_;
+  int ** offlineEffMultijetPixelArray_;
+  int ** offlineEffMEtJetPixelArray_;
 
   // Directory in the root file to hold the multiple histograms
   TDirectory *DirVertexDz_;

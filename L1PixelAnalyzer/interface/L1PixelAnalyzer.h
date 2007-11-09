@@ -100,7 +100,12 @@
 #include "DataFormats/JetReco/interface/GenJet.h"
 
 // Associator for the jets
-#include "../../PJVERTEX_CMSSW/Classes/Associator/Associator.h"
+#include "AnalysisExamples/AnalysisClasses/interface/Associator.h"
+
+// L1Trigger evaluator
+#include "AnalysisExamples/AnalysisClasses/interface/L1Trig.h"
+#include "AnalysisExamples/AnalysisClasses/interface/HiVariables.h"
+#include "AnalysisExamples/AnalysisClasses/interface/MultiTH1F.h"
 
 //
 // class declaration

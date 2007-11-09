@@ -2,29 +2,10 @@
 
 #include "AnalysisExamples/L1PixelAnalyzer/interface/L1PixelAnalyzer.h"
 
-// Add a simple Jet class to allow merging of CenJets and TauJets to be used with the Associator.
-class SimpleJet {
- public:
-  SimpleJet( double PT, double ETA, double PHI ) {
-    pt_ = PT;
-    eta_ = ETA;
-    phi_ = PHI;
-  }
-  double pt() const {
-    return pt_;
-  }
-  double eta() const {
-    return eta_;
-  }
-  double phi() const {
-    return phi_;
-  }
- private:
-  double pt_;
-  double eta_;
-  double phi_;
-};
-
+#include "AnalysisExamples/AnalysisClasses/interface/SimpleJet.h"
+#include "AnalysisExamples/AnalysisClasses/interface/Associator.h"
+#include "AnalysisExamples/AnalysisClasses/interface/DeltaPhi.h"
+#include "AnalysisExamples/AnalysisClasses/interface/L1PixelTrig.h"
 
 //
 // constants, enums and typedefs
@@ -449,7 +430,9 @@ L1PixelAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
   std::map<const PixelJet*, const SimpleJet*>::const_iterator PJ_L1J_assoc_it = (*PJ_L1J_AssocMap).begin();
   for( ; PJ_L1J_assoc_it != (*PJ_L1J_AssocMap).end(); ++PJ_L1J_assoc_it ) {
     PJ_L1J_PtRes_->Fill( PJ_L1J_assoc_it->first->pt(), PJ_L1J_assoc_it->second->pt() );
+#ifdef DEBUG
     std::cout << "PJ_pt = " << PJ_L1J_assoc_it->first->pt() << " , SimpleJet_pt = " << PJ_L1J_assoc_it->second->pt() << std::endl;
+#endif
   }
 
   
