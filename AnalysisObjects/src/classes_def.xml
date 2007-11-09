@@ -1,0 +1,78 @@
+<lcgdict>
+  <class name="anaobj::AnalyzedTrack"/>
+  <class name="std::vector<anaobj::AnalyzedTrack>"/>
+  <class name="edm::Wrapper<std::vector<anaobj::AnalyzedTrack> >"/>
+  <class name="std::vector<anaobj::AnalyzedTrack>::const_iterator"/>
+  <class name="edm::Wrapper<std::vector<anaobj::AnalyzedTrack>::const_iterator >"/>
+  <class name="std::vector<anaobj::AnalyzedTrack>::iterator"/>
+  <class name="edm::Wrapper<std::vector<anaobj::AnalyzedTrack>::iterator >"/>
+  <class name="edm::RefProd<std::vector<anaobj::AnalyzedTrack> >"/>
+  <class name="edm::Ref<std::vector<anaobj::AnalyzedTrack>,anaobj::AnalyzedTrack,edm::refhelper::FindUsingAdvance<std::vector<anaobj::AnalyzedTrack>,anaobj::AnalyzedTrack> >"/>
+  <class name="edm::Wrapper<edm::Ref<std::vector<anaobj::AnalyzedTrack>,anaobj::AnalyzedTrack,edm::refhelper::FindUsingAdvance<std::vector<anaobj::AnalyzedTrack>,anaobj::AnalyzedTrack> > >"/>
+  <class name="edm::RefVector<std::vector<anaobj::AnalyzedTrack>,anaobj::AnalyzedTrack,edm::refhelper::FindUsingAdvance<std::vector<anaobj::AnalyzedTrack>,anaobj::AnalyzedTrack> >"/>
+  <class name="edm::Wrapper<edm::RefVector<std::vector<anaobj::AnalyzedTrack>,anaobj::AnalyzedTrack,edm::refhelper::FindUsingAdvance<std::vector<anaobj::AnalyzedTrack>,anaobj::AnalyzedTrack> > >"/>
+
+  <class name="anaobj::AnalyzedCluster"/>
+  <class name="std::vector<anaobj::AnalyzedCluster>"/>
+  <class name="edm::Wrapper<std::vector<anaobj::AnalyzedCluster> >"/>
+  <class name="std::vector<anaobj::AnalyzedCluster>::const_iterator"/>
+  <class name="edm::Wrapper<std::vector<anaobj::AnalyzedCluster>::const_iterator >"/>
+  <class name="std::vector<anaobj::AnalyzedCluster>::iterator"/>
+  <class name="edm::Wrapper<std::vector<anaobj::AnalyzedCluster>::iterator >"/>
+
+  <class name="std::pair<int, int>"/>
+  <class name="edm::Wrapper<std::pair<int, int> >"/>
+  <class name="std::map<int, int>"/>
+  <class name="edm::Wrapper<std::map<int, int> >"/>
+  <class name="std::map<int, int>::iterator"/>
+  <class name="std::map<int, int>::const_iterator"/>
+
+  <class name="std::pair<const int, int>"/>
+  <class name="std::map<const int, int>"/>
+  <class name="edm::Wrapper<std::map<const int, int> >"/>
+  <class name="std::map<const int, int>::iterator"/>
+  <class name="std::map<const int, int>::const_iterator"/>
+
+  <class name="std::pair<int, float>"/>
+  <class name="edm::Wrapper<std::pair<int, float> >"/>
+  <class name="std::map<int, float>"/>
+  <class name="edm::Wrapper<std::map<int, float> >"/>
+  <class name="std::map<int, float>::iterator"/>
+  <class name="std::map<int, float>::const_iterator"/>
+
+  <class name="std::pair<const int, float>"/>
+  <class name="std::map<const int, float>"/>
+  <class name="edm::Wrapper<std::map<const int, float > >"/>
+  <class name="std::map<const int, float>::iterator"/>
+  <class name="std::map<const int, float>::const_iterator"/>
+
+  <class name="edm::RefProd<std::vector<anaobj::AnalyzedCluster> >"/>
+  <class name="edm::Ref<std::vector<anaobj::AnalyzedCluster>,anaobj::AnalyzedCluster,edm::refhelper::FindUsingAdvance<std::vector<anaobj::AnalyzedCluster>,anaobj::AnalyzedCluster> >"/>
+  <class name="edm::Wrapper<edm::Ref<std::vector<anaobj::AnalyzedCluster>,anaobj::AnalyzedCluster,edm::refhelper::FindUsingAdvance<std::vector<anaobj::AnalyzedCluster>,anaobj::AnalyzedCluster> > >"/>
+  <class name="edm::RefVector<std::vector<anaobj::AnalyzedCluster>,anaobj::AnalyzedCluster,edm::refhelper::FindUsingAdvance<std::vector<anaobj::AnalyzedCluster>,anaobj::AnalyzedCluster> >"/>
+  <class name="edm::Wrapper<edm::RefVector<std::vector<anaobj::AnalyzedCluster>,anaobj::AnalyzedCluster,edm::refhelper::FindUsingAdvance<std::vector<anaobj::AnalyzedCluster>,anaobj::AnalyzedCluster> > >"/>
+
+
+  <class name="anaobj::BaseAll"/>
+  <class name="anaobj::BaseJet"/>
+  <class name="std::vector<anaobj::BaseJet>"/>
+  <class name="edm::Wrapper<std::vector<anaobj::BaseJet> >"/>
+  <class name="std::vector<anaobj::BaseJet>::const_iterator"/>
+  <class name="edm::Wrapper<std::vector<anaobj::BaseJet>::const_iterator >"/>
+  <class name="std::vector<anaobj::BaseJet>::iterator"/>
+  <class name="edm::Wrapper<std::vector<anaobj::BaseJet>::iterator >"/>
+
+  <class name="anaobj::OfflineJet"/>
+  <class name="std::vector<anaobj::OfflineJet>"/>
+  <class name="edm::Wrapper<std::vector<anaobj::OfflineJet> >"/>
+  <class name="std::vector<anaobj::OfflineJet>::const_iterator"/>
+  <class name="edm::Wrapper<std::vector<anaobj::OfflineJet>::const_iterator >"/>
+  <class name="std::vector<anaobj::OfflineJet>::iterator"/>
+  <class name="edm::Wrapper<std::vector<anaobj::OfflineJet>::iterator >"/>
+
+  <class name="anaobj::BaseMEt"/>
+  <class name="edm::Wrapper<anaobj::BaseMEt>"/>
+  <class name="anaobj::OfflineMEt"/>
+  <class name="edm::Wrapper<anaobj::OfflineMEt>"/>
+
+</lcgdict>

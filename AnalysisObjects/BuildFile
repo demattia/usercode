@@ -1,0 +1,22 @@
+<use name=FWCore/Framework>
+<use name=FWCore/ParameterSet>
+
+<use name=DataFormats/Common>
+
+<use name=clhep>
+<use name=boost>
+<use name=root>
+
+<export>
+ <use name=FWCore/Framework>
+ <use name=FWCore/ParameterSet>
+ <use name=DataFormats/Common>
+
+ <use name=clhep>
+ <use name=boost>
+ <use name=root>
+
+ <lib name=AnalysisExamplesAnalysisObjects>
+</export>
+
+
