@@ -75,4 +75,30 @@
   <class name="anaobj::OfflineMEt"/>
   <class name="edm::Wrapper<anaobj::OfflineMEt>"/>
 
+  <class name="anaobj::BaseParticle"/>
+
+  <class name="anaobj::MCParticle"/>
+  <class name="std::vector<anaobj::MCParticle>"/>
+  <class name="edm::Wrapper<std::vector<anaobj::MCParticle> >"/>
+  <class name="std::vector<anaobj::MCParticle>::const_iterator"/>
+  <class name="edm::Wrapper<std::vector<anaobj::MCParticle>::const_iterator >"/>
+  <class name="std::vector<anaobj::MCParticle>::iterator"/>
+  <class name="edm::Wrapper<std::vector<anaobj::MCParticle>::iterator >"/>
+
+  <class name="anaobj::SimplePixelJet"/>
+  <class name="std::vector<anaobj::SimplePixelJet>"/>
+  <class name="edm::Wrapper<std::vector<anaobj::SimplePixelJet> >"/>
+  <class name="std::vector<anaobj::SimplePixelJet>::const_iterator"/>
+  <class name="edm::Wrapper<std::vector<anaobj::SimplePixelJet>::const_iterator >"/>
+  <class name="std::vector<anaobj::SimplePixelJet>::iterator"/>
+  <class name="edm::Wrapper<std::vector<anaobj::SimplePixelJet>::iterator >"/>
+
+  <class name="anaobj::GlobalMuon"/>
+  <class name="std::vector<anaobj::GlobalMuon>"/>
+  <class name="edm::Wrapper<std::vector<anaobj::GlobalMuon> >"/>
+  <class name="std::vector<anaobj::GlobalMuon>::const_iterator"/>
+  <class name="edm::Wrapper<std::vector<anaobj::GlobalMuon>::const_iterator >"/>
+  <class name="std::vector<anaobj::GlobalMuon>::iterator"/>
+  <class name="edm::Wrapper<std::vector<anaobj::GlobalMuon>::iterator >"/>
+
 </lcgdict>

@@ -5,6 +5,10 @@
 #include "AnalysisExamples/AnalysisObjects/interface/BaseMEt.h"
 #include "AnalysisExamples/AnalysisObjects/interface/OfflineMEt.h"
 #include "AnalysisExamples/AnalysisObjects/interface/OfflineJet.h"
+#include "AnalysisExamples/AnalysisObjects/interface/BaseParticle.h"
+#include "AnalysisExamples/AnalysisObjects/interface/MCParticle.h"
+#include "AnalysisExamples/AnalysisObjects/interface/SimplePixelJet.h"
+#include "AnalysisExamples/AnalysisObjects/interface/GlobalMuon.h"
 #include <vector>
 #include <map>
 
@@ -94,5 +98,29 @@ namespace {
     edm::Wrapper<anaobj::BaseMEt> wmet1;
     anaobj::OfflineMEt offlinemet1;
     edm::Wrapper<anaobj::OfflineMEt> wofflinemet1;
+
+    // MCParticles
+    anaobj::MCParticleCollection mcparc1;
+    edm::Wrapper<anaobj::MCParticleCollection> wmcparc1;
+    anaobj::MCParticleCollection::const_iterator citmcparc1;
+    edm::Wrapper<anaobj::MCParticleCollection::const_iterator> wcitmcparc1;
+    anaobj::MCParticleCollection::iterator itmcparc1;
+    edm::Wrapper<anaobj::MCParticleCollection::iterator> witmcparc1;
+
+    // SimplePixelJets
+    anaobj::SimplePixelJetCollection spjc1;
+    edm::Wrapper<anaobj::SimplePixelJetCollection> wspjc1;
+    anaobj::SimplePixelJetCollection::const_iterator citspjc1;
+    edm::Wrapper<anaobj::SimplePixelJetCollection::const_iterator> wcitspjc1;
+    anaobj::SimplePixelJetCollection::iterator itspjc1;
+    edm::Wrapper<anaobj::SimplePixelJetCollection::iterator> witspjc1;
+
+    anaobj::GlobalMuonCollection gmc1;
+    edm::Wrapper<anaobj::GlobalMuonCollection> wgmc1;
+    anaobj::GlobalMuonCollection::const_iterator citgmc1;
+    edm::Wrapper<anaobj::GlobalMuonCollection::const_iterator> wcitgmc1;
+    anaobj::GlobalMuonCollection::iterator itgmc1;
+    edm::Wrapper<anaobj::GlobalMuonCollection::iterator> witgmc1;
+
   }
 }

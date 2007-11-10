@@ -1,5 +1,5 @@
-#ifndef JET_H
-#define JET_H
+#ifndef BASEJET_H
+#define BASEJET_H
 
 #include "FWCore/Framework/interface/Frameworkfwd.h"
 #include "AnalysisExamples/AnalysisObjects/interface/BaseAll.h"
@@ -9,7 +9,7 @@
 
 /**
  *
- * Simple BaseJet class used for L1BaseJets and as base class
+ * Simple BaseJet class used for L1Jets and as base class
  * for IC5 jets.
  *
  * Author M. De Mattia - 8/11/2007
@@ -23,7 +23,7 @@ namespace anaobj {
     BaseJet( const double & ET, const double & ETA, const double & PHI ) : BaseAll( ETA, PHI ) {
       et_ = ET;
     }
-    // Default constructor, only needed for classes.h
+    /// Default constructor, only needed for classes.h
     BaseJet() : BaseAll( 0., 0. ) {
       et_ = 0.;
     }
@@ -42,7 +42,7 @@ namespace anaobj {
     float e() const {
       return std::sqrt(std::pow(ex(),2)+std::pow(ey(),2)+std::pow(ez(),2));
     }
-    // To sort the BaseJets
+    /// To sort the BaseJets
     bool operator< ( const BaseJet& b ) const {
       return et() < b.et();
     }
@@ -54,4 +54,4 @@ namespace anaobj {
 
 }
 
-#endif // JET_H
+#endif // BASEJET_H
