@@ -101,4 +101,23 @@
   <class name="std::vector<anaobj::GlobalMuon>::iterator"/>
   <class name="edm::Wrapper<std::vector<anaobj::GlobalMuon>::iterator >"/>
 
+  <class name="anaobj::SimpleElectron"/>
+  <class name="std::vector<anaobj::SimpleElectron>"/>
+  <class name="edm::Wrapper<std::vector<anaobj::SimpleElectron> >"/>
+  <class name="std::vector<anaobj::SimpleElectron>::const_iterator"/>
+  <class name="edm::Wrapper<std::vector<anaobj::SimpleElectron>::const_iterator >"/>
+  <class name="std::vector<anaobj::SimpleElectron>::iterator"/>
+  <class name="edm::Wrapper<std::vector<anaobj::SimpleElectron>::iterator >"/>
+
+  <class name="anaobj::SimpleTau"/>
+  <class name="std::vector<anaobj::SimpleTau>"/>
+  <class name="edm::Wrapper<std::vector<anaobj::SimpleTau> >"/>
+  <class name="std::vector<anaobj::SimpleTau>::const_iterator"/>
+  <class name="edm::Wrapper<std::vector<anaobj::SimpleTau>::const_iterator >"/>
+  <class name="std::vector<anaobj::SimpleTau>::iterator"/>
+  <class name="edm::Wrapper<std::vector<anaobj::SimpleTau>::iterator >"/>
+
+  <class name="anaobj::Summary"/>
+  <class name="edm::Wrapper<anaobj::Summary>"/>
+
 </lcgdict>

@@ -9,7 +9,7 @@
 
 /**
  *
- * Stores a ParamGlobalMuon. Includes em , had and ho energy and
+ * Stores a ParamGlobalMuon. Includes em, had and ho energy and
  * sumPt from tracks for isolation.
  *
  * Inherits from BaseParticle.
@@ -30,7 +30,7 @@ namespace anaobj {
       caloHo_ = CALOHO;
       iso03SumPt_ = ISO03SUMPT;
     }
-    // Default constructor, only needed for classes.h
+    /// Default constructor, only needed for classes.h
     GlobalMuon() : BaseParticle( 0., 0., 0. ) {
       caloEm_ = 0.;
       caloHad_ = 0.;

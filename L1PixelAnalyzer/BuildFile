@@ -32,7 +32,10 @@
   <use name=JetMETCorrections/Objects>
   <use name=JetMETCorrections/MCJet>
   <use name=DataFormats/BTauReco>
+  <use name=DataFormats/MuonReco>
   <use name=DataFormats/TrackReco>
+  <use name=DataFormats/EgammaCandidates>
+  <use name=RecoTauTag/InvariantMass>
 
   <use name=AnalysisExamples/AnalysisObjects>
   <use name=AnalysisExamples/AnalysisClasses>
@@ -77,7 +80,10 @@
      <use name=JetMETCorrections/Objects>
      <use name=JetMETCorrections/MCJet>
      <use name=DataFormats/BTauReco>
+     <use name=DataFormats/MuonReco>
      <use name=DataFormats/TrackReco>
+     <use name=DataFormats/EgammaCandidates>
+     <use name=RecoTauTag/InvariantMass>
 
      <use name=AnalysisExamples/AnalysisObjects>
      <use name=AnalysisExamples/AnalysisClasses>
@@ -122,7 +128,10 @@
      <use name=JetMETCorrections/Objects>
      <use name=JetMETCorrections/MCJet>
      <use name=DataFormats/BTauReco>
+     <use name=DataFormats/MuonReco>
      <use name=DataFormats/TrackReco>
+     <use name=DataFormats/EgammaCandidates>
+     <use name=RecoTauTag/InvariantMass>
 
      <use name=AnalysisExamples/AnalysisObjects>
      <use name=AnalysisExamples/AnalysisClasses>
@@ -168,7 +177,10 @@
      <use name=JetMETCorrections/Objects>
      <use name=JetMETCorrections/MCJet>
      <use name=DataFormats/BTauReco>
+     <use name=DataFormats/MuonReco>
      <use name=DataFormats/TrackReco>
+     <use name=DataFormats/EgammaCandidates>
+     <use name=RecoTauTag/InvariantMass>
 
      <use name=AnalysisExamples/AnalysisObjects>
      <use name=AnalysisExamples/AnalysisClasses>

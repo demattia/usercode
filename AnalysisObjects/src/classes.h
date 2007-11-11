@@ -9,6 +9,9 @@
 #include "AnalysisExamples/AnalysisObjects/interface/MCParticle.h"
 #include "AnalysisExamples/AnalysisObjects/interface/SimplePixelJet.h"
 #include "AnalysisExamples/AnalysisObjects/interface/GlobalMuon.h"
+#include "AnalysisExamples/AnalysisObjects/interface/SimpleElectron.h"
+#include "AnalysisExamples/AnalysisObjects/interface/SimpleTau.h"
+#include "AnalysisExamples/AnalysisObjects/interface/Summary.h"
 #include <vector>
 #include <map>
 
@@ -115,6 +118,7 @@ namespace {
     anaobj::SimplePixelJetCollection::iterator itspjc1;
     edm::Wrapper<anaobj::SimplePixelJetCollection::iterator> witspjc1;
 
+    // GlobalMuons
     anaobj::GlobalMuonCollection gmc1;
     edm::Wrapper<anaobj::GlobalMuonCollection> wgmc1;
     anaobj::GlobalMuonCollection::const_iterator citgmc1;
@@ -122,5 +126,24 @@ namespace {
     anaobj::GlobalMuonCollection::iterator itgmc1;
     edm::Wrapper<anaobj::GlobalMuonCollection::iterator> witgmc1;
 
+    // SimpleElectrons
+    anaobj::SimpleElectronCollection sec1;
+    edm::Wrapper<anaobj::SimpleElectronCollection> wsec1;
+    anaobj::SimpleElectronCollection::const_iterator citsec1;
+    edm::Wrapper<anaobj::SimpleElectronCollection::const_iterator> wcitsec1;
+    anaobj::SimpleElectronCollection::iterator itsec1;
+    edm::Wrapper<anaobj::SimpleElectronCollection::iterator> witsec1;
+
+    // SimpleTau
+    anaobj::SimpleTauCollection simpletauc1;
+    edm::Wrapper<anaobj::SimpleTauCollection> wsimpletauc1;
+    anaobj::SimpleTauCollection::const_iterator citsimpletauc1;
+    edm::Wrapper<anaobj::SimpleTauCollection::const_iterator> wcitsimpletauc1;
+    anaobj::SimpleTauCollection::iterator itsimpletauc1;
+    edm::Wrapper<anaobj::SimpleTauCollection::iterator> witsimpletauc1;
+
+    // Summary
+    anaobj::Summary summary1;
+    edm::Wrapper<anaobj::Summary> wsummary1;
   }
 }
