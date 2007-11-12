@@ -18,7 +18,10 @@
 #include "DataFormats/TrackReco/interface/Track.h"
 
 #include <vector>
+#include <cmath>
 #include <boost/cstdint.hpp>
+
+using namespace std;
 
 class PixelJet{
  public:
@@ -32,13 +35,21 @@ class PixelJet{
     eta_ = 0.;
     phi_ = 0.;
     pt_ = 0.;
+    px_ = 0.;
+    py_ = 0.;
+    pz_ = 0.;
     z_ = 0.;
   }
 
   void PixelTrackRef( reco::TrackRef pixeltrack_ref ) {
     pt_ += pixeltrack_ref->pt();
-    eta_ += pixeltrack_ref->eta()*pixeltrack_ref->pt();
-    phi_ += pixeltrack_ref->phi()*pixeltrack_ref->pt();
+//    eta_ += pixeltrack_ref->eta()*pixeltrack_ref->pt();
+//    phi_ += pixeltrack_ref->phi()*pixeltrack_ref->pt();
+    // To evaluate the mean direction sum the vectors of the tracks
+    px_ += pixeltrack_ref->px();
+    py_ += pixeltrack_ref->py();
+    pz_ += pixeltrack_ref->pz();
+
     z_ += ( pixeltrack_ref->vertex().z() )*pixeltrack_ref->pt();
     vecRefPixelTrack.push_back(pixeltrack_ref);
     ++pixelTracksNumber_;
@@ -50,8 +61,11 @@ class PixelJet{
 
   void Close() {
     if ( pixelTracksNumber_ != 0 ) {
-      eta_ = eta_/pt_;
-      phi_ = phi_/pt_;
+      phi_ = (px_==0 && py_==0) ? 0 : atan2(py_, px_);
+      double theta = (pt_==0 && pz_==0) ? 0 : atan2(pz_, pt_);
+      eta_ = -log(tan(0.5*theta));
+//       eta_ = eta_/pt_;
+//       phi_ = phi_/pt_;
       z_ = z_/pt_;
     }
     else {
@@ -81,6 +95,9 @@ class PixelJet{
 
   int pixelTracksNumber_;
   double pt_;
+  double px_;
+  double py_;
+  double pz_;
   double eta_;
   double phi_;
   double z_;

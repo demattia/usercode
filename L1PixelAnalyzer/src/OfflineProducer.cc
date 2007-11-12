@@ -103,6 +103,7 @@ OfflineProducer::OfflineProducer(const edm::ParameterSet& iConfig) :
 
   eventcounter_ = 0;
 //  PI_ = 3.141593;
+  chargedpi_mass_ = 0.13957018;
 
   // L1
   produces<anaobj::BaseJetCollection>( cenJets_ );
@@ -338,7 +339,8 @@ OfflineProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
     int tkcount = 0;
     int tkNum = TkIpTagInfo_it->selectedTracks().size();
     double tkSumPt = 0.;
-    const RefVector<TrackCollection> & vec_TkColl = TkIpTagInfo_it->selectedTracks();
+//    const RefVector<TrackCollection> & vec_TkColl = TkIpTagInfo_it->selectedTracks();
+    const TrackRefVector & vec_TkColl = TkIpTagInfo_it->selectedTracks();
     RefVector<TrackCollection>::const_iterator TkColl_it = vec_TkColl.begin();
     for ( ; TkColl_it != vec_TkColl.end(); ++TkColl_it ) {
 //      cout << "tk_pt["<<tkcount<<"] = " << (*TkColl_it)->pt() << endl;
@@ -350,11 +352,17 @@ OfflineProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
     double jetMass = 0;
     if ( corEt > corPt ) jetMass = sqrt( corEt*corEt - corPt*corPt );
 
+    // Evaluate tag tracks invariant mass
+    double bTagTkInvMass = tagTracksInvariantMass( vec_TkColl );
+    cout << "bTag tracks invariant mass = " << bTagTkInvMass << endl;
+
     // Passing corrected Et, eta, phi, uncorrected Et, emEnergyFraction
     vec_IC5Jets_ptr->push_back( OfflineJet( corEt, caloJets_it->eta(), caloJets_it->phi(), caloJets_it->et(),
                                             caloJets_it->emEnergyFraction(),
                                             bTagHighEff_it->second, bTagHighPur_it->second,
-                                            tkNum, tkSumPt, jetMass ) );
+                                            jetMass, tkNum, tkSumPt, bTagTkInvMass ) );
+
+
 
 //     cout << "high eff jet["<<taginfocounter<<"] = " << bTagHighEff_it->second << endl;
 //     cout << "high pur jet["<<taginfocounter<<"] = " << bTagHighPur_it->second << endl;
@@ -484,6 +492,9 @@ OfflineProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 
   // See here: https://twiki.cern.ch/twiki/bin/view/CMS/MuonIsolation#Suggested_cuts
   // for possible isolation cut values.
+  // From which:
+  // sumPt < 3 in cone 0.3 will give a 96.7 \pm 0.7 % efficiency with about a factor of 10 rejection of muon candidates reconstructed in QCD events.
+  // Use chi2/ndof < 10, nHits>=8 as a quality cut on reconstructed muon (applied to a global-muon, this cut allows to suppress fake muons from K/pi). 
 
   auto_ptr<GlobalMuonCollection> vec_glbmuon_ptr( new GlobalMuonCollection );
 
@@ -500,6 +511,12 @@ OfflineProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
     vec_glbmuon_ptr->push_back( GlobalMuon( muon_it->pt(), muon_it->eta(), muon_it->phi(), muon_it->getCalEnergy().em,
                                             muon_it->getCalEnergy().had, muon_it->getCalEnergy().ho,
                                             muon_it->getIsolationR03().sumPt ) );
+
+
+//     cout << "combined muon number found of hits = " << muon_it->combinedMuon().get()->found() << endl;
+//     cout << "combined muon number valid of hits = " << muon_it->combinedMuon().get()->numberOfValidHits() << endl;
+//     cout << "combined muon chi2 = " << muon_it->combinedMuon().get()->normalizedChi2() << endl;
+
   }
 
   iEvent.put( vec_glbmuon_ptr, globalMuons_ );
@@ -545,46 +562,48 @@ OfflineProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
   // Other important source to look at:                             //
   // ElectroWeakAnalysis/ZTauTau_DoubleTauJet/src/EWKTauAnalyser.cc //
   // -------------------------------------------------------------- //
-  string caloInvMassSrc_ = "invariantMass";
-  double matchingCone_ = 0.1;
-  double signalCone_ = 0.07;
-  double isolationCone_ = 0.4;
-  double leadingTrackPt_ = 6.;
-  double minimumTrackPt_ = 1.;
-//   double clusterSelectionCone_ = 0.4;
-  double clusterTrackMatchingCone_ = 0.08;
-//   double invariantMassCutoff_ = 100.0;
 
 
+//   string caloInvMassSrc_ = "invariantMass";
+//   double matchingCone_ = 0.1;
+//   double signalCone_ = 0.07;
+//   double isolationCone_ = 0.4;
+//   double leadingTrackPt_ = 6.;
+//   double minimumTrackPt_ = 1.;
+// //   double clusterSelectionCone_ = 0.4;
+//   double clusterTrackMatchingCone_ = 0.08;
+// //   double invariantMassCutoff_ = 100.0;
+
+//   Handle<TauMassTagInfoCollection> massTagInfoHandle;
+//   iEvent.getByLabel( caloInvMassSrc_, massTagInfoHandle );
+//   cout << "massTagInfoHandle.isValid() = " << massTagInfoHandle.isValid() << endl;
+//   if (massTagInfoHandle.isValid()) {
+//     const TauMassTagInfoCollection& massTagInfoColl = *(massTagInfoHandle.product());
+
+//     for (TauMassTagInfoCollection::const_iterator iter  = massTagInfoColl.begin(); 
+//          iter != massTagInfoColl.end();
+//          ++iter) {
+//       const IsolatedTauTagInfo& isolatedTauTag = *(iter->getIsolatedTauTag());
+//       double discriminator = isolatedTauTag.discriminator(matchingCone_, signalCone_, isolationCone_, leadingTrackPt_, minimumTrackPt_);
+
+//       cout << "discriminator = " << discriminator << endl;
+//       cout << "TauJet et = " << isolatedTauTag.jet()->et() << endl;
+//       cout << "TauJet eta = " << isolatedTauTag.jet()->eta() << endl;
+//       cout << "TauJet phi = " << isolatedTauTag.jet()->phi() << endl;
+//       cout << "TauJet track number = " << isolatedTauTag.allTracks().size() << endl;
+
+//       if (discriminator == 0) continue;
+//       double invMass = iter->getInvariantMass(matchingCone_, leadingTrackPt_, signalCone_, clusterTrackMatchingCone_); 
+//       cout << "tau invariant mass = " << invMass << endl;
+// //       if (fabs(invMass - 0.139) < 0.01) invMass = 0.0;
+// //       if (invMass > -1.0) caloInvMassH->Fill(invMass);
+//     }
+//   }
 
 
-  Handle<TauMassTagInfoCollection> massTagInfoHandle;
-  iEvent.getByLabel( caloInvMassSrc_, massTagInfoHandle );
-  cout << "massTagInfoHandle.isValid() = " << massTagInfoHandle.isValid() << endl;
-  if (massTagInfoHandle.isValid()) {
-    const TauMassTagInfoCollection& massTagInfoColl = *(massTagInfoHandle.product());
-
-    for (TauMassTagInfoCollection::const_iterator iter  = massTagInfoColl.begin(); 
-         iter != massTagInfoColl.end();
-         ++iter) {
-      const IsolatedTauTagInfo& isolatedTauTag = *(iter->getIsolatedTauTag());
-      double discriminator = isolatedTauTag.discriminator(matchingCone_, signalCone_, isolationCone_, leadingTrackPt_, minimumTrackPt_);
-
-      cout << "discriminator = " << discriminator << endl;
-      cout << "TauJet et = " << isolatedTauTag.jet()->et() << endl;
-      cout << "TauJet eta = " << isolatedTauTag.jet()->eta() << endl;
-      cout << "TauJet phi = " << isolatedTauTag.jet()->phi() << endl;
-      cout << "TauJet track number = " << isolatedTauTag.allTracks().size() << endl;
-
-      if (discriminator == 0) continue;
-      double invMass = iter->getInvariantMass(matchingCone_, leadingTrackPt_, signalCone_, clusterTrackMatchingCone_); 
-      cout << "tau invariant mass = " << invMass << endl;
-//       if (fabs(invMass - 0.139) < 0.01) invMass = 0.0;
-//       if (invMass > -1.0) caloInvMassH->Fill(invMass);
-    }
-  }
 
   const IsolatedTauTagInfoCollection & tauTagInfo = *(tauTagInfoHandle.product());
+  cout << "tauinfo collection size = " << tauTagInfo.size() << endl;
   IsolatedTauTagInfoCollection::const_iterator tauTagInfo_it = tauTagInfo.begin();
   for ( ; tauTagInfo_it != tauTagInfo.end(); ++tauTagInfo_it ) {
 //     cout << "TauJet pt = " << tauTagInfo_it->jet()->pt() << endl;
@@ -592,7 +611,26 @@ OfflineProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 //     cout << "TauJet eta = " << tauTagInfo_it->jet()->eta() << endl;
 //     cout << "TauJet phi = " << tauTagInfo_it->jet()->phi() << endl;
 //     cout << "TauJet track number = " << tauTagInfo_it->allTracks().size() << endl;
-    vec_simptau_ptr->push_back( SimpleTau( tauTagInfo_it->jet()->pt(), tauTagInfo_it->jet()->eta(), tauTagInfo_it->jet()->phi(), 0., tauTagInfo_it->allTracks().size() ) ); 
+//    cout << "tracks invariant mass = " << tauTagInfo_it->jtaRef()->TracksInvariantMass() << endl;
+    cout << "IsolationTauTagInfo all tracks = " << tauTagInfo_it->allTracks().size() << endl;
+    cout << "IsolationTauTagInfo selected tracks = " << tauTagInfo_it->selectedTracks().size() << endl;
+
+//    const TrackRefVector & tauIsoSelectedTks = tauTagInfo_it->selectedTracks();
+
+    double tauJetE = tauTagInfo_it->jet()->energy();
+    double tauJetP = tauTagInfo_it->jet()->p();
+    double tauJetMass = sqrt( pow(tauJetE,2) - pow(tauJetP,2) );
+
+    //get the tracks from the jetTag
+    double tauTagTkInvMass = tagTracksInvariantMass( tauTagInfo_it->allTracks() );
+    //get the selected tracks used to computed the isolation
+    double tauIsoTkInvMass = tagTracksInvariantMass( tauTagInfo_it->selectedTracks() );
+
+    vec_simptau_ptr->push_back( SimpleTau( tauTagInfo_it->jet()->pt(), tauTagInfo_it->jet()->eta(), tauTagInfo_it->jet()->phi(), tauTagTkInvMass, tauTagInfo_it->allTracks().size() ) ); 
+
+    cout << "tau tag tk invariant mass = " << tauTagTkInvMass << endl;
+    cout << "tau isolation tk invariant mass = " << tauIsoTkInvMass << endl;
+
   }
 
   iEvent.put( vec_simptau_ptr, simpleTaus_ );
@@ -667,6 +705,29 @@ void OfflineProducer::beginJob(const edm::EventSetup&) {
 
 // ------------ method called once each job just after ending the event loop  ------------
 void OfflineProducer::endJob() {
+}
+
+/** Taken from CMSSW/RecoTauTag/RecoTau/src/CaloRecoTauAlgorithm.cc
+ * Evaluate jet tracks invariant mass
+ */
+double OfflineProducer::tagTracksInvariantMass( const TrackRefVector & selectedTracks ) const {
+  //      int TksQsum = 0;
+  // setting invariant mass of the signal Tracks system
+  math::XYZTLorentzVector mySignalTksInvariantMass(0.,0.,0.,0.);
+  if( (int)(selectedTracks.size()) != 0 ) {
+    int mySignalTks_qsum = 0;
+    for ( int i=0; i<(int)selectedTracks.size(); ++i ) {
+      mySignalTks_qsum += (selectedTracks)[i]->charge();
+      math::XYZTLorentzVector mychargedpicand_fromTk_LorentzVect( (selectedTracks)[i]->momentum().x(),
+                                                                  (selectedTracks)[i]->momentum().y(),
+                                                                  (selectedTracks)[i]->momentum().z(),
+                                                                  sqrt(pow((double)(selectedTracks)[i]->momentum().r(),2) + pow(chargedpi_mass_,2)));
+      mySignalTksInvariantMass += mychargedpicand_fromTk_LorentzVect;
+    }
+    //        TksQsum = mySignalTks_qsum;    
+  }
+  cout << "Tag tracks invariant mass = " << mySignalTksInvariantMass.mass() << endl;
+  return mySignalTksInvariantMass.mass();
 }
 
 //define this as a plug-in

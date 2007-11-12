@@ -35,7 +35,6 @@
   <use name=DataFormats/MuonReco>
   <use name=DataFormats/TrackReco>
   <use name=DataFormats/EgammaCandidates>
-  <use name=RecoTauTag/InvariantMass>
 
   <use name=AnalysisExamples/AnalysisObjects>
   <use name=AnalysisExamples/AnalysisClasses>
@@ -83,7 +82,6 @@
      <use name=DataFormats/MuonReco>
      <use name=DataFormats/TrackReco>
      <use name=DataFormats/EgammaCandidates>
-     <use name=RecoTauTag/InvariantMass>
 
      <use name=AnalysisExamples/AnalysisObjects>
      <use name=AnalysisExamples/AnalysisClasses>
@@ -131,7 +129,6 @@
      <use name=DataFormats/MuonReco>
      <use name=DataFormats/TrackReco>
      <use name=DataFormats/EgammaCandidates>
-     <use name=RecoTauTag/InvariantMass>
 
      <use name=AnalysisExamples/AnalysisObjects>
      <use name=AnalysisExamples/AnalysisClasses>
@@ -180,7 +177,6 @@
      <use name=DataFormats/MuonReco>
      <use name=DataFormats/TrackReco>
      <use name=DataFormats/EgammaCandidates>
-     <use name=RecoTauTag/InvariantMass>
 
      <use name=AnalysisExamples/AnalysisObjects>
      <use name=AnalysisExamples/AnalysisClasses>

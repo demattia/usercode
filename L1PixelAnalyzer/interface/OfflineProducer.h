@@ -24,7 +24,7 @@
 //
 // Original Author:  Marco De Mattia
 //         Created:  Tue May  8 13:05:37 CEST 2007
-// $Id: OfflineProducer.h,v 1.2 2007/07/23 14:57:30 demattia Exp $
+// $Id: OfflineProducer.h,v 1.1 2007/11/11 16:30:52 demattia Exp $
 //
 //
 
@@ -131,6 +131,8 @@ class OfflineProducer : public edm::EDProducer {
   explicit OfflineProducer(const edm::ParameterSet&);
   ~OfflineProducer();
 
+  /// Method to evaluate the invariant mass coming from the tracks used to evalute the tag
+  double tagTracksInvariantMass( const reco::TrackRefVector & selectedTracks ) const;
 
  private:
   virtual void beginJob(const edm::EventSetup&) ;
@@ -210,6 +212,9 @@ class OfflineProducer : public edm::EDProducer {
   // Summary
   std::string summary_;
   unsigned int eventType_;
+
+  // TagTracksInvarianMass
+  double chargedpi_mass_;
 
   // ----------member data ---------------------------
 };
