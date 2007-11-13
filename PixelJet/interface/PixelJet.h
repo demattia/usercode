@@ -62,9 +62,11 @@ class PixelJet{
   void Close() {
     if ( pixelTracksNumber_ != 0 ) {
       phi_ = (px_==0 && py_==0) ? 0 : atan2(py_, px_);
-      double theta = (pt_==0 && pz_==0) ? 0 : atan2(pz_, pt_);
+      double P = px_*px_ + py_*py_ + pz_*pz_;
+//       double theta = (pt_==0 && pz_==0) ? 0 : atan2(pz_, pt_);
+      double theta = ( P == 0 ) ? 0 : acos(pz_/P);
       eta_ = -log(tan(0.5*theta));
-//       eta_ = eta_/pt_;
+//      eta_ = eta_/pt_;
 //       phi_ = phi_/pt_;
       z_ = z_/pt_;
     }

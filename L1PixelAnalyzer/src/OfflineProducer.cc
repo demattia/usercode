@@ -278,11 +278,7 @@ OfflineProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
   // -----------------------------
   auto_ptr<OfflineMEt> offlineMEt( new OfflineMEt( MET->et(), MET->phi(), MET->sumEt(), MET->mEtSig(), 0. ) );
 
-//   cout << "MET->pt() = " << MET->pt() << endl; 
-//   cout << "MET->et() = " << MET->et() << endl; 
-
   iEvent.put( offlineMEt, offlineMEt_ );
-
 
 
   // Offline Jets IC5
@@ -294,26 +290,21 @@ OfflineProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 
   // B-tagging
   // ---------
+  // Brief description of the btagging algorithm (from the workbook page
+  // https://twiki.cern.ch/twiki/bin/view/CMS/WorkBookBTagging):
+  // -------------------------------------------------------------------
+  // "Track Counting" algorithm: This is a very simple tag, exploiting the long lifetime of B hadrons.
+  // It calculates the signed impact parameter significance of all good tracks, and orders them by decreasing significance.
+  // It's b tag discriminator is defined as the significance of the N'th track, where a good value
+  // is N = 2 (for high efficiency) or N = 3 (for high purity).
+  // -------------------------------------------------------------------
 
-//   cout << "caloJets size = " << caloJetsSize << endl;
-
-//   cout << "HighEff size = " << trackCountingHighEff->size() << endl;
   int tchenum = trackCountingHighEff->size();
-
   JetTagCollection::const_iterator bTagHighEff_it = trackCountingHighEff->begin();
-//   for( ; bTagHighEff_it != trackCountingHighEff->end(); ++bTagHighEff_it ) {
-// //    cout << "High efficiency discriminator = " << bTagHighEff_it->second << endl;
-//   }
 
-//   cout << "HighPur size = " << trackCountingHighPur->size() << endl;
   int tchpnum = trackCountingHighPur->size();
-
   JetTagCollection::const_iterator bTagHighPur_it = trackCountingHighPur->begin();
-//   for( ; bTagHighPur_it != trackCountingHighPur->end(); ++bTagHighPur_it ) {
-// //    cout << "High puritiy discriminator = " << bTagHighPur_it->second << endl;
-//   }
 
-//   cout << "taginfo size = " << iPtagInfos->size() << endl;
   int iptkinfonum = iPtagInfos->size();
 
   // Correct offline jets on the fly
@@ -325,25 +316,23 @@ OfflineProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
   for( ; TkIpTagInfo_it != iPtagInfos->end(); ++TkIpTagInfo_it ) {
     //    cout << "TagInfo number = " << taginfocounter << endl;
     ++taginfocounter;
-//     cout << "high eff jet["<<taginfocounter<<"] = " << bTagHighEff_it->first->et() << endl;
-//     cout << "high pur jet["<<taginfocounter<<"] = " << bTagHighPur_it->first->et() << endl;
-//     cout << "calo jet["<<taginfocounter<<"] = " << caloJets_it->et() << endl;
-
     double scale = corrector->correction( *caloJets_it );
     double corPt = scale*caloJets_it->pt();
     double corEt = scale*caloJets_it->et();
 
-    // Fill the offline jets collection
-    // --------------------------------
-
     int tkcount = 0;
     int tkNum = TkIpTagInfo_it->selectedTracks().size();
+    int probNum_0 = TkIpTagInfo_it->probabilities(0).size();
+    int probNum_1 = TkIpTagInfo_it->probabilities(1).size();
+
+    cout << "selected tracks number["<<taginfocounter<<"] = " << tkNum << endl;
+    cout << "track probabilities( int 3D )["<<taginfocounter<<"] size = " << probNum_0 << endl;
+    cout << "track probabilities( int 2D )["<<taginfocounter<<"] size = " << probNum_1 << endl;
+
     double tkSumPt = 0.;
-//    const RefVector<TrackCollection> & vec_TkColl = TkIpTagInfo_it->selectedTracks();
     const TrackRefVector & vec_TkColl = TkIpTagInfo_it->selectedTracks();
     RefVector<TrackCollection>::const_iterator TkColl_it = vec_TkColl.begin();
     for ( ; TkColl_it != vec_TkColl.end(); ++TkColl_it ) {
-//      cout << "tk_pt["<<tkcount<<"] = " << (*TkColl_it)->pt() << endl;
       tkSumPt += (*TkColl_it)->pt();
       ++tkcount;
     }
@@ -354,21 +343,36 @@ OfflineProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 
     // Evaluate tag tracks invariant mass
     double bTagTkInvMass = tagTracksInvariantMass( vec_TkColl );
-    cout << "bTag tracks invariant mass = " << bTagTkInvMass << endl;
+//     cout << "bTag tracks invariant mass = " << bTagTkInvMass << endl;
+
+    // Fill the offline jets collection
+    // --------------------------------
+
+    // Take the em and had energies to evaluate the emfraction
+    // See CMSSW/RecoJets/JetAlgorithms/src/JetMaker.cc.
+    double EmEnergyInEB = caloJets_it->emEnergyInEB();
+    double EmEnergyInEE = caloJets_it->emEnergyInEE();
+    double EmEnergyInHF = -(caloJets_it->emEnergyInHF());
+
+    double HadEnergyInEB = caloJets_it->hadEnergyInHB();
+    double HadEnergyInEE = caloJets_it->hadEnergyInHE();
+    double HadEnergyInHF = caloJets_it->hadEnergyInHF();
+
+    double EmEnergy = EmEnergyInEB + EmEnergyInEE + EmEnergyInHF;
+    double HadEnergy = HadEnergyInEB + HadEnergyInEE + HadEnergyInHF;
+    double TotalEnergy = EmEnergy + HadEnergy;
+
+    double EmFracFromComp = 0.;
+    if ( TotalEnergy != 0. ) EmFracFromComp = EmEnergy/(TotalEnergy);
+
+    cout << "EmEnergyFraction from components = " << EmFracFromComp << endl;
 
     // Passing corrected Et, eta, phi, uncorrected Et, emEnergyFraction
     vec_IC5Jets_ptr->push_back( OfflineJet( corEt, caloJets_it->eta(), caloJets_it->phi(), caloJets_it->et(),
                                             caloJets_it->emEnergyFraction(),
+//                                            EmFracFromComp,
                                             bTagHighEff_it->second, bTagHighPur_it->second,
                                             jetMass, tkNum, tkSumPt, bTagTkInvMass ) );
-
-
-
-//     cout << "high eff jet["<<taginfocounter<<"] = " << bTagHighEff_it->second << endl;
-//     cout << "high pur jet["<<taginfocounter<<"] = " << bTagHighPur_it->second << endl;
-//     cout << "number of selected tracks = " << TkIpTagInfo_it->selectedTracks().size() << endl;
-
-
     ++caloJets_it;
     ++bTagHighEff_it;
     ++bTagHighPur_it;
@@ -386,13 +390,11 @@ OfflineProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
   iEvent.put( vec_IC5Jets_ptr, offlineJets_ );
 
 
-
   // HepMC
   // -----
 
   auto_ptr<MCParticleCollection> vec_MC_ptr( new MCParticleCollection );
 
-//   int nu_count = 0;
   int MCnum = 0;
   int WtoNuNum = 0;
   int GoodWtoNuNum = 0;
@@ -409,14 +411,6 @@ OfflineProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
            Mpid == 6 || Mpid == 23 || Mpid == 24 || Mpid == 25 ) {
 
         vec_MC_ptr->push_back( MCParticle( MCp->pt(), MCp->eta(), MCp->phi(), MCp->mass(), MCp->pdgId(), MCp->mother()->pdgId() ) );
-
-//         cout << "MCp["<<MCnum<<"] et = " << MCp->et() << endl;;
-//         cout << "MCp["<<MCnum<<"] pt = " << MCp->pt() << endl;;
-//         cout << "MCp["<<MCnum<<"] eta = " << MCp->eta() << endl;;
-//         cout << "MCp["<<MCnum<<"] phi = " << MCp->phi() << endl;;
-//         cout << "MCp["<<MCnum<<"] mass = " << MCp->mass() << endl;;
-//         cout << "MCp["<<MCnum<<"] pid = " << pid << endl;;
-//         cout << "MCp["<<MCnum<<"] Mpid = " << Mpid << endl;;
       }
 
       // Count the number of nu
@@ -431,16 +425,6 @@ OfflineProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
       if ( pid == 5 && Mpid == 25 ) {
         ++bFromHiggsNum;
       }
-
-// //         Partons << "For parton number = " << counter << std::endl;
-// //         Partons << "status = " << MCp->status() << std::endl;
-// //         Partons << "pdgId = " << MCp->pdgId() << std::endl;
-// //         Partons << "Et = " << MCp->et() << std::endl;
-// //         Partons << "Eta = " << MCp->eta() << std::endl;
-// //         Partons << "Phi = " << MCp->phi() << std::endl;
-// //         Partons << "Number of mothers = " << MCp->numberOfMothers() << std::endl;
-// //         Partons << "first mother = " << MCp->mother() << std::endl;
-// //         Partons << "Mother pdgId = " << MCp->mother()->pdgId() << std::endl;
     }
     ++MCnum;
   } // end loop on MC particles
@@ -493,29 +477,35 @@ OfflineProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
   // See here: https://twiki.cern.ch/twiki/bin/view/CMS/MuonIsolation#Suggested_cuts
   // for possible isolation cut values.
   // From which:
-  // sumPt < 3 in cone 0.3 will give a 96.7 \pm 0.7 % efficiency with about a factor of 10 rejection of muon candidates reconstructed in QCD events.
-  // Use chi2/ndof < 10, nHits>=8 as a quality cut on reconstructed muon (applied to a global-muon, this cut allows to suppress fake muons from K/pi). 
+  // sumPt < 3 in cone 0.3 will give a 96.7 \pm 0.7 % efficiency with about a factor of 10
+  // rejection of muon candidates reconstructed in QCD events.
+  // Use chi2/ndof < 10, nHits>=8 as a quality cut on reconstructed muon (applied to a
+  // global-muon, this cut allows to suppress fake muons from K/pi). 
 
   auto_ptr<GlobalMuonCollection> vec_glbmuon_ptr( new GlobalMuonCollection );
 
+  int muon = 0;
   MuonCollection::const_iterator muon_it = paramGlobalMuons->begin();
   for ( ; muon_it != paramGlobalMuons->end(); ++muon_it ) {
-//     cout << "muon pt = " << muon_it->pt() << endl;
-//     cout << "muon eta = " << muon_it->eta() << endl;
-//     cout << "muon phi = " << muon_it->phi() << endl;
-//     cout << "muon caloem = " << muon_it->getCalEnergy().em << endl;
-//     cout << "muon calohad = " << muon_it->getCalEnergy().had << endl;
-//     cout << "muon caloho = " << muon_it->getCalEnergy().ho << endl;
-//     cout << "muon iso tk R03 SumPt = " << muon_it->getIsolationR03().sumPt << endl;
-
     vec_glbmuon_ptr->push_back( GlobalMuon( muon_it->pt(), muon_it->eta(), muon_it->phi(), muon_it->getCalEnergy().em,
                                             muon_it->getCalEnergy().had, muon_it->getCalEnergy().ho,
-                                            muon_it->getIsolationR03().sumPt ) );
+                                            muon_it->getIsolationR03().sumPt, muon_it->track().get()->normalizedChi2(),
+                                            muon_it->track().get()->numberOfValidHits() ) );
 
+    cout << "muon track["<<muon<<"] = " << &(muon_it->track()) << endl;
+    cout << "combined muon["<<muon<<"] = " << &(muon_it->combinedMuon()) << endl;
+    cout << "before norm["<<muon<<"]" << endl;
+    cout << "muon track get["<<muon<<"] = " << muon_it->track().get() << endl;
+    cout << "combined muon get["<<muon<<"] = " << muon_it->combinedMuon().get() << endl;
+    cout << "Muon normalizedChi2["<<muon<<"] = " << muon_it->track().get()->normalizedChi2() << endl;
+    cout << "Muon normalizedChi2["<<muon<<"] = " << muon_it->track().get()->numberOfValidHits() << endl;
+    cout << "after norm["<<muon<<"]" << endl;
 
 //     cout << "combined muon number found of hits = " << muon_it->combinedMuon().get()->found() << endl;
 //     cout << "combined muon number valid of hits = " << muon_it->combinedMuon().get()->numberOfValidHits() << endl;
 //     cout << "combined muon chi2 = " << muon_it->combinedMuon().get()->normalizedChi2() << endl;
+
+    ++muon;
 
   }
 
@@ -526,26 +516,10 @@ OfflineProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 
   auto_ptr<SimpleElectronCollection> vec_simpelec_ptr( new SimpleElectronCollection );
 
-//  PixelMatchGsfElectronCollection::const_iterator elec_it = electronCandidates->begin();
-//  for ( ; elec_it != electronCandidates->end(); ++elec_it ) {
-//     cout << "electron pt = " << elec_it->pt() << endl;
-//     cout << "electron et = " << elec_it->et() << endl;
-//     cout << "electron eta = " << elec_it->eta() << endl;
-//     cout << "electron phi = " << elec_it->phi() << endl;
-//     cout << "electron had/em = " << elec_it->hadronicOverEm() << endl;
-//     vec_simpelec_ptr->push_back( SimpleElectron( elec_it->pt(), elec_it->eta(), elec_it->phi(), elec_it->et(), elec_it->hadronicOverEm() ) );
-
   CandViewDoubleAssociations::const_iterator elec_it = electronHcalIsolation->begin();
   for ( ; elec_it != electronHcalIsolation->end(); ++elec_it ) {
-//    PixelMatchGsfElectron & elec_ref = elec_it->first.castTo<PixelMatchGsfElectron>();
     PixelMatchGsfElectronRef elec_ref = elec_it->first.castTo<PixelMatchGsfElectronRef>();
     const PixelMatchGsfElectron & elec = *elec_ref;
-//     cout << "electron pt = " << elec.pt() << endl;
-//     cout << "electron et = " << elec.et() << endl;
-//     cout << "electron eta = " << elec.eta() << endl;
-//     cout << "electron phi = " << elec.phi() << endl;
-//     cout << "electron had/em = " << elec.hadronicOverEm() << endl;
-//     cout << "electron Hcal isolation = " << elec_it->second << endl;
     vec_simpelec_ptr->push_back( SimpleElectron( elec.pt(), elec.eta(), elec.phi(), elec.et(), elec.hadronicOverEm(), elec_it->second ) );
   }
 
@@ -603,19 +577,11 @@ OfflineProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 
 
   const IsolatedTauTagInfoCollection & tauTagInfo = *(tauTagInfoHandle.product());
-  cout << "tauinfo collection size = " << tauTagInfo.size() << endl;
+//   cout << "tauinfo collection size = " << tauTagInfo.size() << endl;
   IsolatedTauTagInfoCollection::const_iterator tauTagInfo_it = tauTagInfo.begin();
   for ( ; tauTagInfo_it != tauTagInfo.end(); ++tauTagInfo_it ) {
-//     cout << "TauJet pt = " << tauTagInfo_it->jet()->pt() << endl;
-//     cout << "TauJet et = " << tauTagInfo_it->jet()->et() << endl;
-//     cout << "TauJet eta = " << tauTagInfo_it->jet()->eta() << endl;
-//     cout << "TauJet phi = " << tauTagInfo_it->jet()->phi() << endl;
-//     cout << "TauJet track number = " << tauTagInfo_it->allTracks().size() << endl;
-//    cout << "tracks invariant mass = " << tauTagInfo_it->jtaRef()->TracksInvariantMass() << endl;
-    cout << "IsolationTauTagInfo all tracks = " << tauTagInfo_it->allTracks().size() << endl;
-    cout << "IsolationTauTagInfo selected tracks = " << tauTagInfo_it->selectedTracks().size() << endl;
-
-//    const TrackRefVector & tauIsoSelectedTks = tauTagInfo_it->selectedTracks();
+//     cout << "IsolationTauTagInfo all tracks = " << tauTagInfo_it->allTracks().size() << endl;
+//     cout << "IsolationTauTagInfo selected tracks = " << tauTagInfo_it->selectedTracks().size() << endl;
 
     double tauJetE = tauTagInfo_it->jet()->energy();
     double tauJetP = tauTagInfo_it->jet()->p();
@@ -623,13 +589,15 @@ OfflineProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 
     //get the tracks from the jetTag
     double tauTagTkInvMass = tagTracksInvariantMass( tauTagInfo_it->allTracks() );
-    //get the selected tracks used to computed the isolation
+    //get the selected tracks used to compute the isolation
     double tauIsoTkInvMass = tagTracksInvariantMass( tauTagInfo_it->selectedTracks() );
 
-    vec_simptau_ptr->push_back( SimpleTau( tauTagInfo_it->jet()->pt(), tauTagInfo_it->jet()->eta(), tauTagInfo_it->jet()->phi(), tauTagTkInvMass, tauTagInfo_it->allTracks().size() ) ); 
+    vec_simptau_ptr->push_back( SimpleTau( tauTagInfo_it->jet()->pt(), tauTagInfo_it->jet()->eta(), tauTagInfo_it->jet()->phi(),
+                                           tauTagTkInvMass, tauTagInfo_it->allTracks().size(),
+                                           tauIsoTkInvMass, tauTagInfo_it->selectedTracks().size() ) ); 
 
-    cout << "tau tag tk invariant mass = " << tauTagTkInvMass << endl;
-    cout << "tau isolation tk invariant mass = " << tauIsoTkInvMass << endl;
+//     cout << "tau tag tk invariant mass = " << tauTagTkInvMass << endl;
+//     cout << "tau isolation tk invariant mass = " << tauIsoTkInvMass << endl;
 
   }
 
@@ -664,9 +632,6 @@ OfflineProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 
   // etMiss() method returns et() method (at least for version 1_7_0_pre10)
   std::auto_ptr<BaseMEt> L1MEt( new BaseMEt( l1eEtMiss->etMiss(), l1eEtMiss->phi(), 0. ) );
-//  std::auto_ptr<BaseMEt> L1MEt( new BaseMEt( 0., 0., 0. ) );
-
-//   cout << "l1eEtMiss->etMiss() = " << l1eEtMiss->et() << endl;
 
   // Put the L1 jest collections in the event
   iEvent.put( v_CenJets_ptr, cenJets_ );
@@ -726,7 +691,7 @@ double OfflineProducer::tagTracksInvariantMass( const TrackRefVector & selectedT
     }
     //        TksQsum = mySignalTks_qsum;    
   }
-  cout << "Tag tracks invariant mass = " << mySignalTksInvariantMass.mass() << endl;
+//   cout << "Tag tracks invariant mass = " << mySignalTksInvariantMass.mass() << endl;
   return mySignalTksInvariantMass.mass();
 }
 
