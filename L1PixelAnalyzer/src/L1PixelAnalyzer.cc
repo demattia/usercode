@@ -373,7 +373,7 @@ L1PixelAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
     PixelJet_Pt_->Fill(pj_it->pt());
     PixelJet_Eta_->Fill(pj_it->eta());
     PixelJet_Phi_->Fill(pj_it->phi());
-    PixelJet_NumTk_->Fill(pj_it->NumTk());
+    PixelJet_NumTk_->Fill(pj_it->tkNum());
     PixelJet_Vertex_Z_->Fill(pj_it->z());
   }
 

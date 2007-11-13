@@ -40,7 +40,7 @@ void L1PixelTrig<T1>::Fill ( const vector<T1> & vec_pj ) {
     // Use only pixeljets with at least numTkCut_ tracks.
     typename vector<T1>::const_iterator vec_pj_it = vec_pj.begin();
     for ( ; vec_pj_it != vec_pj.end(); ++vec_pj_it ) {
-      if ( vec_pj_it->NumTk() >= numTkCut_ )
+      if ( vec_pj_it->tkNum() >= numTkCut_ )
       vec_pj_ptr.push_back( &*(vec_pj_it) );
     }
 

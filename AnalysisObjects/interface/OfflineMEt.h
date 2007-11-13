@@ -21,17 +21,17 @@ namespace anaobj {
   public:
     /// Default empty constructor, needed to make it become a product
     OfflineMEt() {}
-    OfflineMEt( const double & MET, const double & PHI, const double & SUMET, const double & METSIGNIFICANCE, const double & DPHIMIN ) : BaseMEt( MET, PHI, SUMET ) {
-      mEtSignificance_ = METSIGNIFICANCE;
+    OfflineMEt( const double & MET, const double & PHI, const double & SUMET, const double & METSIG, const double & DPHIMIN ) : BaseMEt( MET, PHI, SUMET ) {
+      mEtSig_ = METSIG;
       dPhiMin_ = DPHIMIN;
     }
-    double mEtSignificance() const { return mEtSignificance_; }
+    double mEtSig() const { return mEtSig_; }
     double dPhiMin() const { return dPhiMin_; }
-    void setMEtSignificance( const double & METSIGNIFICANCE ) { mEtSignificance_ = METSIGNIFICANCE; }
+    void setMEtSig( const double & METSIG ) { mEtSig_ = METSIG; }
     void setDPhiMin( const double & DPHIMIN ) { dPhiMin_ = DPHIMIN; }
 
   protected:
-    double mEtSignificance_;
+    double mEtSig_;
     double dPhiMin_;
   };
 

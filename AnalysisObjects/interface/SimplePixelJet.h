@@ -21,21 +21,21 @@ namespace anaobj {
 
   class SimplePixelJet : public BaseParticle {
   public:
-    SimplePixelJet( const double & PT, const double & ETA, const double & PHI, const double & Z, const int PIXELTRACKSNUM ) : BaseParticle( PT, ETA, PHI ) {
+    SimplePixelJet( const double & PT, const double & ETA, const double & PHI, const double & Z, const int TKNUM ) : BaseParticle( PT, ETA, PHI ) {
       z_ = Z;
-      pixelTracksNum_ = PIXELTRACKSNUM;
+      tkNum_ = TKNUM;
     }
     // Default constructor, only needed for classes.h
     SimplePixelJet() : BaseParticle( 0., 0., 0. ) {
       z_ = 0.;
-      pixelTracksNum_ = 0;
+      tkNum_ = 0;
     }
     double z() const { return z_; }
-    int pixelTracksNum() const { return pixelTracksNum_; }
+    int tkNum() const { return tkNum_; }
     void setZ( const double & Z ) { z_ = Z; }
-    void setPixelTracksNum( const int PIXELTRACKSNUM ) { pixelTracksNum_ = PIXELTRACKSNUM; }
+    void setTkNum( const int TKNUM ) { tkNum_ = TKNUM; }
   protected:
-    int pixelTracksNum_;
+    int tkNum_;
     double z_;
   };
 

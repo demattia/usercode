@@ -18,18 +18,18 @@ namespace anaobj {
     BaseMEt() {};
     /// Receives MEt, MEt phi and SumEt
     BaseMEt( const double & MET, const double & PHI, const double & SUMET ) {
-      mEt_ = MET;
+      et_ = MET;
       phi_ = PHI;
       sumEt_ = SUMET;
     }
-    double MEt() const { return mEt_; }
+    double et() const { return et_; }
     double phi() const { return phi_; }
     double sumEt() const { return sumEt_; }
-    void setMEt( const double & MET ) { mEt_ = MET; }
+    void setEt( const double & MET ) { et_ = MET; }
     void setPhi( const double & PHI ) { phi_ = PHI; }
     void setSumEt( const double & SUMET ) { sumEt_ = SUMET; }
   protected:
-    double mEt_;
+    double et_;
     double phi_;
     double sumEt_;
   };
