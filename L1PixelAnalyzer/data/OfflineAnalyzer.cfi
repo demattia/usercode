@@ -1,7 +1,7 @@
-module L1TrigPixelAna = L1TrigPixelAnalyzer {
+module OfflineAna = OfflineAnalyzer {
 
-  untracked string OutputName = "L1TrigPixelAna.root"
-  untracked InputTag HiVarName                  = "HiVariables"
+  untracked string OutputName                   = "OfflineAnalyzer.root"
+  untracked string HiVarName                    = "HiVariables"
 
   // Labels for the objects to be opened
   untracked InputTag CenJets                    = offlineProd:cenJets

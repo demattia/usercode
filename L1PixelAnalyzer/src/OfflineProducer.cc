@@ -276,7 +276,8 @@ OfflineProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
   // ---------
   // Not including DPhiMin for now
   // -----------------------------
-  auto_ptr<OfflineMEt> offlineMEt( new OfflineMEt( MET->et(), MET->phi(), MET->sumEt(), MET->mEtSig(), 0. ) );
+  //  auto_ptr<OfflineMEt> offlineMEt( new OfflineMEt( MET->et(), MET->phi(), MET->sumEt(), MET->mEtSig(), 0. ) );
+  auto_ptr<OfflineMEt> offlineMEt( new OfflineMEt( MET->et(), MET->phi(), MET->sumEt(), MET->mEtSig() ) );
 
   iEvent.put( offlineMEt, offlineMEt_ );
 
@@ -310,26 +311,56 @@ OfflineProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
   // Correct offline jets on the fly
   const JetCorrector* corrector = JetCorrector::getJetCorrector (JetCorrectionService, iSetup);
 
-  int taginfocounter = 0;
+//   int taginfocounter = 0;
   CaloJetCollection::const_iterator caloJets_it = caloJets->begin();
   TrackIPTagInfoCollection::const_iterator TkIpTagInfo_it = iPtagInfos->begin();
   for( ; TkIpTagInfo_it != iPtagInfos->end(); ++TkIpTagInfo_it ) {
-    ++taginfocounter;
+
+
+//     ++taginfocounter;
     double scale = corrector->correction( *caloJets_it );
     double corPt = scale*caloJets_it->pt();
     double corEt = scale*caloJets_it->et();
 
-    int tkcount = 0;
-    int tkNum = TkIpTagInfo_it->selectedTracks().size();
+//    int tkNum = TkIpTagInfo_it->selectedTracks().size();
+    int tkNum_S1 = 0;
+    int tkNum_S2 = 0;
+    int tkNum_S3 = 0;
+
 //     int probNum_0 = TkIpTagInfo_it->probabilities(0).size();
 //     int probNum_1 = TkIpTagInfo_it->probabilities(1).size();
 
-    double tkSumPt = 0.;
+    double tkSumPt_S1 = 0.;
+    double tkSumPt_S2 = 0.;
+    double tkSumPt_S3 = 0.;
     const TrackRefVector & vec_TkColl = TkIpTagInfo_it->selectedTracks();
+    // Take the IP vector (ordered as the selectedTracks vector)
+    const vector<TrackIPTagInfo::TrackIPData> & vec_TkIP = TkIpTagInfo_it->impactParameterData();
+    // Additional vectors to store subgroups of selectedTracks
+    TrackRefVector vec_TkColl_S1;
+    TrackRefVector vec_TkColl_S2;
+    TrackRefVector vec_TkColl_S3;
+
+    vector<TrackIPTagInfo::TrackIPData>::const_iterator TkIP_it = vec_TkIP.begin();
     RefVector<TrackCollection>::const_iterator TkColl_it = vec_TkColl.begin();
-    for ( ; TkColl_it != vec_TkColl.end(); ++TkColl_it ) {
-      tkSumPt += (*TkColl_it)->pt();
-      ++tkcount;
+    for ( ; TkColl_it != vec_TkColl.end(); ++TkColl_it, ++TkIP_it ) {
+      // Take tracks with minimum IP significance
+      if ( TkIP_it->ip3d.significance() > 1. ) {
+        vec_TkColl_S1.push_back(*TkColl_it);
+        tkSumPt_S1 += (*TkColl_it)->pt();
+        ++tkNum_S1;
+      }
+      if ( TkIP_it->ip3d.significance() > 2. ) {
+        vec_TkColl_S2.push_back(*TkColl_it);
+        tkSumPt_S2 += (*TkColl_it)->pt();
+        ++tkNum_S2;
+      }
+      if ( TkIP_it->ip3d.significance() > 3. ) {
+        vec_TkColl_S3.push_back(*TkColl_it);
+        tkSumPt_S3 += (*TkColl_it)->pt();
+        ++tkNum_S3;
+      }
+//       ++tkcount;
     }
 
     // Jet mass
@@ -337,34 +368,45 @@ OfflineProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
     if ( corEt > corPt ) jetMass = sqrt( corEt*corEt - corPt*corPt );
 
     // Evaluate tag tracks invariant mass
-    double bTagTkInvMass = tagTracksInvariantMass( vec_TkColl );
+//    double bTagTkInvMass = tagTracksInvariantMass( vec_TkColl );
+    double bTagTkInvMass_S1 = tagTracksInvariantMass( vec_TkColl_S1 );
+    double bTagTkInvMass_S2 = tagTracksInvariantMass( vec_TkColl_S2 );
+    double bTagTkInvMass_S3 = tagTracksInvariantMass( vec_TkColl_S3 );
 
     // Fill the offline jets collection
     // --------------------------------
 
-//     // Take the em and had energies to evaluate the emfraction
-//     // See CMSSW/RecoJets/JetAlgorithms/src/JetMaker.cc.
-//     double EmEnergyInEB = caloJets_it->emEnergyInEB();
-//     double EmEnergyInEE = caloJets_it->emEnergyInEE();
-//     double EmEnergyInHF = -(caloJets_it->emEnergyInHF());
+    // Take the em and had energies to evaluate the emfraction
+    // See CMSSW/RecoJets/JetAlgorithms/src/JetMaker.cc.
+    // Ignoring HF contribution
+    double EmEnergyInEB = caloJets_it->emEnergyInEB();
+    double EmEnergyInEE = caloJets_it->emEnergyInEE();
+    //    double EmEnergyInHF = -(caloJets_it->emEnergyInHF());
 
-//     double HadEnergyInEB = caloJets_it->hadEnergyInHB();
-//     double HadEnergyInEE = caloJets_it->hadEnergyInHE();
-//     double HadEnergyInHF = caloJets_it->hadEnergyInHF();
+    double HadEnergyInEB = caloJets_it->hadEnergyInHB();
+    double HadEnergyInEE = caloJets_it->hadEnergyInHE();
+    //    double HadEnergyInHF = caloJets_it->hadEnergyInHF();
 
-//     double EmEnergy = EmEnergyInEB + EmEnergyInEE + EmEnergyInHF;
-//     double HadEnergy = HadEnergyInEB + HadEnergyInEE + HadEnergyInHF;
-//     double TotalEnergy = EmEnergy + HadEnergy;
+    //     double EmEnergy = EmEnergyInEB + EmEnergyInEE + EmEnergyInHF;
+    //     double HadEnergy = HadEnergyInEB + HadEnergyInEE + HadEnergyInHF;
+    double EmEnergy = EmEnergyInEB + EmEnergyInEE;
+    double HadEnergy = HadEnergyInEB + HadEnergyInEE;
+    double TotalEnergy = EmEnergy + HadEnergy;
 
-//     double EmFracFromComp = 0.;
-//     if ( TotalEnergy != 0. ) EmFracFromComp = EmEnergy/(TotalEnergy);
+    double EmFracFromComp = 0.;
+    if ( TotalEnergy != 0. ) EmFracFromComp = EmEnergy/(TotalEnergy);
+
+
 
     // Passing corrected Et, eta, phi, uncorrected Et, emEnergyFraction
     vec_IC5Jets_ptr->push_back( OfflineJet( corEt, caloJets_it->eta(), caloJets_it->phi(), caloJets_it->et(),
-                                            caloJets_it->emEnergyFraction(),
-//                                            EmFracFromComp,
+//                                            caloJets_it->emEnergyFraction(),
+                                            EmFracFromComp,
                                             bTagHighEff_it->second, bTagHighPur_it->second,
-                                            jetMass, tkNum, tkSumPt, bTagTkInvMass ) );
+                                            jetMass,
+                                            tkNum_S1, tkSumPt_S1, bTagTkInvMass_S1,
+                                            tkNum_S2, tkSumPt_S2, bTagTkInvMass_S2,
+                                            tkNum_S3, tkSumPt_S3, bTagTkInvMass_S3 ) );
     ++caloJets_it;
     ++bTagHighEff_it;
     ++bTagHighPur_it;

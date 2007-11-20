@@ -21,16 +21,27 @@ namespace anaobj {
   class OfflineJet : public BaseJet {
   public:
     OfflineJet( const double & ET, const double & ETA, const double & PHI, const double & UNCORRET, const double & EMENERGYFRACTION,
-                const float & DISCRIMINATORHIGHEFF, const float & DISCRIMINATORHIGHPUR, const double & JETMASS
-                , const int TKNUM, const double & TKSUMPT, const double & TAGTKMASS ) : BaseJet( ET, ETA, PHI ) {
+                const float & DISCRIMINATORHIGHEFF, const float & DISCRIMINATORHIGHPUR, const double & JETMASS,
+                const int TKNUMS1, const double & TKSUMPTS1, const double & TAGTKMASSS1,
+                const int TKNUMS2, const double & TKSUMPTS2, const double & TAGTKMASSS2,
+                const int TKNUMS3, const double & TKSUMPTS3, const double & TAGTKMASSS3 ) : BaseJet( ET, ETA, PHI ) {
       uncorrEt_ = UNCORRET;
       emEnergyFraction_ = EMENERGYFRACTION;
       discriminatorHighEff_ = DISCRIMINATORHIGHEFF;
       discriminatorHighPur_ = DISCRIMINATORHIGHPUR;
-      tkNum_ = TKNUM;
-      tkSumPt_ = TKSUMPT;
       jetMass_ = JETMASS;
-      tagTkMass_ = TAGTKMASS;
+
+      tkNumS1_ = TKNUMS1;
+      tkSumPtS1_ = TKSUMPTS1;
+      tagTkMassS1_ = TAGTKMASSS1;
+
+      tkNumS2_ = TKNUMS2;
+      tkSumPtS2_ = TKSUMPTS2;
+      tagTkMassS2_ = TAGTKMASSS2;
+
+      tkNumS3_ = TKNUMS3;
+      tkSumPtS3_ = TKSUMPTS3;
+      tagTkMassS3_ = TAGTKMASSS3;
     }
     // Default constructor, only needed for classes.h
     OfflineJet() : BaseJet( 0., 0., 0. ) {
@@ -38,36 +49,74 @@ namespace anaobj {
       emEnergyFraction_ = 0.;
       discriminatorHighEff_ = 0.;
       discriminatorHighPur_ = 0.;
-      tkNum_ = 0;
-      tkSumPt_ = 0.;
       jetMass_ = 0.;
-      tagTkMass_ = 0.;
+
+      tkNumS1_ = 0;
+      tkSumPtS1_ = 0.;
+      tagTkMassS1_ = 0.;
+
+      tkNumS2_ = 0;
+      tkSumPtS2_ = 0.;
+      tagTkMassS2_ = 0.;
+
+      tkNumS3_ = 0;
+      tkSumPtS3_ = 0.;
+      tagTkMassS3_ = 0.;
     }
     double uncorrEt() const { return uncorrEt_; }
     double emEnergyFraction() const { return emEnergyFraction_; }
     float discriminatorHighEff() const { return discriminatorHighEff_; }
     float discriminatorHighPur() const { return discriminatorHighPur_; }
     double jetMass() const { return jetMass_; }
-    int tkNum() const { return tkNum_; }
-    double tkSumPt() const { return tkSumPt_; }
-    double tagTkMass() const { return tagTkMass_; }
+
+    int tkNumS1() const { return tkNumS1_; }
+    double tkSumPtS1() const { return tkSumPtS1_; }
+    double tagTkMassS1() const { return tagTkMassS1_; }
+
+    int tkNumS2() const { return tkNumS2_; }
+    double tkSumPtS2() const { return tkSumPtS2_; }
+    double tagTkMassS2() const { return tagTkMassS2_; }
+
+    int tkNumS3() const { return tkNumS3_; }
+    double tkSumPtS3() const { return tkSumPtS3_; }
+    double tagTkMassS3() const { return tagTkMassS3_; }
+
     void setUncorrEt( const double & UNCORRET ) { uncorrEt_ = UNCORRET; }
     void setEmEnergyFraction( const double & EMENERGYFRACTION ) { emEnergyFraction_ = EMENERGYFRACTION; }
     void setDiscriminatorHighEff( const float & DISCRIMINATORHIGHEFF ) { discriminatorHighEff_ = DISCRIMINATORHIGHEFF; }
     void setDiscriminatorHighPur( const float & DISCRIMINATORHIGHPUR ) { discriminatorHighPur_ = DISCRIMINATORHIGHPUR; }
     void setJetMass( const double & JETMASS ) { jetMass_ = JETMASS; }
-    void setTkNum( const int TKNUM ) { tkNum_ = TKNUM; }
-    void setTkSumPt( const double & TKSUMPT ) { tkSumPt_ = TKSUMPT; }
-    void setTagTkMass( const double & TAGTKMASS ) { jetMass_ = TAGTKMASS; }
+
+    void setTkNumS1( const int TKNUMS1 ) { tkNumS1_ = TKNUMS1; }
+    void setTkSumPtS1( const double & TKSUMPTS1 ) { tkSumPtS1_ = TKSUMPTS1; }
+    void setTagTkMassS1( const double & TAGTKMASSS1 ) { tagTkMassS1_ = TAGTKMASSS1; }
+
+    void setTkNumS2( const int TKNUMS2 ) { tkNumS2_ = TKNUMS2; }
+    void setTkSumPtS2( const double & TKSUMPTS2 ) { tkSumPtS2_ = TKSUMPTS2; }
+    void setTagTkMassS2( const double & TAGTKMASSS2 ) { tagTkMassS2_ = TAGTKMASSS2; }
+
+    void setTkNumS3( const int TKNUMS3 ) { tkNumS3_ = TKNUMS3; }
+    void setTkSumPtS3( const double & TKSUMPTS3 ) { tkSumPtS3_ = TKSUMPTS3; }
+    void setTagTkMassS3( const double & TAGTKMASSS3 ) { tagTkMassS3_ = TAGTKMASSS3; }
+
   protected:
     double uncorrEt_;
     double emEnergyFraction_;
     float discriminatorHighEff_;
     float discriminatorHighPur_;
     double jetMass_;
-    int tkNum_;
-    double tkSumPt_;
-    double tagTkMass_;
+
+    int tkNumS1_;
+    double tkSumPtS1_;
+    double tagTkMassS1_;
+
+    int tkNumS2_;
+    double tkSumPtS2_;
+    double tagTkMassS2_;
+
+    int tkNumS3_;
+    double tkSumPtS3_;
+    double tagTkMassS3_;
   };
 
   typedef std::vector<OfflineJet> OfflineJetCollection;

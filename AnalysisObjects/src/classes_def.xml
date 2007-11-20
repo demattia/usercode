@@ -54,6 +54,8 @@
 
 
   <class name="anaobj::BaseAll"/>
+  <class name="edm::Wrapper<anaobj::BaseAll>"/>
+
   <class name="anaobj::BaseJet"/>
   <class name="std::vector<anaobj::BaseJet>"/>
   <class name="edm::Wrapper<std::vector<anaobj::BaseJet> >"/>

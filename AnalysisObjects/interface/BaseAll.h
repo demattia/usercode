@@ -18,6 +18,11 @@ namespace anaobj {
       eta_ = ETA;
       phi_ = PHI;
     }
+    /// Default constructor, only needed for classes.h
+    BaseAll(){
+      eta_ = 0.;
+      phi_ = 0.;
+    }
     double eta() const { return eta_; }
     double phi() const { return phi_; }
     void setEta( const double & ETA ) { eta_ = ETA; }

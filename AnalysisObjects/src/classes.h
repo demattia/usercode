@@ -79,6 +79,10 @@ namespace {
     std::map<const int, float>::iterator cmap_float_iter;
     std::map<const int, float>::const_iterator cmap_float_const_iter;
 
+    // BaseAll
+    anaobj::BaseAll all1;
+    edm::Wrapper<anaobj::BaseAll> wall1;
+
     // BaseJet
 //     anaobj::BaseJet jet1;
     anaobj::BaseJetCollection jetc1;

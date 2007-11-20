@@ -37,18 +37,18 @@ L1Trig OfflineAnalyzer::L1Trigger;
 //
 OfflineAnalyzer::OfflineAnalyzer(const edm::ParameterSet& iConfig) :
   conf_( iConfig ),
-  cenJetLabel_( iConfig.getParameter<edm::InputTag>( "CenJets" ) ),
-  forJetLabel_( iConfig.getParameter<edm::InputTag>( "ForJets" ) ),
-  tauJetLabel_( iConfig.getParameter<edm::InputTag>( "TauJets" ) ),
-  l1MEtLabel_( iConfig.getParameter<edm::InputTag>( "L1MEt" ) ),
-  offlineJetLabel_( iConfig.getParameter<edm::InputTag>( "OfflineJets" ) ),
-  offlineMEtLabel_( iConfig.getParameter<edm::InputTag>( "OfflineMEt" ) ),
-  MCParticleLabel_( iConfig.getParameter<edm::InputTag>( "MCParticles" ) ),
-  simplePixelJetLabel_( iConfig.getParameter<edm::InputTag>( "SimplePixelJets" ) ),
-  globalMuonLabel_( iConfig.getParameter<edm::InputTag>( "GlobalMuons" ) ),
-  simpleElectronLabel_( iConfig.getParameter<edm::InputTag>( "SimpleElectrons" ) ),
-  simpleTauLabel_( iConfig.getParameter<edm::InputTag>( "SimpleTaus" ) ),
-  summaryLabel_( iConfig.getParameter<edm::InputTag>( "Summary" ) ),
+  cenJetLabel_( iConfig.getUntrackedParameter<edm::InputTag>( "CenJets" ) ),
+  forJetLabel_( iConfig.getUntrackedParameter<edm::InputTag>( "ForJets" ) ),
+  tauJetLabel_( iConfig.getUntrackedParameter<edm::InputTag>( "TauJets" ) ),
+  l1MEtLabel_( iConfig.getUntrackedParameter<edm::InputTag>( "L1MEt" ) ),
+  offlineJetLabel_( iConfig.getUntrackedParameter<edm::InputTag>( "OfflineJets" ) ),
+  offlineMEtLabel_( iConfig.getUntrackedParameter<edm::InputTag>( "OfflineMEt" ) ),
+  MCParticleLabel_( iConfig.getUntrackedParameter<edm::InputTag>( "MCParticles" ) ),
+  simplePixelJetLabel_( iConfig.getUntrackedParameter<edm::InputTag>( "SimplePixelJets" ) ),
+  globalMuonLabel_( iConfig.getUntrackedParameter<edm::InputTag>( "GlobalMuons" ) ),
+  simpleElectronLabel_( iConfig.getUntrackedParameter<edm::InputTag>( "SimpleElectrons" ) ),
+  simpleTauLabel_( iConfig.getUntrackedParameter<edm::InputTag>( "SimpleTaus" ) ),
+  summaryLabel_( iConfig.getUntrackedParameter<edm::InputTag>( "Summary" ) ),
   OutputEffFileName( iConfig.getUntrackedParameter<string>( "OutputEffFileName" ) )
 {
   //now do what ever initialization is needed
