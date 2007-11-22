@@ -1,0 +1,87 @@
+module offlineProd = OfflineProducer {
+
+  //  untracked string OutputName = "L1TrigPixelAna.root"
+
+  // Labels for L1Extra digis
+  untracked InputTag l1eCentralJetsSource       = fastL1CaloSim:Central
+  untracked InputTag l1eForwardJetsSource       = fastL1CaloSim:Forward
+  untracked InputTag l1eTauJetsSource           = fastL1CaloSim:Tau
+  untracked InputTag l1eEtMissSource            = fastL1CaloSim:
+
+  untracked string HiVarName                    = "HiVariables"
+  untracked string CaloJetAlgorithm             = "iterativeCone5CaloJets"
+  untracked string JetCorrectionService         = "MCJetCorrectorIcone5"
+
+  untracked string genParticleCandidates        = "genParticleCandidates"
+
+  untracked string trackCountingHighEffJetTags  = "trackCountingHighEffBJetTags"
+  untracked string trackCountingHighPurJetTags  = "trackCountingHighPurBJetTags"
+  untracked string impactParameterTagInfos      = "impactParameterTagInfos"
+
+  //  untracked string METCollection          = "met"
+  // Corrected MET using IC5 jets corrected with MCJets.
+  untracked string METCollection                = "corMetType1Icone5"
+
+  // ParamGlobalMuons
+  untracked InputTag ParamGlobalMuons           = paramMuons:ParamGlobalMuons
+
+  // ElectronCandidates
+  untracked InputTag electronCandidates         = pixelMatchGsfElectrons
+  untracked InputTag electronHcalIsolation      = egammaTowerIsolation
+
+  // TauTagInfo
+  untracked InputTag tauTagInfo                 = coneIsolationTauJetTags
+
+  // Label for PixelJets
+  untracked InputTag PixelJetSource             = PixelJetFinder:PixelJets
+
+  untracked uint32 TracksMinimumNum_in_PixelJet = 3
+
+  untracked string OutputEffFileName            = "Efficiency_file.txt"
+
+  // L1
+  string CenJets                                = "cenJets"
+  string ForJets                                = "forJets"
+  string TauJets                                = "tauJets"
+  string L1MEt                                  = "l1MEt"
+
+  // Offline
+  string OfflineJets                            = "offlineJets"
+  string OfflineMEt                             = "offlineMEt"
+
+  // MC
+  string MCParticles                            = "MCParticles"
+
+  // SimplePixelJet
+  string SimplePixelJets                        = "simplePixelJets"
+
+  // GlobalMuons
+  string GlobalMuons                            = "globalMuons"
+
+  // SimpleElectrons
+  string SimpleElectrons                        = "simpleElectrons"
+
+  // SimpleTaus
+  string SimpleTaus                             = "simpleTaus"
+
+  // Summary
+  string Summary                                = "summary"
+  // EventType for the summary:
+  // ttbar + 0 jets ----------> 0
+  // ttbar + 1 jets ----------> 1
+  // ttbar + 2 jets ----------> 2
+  // ttbar + 3 jets ----------> 3
+  // ttbar + >= 4 jets -------> 4
+  // ttH (Higgs mass = 115) --> 5
+  // ttH (Higgs mass = 120) --> 6
+  // ttH (Higgs mass = 125) --> 7
+  // qcd 30-50 ---------------> 8
+  // qcd 50-80 ---------------> 9
+  // qcd 80-120 --------------> 10
+  // qcd 120-170 -------------> 11
+  // qcd 170-230 -------------> 12
+  // qcd 230-300 -------------> 13
+  // qcd 300-380 -------------> 14
+  // other -------------------> 15
+  uint32 EventType                              = 6
+}

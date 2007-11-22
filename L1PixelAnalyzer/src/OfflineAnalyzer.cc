@@ -49,6 +49,7 @@ OfflineAnalyzer::OfflineAnalyzer(const edm::ParameterSet& iConfig) :
   simpleElectronLabel_( iConfig.getUntrackedParameter<edm::InputTag>( "SimpleElectrons" ) ),
   simpleTauLabel_( iConfig.getUntrackedParameter<edm::InputTag>( "SimpleTaus" ) ),
   summaryLabel_( iConfig.getUntrackedParameter<edm::InputTag>( "Summary" ) ),
+  numTkCut_( iConfig.getUntrackedParameter<unsigned int>( "TracksMinimumNum_in_PixelJet" ) ),
   OutputEffFileName( iConfig.getUntrackedParameter<string>( "OutputEffFileName" ) )
 {
   //now do what ever initialization is needed
@@ -239,7 +240,33 @@ OfflineAnalyzer::OfflineAnalyzer(const edm::ParameterSet& iConfig) :
   offlineEffTauTrig_ = 0;
 
   eventcounter_ = 0;
-//  PI_ = 3.141593;
+  //  PI_ = 3.141593;
+
+  // PixelTrigger alone efficiency
+  pixelTrig_3_ = 0;
+  pixelTrig_4_ = 0;
+  pixelTrig_5_ = 0;
+  pixelTrig_6_ = 0;
+
+  numgoodpjeff_ = new int[20];
+  numgoodpjeff_3_ = new int[20];
+  numgoodpjeff_4_ = new int[20];
+  numgoodpjeff_5_ = new int[20];
+  numgoodpjeff_6_ = new int[20];
+
+  EffNumGoodPj_ = new TH1F ( "EffNumGoodPj", "Efficiency of cut on number of good pixeljets", 20, 0, 20 );
+  EffNumGoodPj_3_ = new TH1F ( "EffNumGoodPj_3", "Efficiency of cut on number of good pixeljets && 3 pj from pv", 20, 0, 20 );
+  EffNumGoodPj_4_ = new TH1F ( "EffNumGoodPj_4", "Efficiency of cut on number of good pixeljets && 4 pj from pv", 20, 0, 20 );
+  EffNumGoodPj_5_ = new TH1F ( "EffNumGoodPj_5", "Efficiency of cut on number of good pixeljets && 5 pj from pv", 20, 0, 20 );
+  EffNumGoodPj_6_ = new TH1F ( "EffNumGoodPj_6", "Efficiency of cut on number of good pixeljets && 6 pj from pv", 20, 0, 20 );
+
+  for (int i=0; i<20; ++i) {
+    numgoodpjeff_[i] = 0;
+    numgoodpjeff_3_[i] = 0;
+    numgoodpjeff_4_[i] = 0;
+    numgoodpjeff_5_[i] = 0;
+    numgoodpjeff_6_[i] = 0;
+  }
 }
 
 
@@ -270,6 +297,12 @@ OfflineAnalyzer::~OfflineAnalyzer()
   delete[] EffMEtJetPixelArray_;
   delete[] offlineEffMultijetPixelArray_;
   delete[] offlineEffMEtJetPixelArray_;
+
+  delete[] numgoodpjeff_;
+  delete[] numgoodpjeff_3_;
+  delete[] numgoodpjeff_4_;
+  delete[] numgoodpjeff_5_;
+  delete[] numgoodpjeff_6_;
 }
 
 //
@@ -432,6 +465,13 @@ OfflineAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
 
   const SimplePixelJetCollection pixeljets = *(pixelJetsHandle.product());
 
+  // Count the number of pixeljets with at least numTkCut_ tracks
+  SimplePixelJetCollection::const_iterator pj_it = pixeljets.begin();
+  int goodPjNum = 0;
+  for ( ; pj_it != pixeljets.end(); ++pj_it ) {
+    if ( pj_it->tkNum() >= int(numTkCut_) ) ++goodPjNum;
+  }
+
   // Pixel trigger requiring at least 2 pixel jets coming from the primary vertex
   // (constructed from pixel jets, and taken as the vertex with the highest ptsum)
 
@@ -440,10 +480,10 @@ OfflineAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
     double dz = dz_ + dz_*(numdz);
 
 #ifdef DEBUG
-    std::cout << "numTkCut = " << numTkCut << std::endl;
+    std::cout << "numTkCut = " << numTkCut_ << std::endl;
 #endif
 
-    L1PixelTrig<SimplePixelJet> PJtrig(2, dz, numTkCut);
+    L1PixelTrig<SimplePixelJet> PJtrig(2, dz, numTkCut_);
 
     PJtrig.Fill( pixeljets );
 
@@ -727,10 +767,10 @@ OfflineAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
   // PixelTrigger
   // ------------
   // dz = 0.4 and numtk = 3
-  L1PixelTrig<SimplePixelJet> Pixeltrig_3(3, 0.4, 3);
-  L1PixelTrig<SimplePixelJet> Pixeltrig_4(4, 0.4, 3);
-  L1PixelTrig<SimplePixelJet> Pixeltrig_5(5, 0.4, 3);
-  L1PixelTrig<SimplePixelJet> Pixeltrig_6(6, 0.4, 3);
+  L1PixelTrig<SimplePixelJet> Pixeltrig_3(3, 0.4, numTkCut_);
+  L1PixelTrig<SimplePixelJet> Pixeltrig_4(4, 0.4, numTkCut_);
+  L1PixelTrig<SimplePixelJet> Pixeltrig_5(5, 0.4, numTkCut_);
+  L1PixelTrig<SimplePixelJet> Pixeltrig_6(6, 0.4, numTkCut_);
 
   Pixeltrig_3.Fill( pixeljets );
   Pixeltrig_4.Fill( pixeljets );
@@ -743,6 +783,22 @@ OfflineAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
   pixelTrigResponse[1] = Pixeltrig_4.Response();
   pixelTrigResponse[2] = Pixeltrig_5.Response();
   pixelTrigResponse[3] = Pixeltrig_6.Response();
+
+  if (pixelTrigResponse[0]) ++pixelTrig_3_;
+  if (pixelTrigResponse[1]) ++pixelTrig_4_;
+  if (pixelTrigResponse[2]) ++pixelTrig_5_;
+  if (pixelTrigResponse[3]) ++pixelTrig_6_;
+
+  // Cut on the number of good pixeljets
+  for ( int numgoodpjcut=0; numgoodpjcut<20; ++numgoodpjcut ) {
+    if ( goodPjNum >= numgoodpjcut ) {
+      ++numgoodpjeff_[numgoodpjcut];
+      if (pixelTrigResponse[0]) ++numgoodpjeff_3_[numgoodpjcut];
+      if (pixelTrigResponse[1]) ++numgoodpjeff_4_[numgoodpjcut];
+      if (pixelTrigResponse[2]) ++numgoodpjeff_5_[numgoodpjcut];
+      if (pixelTrigResponse[3]) ++numgoodpjeff_6_[numgoodpjcut];
+    }
+  }
 
   // Multijet initializations
   // ------------------------
@@ -816,8 +872,8 @@ OfflineAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
 
     // Loop on all the cut values
     int multijetCount = 0;
-    for ( int Et1=160; Et1<260; Et1+=10 ) {
-      for ( int Et2=110; Et2<210; Et2+=10 ) {
+    for ( int Et1=205; Et1<255; Et1+=5 ) {
+      for ( int Et2=155; Et2<205; Et2+=5 ) {
         for ( int Et3=55; Et3<105; Et3+=5 ) {
           for ( int Et4=35; Et4<85; Et4+=5 ) {
             Response_cen = false;
@@ -841,7 +897,7 @@ OfflineAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
 
     // Multijet single cuts efficiencies
     int et1Count = 0;
-    for ( int Et1=160; Et1<260; Et1+=10 ) {
+    for ( int Et1=205; Et1<255; Et1+=5 ) {
       Response_cen_et1 = false;
       Response_for_et1 = false;
       Response_tau_et1 = false;
@@ -852,7 +908,7 @@ OfflineAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
       ++et1Count;
     }
     int et2Count = 0;
-    for ( int Et2=110; Et2<210; Et2+=10 ) {
+    for ( int Et2=155; Et2<205; Et2+=5 ) {
       Response_cen_et2 = false;
       Response_for_et2 = false;
       Response_tau_et2 = false;
@@ -1015,6 +1071,21 @@ void OfflineAnalyzer::endJob() {
     }
   }
 
+  // PixelTrigger alone efficiency
+  for ( int i=0; i<20; ++i ) {
+    EffNumGoodPj_->SetBinContent(i+1, float(numgoodpjeff_[i])/float(eventcounter_));
+    EffNumGoodPj_->SetBinError(i+1, sqrt(float(numgoodpjeff_[i]))/float(eventcounter_));
+    EffNumGoodPj_3_->SetBinContent(i+1, float(numgoodpjeff_3_[i])/float(eventcounter_));
+    EffNumGoodPj_3_->SetBinError(i+1, sqrt(float(numgoodpjeff_3_[i]))/float(eventcounter_));
+    EffNumGoodPj_4_->SetBinContent(i+1, float(numgoodpjeff_4_[i])/float(eventcounter_));
+    EffNumGoodPj_4_->SetBinError(i+1, sqrt(float(numgoodpjeff_4_[i]))/float(eventcounter_));
+    EffNumGoodPj_5_->SetBinContent(i+1, float(numgoodpjeff_5_[i])/float(eventcounter_));
+    EffNumGoodPj_5_->SetBinError(i+1, sqrt(float(numgoodpjeff_5_[i]))/float(eventcounter_));
+    EffNumGoodPj_6_->SetBinContent(i+1, float(numgoodpjeff_6_[i])/float(eventcounter_));
+    EffNumGoodPj_6_->SetBinError(i+1, sqrt(float(numgoodpjeff_6_[i]))/float(eventcounter_));
+  }
+
+
   ofstream Effoutputfile( OutputEffFileName.c_str() );
 
   Effoutputfile << "Multijet trigger" << endl;
@@ -1070,6 +1141,14 @@ void OfflineAnalyzer::endJob() {
   Effoutputfile << "offline efficiency after multijet trigger = " << float(offlineEffMultijet_)/float(eventcounter_) << endl;
   Effoutputfile << "offline efficiency after MEt + Jet trigger = " << float(offlineEffMEtJet_)/float(eventcounter_) << endl;
   Effoutputfile << "offline efficiency after Tau trigger = " << float(offlineEffTauTrig_)/float(eventcounter_) << endl;
+  Effoutputfile << endl;
+
+  Effoutputfile << "PixelTrigger alone efficiency" << endl;
+  Effoutputfile << "-----------------------------" << endl;
+  Effoutputfile << ">=3 PixelJets from primary vertex = " << float(pixelTrig_3_)/float(eventcounter_) << endl;
+  Effoutputfile << ">=4 PixelJets from primary vertex = " << float(pixelTrig_4_)/float(eventcounter_) << endl;
+  Effoutputfile << ">=5 PixelJets from primary vertex = " << float(pixelTrig_5_)/float(eventcounter_) << endl;
+  Effoutputfile << ">=6 PixelJets from primary vertex = " << float(pixelTrig_6_)/float(eventcounter_) << endl;
   Effoutputfile << endl;
 
   Effoutputfile << "Total events = " << eventcounter_ << endl;
