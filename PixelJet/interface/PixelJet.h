@@ -87,7 +87,7 @@ class PixelJet{
   double z() const {
     return z_;
   }
-  int NumTk() const {
+  int tkNum() const {
     return pixelTracksNumber_;
   }
 

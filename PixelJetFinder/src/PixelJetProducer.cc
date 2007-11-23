@@ -324,7 +324,7 @@ void PixelJetProducer::produce(edm::Event& e, const edm::EventSetup& es) {
 	PJ->Close();
 
 	// If the PJ has enough tracks, save it
-	if ( PJ->NumTk() >= NumTk_cut_ ) {
+	if ( PJ->tkNum() >= NumTk_cut_ ) {
 	  // Put the PixelJet in the collection
 	  v_pj_ptr->push_back( *PJ );
 	}
