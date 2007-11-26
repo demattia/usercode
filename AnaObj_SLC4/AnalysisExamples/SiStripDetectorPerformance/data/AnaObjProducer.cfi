@@ -1,0 +1,28 @@
+module modAnaObjProducer = AnaObjProducer {
+  bool TIB_ON = true
+  bool TOB_ON = true
+  bool TID_ON = true
+  bool TEC_ON = true
+  bool SINGLE_DETECTORS = false
+  string TTRHBuilder="WithTrackAngle"
+//  string Fitter = "KFFittingSmoother"   
+//  string Propagator = "PropagatorWithMaterial" 
+//  string src = "ctfWithMaterialTracks"
+  string fileName = "test_TAC.root"
+//  string analyzedtrack   = ""
+//  string analyzedcluster = ""
+  string analyzedcluster = "AnalyzedClusters"
+  string analyzedtrack = "AnalyzedTracks"
+
+// This uses all the information (also the rechits)
+// Set updatedState to combinedState to exclude rechits (usefull to evaluate pulls and residuals)
+InputTag TrackInfoLabel=trackinfo:combinedState
+
+  // Objects Labels
+  string TracksLabel = "cosmictrackfinder"
+  string SeedsLabel  = "cosmicseedfinder"
+
+  untracked double dCrossTalkErr = 0.10
+
+  bool Simulation = false
+}
