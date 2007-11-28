@@ -10,11 +10,11 @@ project CMSSW
 cvs co UserCode/DeMattia/AnalysisObjects
 mv UserCode/DeMattia/AnalysisObjects CMSSW_1_7_0/src/AnalysisExamples
 # Copy AnalysisClasses
-cvs co UserCode/DeMattia/AnalysisObjects
-mv UserCode/DeMattia/AnalysisObjects CMSSW_1_7_0/src/AnalysisExamples
+cvs co UserCode/DeMattia/AnalysisClasses
+mv UserCode/DeMattia/AnalysisClasses CMSSW_1_7_0/src/AnalysisExamples
 # Copy L1PixelAnalyzer
 cvs co UserCode/DeMattia/L1PixelAnalyzer
-mv UserCode/DeMattia/AnalysisObjects CMSSW_1_7_0/src/AnalysisExamples
+mv UserCode/DeMattia/L1PixelAnalyzer CMSSW_1_7_0/src/AnalysisExamples
 # Copy PixelJets
 cvs co UserCode/DeMattia/PixelJet
 mv UserCode/DeMattia/PixelJet CMSSW_1_7_0/src/AnalysisExamples
