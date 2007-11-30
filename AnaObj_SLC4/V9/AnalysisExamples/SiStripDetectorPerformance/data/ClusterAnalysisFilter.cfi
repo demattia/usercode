@@ -1,0 +1,57 @@
+module clusterAnalysisFilter = ClusterAnalysisFilter {
+    using sources
+    
+    PSet TrackNumberSelector = {
+	bool On = false
+	int32 minNTracks = 0     # min <= value < max
+	int32 maxNTracks = 100	
+    }    
+    
+    PSet ClusterNumberSelector = {
+	bool On = false
+	int32 minNClus = 6     # min <= value < max
+	int32 maxNClus = 1000	
+    }    
+    
+    PSet TriggerSelector = {
+	bool On     = false
+	bool DT     = true
+	bool CSC    = true
+	bool RBC1   = true
+	bool RBC2   = true
+	bool RPCTB  = true
+	
+	# LTCTriggerBitsFilter
+	# 0 DT
+	# 1 CSC
+	# 2 RBC1 (RPC techn. cosmic trigger for wheel +1, sector 10)
+	# 3 RBC2 (RPC techn. cosmic trigger for wheel +2, sector 10)
+	# 4 RPCTB (RPC Trigger Board trigger, covering both sectors 10 of wheels, but with different geometrical acceptance ("pointing")) 
+    }    
+    
+    
+    PSet ClusterInModuleSelector = {
+	###REmove events in witch there is at least a cluster that satisfies ClusterConditions
+	###in Modules to be excluded, or in SubDetToBeexcluded, or in LayerToBeExcluded
+	### 
+	
+	bool On    = true #Global switch: false=all events pass, true=apply selection
+	
+	bool Accept = true
+	
+	vuint32 SkipModules = { }  #Modules to be skipped in applying this cut
+	
+	vuint32 ModulesToLookIn = {}
+	
+	vuint32 SubDetToLookIn = { 2, 3, 4, 5 }  #  TIB=2, TOB=3, TID=4, TEC=5,
+	
+	#vuint32 LayerToBeExcluded = {} #to be implemented
+	
+	PSet ClusterConditions = {
+	    double minStoN = 10
+	    double maxStoN = 2000
+	    double minWidth = 0
+	    double maxWidth = 200
+	}   
+    }    
+}

@@ -1,0 +1,24 @@
+module modMTCCAmplifyDigis = MTCCAmplifyDigis {
+  untracked string oSiStripDigisLabel        = "siStripDigis"
+  untracked string oSiStripDigisProdInstName = ""
+  untracked string oNewSiStripDigisLabel     = "SiStripAmplifiedDigis"
+
+  // Scale factors ParameterSet
+  untracked PSet oDigiScaleFactors = {
+    untracked PSet oTIB = {
+      untracked double dL1 = 0.857
+      untracked double dL2 = 0.914
+    }
+
+    untracked PSet oTOB = {
+      untracked double dL1 = 0.935 
+      untracked double dL2 = 0.854
+    }
+  }
+
+  // Sigmas for different Subdetectors
+  untracked PSet oDigiAmplifySigmas = {
+    untracked double dTIB = 4
+    untracked double dTOB = 5
+  }
+}
