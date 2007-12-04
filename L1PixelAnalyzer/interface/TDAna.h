@@ -1,9 +1,9 @@
 // -*- C++ -*-
 //
-// Package:    OfflineAnalyzer
-// Class:      OfflineAnalyzer
+// Package:    TDAna
+// Class:      TDAna
 // 
-/**\class OfflineAnalyzer OfflineAnalyzer.cc AnalysisExamples/OfflineAnalyzer/src/OfflineAnalyzer.cc
+/**\class TDAna TDAna.cc AnalysisExamples/TDAna/src/TDAna.cc
 
  Description: <one line class summary>
 
@@ -24,7 +24,7 @@
 //
 // Original Author:  Marco De Mattia
 //         Created:  Tue May  8 13:05:37 CEST 2007
-// $Id: OfflineAnalyzer.h,v 1.2 2007/11/22 16:42:56 demattia Exp $
+// $Id: TDAna.h,v 1.2 2007/11/22 16:42:56 demattia Exp $
 //
 //
 
@@ -128,10 +128,10 @@
 // class declaration
 //
 
-class OfflineAnalyzer : public edm::EDAnalyzer {
+class TDAna : public edm::EDAnalyzer {
  public:
-  explicit OfflineAnalyzer(const edm::ParameterSet&);
-  ~OfflineAnalyzer();
+  explicit TDAna(const edm::ParameterSet&);
+  ~TDAna();
 
 
  private:
@@ -144,7 +144,7 @@ class OfflineAnalyzer : public edm::EDAnalyzer {
   int eventcounter_;
 
   // Declare as static so that only one exists, even if more
-  // than one OfflineAnalyzer object is created
+  // than one TDAna object is created
   static L1Trig L1Trigger;
 
   edm::ParameterSet conf_;
@@ -152,7 +152,7 @@ class OfflineAnalyzer : public edm::EDAnalyzer {
 
   // Declare here, since it does not have a default constructor
   // it will be initialized with an initialization list ( in
-  // the OfflineAnalyzer constructor ).
+  // the TDAna constructor ).
   //  HiVariables HiVar;
 
   // Use a dynamic construction, or the TFile problem will crash the job
@@ -174,8 +174,6 @@ class OfflineAnalyzer : public edm::EDAnalyzer {
   edm::InputTag summaryLabel_;
 
   unsigned int numTkCut_;
-  double minDz_;
-  double maxDz_;
   std::string OutputEffFileName;
 
   TH1F * uncorr_JetPt_IC5_;
