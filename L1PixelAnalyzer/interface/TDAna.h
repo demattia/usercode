@@ -24,7 +24,7 @@
 //
 // Original Author:  Marco De Mattia
 //         Created:  Tue May  8 13:05:37 CEST 2007
-// $Id: TDAna.h,v 1.2 2007/11/22 16:42:56 demattia Exp $
+// $Id: TDAna.h,v 1.1 2007/12/04 11:15:09 demattia Exp $
 //
 //
 
@@ -116,12 +116,13 @@
 
 
 // Associator for the jets
-#include "AnalysisExamples/AnalysisClasses/interface/Associator.h"
+#include "AnalysisExamples/AnalysisClasses/interface/AssociatorEt.h"
 
 // L1Trigger evaluator
 #include "AnalysisExamples/AnalysisClasses/interface/L1Trig.h"
 #include "AnalysisExamples/AnalysisClasses/interface/HiVariables.h"
 #include "AnalysisExamples/AnalysisClasses/interface/MultiTH1F.h"
+#include "AnalysisExamples/AnalysisClasses/interface/MultiTProfile.h"
 #include "AnalysisExamples/AnalysisClasses/interface/L1PixelTrig.h"
 
 //
@@ -262,6 +263,8 @@ class TDAna : public edm::EDAnalyzer {
   double dz_;
   double dzmax_;
   int bins_;
+  double dR_;
+  double dRmax_;
 
   // Pixel trigger efficiency
   TH1F ** EffMultijetPixel_;
@@ -311,6 +314,43 @@ class TDAna : public edm::EDAnalyzer {
   TH1F * EffNumGoodPj_4_;
   TH1F * EffNumGoodPj_5_;
   TH1F * EffNumGoodPj_6_;
+
+
+  // b tag discriminator histograms
+  MultiTH1F * Multi_bDiscrHighEff;
+  MultiTH1F * Multi_bDiscrHighPur;
+  MultiTH1F * Multi_nobDiscrHighEff;
+  MultiTH1F * Multi_nobDiscrHighPur;
+  MultiTH1F * Multi_tagMassS1;
+  MultiTH1F * Multi_tagMassS2;
+  MultiTH1F * Multi_tagMassS3;
+  MultiTProfile * Multi_jetEtVSbPt;
+
+  // b tag discriminator histograms
+  TH1F * bHighEff;   
+  TH1F * bHighPur;   
+  TH1F * nobHighEff; 
+  TH1F * nobHighPur; 
+  TH1F * deltaR;
+  TH2F * jetEtVSbParton;
+  TH2F * jetUncorrEtVSbParton;
+TH1F * tagTkMassS1;
+TH1F * tagTkMassS2;
+TH1F * tagTkMassS3;
+
+TH2F * mPdiVsDiscHighEff;
+TH2F * uncorrEtVsDiscHighEff;
+TH2F * emEnergyFractionVsDiscHighEff;
+TH2F * jetMassVsDiscHighEff;
+TH2F * tkNumS1VsDiscHighEff;
+TH2F * tkSumPtS1VsDiscHighEff;
+TH2F * tagTkMassS1VsDiscHighEff;
+TH2F * tkNumS2VsDiscHighEff;
+TH2F * tkSumPtS2VsDiscHighEff;
+TH2F * tagTkMassS2VsDiscHighEff;
+TH2F * tkNumS3VsDiscHighEff;
+TH2F * tkSumPtS3VsDiscHighEff;
+TH2F * tagTkMassS3VsDiscHighEff;
 
   // ----------member data ---------------------------
 };
