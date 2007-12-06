@@ -1,10 +1,10 @@
-#ifndef MULTITH1F_H
-#define MULTITH1F_H
+#ifndef MULTITPROFILE_H
+#define MULTITPROFILE_H
 
 #include <vector>
 #include <sstream>
 
-#include "TH1F.h"
+#include "TProfile.h"
 #include "TFile.h"
 #include "TDirectory.h"
 
@@ -17,10 +17,11 @@
  * directory with the name passed as histogram name.
  *
  * The constructor is called like a TH2F but requiring also a TFile*:
- * MultiTH1F multi( "name", "title", bins val, first val, last val, bin par, first par, last par, TFile* outfile ).
+ * MultiTProfile multi( "name", "title", bins valx, first valx, last valx, first valy, last valy, bin par, first par, last par, TFile* outfile ).
  *
- * Where the "val" parameters refer to the variable into consideretion ( for
- * example eta, or pt).
+ * Where the "valx" parameters refer to x the variable into consideration ( for
+ * example eta, or pt). "valy" refer to the y variable. No bin number is to
+ * be specified for this variable (as for the TProfile).
  * The "par" parameters refer to the parameter which is being varied (for
  * example dz, when considering distribution of the pt of the primary vertex
  * as a function of the minimum dz used to reconstruct it).
@@ -41,29 +42,32 @@
  * 
  */
 
-class MultiTH1F {
+class MultiTProfile {
  public:
 
-  MultiTH1F ( const char* NAME, const char* TITLE,
-              const int & BINVAL, const double & FIRSTVAL, const double & LASTVAL,
-              const int & BINPAR, const double & FIRSTPAR, const double & LASTPAR,
-              TFile* OUTFILE );
+  MultiTProfile ( const char* NAME, const char* TITLE,
+                  const int & BINVALX, const double & FIRSTVALX, const double & LASTVALX,
+                  const double & FIRSTVALY, const double & LASTVALY,
+                  const int & BINPAR, const double & FIRSTPAR, const double & LASTPAR,
+                  TFile* OUTFILE );
 
-  /// Fills the histogram corresponding to the index passed as second parameter with the value passed as first parameter
-  void Fill( const double & VAL, const int & PAR );
+  /** Fills the histogram corresponding to the index passed as third parameter with the x value passed as first parameter
+   *  and the y value as second.
+   */
+  void Fill( const double & VALX, const double & VALY, const int & PAR );
 
   /// Writes the histograms to file
   void Write();
 
   /// Returns vector of internal histograms
-  std::vector<TH1F*> multiHistos() const;
+  std::vector<TProfile*> multiProfiles() const;
 
  private:
   TDirectory * Directory_;
-  TH1F * HistoMean_;
+  //  TH1F * HistoMean_;
   THStackLegend * StackLegend_;
   THStackLegend * SparseStackLegend_;
-  std::vector<TH1F*> vec_MultiHisto_;
+  std::vector<TProfile*> vec_MultiHisto_;
   std::ostringstream snum_;
   double firstpar_;
   double lastpar_;
@@ -72,4 +76,4 @@ class MultiTH1F {
   TFile* outfile_;
 };
 
-#endif //MULTITH1F_H
+#endif //MULTITPROFILE_H

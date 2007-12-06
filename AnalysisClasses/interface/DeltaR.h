@@ -18,7 +18,7 @@ inline double DeltaR ( double Eta1,
   delPhi = DeltaPhi( Phi1, Phi2 );
   delEta = Eta1 - Eta2;
 
-  return ( std::sqrt(delPhi*delPhi + delEta*delEta );
+  return ( std::sqrt(delPhi*delPhi + delEta*delEta ) );
 
 
 }

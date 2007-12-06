@@ -1,5 +1,5 @@
-#ifndef ASSOCIATOR_HH
-#define ASSOCIATOR_HH
+#ifndef ASSOCIATORET_HH
+#define ASSOCIATORET_HH
 
 ////////////////////////////////////////////////////////////////////////////
 //
@@ -34,36 +34,31 @@
 #include <algorithm>
 #include <cmath>
 #include <functional>
-#include "AnalysisExamples/AnalysisObjects/interface/OfflineJet.h"
-
-using namespace anaobj;
 
 template <class T1, class T2>
-  bool Associator_PtSort( const T1* first, const T2* second ) {
+  bool AssociatorEt_PtSort( const T1* first, const T2* second ) {
 
-  return first->pt() < second->pt();
+  return first->et() < second->et();
 }
 
 template <class T1, class T2>
-  class Associator {
+  class AssociatorEt {
  public:
-  Associator( double CONER_CUT ) {
+  AssociatorEt( double CONER_CUT ) {
     PI_ = 3.141593;
     ConeR_cut_ = CONER_CUT;
   }
   std::auto_ptr<std::map<const T1*, const T2*> > Associate( const std::vector<T1> & v_T1, const std::vector<T2> & v_T2 );
-//  void Associate( const std::vector<T1> & v_T1, const std::vector<T2> & v_T2 );
+
  private:
-//  bool PtSort_( const T1* first, const T1* second ) {
-//    return first->pt() < second->pt();
-//  }
   double PI_;
   double ConeR_cut_;
 };
 
 template <class T1, class T2>
-  std::auto_ptr<std::map<const T1*, const T2*> > Associator<T1, T2>::Associate( const std::vector<T1> & v_T1, const std::vector<T2> & v_T2 ) {
-//  void Associator<T1, T2>::Associate( const std::vector<T1> & v_T1, const std::vector<T2> & v_T2 ) {
+  std::auto_ptr<std::map<const T1*, 
+                         const T2*> > AssociatorEt<T1, T2>::Associate( const std::vector<T1> & v_T1, 
+								       const std::vector<T2> & v_T2 ) {
 
   using namespace std;
 
@@ -80,8 +75,7 @@ template <class T1, class T2>
     v_T2_ptr.push_back( &(*temp_it2) );
   }
 
-//  sort( v_T1_ptr.begin(), v_T1_ptr.end(), mem_fun_ref( &Associator<T1, T2>::PtSort_ ) );
-  sort( v_T1_ptr.begin(), v_T1_ptr.end(), Associator_PtSort<T1, T1> );
+  sort( v_T1_ptr.begin(), v_T1_ptr.end(), AssociatorEt_PtSort<T1, T1> );
 
   // Map to be returned
   auto_ptr<map<const T1*, const T2*> > AssocMap_ptr( new map<const T1*, const T2*> );

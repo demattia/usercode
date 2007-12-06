@@ -1,10 +1,11 @@
-#ifndef MULTITH1F_CC
-#define MULTITH1F_CC
+#ifndef MULTITPROFILE_CC
+#define MULTITPROFILE_CC
 
-#include "AnalysisExamples/AnalysisClasses/interface/MultiTH1F.h"
+#include "AnalysisExamples/AnalysisClasses/interface/MultiTProfile.h"
 
-MultiTH1F::MultiTH1F ( const char* NAME, const char* TITLE,
-                       const int & BINVAL, const double & FIRSTVAL, const double & LASTVAL,
+MultiTProfile::MultiTProfile ( const char* NAME, const char* TITLE,
+                       const int & BINVALX, const double & FIRSTVALX, const double & LASTVALX,
+                       const double & FIRSTVALY, const double & LASTVALY,
                        const int & BINPAR, const double & FIRSTPAR, const double & LASTPAR,
                        TFile* OUTFILE ) {
 
@@ -32,14 +33,14 @@ MultiTH1F::MultiTH1F ( const char* NAME, const char* TITLE,
   SparseStackLegend_ = new THStackLegend( SparseStack + Name );
 
   // Mean histogram
-  HistoMean_ = new TH1F( Mean + Name, Mean + Title, BINPAR, FIRSTPAR, LASTPAR );
+  //   HistoMean_ = new TH1F( Mean + Name, Mean + Title, BINPAR, FIRSTPAR, LASTPAR );
 
   // Multiple histograms
   double Multi = 0.;
   for ( int num = 0; num < BINPAR; ++num ) {
     Multi = FIRSTPAR + increment_*double(num);
     snum_ << Multi;
-    vec_MultiHisto_.push_back( new TH1F( Name + snum_.str(), Title + snum_.str(), BINVAL, FIRSTVAL, LASTVAL ) );
+    vec_MultiHisto_.push_back( new TProfile( Name + snum_.str(), Title + snum_.str(), BINVALX, FIRSTVALX, LASTVALX, FIRSTVALY, LASTVALY ) );
     // Empty the ostringstream
     snum_.str("");
   }
@@ -48,40 +49,40 @@ MultiTH1F::MultiTH1F ( const char* NAME, const char* TITLE,
 }
 
 /// Fills the histogram corresponding to the index passed as second parameter with the value passed as first parameter
-void MultiTH1F::Fill( const double & VAL, const int & PAR ) {
+void MultiTProfile::Fill( const double & VALX, const double & VALY, const int & PAR ) {
   // Check that the index is in the allowed range
   if ( PAR >= 0 && PAR < binpar_ ) {
-    vec_MultiHisto_[PAR]->Fill( VAL );
+    vec_MultiHisto_[PAR]->Fill( VALX, VALY );
   }
 }
 
 /// Writes the histograms to file
-void MultiTH1F::Write() {
+void MultiTProfile::Write() {
 
   // Put all the duplicate histograms in the subdir
 
   int sparse = binpar_/5;
   // Center labels for the mean histogram and put one on each bin
-  HistoMean_->GetXaxis()->CenterLabels();
-  HistoMean_->GetXaxis()->SetNdivisions(HistoMean_->GetSize()-2, false);
-  HistoMean_->GetXaxis()->SetLabelSize(0.02);
+  //   HistoMean_->GetXaxis()->CenterLabels();
+  //   HistoMean_->GetXaxis()->SetNdivisions(HistoMean_->GetSize()-2, false);
+  //   HistoMean_->GetXaxis()->SetLabelSize(0.02);
   double Multi = 0;
   for( int num = 0; num < binpar_; ++num ) {
     Multi = firstpar_ + increment_*double(num);
     snum_ << Multi;
 
-    TH1F* MultiHisto_ptr = vec_MultiHisto_[num];
+    TProfile* MultiHisto_ptr = vec_MultiHisto_[num];
 
     // Fill the mean histogram
-    HistoMean_->SetBinContent( num+1, MultiHisto_ptr->GetMean() );
-    HistoMean_->SetBinError( num+1, MultiHisto_ptr->GetMeanError() );
+    //     HistoMean_->SetBinContent( num+1, MultiHisto_ptr->GetMean() );
+    //     HistoMean_->SetBinError( num+1, MultiHisto_ptr->GetMeanError() );
 
     // Fill the THStackLegend histogram
-    StackLegend_->Add( MultiHisto_ptr, snum_.str().c_str(), true );
+    StackLegend_->Add( MultiHisto_ptr, snum_.str().c_str(), false );
 
     // When the bin number is a multiple of one-tenth of the total number of bins
     if ( float(num+1)/float(sparse) == (num+1)/sparse ) {
-      SparseStackLegend_->Add( MultiHisto_ptr, snum_.str().c_str(), true );
+      SparseStackLegend_->Add( MultiHisto_ptr, snum_.str().c_str(), false );
     }
 
     // Empty the ostringstream
@@ -97,9 +98,9 @@ void MultiTH1F::Write() {
   outfile_->cd();
 }
 
-std::vector<TH1F*> MultiTH1F::multiHistos() const {
+std::vector<TProfile*> MultiTProfile::multiProfiles() const {
   
   return vec_MultiHisto_;
 }
 
-#endif // MULTITH1F_CC
+#endif // MULTITPROFILE_CC
