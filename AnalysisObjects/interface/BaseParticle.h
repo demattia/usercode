@@ -7,17 +7,17 @@
 #include <cmath>
 #include <vector>
 
-/**
- *
- * Simple BaseParticle class used as base class for
- * MCParticles.
- * It is exactly like BaseJet, but et -> pt.
- *
- * Author M. De Mattia - 8/11/2007
- *
- */
-
 namespace anaobj {
+
+  /**
+   *
+   * Simple BaseParticle class used as base class for
+   * MCParticles.
+   * It is exactly like BaseJet, but et -> pt.
+   *
+   * Author M. De Mattia - 8/11/2007
+   *
+   */
 
   class BaseParticle : public BaseAll {
   public:

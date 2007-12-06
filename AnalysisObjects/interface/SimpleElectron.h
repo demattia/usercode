@@ -7,18 +7,18 @@
 #include <cmath>
 #include <vector>
 
-/**
- *
- * Stores an offline electron. Inlcudes Et, had/em fraction and
- * isolation.
- *
- * Inherits from BaseParticle.
- *
- * Author M. De Mattia - 8/11/2007
- *
- */
-
 namespace anaobj {
+
+  /**
+   *
+   * Stores an offline electron. Inlcudes Et, had/em fraction and
+   * isolation.
+   *
+   * Inherits from BaseParticle.
+   *
+   * Author M. De Mattia - 8/11/2007
+   *
+   */
 
   class SimpleElectron : public BaseParticle {
   public:

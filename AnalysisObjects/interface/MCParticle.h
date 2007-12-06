@@ -3,16 +3,16 @@
 
 #include "AnalysisExamples/AnalysisObjects/interface/BaseParticle.h"
 
-/**
- *
- * Stores a MCParticle. Inherits from BaseParticle and
- * adds the methods for mass, pid and mother's pid.
- *
- * Author M. De Mattia - 10/11/2007
- *
- */
-
 namespace anaobj {
+
+  /**
+   *
+   * Stores a MCParticle. Inherits from BaseParticle and
+   * adds the methods for mass, pid and mother's pid.
+   *
+   * Author M. De Mattia - 10/11/2007
+   *
+   */
 
   class MCParticle : public BaseParticle {
   public:

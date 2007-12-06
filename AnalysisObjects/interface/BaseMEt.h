@@ -1,16 +1,16 @@
 #ifndef BASEMET_H
 #define BASEMET_H
 
-/**
- *
- * Simple MEt class, used to store L1 MEt and SumEt and
- * as a base class for the offline MEt.
- *
- * Author M. De Mattia - 8/11/2007
- *
- */
-
 namespace anaobj {
+
+  /**
+   *
+   * Simple MEt class, used to store L1 MEt and SumEt and
+   * as a base class for the offline MEt.
+   *
+   * Author M. De Mattia - 8/11/2007
+   *
+   */
 
   class BaseMEt {
   public:

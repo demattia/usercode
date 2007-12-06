@@ -7,18 +7,18 @@
 #include <cmath>
 #include <vector>
 
-/**
- *
- * Stores a ParamGlobalMuon. Includes em, had and ho energy and
- * sumPt from tracks for isolation.
- *
- * Inherits from BaseParticle.
- *
- * Author M. De Mattia - 8/11/2007
- *
- */
-
 namespace anaobj {
+
+  /**
+   *
+   * Stores a ParamGlobalMuon. Includes em, had and ho energy and
+   * sumPt from tracks for isolation.
+   *
+   * Inherits from BaseParticle.
+   *
+   * Author M. De Mattia - 8/11/2007
+   *
+   */
 
   class GlobalMuon : public BaseParticle {
   public:

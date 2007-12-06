@@ -7,17 +7,17 @@
 #include <cmath>
 #include <vector>
 
-/**
- *
- * Used for pixel jets. Same as a PixelJet but without the
- * vector of references to pixel tracks.
- * Inherits from BaseParticle, since it has pt, not et.
- *
- * Author M. De Mattia - 8/11/2007
- *
- */
-
 namespace anaobj {
+
+  /**
+   *
+   * Used for pixel jets. Same as a PixelJet but without the
+   * vector of references to pixel tracks.
+   * Inherits from BaseParticle, since it has pt, not et.
+   *
+   * Author M. De Mattia - 8/11/2007
+   *
+   */
 
   class SimplePixelJet : public BaseParticle {
   public:

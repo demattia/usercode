@@ -7,16 +7,16 @@
 #include <cmath>
 #include <vector>
 
-/**
- *
- * Used for taus.
- * Inherits from BaseJet.
- *
- * Author M. De Mattia - 8/11/2007
- *
- */
-
 namespace anaobj {
+
+  /**
+   *
+   * Used for taus.
+   * Inherits from BaseJet.
+   *
+   * Author M. De Mattia - 8/11/2007
+   *
+   */
 
   class SimpleTau : public BaseJet {
   public:

@@ -7,16 +7,16 @@
 #include <cmath>
 #include <vector>
 
-/**
- *
- * Used for offline jets. Includes b-tagging informations.
- * Inherits from BaseJet.
- *
- * Author M. De Mattia - 8/11/2007
- *
- */
-
 namespace anaobj {
+
+  /**
+   *
+   * Used for offline jets. Includes b-tagging informations.
+   * Inherits from BaseJet.
+   *
+   * Author M. De Mattia - 8/11/2007
+   *
+   */
 
   class OfflineJet : public BaseJet {
   public:

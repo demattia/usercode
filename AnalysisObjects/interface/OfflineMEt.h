@@ -3,18 +3,18 @@
 
 #include "AnalysisExamples/AnalysisObjects/interface/BaseMEt.h"
 
-/**
- *
- * MEt class used to store offline MEt, MEt phi,
- * sumEt, MEtSignificance and minimum DPhi between
- * MEt and the closest offline Jet.
- * Inherits from BaseMEt.
- *
- * Author M. De Mattia - 9/11/2007
- *
- */
-
 namespace anaobj {
+
+  /**
+   *
+   * MEt class used to store offline MEt, MEt phi,
+   * sumEt, MEtSignificance and minimum DPhi between
+   * MEt and the closest offline Jet.
+   * Inherits from BaseMEt.
+   *
+   * Author M. De Mattia - 9/11/2007
+   *
+   */
 
   class OfflineMEt : public BaseMEt
   {

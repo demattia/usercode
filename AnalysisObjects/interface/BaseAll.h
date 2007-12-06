@@ -1,16 +1,16 @@
 #ifndef BASEALL_H
 #define BASEALL_H
 
-/**
- *
- * Base class for all jets and particles to be stored.
- * It has only eta and phi.
- *
- * Author M. De Mattia - 8/11/2007
- *
- */
-
 namespace anaobj {
+
+  /**
+   *
+   * Base class for all jets and particles to be stored.
+   * It has only eta and phi.
+   *
+   * Author M. De Mattia - 8/11/2007
+   *
+   */
 
   class BaseAll {
   public:

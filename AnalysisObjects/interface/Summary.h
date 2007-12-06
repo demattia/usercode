@@ -3,6 +3,16 @@
 
 namespace anaobj {
 
+  /**
+   * Stores general informations on the events. <br>
+   * \li The number of offline jets. <br>
+   * \li In the case of ttH or tt if it is a semileptonic event and if it is a ttH event if the H decayed to bb. <br>
+   * The bools "semileptonic" and "hTobb" are set to true in all non tt or ttH events. <br>
+   * \li An integer identifying the event type ( for the table of correspondence see AnalysisExamples/L1PixelAnalyzer/data/OfflineProducer.cfi ).
+   *
+   * Author M. De Mattia - 8/11/2007
+   */
+
   class Summary {
   public:
     /// Empty constructor, needed only for classes.h

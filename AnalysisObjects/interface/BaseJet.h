@@ -7,16 +7,16 @@
 #include <cmath>
 #include <vector>
 
-/**
- *
- * Simple BaseJet class used for L1Jets and as base class
- * for IC5 jets.
- *
- * Author M. De Mattia - 8/11/2007
- *
- */
-
 namespace anaobj {
+
+  /**
+   *
+   * Simple BaseJet class used for L1Jets and as base class
+   * for IC5 jets.
+   *
+   * Author M. De Mattia - 8/11/2007
+   *
+   */
 
   class BaseJet : public BaseAll {
   public:
