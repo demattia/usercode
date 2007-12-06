@@ -18,10 +18,6 @@ module OfflineAna = OfflineAnalyzer {
   untracked InputTag Summary                    = offlineProd:summary
 
   untracked uint32 TracksMinimumNum_in_PixelJet = 3
-  // To select one value use min = 0.x and max = 0.x+0.1 (eg 0.4 and 0.5),
-  // this way only the first value will be processed.
-  untracked double MinDz = 0.4
-  untracked double MaxDz = 0.5
 
   untracked string OutputEffFileName            = "Efficiency_file.txt"
 }

@@ -97,9 +97,4 @@ void MultiTH1F::Write() {
   outfile_->cd();
 }
 
-std::vector<TH1F*> MultiTH1F::multiHistos() const {
-  
-  return vec_MultiHisto_;
-}
-
 #endif // MULTITH1F_CC

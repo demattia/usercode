@@ -24,7 +24,7 @@
 //
 // Original Author:  Marco De Mattia
 //         Created:  Tue May  8 13:05:37 CEST 2007
-// $Id: OfflineAnalyzer.h,v 1.2 2007/11/22 16:42:56 demattia Exp $
+// $Id: OfflineAnalyzer.h,v 1.6 2007/11/09 17:25:29 demattia Exp $
 //
 //
 
@@ -173,9 +173,7 @@ class OfflineAnalyzer : public edm::EDAnalyzer {
   edm::InputTag simpleTauLabel_;
   edm::InputTag summaryLabel_;
 
-  unsigned int numTkCut_;
-  double minDz_;
-  double maxDz_;
+  unsigned int numTkCut;
   std::string OutputEffFileName;
 
   TH1F * uncorr_JetPt_IC5_;
@@ -295,24 +293,6 @@ class OfflineAnalyzer : public edm::EDAnalyzer {
 
   // Directory in the root file to hold the multiple histograms
   TDirectory *DirVertexDz_;
-
-  // PixelTrigger alone efficiency
-  int pixelTrig_3_;
-  int pixelTrig_4_;
-  int pixelTrig_5_;
-  int pixelTrig_6_;
-
-  int *numgoodpjeff_;
-  int *numgoodpjeff_3_;
-  int *numgoodpjeff_4_;
-  int *numgoodpjeff_5_;
-  int *numgoodpjeff_6_;
-
-  TH1F * EffNumGoodPj_;
-  TH1F * EffNumGoodPj_3_;
-  TH1F * EffNumGoodPj_4_;
-  TH1F * EffNumGoodPj_5_;
-  TH1F * EffNumGoodPj_6_;
 
   // ----------member data ---------------------------
 };

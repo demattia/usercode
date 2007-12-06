@@ -1,17 +1,7 @@
 #ifndef THSTACKLEGEND_HH
 #define THSTACKLEGEND_HH
 
-/**
- * Simple THStack container that automatically generates a legend and modifies the
- * color of the different histograms to make them recognizable.
- * The THStack works with any TH1 inheriting histograms, so it works on TH1F and
- * TProfile as well.
- */
-
 #include "THStack.h"
-#include "TH1.h"
-#include "TH1F.h"
-#include "TProfile.h"
 #include "TLegend.h"
 #include "TCanvas.h"
 
@@ -31,11 +21,9 @@ class THStackLegend {
   }
 //  void Add(TH1F * HISTO, char* LEGEND = "", char* FILL = "l");
   TH1F* Add(const TH1F * HISTO, const char* LEGEND = "", const bool & NORMALIZE = false, const char* FILL = "l");
-  TProfile* Add(const TProfile * HISTO, const char* LEGEND = "", const bool & NORMALIZE = false, const char* FILL = "l");
   void Draw(TString OPTION = "") const;
   void Write(TString OPTION = "") const;
  private:
-//  TH1* Add(const TH1 * HISTO, const char* LEGEND = "", const bool & NORMALIZE = false, const char* FILL = "l");
   THStack * stack_;
   TCanvas * canvas_;
   TLegend * legend_;

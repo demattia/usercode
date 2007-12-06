@@ -49,9 +49,6 @@ OfflineAnalyzer::OfflineAnalyzer(const edm::ParameterSet& iConfig) :
   simpleElectronLabel_( iConfig.getUntrackedParameter<edm::InputTag>( "SimpleElectrons" ) ),
   simpleTauLabel_( iConfig.getUntrackedParameter<edm::InputTag>( "SimpleTaus" ) ),
   summaryLabel_( iConfig.getUntrackedParameter<edm::InputTag>( "Summary" ) ),
-  numTkCut_( iConfig.getUntrackedParameter<unsigned int>( "TracksMinimumNum_in_PixelJet" ) ),
-  minDz_( iConfig.getUntrackedParameter<double>( "MinDz" ) ),
-  maxDz_( iConfig.getUntrackedParameter<double>( "MaxDz" ) ),
   OutputEffFileName( iConfig.getUntrackedParameter<string>( "OutputEffFileName" ) )
 {
   //now do what ever initialization is needed
@@ -79,17 +76,14 @@ OfflineAnalyzer::OfflineAnalyzer(const edm::ParameterSet& iConfig) :
   PixelJet_Track_Num_ = new TH1F( "PixelJet_Track_Num", "Number of pixeltracks in pixeljets", 15, 0, 15 );
 
   // Pixel trigger efficiency
-  int dzIndexSize = 10;
+  EffMultijetPixelSize_ = 10000;
+  EffMEtJetPixelSize_ = 100;
   EffMultijetPixelSizeEt1_ = 10;
   EffMultijetPixelSizeEt2_ = 10;
   EffMultijetPixelSizeEt3_ = 10;
   EffMultijetPixelSizeEt4_ = 10;
-  EffMultijetPixelSize_ = EffMultijetPixelSizeEt1_*EffMultijetPixelSizeEt2_*EffMultijetPixelSizeEt3_*EffMultijetPixelSizeEt4_*dzIndexSize;
-  offlineEffMultijetPixelSize_ = EffMultijetPixelSize_;
-
-  EffMEtJetPixelSize_ = 100*dzIndexSize;
-  offlineEffMEtJetPixelSize_ = EffMEtJetPixelSize_;
-
+  offlineEffMultijetPixelSize_ = 10000;
+  offlineEffMEtJetPixelSize_ = 100;
   TString EffMultijetName("EffMultijetPixel");
   TString EffMultijetTitle("Efficiency of multijet + pixel trigger for PVnum = ");
   TString EffMEtJetName("EffMEtJetPixel");
@@ -245,33 +239,7 @@ OfflineAnalyzer::OfflineAnalyzer(const edm::ParameterSet& iConfig) :
   offlineEffTauTrig_ = 0;
 
   eventcounter_ = 0;
-  //  PI_ = 3.141593;
-
-  // PixelTrigger alone efficiency
-  pixelTrig_3_ = 0;
-  pixelTrig_4_ = 0;
-  pixelTrig_5_ = 0;
-  pixelTrig_6_ = 0;
-
-  numgoodpjeff_ = new int[20];
-  numgoodpjeff_3_ = new int[20];
-  numgoodpjeff_4_ = new int[20];
-  numgoodpjeff_5_ = new int[20];
-  numgoodpjeff_6_ = new int[20];
-
-  EffNumGoodPj_ = new TH1F ( "EffNumGoodPj", "Efficiency of cut on number of good pixeljets", 20, 0, 20 );
-  EffNumGoodPj_3_ = new TH1F ( "EffNumGoodPj_3", "Efficiency of cut on number of good pixeljets && 3 pj from pv", 20, 0, 20 );
-  EffNumGoodPj_4_ = new TH1F ( "EffNumGoodPj_4", "Efficiency of cut on number of good pixeljets && 4 pj from pv", 20, 0, 20 );
-  EffNumGoodPj_5_ = new TH1F ( "EffNumGoodPj_5", "Efficiency of cut on number of good pixeljets && 5 pj from pv", 20, 0, 20 );
-  EffNumGoodPj_6_ = new TH1F ( "EffNumGoodPj_6", "Efficiency of cut on number of good pixeljets && 6 pj from pv", 20, 0, 20 );
-
-  for (int i=0; i<20; ++i) {
-    numgoodpjeff_[i] = 0;
-    numgoodpjeff_3_[i] = 0;
-    numgoodpjeff_4_[i] = 0;
-    numgoodpjeff_5_[i] = 0;
-    numgoodpjeff_6_[i] = 0;
-  }
+//  PI_ = 3.141593;
 }
 
 
@@ -302,12 +270,6 @@ OfflineAnalyzer::~OfflineAnalyzer()
   delete[] EffMEtJetPixelArray_;
   delete[] offlineEffMultijetPixelArray_;
   delete[] offlineEffMEtJetPixelArray_;
-
-  delete[] numgoodpjeff_;
-  delete[] numgoodpjeff_3_;
-  delete[] numgoodpjeff_4_;
-  delete[] numgoodpjeff_5_;
-  delete[] numgoodpjeff_6_;
 }
 
 //
@@ -470,13 +432,6 @@ OfflineAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
 
   const SimplePixelJetCollection pixeljets = *(pixelJetsHandle.product());
 
-  // Count the number of pixeljets with at least numTkCut_ tracks
-  SimplePixelJetCollection::const_iterator pj_it = pixeljets.begin();
-  int goodPjNum = 0;
-  for ( ; pj_it != pixeljets.end(); ++pj_it ) {
-    if ( pj_it->tkNum() >= int(numTkCut_) ) ++goodPjNum;
-  }
-
   // Pixel trigger requiring at least 2 pixel jets coming from the primary vertex
   // (constructed from pixel jets, and taken as the vertex with the highest ptsum)
 
@@ -485,10 +440,10 @@ OfflineAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
     double dz = dz_ + dz_*(numdz);
 
 #ifdef DEBUG
-    std::cout << "numTkCut = " << numTkCut_ << std::endl;
+    std::cout << "numTkCut = " << numTkCut << std::endl;
 #endif
 
-    L1PixelTrig<SimplePixelJet> PJtrig(2, dz, numTkCut_);
+    L1PixelTrig<SimplePixelJet> PJtrig(2, dz, numTkCut);
 
     PJtrig.Fill( pixeljets );
 
@@ -772,10 +727,10 @@ OfflineAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
   // PixelTrigger
   // ------------
   // dz = 0.4 and numtk = 3
-  L1PixelTrig<SimplePixelJet> Pixeltrig_3(3, 0.4, numTkCut_);
-  L1PixelTrig<SimplePixelJet> Pixeltrig_4(4, 0.4, numTkCut_);
-  L1PixelTrig<SimplePixelJet> Pixeltrig_5(5, 0.4, numTkCut_);
-  L1PixelTrig<SimplePixelJet> Pixeltrig_6(6, 0.4, numTkCut_);
+  L1PixelTrig<SimplePixelJet> Pixeltrig_3(3, 0.4, 3);
+  L1PixelTrig<SimplePixelJet> Pixeltrig_4(4, 0.4, 3);
+  L1PixelTrig<SimplePixelJet> Pixeltrig_5(5, 0.4, 3);
+  L1PixelTrig<SimplePixelJet> Pixeltrig_6(6, 0.4, 3);
 
   Pixeltrig_3.Fill( pixeljets );
   Pixeltrig_4.Fill( pixeljets );
@@ -788,22 +743,6 @@ OfflineAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
   pixelTrigResponse[1] = Pixeltrig_4.Response();
   pixelTrigResponse[2] = Pixeltrig_5.Response();
   pixelTrigResponse[3] = Pixeltrig_6.Response();
-
-  if (pixelTrigResponse[0]) ++pixelTrig_3_;
-  if (pixelTrigResponse[1]) ++pixelTrig_4_;
-  if (pixelTrigResponse[2]) ++pixelTrig_5_;
-  if (pixelTrigResponse[3]) ++pixelTrig_6_;
-
-  // Cut on the number of good pixeljets
-  for ( int numgoodpjcut=0; numgoodpjcut<20; ++numgoodpjcut ) {
-    if ( goodPjNum >= numgoodpjcut ) {
-      ++numgoodpjeff_[numgoodpjcut];
-      if (pixelTrigResponse[0]) ++numgoodpjeff_3_[numgoodpjcut];
-      if (pixelTrigResponse[1]) ++numgoodpjeff_4_[numgoodpjcut];
-      if (pixelTrigResponse[2]) ++numgoodpjeff_5_[numgoodpjcut];
-      if (pixelTrigResponse[3]) ++numgoodpjeff_6_[numgoodpjcut];
-    }
-  }
 
   // Multijet initializations
   // ------------------------
@@ -872,113 +811,100 @@ OfflineAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
   // Loop on all the values
   // ----------------------
 
-  int dzIndexMin = int(minDz_*10.);
-  int dzIndexMax = int(maxDz_*10.);
-
   // Do it for the different PV cut values for the pixel trigger
   for ( int PVnum=0; PVnum<4; ++PVnum ) {
 
     // Loop on all the cut values
     int multijetCount = 0;
-    for ( int dzIndex=dzIndexMin; dzIndex<dzIndexMax; ++dzIndex ) {
-      L1PixelTrig<SimplePixelJet> PixeltrigMulti(3+PVnum, float(dzIndex)*0.1, numTkCut_);
-      PixeltrigMulti.Fill( pixeljets );
-      bool pixelTrigMultiResponse = PixeltrigMulti.Response();
-      for ( int Et1=205; Et1<255; Et1+=5 ) {
-        for ( int Et2=155; Et2<205; Et2+=5 ) {
-          for ( int Et3=55; Et3<105; Et3+=5 ) {
-            for ( int Et4=35; Et4<85; Et4+=5 ) {
-              Response_cen = false;
-              Response_for = false;
-              Response_tau = false;
-              // Central
-              if ( (cenJet1 >= Et1) || (cenJet2 >= Et2) || (cenJet3 >= Et3) || (cenJet4 >= Et4) ) Response_cen = true;
-              // Forward
-              if ( (forJet1 >= Et1) || (forJet2 >= Et2) || (forJet3 >= Et3) || (forJet4 >= Et4) ) Response_for = true;
-              // Tau
-              if ( (tauJet1 >= Et1) || (tauJet2 >= Et2) || (tauJet3 >= Et3) || (tauJet4 >= Et4) ) Response_tau = true;
-              // Full
-              if ( (Response_cen || Response_tau || Response_for) && pixelTrigMultiResponse ) ++((EffMultijetPixelArray_[PVnum])[multijetCount]);
-              if ( (Response_cen || Response_tau || Response_for) && pixelTrigMultiResponse && offline ) ++((offlineEffMultijetPixelArray_[PVnum])[multijetCount]);
-              // increase the index, in the inner loop
-              ++multijetCount;
-            }
+    for ( int Et1=160; Et1<260; Et1+=10 ) {
+      for ( int Et2=110; Et2<210; Et2+=10 ) {
+        for ( int Et3=55; Et3<105; Et3+=5 ) {
+          for ( int Et4=35; Et4<85; Et4+=5 ) {
+            Response_cen = false;
+            Response_for = false;
+            Response_tau = false;
+            // Central
+            if ( (cenJet1 >= Et1) || (cenJet2 >= Et2) || (cenJet3 >= Et3) || (cenJet4 >= Et4) ) Response_cen = true;
+            // Forward
+            if ( (forJet1 >= Et1) || (forJet2 >= Et2) || (forJet3 >= Et3) || (forJet4 >= Et4) ) Response_for = true;
+            // Tau
+            if ( (tauJet1 >= Et1) || (tauJet2 >= Et2) || (tauJet3 >= Et3) || (tauJet4 >= Et4) ) Response_tau = true;
+            // Full
+            if ( (Response_cen || Response_tau || Response_for) && pixelTrigResponse[PVnum] ) ++((EffMultijetPixelArray_[PVnum])[multijetCount]);
+            if ( (Response_cen || Response_tau || Response_for) && pixelTrigResponse[PVnum] && offline ) ++((offlineEffMultijetPixelArray_[PVnum])[multijetCount]);
+            // increase the index, in the inner loop
+            ++multijetCount;
           }
         }
       }
+    }
 
-      // Multijet single cuts efficiencies
-      int et1Count = 0;
-      for ( int Et1=205; Et1<255; Et1+=5 ) {
-        Response_cen_et1 = false;
-        Response_for_et1 = false;
-        Response_tau_et1 = false;
-        if ( cenJet1 >= Et1 ) Response_cen_et1 = true;
-        if ( forJet1 >= Et1 ) Response_for_et1 = true;
-        if ( tauJet1 >= Et1 ) Response_tau_et1 = true;
-        if ( (Response_cen_et1 || Response_for_et1 || Response_for_et1) && pixelTrigMultiResponse ) ++((EffMultijetPixelArrayEt1_[PVnum])[et1Count]);
-        ++et1Count;
-      }
-      int et2Count = 0;
-      for ( int Et2=155; Et2<205; Et2+=5 ) {
-        Response_cen_et2 = false;
-        Response_for_et2 = false;
-        Response_tau_et2 = false;
-        if ( cenJet2 >= Et2 ) Response_cen_et2 = true;
-        if ( forJet2 >= Et2 ) Response_for_et2 = true;
-        if ( tauJet2 >= Et2 ) Response_tau_et2 = true;
-        if ( (Response_cen_et2 || Response_for_et2 || Response_for_et2) && pixelTrigMultiResponse ) ++((EffMultijetPixelArrayEt2_[PVnum])[et2Count]);
-        ++et2Count;
-      }
-      int et3Count = 0;
-      for ( int Et3=55; Et3<105; Et3+=5 ) {
-        Response_cen_et3 = false;
-        Response_for_et3 = false;
-        Response_tau_et3 = false;
-        if ( cenJet3 >= Et3 ) Response_cen_et3 = true;
-        if ( forJet3 >= Et3 ) Response_for_et3 = true;
-        if ( tauJet3 >= Et3 ) Response_tau_et3 = true;
-        if ( (Response_cen_et3 || Response_for_et3 || Response_for_et3) && pixelTrigMultiResponse ) ++((EffMultijetPixelArrayEt3_[PVnum])[et3Count]);
-        ++et3Count;
-      }
-      int et4Count = 0;
-      for ( int Et4=35; Et4<85; Et4+=5 ) {
-        Response_cen_et4 = false;
-        Response_for_et4 = false;
-        Response_tau_et4 = false;
-        if ( cenJet4 >= Et4 ) Response_cen_et4 = true;
-        if ( forJet4 >= Et4 ) Response_for_et4 = true;
-        if ( tauJet4 >= Et4 ) Response_tau_et4 = true;
-        if ( (Response_cen_et4 || Response_for_et4 || Response_for_et4) && pixelTrigMultiResponse ) ++((EffMultijetPixelArrayEt4_[PVnum])[et4Count]);
-        ++et4Count;
-      }
-    } // end dz loop
+    // Multijet single cuts efficiencies
+    int et1Count = 0;
+    for ( int Et1=160; Et1<260; Et1+=10 ) {
+      Response_cen_et1 = false;
+      Response_for_et1 = false;
+      Response_tau_et1 = false;
+      if ( cenJet1 >= Et1 ) Response_cen_et1 = true;
+      if ( forJet1 >= Et1 ) Response_for_et1 = true;
+      if ( tauJet1 >= Et1 ) Response_tau_et1 = true;
+      if ( (Response_cen_et1 || Response_for_et1 || Response_for_et1) && pixelTrigResponse[PVnum] ) ++((EffMultijetPixelArrayEt1_[PVnum])[et1Count]);
+      ++et1Count;
+    }
+    int et2Count = 0;
+    for ( int Et2=110; Et2<210; Et2+=10 ) {
+      Response_cen_et2 = false;
+      Response_for_et2 = false;
+      Response_tau_et2 = false;
+      if ( cenJet2 >= Et2 ) Response_cen_et2 = true;
+      if ( forJet2 >= Et2 ) Response_for_et2 = true;
+      if ( tauJet2 >= Et2 ) Response_tau_et2 = true;
+      if ( (Response_cen_et2 || Response_for_et2 || Response_for_et2) && pixelTrigResponse[PVnum] ) ++((EffMultijetPixelArrayEt2_[PVnum])[et2Count]);
+      ++et2Count;
+    }
+    int et3Count = 0;
+    for ( int Et3=55; Et3<105; Et3+=5 ) {
+      Response_cen_et3 = false;
+      Response_for_et3 = false;
+      Response_tau_et3 = false;
+      if ( cenJet3 >= Et3 ) Response_cen_et3 = true;
+      if ( forJet3 >= Et3 ) Response_for_et3 = true;
+      if ( tauJet3 >= Et3 ) Response_tau_et3 = true;
+      if ( (Response_cen_et3 || Response_for_et3 || Response_for_et3) && pixelTrigResponse[PVnum] ) ++((EffMultijetPixelArrayEt3_[PVnum])[et3Count]);
+      ++et3Count;
+    }
+    int et4Count = 0;
+    for ( int Et4=35; Et4<85; Et4+=5 ) {
+      Response_cen_et4 = false;
+      Response_for_et4 = false;
+      Response_tau_et4 = false;
+      if ( cenJet4 >= Et4 ) Response_cen_et4 = true;
+      if ( forJet4 >= Et4 ) Response_for_et4 = true;
+      if ( tauJet4 >= Et4 ) Response_tau_et4 = true;
+      if ( (Response_cen_et4 || Response_for_et4 || Response_for_et4) && pixelTrigResponse[PVnum] ) ++((EffMultijetPixelArrayEt4_[PVnum])[et4Count]);
+      ++et4Count;
+    }
 
     // MEt + Jet
     // ---------
     int mEtJetCount = 0;
-    for ( int dzIndex=dzIndexMin; dzIndex<dzIndexMax; ++dzIndex ) {
-      L1PixelTrig<SimplePixelJet> PixeltrigMEtJet(3+PVnum, float(dzIndex)*0.1, numTkCut_);
-      PixeltrigMEtJet.Fill( pixeljets );
-      bool pixelTrigMEtJetResponse = PixeltrigMEtJet.Response();
-      for ( int MEt=35; MEt<85; MEt+=5 ) {
-        for ( int Jet=55; Jet<105; Jet+=5 ) {
-          Response_MEtJet_cen = false;
-          Response_MEtJet_for = false;
-          Response_MEtJet_tau = false;
-          // Central
-          if ( ( L1MEt >= float(MEt) ) && ( cenJet1 >= float(Jet) ) ) Response_MEtJet_cen = true;
-          // Forward
-          if ( ( L1MEt >= float(MEt) ) && ( forJet1 >= float(Jet) ) ) Response_MEtJet_for = true;
-          // Tau
-          if ( ( L1MEt >= float(MEt) ) && ( tauJet1 >= float(Jet) ) ) Response_MEtJet_tau = true;
-          // Full
-          if ( (Response_MEtJet_cen || Response_MEtJet_tau || Response_MEtJet_for) && pixelTrigMEtJetResponse ) ++((EffMEtJetPixelArray_[PVnum])[mEtJetCount]);
-          if ( (Response_MEtJet_cen || Response_MEtJet_tau || Response_MEtJet_for) && pixelTrigMEtJetResponse && offline ) ++((offlineEffMEtJetPixelArray_[PVnum])[mEtJetCount]);
-          ++mEtJetCount;
-        }
+    for ( int MEt=35; MEt<85; MEt+=5 ) {
+      for ( int Jet=55; Jet<105; Jet+=5 ) {
+        Response_MEtJet_cen = false;
+        Response_MEtJet_for = false;
+        Response_MEtJet_tau = false;
+        // Central
+        if ( ( L1MEt >= float(MEt) ) && ( cenJet1 >= float(Jet) ) ) Response_MEtJet_cen = true;
+        // Forward
+        if ( ( L1MEt >= float(MEt) ) && ( forJet1 >= float(Jet) ) ) Response_MEtJet_for = true;
+        // Tau
+        if ( ( L1MEt >= float(MEt) ) && ( tauJet1 >= float(Jet) ) ) Response_MEtJet_tau = true;
+        // Full
+        if ( (Response_MEtJet_cen || Response_MEtJet_tau || Response_MEtJet_for) && pixelTrigResponse[PVnum] ) ++((EffMEtJetPixelArray_[PVnum])[mEtJetCount]);
+        if ( (Response_MEtJet_cen || Response_MEtJet_tau || Response_MEtJet_for) && pixelTrigResponse[PVnum] && offline ) ++((offlineEffMEtJetPixelArray_[PVnum])[mEtJetCount]);
+        ++mEtJetCount;
       }
-    } // end dz loop
+    }
   } // end loop on PV cuts
 
 
@@ -1089,21 +1015,6 @@ void OfflineAnalyzer::endJob() {
     }
   }
 
-  // PixelTrigger alone efficiency
-  for ( int i=0; i<20; ++i ) {
-    EffNumGoodPj_->SetBinContent(i+1, float(numgoodpjeff_[i])/float(eventcounter_));
-    EffNumGoodPj_->SetBinError(i+1, sqrt(float(numgoodpjeff_[i]))/float(eventcounter_));
-    EffNumGoodPj_3_->SetBinContent(i+1, float(numgoodpjeff_3_[i])/float(eventcounter_));
-    EffNumGoodPj_3_->SetBinError(i+1, sqrt(float(numgoodpjeff_3_[i]))/float(eventcounter_));
-    EffNumGoodPj_4_->SetBinContent(i+1, float(numgoodpjeff_4_[i])/float(eventcounter_));
-    EffNumGoodPj_4_->SetBinError(i+1, sqrt(float(numgoodpjeff_4_[i]))/float(eventcounter_));
-    EffNumGoodPj_5_->SetBinContent(i+1, float(numgoodpjeff_5_[i])/float(eventcounter_));
-    EffNumGoodPj_5_->SetBinError(i+1, sqrt(float(numgoodpjeff_5_[i]))/float(eventcounter_));
-    EffNumGoodPj_6_->SetBinContent(i+1, float(numgoodpjeff_6_[i])/float(eventcounter_));
-    EffNumGoodPj_6_->SetBinError(i+1, sqrt(float(numgoodpjeff_6_[i]))/float(eventcounter_));
-  }
-
-
   ofstream Effoutputfile( OutputEffFileName.c_str() );
 
   Effoutputfile << "Multijet trigger" << endl;
@@ -1159,14 +1070,6 @@ void OfflineAnalyzer::endJob() {
   Effoutputfile << "offline efficiency after multijet trigger = " << float(offlineEffMultijet_)/float(eventcounter_) << endl;
   Effoutputfile << "offline efficiency after MEt + Jet trigger = " << float(offlineEffMEtJet_)/float(eventcounter_) << endl;
   Effoutputfile << "offline efficiency after Tau trigger = " << float(offlineEffTauTrig_)/float(eventcounter_) << endl;
-  Effoutputfile << endl;
-
-  Effoutputfile << "PixelTrigger alone efficiency" << endl;
-  Effoutputfile << "-----------------------------" << endl;
-  Effoutputfile << ">=3 PixelJets from primary vertex = " << float(pixelTrig_3_)/float(eventcounter_) << endl;
-  Effoutputfile << ">=4 PixelJets from primary vertex = " << float(pixelTrig_4_)/float(eventcounter_) << endl;
-  Effoutputfile << ">=5 PixelJets from primary vertex = " << float(pixelTrig_5_)/float(eventcounter_) << endl;
-  Effoutputfile << ">=6 PixelJets from primary vertex = " << float(pixelTrig_6_)/float(eventcounter_) << endl;
   Effoutputfile << endl;
 
   Effoutputfile << "Total events = " << eventcounter_ << endl;

@@ -55,9 +55,6 @@ class MultiTH1F {
   /// Writes the histograms to file
   void Write();
 
-  /// Returns vector of internal histograms
-  std::vector<TH1F*> multiHistos() const;
-
  private:
   TDirectory * Directory_;
   TH1F * HistoMean_;

@@ -34,13 +34,9 @@
 #include <algorithm>
 #include <cmath>
 #include <functional>
-#include "AnalysisExamples/AnalysisObjects/interface/OfflineJet.h"
-
-using namespace anaobj;
 
 template <class T1, class T2>
   bool Associator_PtSort( const T1* first, const T2* second ) {
-
   return first->pt() < second->pt();
 }
 
