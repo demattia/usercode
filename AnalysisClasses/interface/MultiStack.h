@@ -40,7 +40,7 @@ class MultiStack {
 	      const int      WIDTH          = 1000,
 	      const int      HEIGHT         = 800,
               const int      HISTOPERCANVAS = 4,
-              const int      FIRSTHISTO     = 0,
+              const int      FIRSTHISTO     = 1,
               const int      LASTHISTO      = 0,
               const bool     NORMALIZE      = false );
 
@@ -87,8 +87,8 @@ MultiStack<T1, T2>::MultiStack( const TString& CANVASNAME,
   width_          = WIDTH;
   normalize_      = NORMALIZE;
   histoPerCanvas_ = HISTOPERCANVAS;
-  firstHisto_     = FIRSTHISTO;
-  lastHisto_      = LASTHISTO;
+  firstHisto_     = FIRSTHISTO-1;
+  lastHisto_      = LASTHISTO-1;
   canvasNum_      = 0;
 }
 
@@ -122,22 +122,27 @@ void MultiStack<T1, T2>::Write( const TString & OPTION )
     stringstream canvasIndex;
     canvasIndex << iCanvas;
     TCanvas * canvasPtr = new TCanvas( canvasName_ + "_" + canvasIndex.str(), canvasTitle_ + "_" + canvasIndex.str(), width_, height_ );
-    canvasPtr->Divide( histoPerCanvas_ );
+    canvasPtr->Divide(2, int((histoPerCanvas_+1)/2) );
     vecCanvasPtr_.push_back( canvasPtr );
   }
 
   // Loop on the histograms
-  typename vector<T2*>::const_iterator histo1_it = vecMultiHisto1_.begin();
-  typename vector<T2*>::const_iterator histo2_it = vecMultiHisto2_.begin();
+  //  typename vector<T2*>::const_iterator histo1_it = vecMultiHisto1_.begin();
+  //  typename vector<T2*>::const_iterator histo2_it = vecMultiHisto2_.begin();
 
   // Canvas index
   int canvas = 0;
 
   // Loop only on selected histograms
-  for ( int i=firstHisto_; i<lastHisto_; ++i, ++histo1_it, ++histo2_it ) {
+  int histoIndex=firstHisto_;
+  for ( int i=0; i<(lastHisto_-firstHisto_); ++i, ++histoIndex ) {
+    //, ++histo1_it, ++histo2_it ) {
+
+    T2* histo1_ptr = vecMultiHisto1_[histoIndex];
+    T2* histo2_ptr = vecMultiHisto2_[histoIndex];
 
     // Generate the name for the stack
-    string histoName( (*histo1_it)->GetName() );
+    string histoName( histo1_ptr->GetName() );
     // Take the index of the last character in the string matching the underscore.
     // In MultiHisto the index is added as _num. This gives us the part we need to
     // create the index to append to the stack name and title.
@@ -148,20 +153,20 @@ void MultiStack<T1, T2>::Write( const TString & OPTION )
 
     // Normalize only if required
     if ( normalize_ ) {
-      Double_t integral1 = (*histo1_it)->GetEntries();
-      Double_t integral2 = (*histo2_it)->GetEntries();
+      Double_t integral1 = histo1_ptr->GetEntries();
+      Double_t integral2 = histo2_ptr->GetEntries();
       if ( integral1 != 0 && integral2 != 0 ) {
-        (*histo1_it)->Scale(1./integral1);
-        (*histo2_it)->Scale(1./integral2);
+        histo1_ptr->Scale(1./integral1);
+        histo2_ptr->Scale(1./integral2);
       }
     }
 
-    (*histo2_it)->SetLineColor(kRed);
-    stack->Add(*histo1_it);
-    stack->Add(*histo2_it);
-    legend->AddEntry(*histo1_it, (*histo1_it)->GetName(), "l");
-    legend->AddEntry(*histo2_it, (*histo2_it)->GetName(), "l");
-    vecCanvasPtr_[canvas]->cd(i);
+    histo1_ptr->SetLineColor(kRed);
+    stack->Add(histo1_ptr);
+    stack->Add(histo2_ptr);
+    legend->AddEntry(histo1_ptr, histo1_ptr->GetName(), "l");
+    legend->AddEntry(histo2_ptr, histo2_ptr->GetName(), "l");
+    vecCanvasPtr_[canvas]->cd(i+1-(canvas*histoPerCanvas_));
     stack->Draw( OPTION );
     legend->Draw();
     // Increase the canvas index if needed
