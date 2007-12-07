@@ -41,7 +41,7 @@ MultiTProfile::MultiTProfile ( const char* NAME, const char* TITLE,
   for ( int num = 0; num < BINPAR; ++num ) {
     Multi = FIRSTPAR + increment_*double(num);
     snum_ << Multi;
-    vec_MultiHisto_.push_back( new TProfile( Name + snum_.str(), Title + snum_.str(), BINVALX, FIRSTVALX, LASTVALX, FIRSTVALY, LASTVALY ) );
+    vec_MultiHisto_.push_back( new TProfile( Name + "_" + snum_.str(), Title + "_" + snum_.str(), BINVALX, FIRSTVALX, LASTVALX, FIRSTVALY, LASTVALY ) );
     // Empty the ostringstream
     snum_.str("");
   }

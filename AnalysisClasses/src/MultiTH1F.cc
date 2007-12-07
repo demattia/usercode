@@ -39,7 +39,7 @@ MultiTH1F::MultiTH1F ( const char* NAME, const char* TITLE,
   for ( int num = 0; num < BINPAR; ++num ) {
     Multi = FIRSTPAR + increment_*double(num);
     snum_ << Multi;
-    vec_MultiHisto_.push_back( new TH1F( Name + snum_.str(), Title + snum_.str(), BINVAL, FIRSTVAL, LASTVAL ) );
+    vec_MultiHisto_.push_back( new TH1F( Name + "_" + snum_.str(), Title + "_" + snum_.str(), BINVAL, FIRSTVAL, LASTVAL ) );
     // Empty the ostringstream
     snum_.str("");
   }
