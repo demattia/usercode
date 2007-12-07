@@ -127,7 +127,6 @@ void MultiStack<T1, T2>::Write( const TString & OPTION )
   }
 
   // Loop on the histograms
-  int i = 0;
   typename vector<T2*>::const_iterator histo1_it = vecMultiHisto1_.begin();
   typename vector<T2*>::const_iterator histo2_it = vecMultiHisto2_.begin();
 
@@ -138,7 +137,7 @@ void MultiStack<T1, T2>::Write( const TString & OPTION )
   for ( int i=firstHisto_; i<lastHisto_; ++i, ++histo1_it, ++histo2_it ) {
 
     // Generate the name for the stack
-    string histoName( histo1_it->GetName() );
+    string histoName( (*histo1_it)->GetName() );
     // Take the index of the last character in the string matching the underscore.
     // In MultiHisto the index is added as _num. This gives us the part we need to
     // create the index to append to the stack name and title.
