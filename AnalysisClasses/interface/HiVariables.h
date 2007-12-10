@@ -1,21 +1,19 @@
 #ifndef HIVARIABLES_H
 #define HIVARIABLES_H
-////////////////////////////////////////////////////////////////////
-//
-// The HiVariables class evaluates some higher level variables and 
-// fills the corresponding histograms.
-// The variables are: SumEt; Mtot (total mass of the jets);
-// Centrality (SumEt/Mtot); Aplanarity; Sphericity; Thrust;
-//
-// The Jet struct is a container of the jets variables ot be passed
-// to HiVariables by the method Fill(), which requires: a vector of
-// Jet objects, the fCurrent sample number and the TOTAL number of
-// events. It uses the HistoSampler to rescale the histograms for
-// the different cross sections.
-//
-// Author M. De Mattia - 9/10/2007
-//
-////////////////////////////////////////////////////////////////////
+/**
+ * The HiVariables class evaluates some higher level variables and 
+ * fills the corresponding histograms.
+ * The variables are: SumEt; Mtot (total mass of the jets);
+ * Centrality (SumEt/Mtot); Aplanarity; Sphericity; Thrust;
+ *
+ * The Jet struct is a container of the jets variables ot be passed
+ * to HiVariables by the method Fill(), which requires: a vector of
+ * Jet objects, the fCurrent sample number and the TOTAL number of
+ * events. It uses the HistoSampler to rescale the histograms for
+ * the different cross sections.
+ *
+ * Author M. De Mattia - 9/10/2007
+ */
 
 #include "TH1F.h"
 #include "TH2F.h"
@@ -160,11 +158,12 @@ class HiVariables {
   float Get_MinorBroadening() {
     return(_mjetBroadening);
   }
-  // To write a canvas with all the plots
+  /// To write a canvas with all the plots
   void Plot();
 
-  // This functions uses _momJB, it must be
-  // called after _momJB has been filled
+  /** This functions uses _momJB, it must be
+   * called after _momJB has been filled
+   */
   void EvalThrust(float **, int);
 
   // Member functions
