@@ -24,21 +24,21 @@
 //
 // Original Author:  Marco De Mattia
 //         Created:  Tue May  8 13:05:37 CEST 2007
-// $Id: BaseTDAna.h,v 1.2 2007/12/06 12:08:22 tosi Exp $
+// $Id: BaseTDAna.h,v 1.3 2007/12/10 12:27:41 tosi Exp $
 //
 //
 
-// system include files
+// System include files
+// --------------------
 #include <memory>
 #include <vector>
 
-// user include files
+// User include files
+// ------------------
 #include "FWCore/Framework/interface/Frameworkfwd.h"
 #include "FWCore/Framework/interface/EDAnalyzer.h"
-
 #include "FWCore/Framework/interface/Event.h"
 #include "FWCore/Framework/interface/MakerMacros.h"
-
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
 #include "FWCore/ParameterSet/interface/InputTag.h"
 
@@ -119,23 +119,24 @@
 #include "AnalysisExamples/AnalysisClasses/interface/AssociatorEt.h"
 
 // L1Trigger evaluator
+// -------------------
 #include "AnalysisExamples/AnalysisClasses/interface/L1Trig.h"
 #include "AnalysisExamples/AnalysisClasses/interface/HiVariables.h"
 #include "AnalysisExamples/AnalysisClasses/interface/MultiTH1F.h"
 #include "AnalysisExamples/AnalysisClasses/interface/MultiTProfile.h"
+#include "AnalysisExamples/AnalysisClasses/interface/MultiStack.h"
 #include "AnalysisExamples/AnalysisClasses/interface/L1PixelTrig.h"
 
-//
-// class declaration
-//
+// Class declaration
+// -----------------
 
 class BaseTDAna : public edm::EDAnalyzer {
- public:
+public:
   explicit BaseTDAna(const edm::ParameterSet&);
   ~BaseTDAna();
 
-
- private:
+  
+private:
   virtual void beginJob(const edm::EventSetup&) ;
   virtual void analyze(const edm::Event&, const edm::EventSetup&);
   virtual void endJob() ;
@@ -146,6 +147,7 @@ class BaseTDAna : public edm::EDAnalyzer {
 
   // Declare as static so that only one exists, even if more
   // than one BaseTDAna object is created
+  // -------------------------------------------------------
   static L1Trig L1Trigger;
 
   edm::ParameterSet conf_;
@@ -159,6 +161,7 @@ class BaseTDAna : public edm::EDAnalyzer {
   // Use a dynamic construction, or the TFile problem will crash the job
   // when moving from one input file to another.
   // The histograms must be created after the TFile is opened.
+  // -------------------------------------------------------------------
   HiVariables * HiVar;
 
   edm::InputTag cenJetLabel_;
@@ -191,6 +194,7 @@ class BaseTDAna : public edm::EDAnalyzer {
   TH1F * PixelJet_Track_Num_;
 
   // Means
+  // -----
   MultiTH1F * Multi_Vertex_Dz_;
   MultiTH1F * Multi_Prim_Second_Vertex_Dz_;
   MultiTH1F * Multi_Vertex_Num_;
@@ -214,6 +218,7 @@ class BaseTDAna : public edm::EDAnalyzer {
 
   // Trigger efficiency counters
   // Multijet
+  // ---------------------------
   int Eff_;
   int Eff_et1_;
   int Eff_et2_;
@@ -245,17 +250,21 @@ class BaseTDAna : public edm::EDAnalyzer {
   int Eff_nofor_et4_;
 
   // MEt+Jet
+  // -------
   int Eff_MEtJet_;
   int Eff_MEtJet_cen_;
   int Eff_MEtJet_tau_;
   int Eff_MEtJet_for_;
   int Eff_MEtJet_nofor_;
+
   // Tau
+  // ---
   int Eff_tautrig_;
   int Eff_tautrig_single_;
   int Eff_tautrig_ditau_;
 
   // Offline
+  // -------
   int offlineEffMultijet_;
   int offlineEffMEtJet_;
   int offlineEffTauTrig_;
@@ -265,8 +274,12 @@ class BaseTDAna : public edm::EDAnalyzer {
   int bins_;
   double dR_;
   double dRmax_;
+  int jets_;
+  int jetMin_;
+  int jetMax_;
 
   // Pixel trigger efficiency
+  // ------------------------
   TH1F ** EffMultijetPixel_;
   TH1F ** EffMultijetPixelEt1_;
   TH1F ** EffMultijetPixelEt2_;
@@ -287,6 +300,7 @@ class BaseTDAna : public edm::EDAnalyzer {
   int ** EffMEtJetPixelArray_;
 
   // Offline efficiency
+  // ------------------
   TH1F ** offlineEffMultijetPixel_;
   TH1F ** offlineEffMEtJetPixel_;
   int offlineEffMultijetPixelSize_;
@@ -295,9 +309,11 @@ class BaseTDAna : public edm::EDAnalyzer {
   int ** offlineEffMEtJetPixelArray_;
 
   // Directory in the root file to hold the multiple histograms
+  // ----------------------------------------------------------
   TDirectory *DirVertexDz_;
 
   // PixelTrigger alone efficiency
+  // -----------------------------
   int pixelTrig_3_;
   int pixelTrig_4_;
   int pixelTrig_5_;
@@ -315,42 +331,4 @@ class BaseTDAna : public edm::EDAnalyzer {
   TH1F * EffNumGoodPj_5_;
   TH1F * EffNumGoodPj_6_;
 
-
-  // b tag discriminator histograms
-  MultiTH1F * Multi_bDiscrHighEff;
-  MultiTH1F * Multi_bDiscrHighPur;
-  MultiTH1F * Multi_nobDiscrHighEff;
-  MultiTH1F * Multi_nobDiscrHighPur;
-  MultiTH1F * Multi_tagMassS1;
-  MultiTH1F * Multi_tagMassS2;
-  MultiTH1F * Multi_tagMassS3;
-  MultiTProfile * Multi_jetEtVSbPt;
-
-  // b tag discriminator histograms
-  TH1F * bHighEff;   
-  TH1F * bHighPur;   
-  TH1F * nobHighEff; 
-  TH1F * nobHighPur; 
-  TH1F * deltaR;
-  TH2F * jetEtVSbParton;
-  TH2F * jetUncorrEtVSbParton;
-TH1F * tagTkMassS1;
-TH1F * tagTkMassS2;
-TH1F * tagTkMassS3;
-
-TH2F * mPdiVsDiscHighEff;
-TH2F * uncorrEtVsDiscHighEff;
-TH2F * emEnergyFractionVsDiscHighEff;
-TH2F * jetMassVsDiscHighEff;
-TH2F * tkNumS1VsDiscHighEff;
-TH2F * tkSumPtS1VsDiscHighEff;
-TH2F * tagTkMassS1VsDiscHighEff;
-TH2F * tkNumS2VsDiscHighEff;
-TH2F * tkSumPtS2VsDiscHighEff;
-TH2F * tagTkMassS2VsDiscHighEff;
-TH2F * tkNumS3VsDiscHighEff;
-TH2F * tkSumPtS3VsDiscHighEff;
-TH2F * tagTkMassS3VsDiscHighEff;
-
-  // ----------member data ---------------------------
 };
