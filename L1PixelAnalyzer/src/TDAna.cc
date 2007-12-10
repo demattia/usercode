@@ -94,44 +94,76 @@ TDAna::TDAna(const edm::ParameterSet& iConfig) :
   dR_    = 0.05;
   dRmax_ = dR_ + dR_*(bins_);
   // multiple b tag discriminator histograms
-  Multi_bDiscrHighEff   = new MultiTH1F( "bDiscrHighEff",   "high efficiency discriminator for b jet",   200,-20.,80., bins_, dR_, dRmax_, OutputFile );
-  Multi_bDiscrHighPur   = new MultiTH1F( "bDiscrHighPur",   "high purity discriminator for b jet",       200,-20.,80., bins_, dR_, dRmax_, OutputFile );
-  Multi_nobDiscrHighEff = new MultiTH1F( "nobDiscrHighEff", "high efficiency discriminator for no b jet",200,-20.,80., bins_, dR_, dRmax_, OutputFile );
-  Multi_nobDiscrHighPur = new MultiTH1F( "nobDiscrHighPur", "high purity discriminator for no b jet",    200,-20.,80., bins_, dR_, dRmax_, OutputFile );
-  Multi_tagMassS1       = new MultiTH1F( "tagMassS1",       "tag mass S1 for b jet",                     150,  0.,15., bins_, dR_, dRmax_, OutputFile );
-  Multi_tagMassS2       = new MultiTH1F( "tagMassS2",       "tag mass S2 for b jet",                     150,  0.,15., bins_, dR_, dRmax_, OutputFile );
-  Multi_tagMassS3       = new MultiTH1F( "tagMassS3",       "tag mass S3 for b jet",                     150,  0.,15., bins_, dR_, dRmax_, OutputFile );
-  Multi_nobtagMassS1    = new MultiTH1F( "nobtagMassS1",    "tag mass S1for no b jet",                   150,  0.,15., bins_, dR_, dRmax_, OutputFile );
-  Multi_nobtagMassS2    = new MultiTH1F( "nobtagMassS2",    "tag mass S2for no b jet",                   150,  0.,15., bins_, dR_, dRmax_, OutputFile );
-  Multi_nobtagMassS3    = new MultiTH1F( "nobtagMassS3",    "tag mass S3for no b jet",                   150,  0.,15., bins_, dR_, dRmax_, OutputFile );
-  Multi_jetEtVSbPt      = new MultiTProfile("jetEtVSbPt",   "jet Et as function as b parton Pt",   500,0.,500.,0.,500., bins_, dR_, dRmax_, OutputFile );
-  Multi_jetEtVSnobPt    = new MultiTProfile("jetEtVSnobPt", "jet Et as function as no b parton Pt",500,0.,500.,0.,500., bins_, dR_, dRmax_, OutputFile );
+  MultidR_bDiscrHighEff   = new MultiTH1F( "multidRbDiscrHighEff",   "high efficiency discriminator for b jet",   200,-20.,80., bins_, dR_, dRmax_, OutputFile );
+  MultidR_bDiscrHighPur   = new MultiTH1F( "multidRbDiscrHighPur",   "high purity discriminator for b jet",       200,-20.,80., bins_, dR_, dRmax_, OutputFile );
+  MultidR_nobDiscrHighEff = new MultiTH1F( "multidRnobDiscrHighEff", "high efficiency discriminator for no b jet",200,-20.,80., bins_, dR_, dRmax_, OutputFile );
+  MultidR_nobDiscrHighPur = new MultiTH1F( "multidRnobDiscrHighPur", "high purity discriminator for no b jet",    200,-20.,80., bins_, dR_, dRmax_, OutputFile );
 
-  bHighEff   = new TH1F("bHighEff",  "high efficiency discriminator for b jet",   300,-50.,100.);
-  bHighPur   = new TH1F("bHighPur",  "high purity discriminator for b jet",       300,-50.,100.);
-  nobHighEff = new TH1F("nobHighEff","high efficiency discriminator for no b jet",300,-50.,100.);
-  nobHighPur = new TH1F("nobHighPur","high purity discriminator for no b jet",    300,-50.,100.);
+  MultidR_tagMassS1       = new MultiTH1F( "multidRtagMassS1",       "tag mass S1 for b jet",                     150,  0.,15., bins_, dR_, dRmax_, OutputFile );
+  MultidR_tagMassS2       = new MultiTH1F( "multidRtagMassS2",       "tag mass S2 for b jet",                     150,  0.,15., bins_, dR_, dRmax_, OutputFile );
+  MultidR_tagMassS3       = new MultiTH1F( "multidRtagMassS3",       "tag mass S3 for b jet",                     150,  0.,15., bins_, dR_, dRmax_, OutputFile );
+  MultidR_nobtagMassS1    = new MultiTH1F( "multidRnobtagMassS1",    "tag mass S1for no b jet",                   150,  0.,15., bins_, dR_, dRmax_, OutputFile );
+  MultidR_nobtagMassS2    = new MultiTH1F( "multidRnobtagMassS2",    "tag mass S2for no b jet",                   150,  0.,15., bins_, dR_, dRmax_, OutputFile );
+  MultidR_nobtagMassS3    = new MultiTH1F( "multidRnobtagMassS3",    "tag mass S3for no b jet",                   150,  0.,15., bins_, dR_, dRmax_, OutputFile );
 
-deltaR                        = new TH1F("deltaR","deltaR between matched jet and b-parton",250,0.,1.0);
-jetEtVSbParton                = new TH2F("jetEtVSbParton", "jetEtVSbParton", 500,0.,500.,500,0.,500. );
-jetUncorrEtVSbParton          = new TH2F("jetUncorrEtVSbParton", "jetUncorrEtVSbParton", 500,0.,500.,500,0.,500. );
-tagTkMassS1                   = new TH1F("tagTkMassS1","tagTkMassS1",150,0.,15.);                   
-tagTkMassS2                   = new TH1F("tagTkMassS2","tagTkMassS2",150,0.,15.);
-tagTkMassS3                   = new TH1F("tagTkMassS3","tagTkMassS3",150,0.,15.);
+  MultidR_tagMassS1_loose   =new MultiTH1F( "multidRtagMassS1_loose",   "tag mass S1 for b jet loose b-tagging cut",  150,  0.,15., bins_, dR_, dRmax_, OutputFile );
+  MultidR_tagMassS2_loose   =new MultiTH1F( "multidRtagMassS2_loose",   "tag mass S2 for b jet loose b-tagging cut",  150,  0.,15., bins_, dR_, dRmax_, OutputFile );
+  MultidR_tagMassS3_loose   =new MultiTH1F( "multidRtagMassS3_loose",   "tag mass S3 for b jet loose b-tagging cut",  150,  0.,15., bins_, dR_, dRmax_, OutputFile );
+  MultidR_nobtagMassS1_loose=new MultiTH1F( "multidRnobtagMassS1_loose","tag mass S1for no b jet loose b-tagging cut", 150,  0.,15., bins_, dR_, dRmax_, OutputFile );
+  MultidR_nobtagMassS2_loose=new MultiTH1F( "multidRnobtagMassS2_loose","tag mass S2for no b jet loose b-tagging cut", 150,  0.,15., bins_, dR_, dRmax_, OutputFile );
+  MultidR_nobtagMassS3_loose=new MultiTH1F( "multidRnobtagMassS3_loose","tag mass S3for no b jet loose b-tagging cut", 150,  0.,15., bins_, dR_, dRmax_, OutputFile );
 
-mPdiVsDiscHighEff             = new TH2F("mPid", "mPidVsDiscHighEff", 34,-7.,26.,200,-100.,100. );
-uncorrEtVsDiscHighEff         = new TH2F("uncorrEt", "uncorrEtVsDiscHighEff", 300,0.,300.,200,-100.,100. );
-emEnergyFractionVsDiscHighEff = new TH2F("emEnergyFraction", "emEnergyFractionVSDiscHighEff",10,0.,1.,200,-100.,100. );
-jetMassVsDiscHighEff          = new TH2F("jetMass", "jetMassVSDiscHighEff",100,0.,100.,200,-100.,100.);
-tkNumS1VsDiscHighEff          = new TH2F("tkNumS1", "tkNumS1VSDiscHighEff",30,0.,30.,200,-100.,100.);
-tkSumPtS1VsDiscHighEff        = new TH2F("tkSumPtS1","tkSumPtS1VSDiscHighEff",650,0.,650.,200,-100.,100.);
-tagTkMassS1VsDiscHighEff      = new TH2F("tagTkMassS1VS","tagTkMassS1VSDiscHighEff",150,0.,15.,200,-100.,100.);
-tkNumS2VsDiscHighEff          = new TH2F("tkNumS2", "tkNumS2VSDiscHighEff",30,0.,30.,200,-100.,100.);
-tkSumPtS2VsDiscHighEff        = new TH2F("tkSumPtS2","tkSumPtS2VSDiscHighEff",650,0.,650.,200,-100.,100.);
-tagTkMassS2VsDiscHighEff      = new TH2F("tagTkMassS2VS","tagTkMassS2VSDiscHighEff",150,0.,15.,200,-100.,100.);
-tkNumS3VsDiscHighEff          = new TH2F("tkNumS3", "tkNumS3VSDiscHighEff",30,0.,30.,200,-100.,100.);
-tkSumPtS3VsDiscHighEff        = new TH2F("tkSumPtS3","tkSumPtS3VSDiscHighEff",650,0.,650.,200,-100.,100.);
-tagTkMassS3VsDiscHighEff      = new TH2F("tagTkMassS3VS","tagTkMassS3VSDiscHighEff",150,0.,15.,200,-100.,100.);
+  MultidR_tagMassS1_medium   =new MultiTH1F("multidRtagMassS1_medium",   "tag mass S1 for b jet medium b-tagging cut",  150,0.,15., bins_,dR_,dRmax_,OutputFile );
+  MultidR_tagMassS2_medium   =new MultiTH1F("multidRtagMassS2_medium",   "tag mass S2 for b jet medium b-tagging cut",  150,0.,15., bins_,dR_,dRmax_,OutputFile );
+  MultidR_tagMassS3_medium   =new MultiTH1F("multidRtagMassS3_medium",   "tag mass S3 for b jet medium b-tagging cut",  150,0.,15., bins_,dR_,dRmax_,OutputFile );
+  MultidR_nobtagMassS1_medium=new MultiTH1F("multidRnobtagMassS1_medium","tag mass S1for no b jet medium b-tagging cut",150,0.,15., bins_,dR_,dRmax_,OutputFile );
+  MultidR_nobtagMassS2_medium=new MultiTH1F("multidRnobtagMassS2_medium","tag mass S2for no b jet medium b-tagging cut",150,0.,15., bins_,dR_,dRmax_,OutputFile );
+  MultidR_nobtagMassS3_medium=new MultiTH1F("multidRnobtagMassS3_medium","tag mass S3for no b jet medium b-tagging cut",150,0.,15., bins_,dR_,dRmax_,OutputFile );
+
+  MultidR_tagMassS1_tight   =new MultiTH1F( "multidRtagMassS1_tight",   "tag mass S1 for b jet tight b-tagging cut",  150,  0.,15., bins_, dR_, dRmax_, OutputFile );
+  MultidR_tagMassS2_tight   =new MultiTH1F( "multidRtagMassS2_tight",   "tag mass S2 for b jet tight b-tagging cut",  150,  0.,15., bins_, dR_, dRmax_, OutputFile );
+  MultidR_tagMassS3_tight   =new MultiTH1F( "multidRtagMassS3_tight",   "tag mass S3 for b jet tight b-tagging cut",  150,  0.,15., bins_, dR_, dRmax_, OutputFile );
+  MultidR_nobtagMassS1_tight=new MultiTH1F( "multidRnobtagMassS1_tight","tag mass S1for no b jet tight b-tagging cut",150,  0.,15., bins_, dR_, dRmax_, OutputFile );
+  MultidR_nobtagMassS2_tight=new MultiTH1F( "multidRnobtagMassS2_tight","tag mass S2for no b jet tight b-tagging cut",150,  0.,15., bins_, dR_, dRmax_, OutputFile );
+  MultidR_nobtagMassS3_tight=new MultiTH1F( "multidRnobtagMassS3_tight","tag mass S3for no b jet tight b-tagging cut",150,  0.,15., bins_, dR_, dRmax_, OutputFile );
+
+  MultidR_jetEtVSbPt      = new MultiTProfile("multidRjetEtVSbPt",   "jet Et as function as b parton Pt",   500,0.,500.,0.,500., bins_, dR_, dRmax_, OutputFile );
+  MultidR_jetEtVSnobPt    = new MultiTProfile("multidRjetEtVSnobPt", "jet Et as function as no b parton Pt",500,0.,500.,0.,500., bins_, dR_, dRmax_, OutputFile );
+  MultidR_jetUncorrEtVSbPt= new MultiTProfile("multidRjetUncorrEtVSbPt","jet uncorrected Et as function as b parton Pt",   500,0.,500.,0.,500., bins_, dR_, dRmax_, OutputFile );
+  MultidR_jetUncorrEtVSnobPt= new MultiTProfile("multidRjetUncorrEtVSnobPt","jet uncorrected Et as function as no b parton Pt",500,0.,500.,0.,500., bins_, dR_, dRmax_, OutputFile );
+
+  jets_   = 4;
+  jetMin_ = 4;
+  jetMax_ = jetMin_+jets_;
+  MultijetNum_tagMassS1       = new MultiTH1F( "numJettagMassS1",       "tag mass S1 for b jet",                     150,  0.,15., jets_, jetMin_, jetMax_, OutputFile );
+  MultijetNum_tagMassS2       = new MultiTH1F( "numJettagMassS2",       "tag mass S2 for b jet",                     150,  0.,15., jets_, jetMin_, jetMax_, OutputFile );
+  MultijetNum_tagMassS3       = new MultiTH1F( "numJettagMassS3",       "tag mass S3 for b jet",                     150,  0.,15., jets_, jetMin_, jetMax_, OutputFile );
+  MultijetNum_nobtagMassS1    = new MultiTH1F( "numJetnobtagMassS1",    "tag mass S1for no b jet",                   150,  0.,15., jets_, jetMin_, jetMax_, OutputFile );
+  MultijetNum_nobtagMassS2    = new MultiTH1F( "numJetnobtagMassS2",    "tag mass S2for no b jet",                   150,  0.,15., jets_, jetMin_, jetMax_, OutputFile );
+  MultijetNum_nobtagMassS3    = new MultiTH1F( "numJetnobtagMassS3",    "tag mass S3for no b jet",                   150,  0.,15., jets_, jetMin_, jetMax_, OutputFile );
+
+  MultijetNum_tagMassS1_loose   =new MultiTH1F( "numJettagMassS1_loose",   "tag mass S1 for b jet loose b-tagging cut",  150,  0.,15., jets_, jetMin_, jetMax_, OutputFile );
+  MultijetNum_tagMassS2_loose   =new MultiTH1F( "numJettagMassS2_loose",   "tag mass S2 for b jet loose b-tagging cut",  150,  0.,15., jets_, jetMin_, jetMax_, OutputFile );
+  MultijetNum_tagMassS3_loose   =new MultiTH1F( "numJettagMassS3_loose",   "tag mass S3 for b jet loose b-tagging cut",  150,  0.,15., jets_, jetMin_, jetMax_, OutputFile );
+  MultijetNum_nobtagMassS1_loose=new MultiTH1F( "numJetnobtagMassS1_loose","tag mass S1for no b jet loose b-tagging cut", 150,  0.,15., jets_, jetMin_, jetMax_, OutputFile );
+  MultijetNum_nobtagMassS2_loose=new MultiTH1F( "numJetnobtagMassS2_loose","tag mass S2for no b jet loose b-tagging cut", 150,  0.,15., jets_, jetMin_, jetMax_, OutputFile );
+  MultijetNum_nobtagMassS3_loose=new MultiTH1F( "numJetnobtagMassS3_loose","tag mass S3for no b jet loose b-tagging cut", 150,  0.,15., jets_, jetMin_, jetMax_, OutputFile );
+
+  MultijetNum_tagMassS1_medium   =new MultiTH1F("numJettagMassS1_medium",   "tag mass S1 for b jet medium b-tagging cut",  150,0.,15., jets_,jetMin_,jetMax_,OutputFile );
+  MultijetNum_tagMassS2_medium   =new MultiTH1F("numJettagMassS2_medium",   "tag mass S2 for b jet medium b-tagging cut",  150,0.,15., jets_,jetMin_,jetMax_,OutputFile );
+  MultijetNum_tagMassS3_medium   =new MultiTH1F("numJettagMassS3_medium",   "tag mass S3 for b jet medium b-tagging cut",  150,0.,15., jets_,jetMin_,jetMax_,OutputFile );
+  MultijetNum_nobtagMassS1_medium=new MultiTH1F("numJetnobtagMassS1_medium","tag mass S1for no b jet medium b-tagging cut",150,0.,15., jets_,jetMin_,jetMax_,OutputFile );
+  MultijetNum_nobtagMassS2_medium=new MultiTH1F("numJetnobtagMassS2_medium","tag mass S2for no b jet medium b-tagging cut",150,0.,15., jets_,jetMin_,jetMax_,OutputFile );
+  MultijetNum_nobtagMassS3_medium=new MultiTH1F("numJetnobtagMassS3_medium","tag mass S3for no b jet medium b-tagging cut",150,0.,15., jets_,jetMin_,jetMax_,OutputFile );
+
+  MultijetNum_tagMassS1_tight   =new MultiTH1F( "numJettagMassS1_tight",   "tag mass S1 for b jet tight b-tagging cut",  150,  0.,15., jets_, jetMin_, jetMax_, OutputFile );
+  MultijetNum_tagMassS2_tight   =new MultiTH1F( "numJettagMassS2_tight",   "tag mass S2 for b jet tight b-tagging cut",  150,  0.,15., jets_, jetMin_, jetMax_, OutputFile );
+  MultijetNum_tagMassS3_tight   =new MultiTH1F( "numJettagMassS3_tight",   "tag mass S3 for b jet tight b-tagging cut",  150,  0.,15., jets_, jetMin_, jetMax_, OutputFile );
+  MultijetNum_nobtagMassS1_tight=new MultiTH1F( "numJetnobtagMassS1_tight","tag mass S1for no b jet tight b-tagging cut",150,  0.,15., jets_, jetMin_, jetMax_, OutputFile );
+  MultijetNum_nobtagMassS2_tight=new MultiTH1F( "numJetnobtagMassS2_tight","tag mass S2for no b jet tight b-tagging cut",150,  0.,15., jets_, jetMin_, jetMax_, OutputFile );
+  MultijetNum_nobtagMassS3_tight=new MultiTH1F( "numJetnobtagMassS3_tight","tag mass S3for no b jet tight b-tagging cut",150,  0.,15., jets_, jetMin_, jetMax_, OutputFile );
+
+  deltaR = new TH1F("deltaR","deltaR between matched jet and b-parton",250,0.,1.0);
 
 
 }
@@ -422,12 +454,10 @@ TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
     iSetup.get<SetupRecord>().get(pSetup);
 #endif
 
-    // if #b-tag
+    // if deltaR cut [0.05;1.0]
     for( int numdR = 0; numdR < bins_; ++numdR){
       double dRcut = dR_ + dR_*(numdR);
       AssociatorEt<OfflineJet, MCParticle > associator( dRcut );      
-//      std::auto_ptr<std::map<const OfflineJet*, 
-//	                     const MCParticle*> > assocMap( associator.Associate( *caloJets, *MCpartons ) );
       std::auto_ptr<std::map<const OfflineJet*, 
 	                     const MCParticle*> > assocMap( associator.Associate( goodIc5JetVec, *MCpartons ) );
       
@@ -440,15 +470,33 @@ TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	float tagMassS2   = assocMap_it->first->tagTkMassS2();
 	float tagMassS3   = assocMap_it->first->tagTkMassS3();
 	float jetEt       = assocMap_it->first->et();
+	float jetUncorrEt = assocMap_it->first->uncorrEt();
 	float partonPt    = assocMap_it->second->pt();
 
 	if( fabs( assocMap_it->second->pid() ) == 5 ){
-	  Multi_bDiscrHighEff->Fill(discHighEff,numdR);
-	  Multi_bDiscrHighPur->Fill(discHighPur,numdR);  
-	  if(tagMassS1 > 0.2) Multi_tagMassS1->Fill(tagMassS1,numdR);
-	  if(tagMassS2 > 0.2) Multi_tagMassS2->Fill(tagMassS2,numdR);
-	  if(tagMassS3 > 0.2) Multi_tagMassS3->Fill(tagMassS3,numdR);
-	  Multi_jetEtVSbPt->Fill(partonPt,jetEt,numdR);
+	  MultidR_bDiscrHighEff->Fill(discHighEff,numdR);
+	  MultidR_bDiscrHighPur->Fill(discHighPur,numdR);  
+	  if(tagMassS1 > 0.2) MultidR_tagMassS1->Fill(tagMassS1,numdR);
+	  if(tagMassS2 > 0.2) MultidR_tagMassS2->Fill(tagMassS2,numdR);
+	  if(tagMassS3 > 0.2) MultidR_tagMassS3->Fill(tagMassS3,numdR);
+
+	  if(discHighEff > 2.3){
+	    if(tagMassS1 > 0.2) MultidR_tagMassS1_loose->Fill(tagMassS1,numdR);
+	    if(tagMassS2 > 0.2) MultidR_tagMassS2_loose->Fill(tagMassS2,numdR);
+	    if(tagMassS3 > 0.2) MultidR_tagMassS3_loose->Fill(tagMassS3,numdR);
+	  }
+	  if(discHighEff > 5.3){
+	    if(tagMassS1 > 0.2) MultidR_tagMassS1_medium->Fill(tagMassS1,numdR);
+	    if(tagMassS2 > 0.2) MultidR_tagMassS2_medium->Fill(tagMassS2,numdR);
+	    if(tagMassS3 > 0.2) MultidR_tagMassS3_medium->Fill(tagMassS3,numdR);
+	  }
+	  if(discHighPur > 4.8){
+	    if(tagMassS1 > 0.2) MultidR_tagMassS1_tight->Fill(tagMassS1,numdR);
+	    if(tagMassS2 > 0.2) MultidR_tagMassS2_tight->Fill(tagMassS2,numdR);
+	    if(tagMassS3 > 0.2) MultidR_tagMassS3_tight->Fill(tagMassS3,numdR);
+	  }
+	  MultidR_jetEtVSbPt->Fill(partonPt,jetEt,numdR);
+	  MultidR_jetUncorrEtVSbPt->Fill(partonPt,jetUncorrEt,numdR);
 	  if(dRcut == 1.0){
 	    double jetEta = assocMap_it->first->eta();
 	    double jetPhi = assocMap_it->first->phi();
@@ -458,59 +506,110 @@ TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	    deltaR->Fill(dR);
 	  }
 	}else{
-	  Multi_nobDiscrHighEff->Fill(discHighEff,numdR);
-	  Multi_nobDiscrHighPur->Fill(discHighPur,numdR);
-//	  if(tagMassS1 > 0.2) Multi_nobtagMassS1->Fill(tagMassS1,numdR);
-//	  if(tagMassS2 > 0.2) Multi_nobtagMassS2->Fill(tagMassS2,numdR);
-//	  if(tagMassS3 > 0.2) Multi_nobtagMassS3->Fill(tagMassS3,numdR);
-	  Multi_nobtagMassS1->Fill(tagMassS1,numdR);
-	  Multi_nobtagMassS2->Fill(tagMassS2,numdR);
-	  Multi_nobtagMassS3->Fill(tagMassS3,numdR);
-	  Multi_jetEtVSnobPt->Fill(partonPt,jetEt,numdR);
+	  MultidR_nobDiscrHighEff->Fill(discHighEff,numdR);
+	  MultidR_nobDiscrHighPur->Fill(discHighPur,numdR);
+	  if(tagMassS1 > 0.2) MultidR_nobtagMassS1->Fill(tagMassS1,numdR);
+	  if(tagMassS2 > 0.2) MultidR_nobtagMassS2->Fill(tagMassS2,numdR);
+	  if(tagMassS3 > 0.2) MultidR_nobtagMassS3->Fill(tagMassS3,numdR);
+
+	  if(discHighEff > 2.3){
+	    if(tagMassS1 > 0.2) MultidR_nobtagMassS1_loose->Fill(tagMassS1,numdR);
+	    if(tagMassS2 > 0.2) MultidR_nobtagMassS2_loose->Fill(tagMassS2,numdR);
+	    if(tagMassS3 > 0.2) MultidR_nobtagMassS3_loose->Fill(tagMassS3,numdR);
+	  }
+	  if(discHighEff > 5.3){
+	    if(tagMassS1 > 0.2) MultidR_nobtagMassS1_medium->Fill(tagMassS1,numdR);
+	    if(tagMassS2 > 0.2) MultidR_nobtagMassS2_medium->Fill(tagMassS2,numdR);
+	    if(tagMassS3 > 0.2) MultidR_nobtagMassS3_medium->Fill(tagMassS3,numdR);
+	  }
+	  if(discHighPur > 4.8){
+	    if(tagMassS1 > 0.2) MultidR_nobtagMassS1_tight->Fill(tagMassS1,numdR);
+	    if(tagMassS2 > 0.2) MultidR_nobtagMassS2_tight->Fill(tagMassS2,numdR);
+	    if(tagMassS3 > 0.2) MultidR_nobtagMassS3_tight->Fill(tagMassS3,numdR);
+	  }
+	  MultidR_jetEtVSnobPt->Fill(partonPt,jetEt,numdR);
+	  MultidR_jetUncorrEtVSnobPt->Fill(partonPt,jetUncorrEt,numdR);
 	}
       }
     }
 
-    AssociatorEt<OfflineJet, MCParticle > associator( 0.3 );
-    std::auto_ptr<std::map<const OfflineJet*, 
-                           const MCParticle*> > assocMap( associator.Associate( *caloJets, *MCpartons ) );
+    // if( goodIc5JetVec.size() >=4 ) {,>=5,>=6,>=7  goodIc5jets
+    for( int numGoodIc5Jet = 0; numGoodIc5Jet < jets_; ++numGoodIc5Jet){
+      int goodIc5Jetcut = jetMin_+numGoodIc5Jet;
+      if( goodIc5JetVec.size() >= goodIc5Jetcut ) {
+	AssociatorEt<OfflineJet, MCParticle > associator( 0.3 );
+	std::auto_ptr<std::map<const OfflineJet*, 
+  	                       const MCParticle*> > assocMap( associator.Associate( goodIc5JetVec, *MCpartons ) );
+	
+	std::map<const OfflineJet*, 
+	         const MCParticle*>::const_iterator assocMap_it = assocMap->begin();
+	for ( ; assocMap_it != assocMap->end(); ++assocMap_it ) {
+	  // jet variables
+	  float discHighPur      = assocMap_it->first->discriminatorHighPur();
+	  float discHighEff      = assocMap_it->first->discriminatorHighEff();
+	  float tagMassS1        = assocMap_it->first->tagTkMassS1();
+	  float tagMassS2        = assocMap_it->first->tagTkMassS2();
+	  float tagMassS3        = assocMap_it->first->tagTkMassS3();
+	  float jetEt            = assocMap_it->first->et();
+	  float jetUncorrEt      = assocMap_it->first->uncorrEt();
+	  float emEnergyFraction = assocMap_it->first->emEnergyFraction();
+	  float jetMass          = assocMap_it->first->jetMass();
+	  int   tagNumTkS1       = assocMap_it->first->tkNumS1();
+	  int   tagNumTkS2       = assocMap_it->first->tkNumS2();
+	  int   tagNumTkS3       = assocMap_it->first->tkNumS3();
+	  float tagSumPtTkS1     = assocMap_it->first->tkSumPtS1();
+	  float tagSumPtTkS2     = assocMap_it->first->tkSumPtS2();
+	  float tagSumPtTkS3     = assocMap_it->first->tkSumPtS3();
 
-    std::map<const OfflineJet*, 
-             const MCParticle*>::const_iterator assocMap_it = assocMap->begin();
-    for ( ; assocMap_it != assocMap->end(); ++assocMap_it ) {
-      if( fabs( assocMap_it->second->pid() ) == 5 ){
+	  // MCparton variables
+	  int   partonPid   = assocMap_it->second->mPid();
+	  float partonPt    = assocMap_it->second->pt();
 
-	jetEtVSbParton->Fill(      assocMap_it->second->pt(),assocMap_it->first->et());
-	jetUncorrEtVSbParton->Fill(assocMap_it->second->pt(),assocMap_it->first->uncorrEt());
-
-        float tagMassS1 = assocMap_it->first->tagTkMassS1();
-        float tagMassS2 = assocMap_it->first->tagTkMassS2();
-        float tagMassS3 = assocMap_it->first->tagTkMassS3();
-	if(tagMassS1 > 0.2) tagTkMassS1->Fill(tagMassS1);
-	if(tagMassS2 > 0.2) tagTkMassS2->Fill(tagMassS2);
-	if(tagMassS3 > 0.2) tagTkMassS3->Fill(tagMassS3);
-
-	float discHighPur = assocMap_it->first->discriminatorHighPur();
-	float discHighEff = assocMap_it->first->discriminatorHighEff();
-	mPdiVsDiscHighEff->Fill(                          assocMap_it->second->mPid(),            discHighEff );
-        uncorrEtVsDiscHighEff->Fill(                      assocMap_it->first->uncorrEt(),         discHighEff );
-        emEnergyFractionVsDiscHighEff->Fill(              assocMap_it->first->emEnergyFraction(), discHighEff );
-	jetMassVsDiscHighEff->Fill(                       assocMap_it->first->jetMass(),          discHighEff );
-	tkNumS1VsDiscHighEff->Fill(                       assocMap_it->first->tkNumS1(),          discHighEff );
-	tkSumPtS1VsDiscHighEff->Fill(                     assocMap_it->first->tkSumPtS1(),        discHighEff );
-	if(tagMassS1 != 0) tagTkMassS1VsDiscHighEff->Fill(assocMap_it->first->tagTkMassS1(),      discHighEff );
-	tkNumS2VsDiscHighEff->Fill(                       assocMap_it->first->tkNumS2(),          discHighEff );
-	tkSumPtS2VsDiscHighEff->Fill(                     assocMap_it->first->tkSumPtS2(),        discHighEff );
-	if(tagMassS2 != 0) tagTkMassS2VsDiscHighEff->Fill(assocMap_it->first->tagTkMassS2(),      discHighEff );
-	tkNumS3VsDiscHighEff->Fill(                       assocMap_it->first->tkNumS3(),          discHighEff );
-	tkSumPtS3VsDiscHighEff->Fill(                     assocMap_it->first->tkSumPtS3(),        discHighEff );
-	if(tagMassS3 != 0) tagTkMassS3VsDiscHighEff->Fill(assocMap_it->first->tagTkMassS3(),      discHighEff );
-
-      } else{
-	nobHighEff->Fill( assocMap_it->first->discriminatorHighEff() );
-	nobHighPur->Fill( assocMap_it->first->discriminatorHighPur() );
+	  if( fabs( assocMap_it->second->pid() ) == 5 ){
+	    if(tagMassS1 > 0.2) MultijetNum_tagMassS1->Fill(tagMassS1,numGoodIc5Jet);
+	    if(tagMassS2 > 0.2) MultijetNum_tagMassS2->Fill(tagMassS2,numGoodIc5Jet);
+	    if(tagMassS3 > 0.2) MultijetNum_tagMassS3->Fill(tagMassS3,numGoodIc5Jet);
+	    
+	    if(discHighEff > 2.3){
+	      if(tagMassS1 > 0.2) MultijetNum_tagMassS1_loose->Fill(tagMassS1,numGoodIc5Jet);
+	      if(tagMassS2 > 0.2) MultijetNum_tagMassS2_loose->Fill(tagMassS2,numGoodIc5Jet);
+	      if(tagMassS3 > 0.2) MultijetNum_tagMassS3_loose->Fill(tagMassS3,numGoodIc5Jet);
+	    }
+	    if(discHighEff > 5.3){
+	      if(tagMassS1 > 0.2) MultijetNum_tagMassS1_medium->Fill(tagMassS1,numGoodIc5Jet);
+	      if(tagMassS2 > 0.2) MultijetNum_tagMassS2_medium->Fill(tagMassS2,numGoodIc5Jet);
+	      if(tagMassS3 > 0.2) MultijetNum_tagMassS3_medium->Fill(tagMassS3,numGoodIc5Jet);
+	    }
+	    if(discHighPur > 4.8){
+	      if(tagMassS1 > 0.2) MultijetNum_tagMassS1_tight->Fill(tagMassS1,numGoodIc5Jet);
+	      if(tagMassS2 > 0.2) MultijetNum_tagMassS2_tight->Fill(tagMassS2,numGoodIc5Jet);
+	      if(tagMassS3 > 0.2) MultijetNum_tagMassS3_tight->Fill(tagMassS3,numGoodIc5Jet);
+	    }
+	  }else{
+	    if(tagMassS1 > 0.2) MultijetNum_nobtagMassS1->Fill(tagMassS1,numGoodIc5Jet);
+	    if(tagMassS2 > 0.2) MultijetNum_nobtagMassS2->Fill(tagMassS2,numGoodIc5Jet);
+	    if(tagMassS3 > 0.2) MultijetNum_nobtagMassS3->Fill(tagMassS3,numGoodIc5Jet);
+	    
+	    if(discHighEff > 2.3){
+	      if(tagMassS1 > 0.2) MultijetNum_nobtagMassS1_loose->Fill(tagMassS1,numGoodIc5Jet);
+	      if(tagMassS2 > 0.2) MultijetNum_nobtagMassS2_loose->Fill(tagMassS2,numGoodIc5Jet);
+	      if(tagMassS3 > 0.2) MultijetNum_nobtagMassS3_loose->Fill(tagMassS3,numGoodIc5Jet);
+	    }
+	    if(discHighEff > 5.3){
+	      if(tagMassS1 > 0.2) MultijetNum_nobtagMassS1_medium->Fill(tagMassS1,numGoodIc5Jet);
+	      if(tagMassS2 > 0.2) MultijetNum_nobtagMassS2_medium->Fill(tagMassS2,numGoodIc5Jet);
+	      if(tagMassS3 > 0.2) MultijetNum_nobtagMassS3_medium->Fill(tagMassS3,numGoodIc5Jet);
+	    }
+	    if(discHighPur > 4.8){
+	      if(tagMassS1 > 0.2) MultijetNum_nobtagMassS1_tight->Fill(tagMassS1,numGoodIc5Jet);
+	      if(tagMassS2 > 0.2) MultijetNum_nobtagMassS2_tight->Fill(tagMassS2,numGoodIc5Jet);
+	      if(tagMassS3 > 0.2) MultijetNum_nobtagMassS3_tight->Fill(tagMassS3,numGoodIc5Jet);
+	    }
+	    
+	  }
+	}
       }
-   }
+    }
 
   // Take the first (and it should be the only one) element in the map and 
   // get the eta of the closest jet (in DeltaR)
@@ -519,16 +618,13 @@ TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   // Do not use DR association. The MEt has no z component. Use DeltaPhi association.
 
 
-
-   // if goodjet >=4,>=5,>=6,>=7  goodIc5jets
- 
    // if #b-tag>=2,>=3
 
-  }
+}
 
   // ------------ method called once each job just before starting event loop  ------------
-  void TDAna::beginJob(const edm::EventSetup&) {
-  }
+void TDAna::beginJob(const edm::EventSetup&) {
+}
 
   // void TDAna::meanHistoSetup( TH1F * meanhisto_ptr, vector<TH1F *> vec_histo ) {
   //   meanhisto_ptr->SetBinContent( numdz+1, mean[numdz]->GetMean() );
@@ -538,184 +634,220 @@ TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   // }
 
   // ------------ method called once each job just after ending the event loop  ------------
-  void TDAna::endJob() {
+void TDAna::endJob() {
 
-    Multi_Vertex_Dz_->Write();
+  Multi_Vertex_Dz_->Write();
     
-    vector<TH1F*> bDiscrHighEffMultiHistos   = Multi_bDiscrHighEff->multiHistos();
-    vector<TH1F*> bDiscrHighPurMultiHistos   = Multi_bDiscrHighPur->multiHistos();
-    vector<TH1F*> nobDiscrHighEffMultiHistos = Multi_nobDiscrHighEff->multiHistos();
-    vector<TH1F*> nobDiscrHighPurMultiHistos = Multi_nobDiscrHighPur->multiHistos();
-    vector<TH1F*> tagMassS1MultiHistos       = Multi_tagMassS1->multiHistos();
-    vector<TH1F*> tagMassS2MultiHistos       = Multi_tagMassS2->multiHistos();
-    vector<TH1F*> tagMassS3MultiHistos       = Multi_tagMassS3->multiHistos();
-    vector<TH1F*> nobtagMassS1MultiHistos    = Multi_nobtagMassS1->multiHistos();
-    vector<TH1F*> nobtagMassS2MultiHistos    = Multi_nobtagMassS2->multiHistos();
-    vector<TH1F*> nobtagMassS3MultiHistos    = Multi_nobtagMassS3->multiHistos();
-    vector<TProfile*> jetEtVSbPtMultiProfiles = Multi_jetEtVSbPt->multiProfiles();
-    vector<TProfile*> jetEtVSnobPtMultiProfiles = Multi_jetEtVSnobPt->multiProfiles();
+  MultiStack<MultiTH1F,TH1F>* canvasdREff        = new MultiStack<MultiTH1F,TH1F>( "discrHighEffVsDeltaRCanvas", 
+										 "b tag discriminator in high efficiency VS delta R", 
+										 1000, 800, 4, 3, 11, true );
+  MultiStack<MultiTH1F,TH1F>* canvasdRPur        = new MultiStack<MultiTH1F,TH1F>( "discrHighPurVsDeltaRCanvas", 
+										 "b tag discriminator in high purity VS delta R",
+										 1000, 800, 4, 3, 11, true );
+  MultiStack<MultiTH1F,TH1F>* canvasdRTagMassS1  = new MultiStack<MultiTH1F,TH1F>( "tagMassS1VsDeltaRCanvas", 
+										 "tag mass S1 VS delta R",
+										 1000, 800, 4, 3, 11, true );
+  MultiStack<MultiTH1F,TH1F>* canvasdRTagMassS2  = new MultiStack<MultiTH1F,TH1F>( "tagMassS2VsDeltaRCanvas",
+										 "tag mass S2 VS delta R",
+										 1000, 800, 4, 3, 11, true );
+  MultiStack<MultiTH1F,TH1F>* canvasdRTagMassS3  = new MultiStack<MultiTH1F,TH1F>( "tagMassS3VsDeltaRCanvas", 
+										 "tag mass S3 VS delta R",
+										 1000, 800, 4, 3, 11, true );
 
-    vector<TH1F*>::iterator bDiscrHighEffMultiHistos_it   = bDiscrHighEffMultiHistos.begin();
-    vector<TH1F*>::iterator nobDiscrHighEffMultiHistos_it = nobDiscrHighEffMultiHistos.begin();
-    vector<TH1F*>::iterator bDiscrHighPurMultiHistos_it   = bDiscrHighPurMultiHistos.begin();
-    vector<TH1F*>::iterator nobDiscrHighPurMultiHistos_it = nobDiscrHighPurMultiHistos.begin();
-    vector<TH1F*>::iterator tagMassS1MultiHistos_it       = tagMassS1MultiHistos.begin();
-    vector<TH1F*>::iterator tagMassS2MultiHistos_it       = tagMassS2MultiHistos.begin();
-    vector<TH1F*>::iterator tagMassS3MultiHistos_it       = tagMassS3MultiHistos.begin();
-    vector<TH1F*>::iterator nobtagMassS1MultiHistos_it    = nobtagMassS1MultiHistos.begin();
-    vector<TH1F*>::iterator nobtagMassS2MultiHistos_it    = nobtagMassS2MultiHistos.begin();
-    vector<TH1F*>::iterator nobtagMassS3MultiHistos_it    = nobtagMassS3MultiHistos.begin();
-    vector<TProfile*>::iterator jetEtVSbPtMultiProfiles_it   = jetEtVSbPtMultiProfiles.begin();
-    vector<TProfile*>::iterator jetEtVSnobPtMultiProfiles_it = jetEtVSnobPtMultiProfiles.begin();
-    TCanvas* canvasEff1        = new TCanvas( "discrHighEffVsDeltaRCanvas_1", "b tag discriminator in high efficiency VS delta R", 1000, 800 );
-    canvasEff1->Divide(2,2);
-    TCanvas* canvasEff2        = new TCanvas( "discrHighEffVsDeltaRCanvas_2", "b tag discriminator in high efficiency VS delta R", 1000, 800 );
-    canvasEff2->Divide(2,2);
-    TCanvas* canvasPur1        = new TCanvas( "discrHighPurVsDeltaRCanvas_1", "b tag discriminator in high purity VS delta R", 1000, 800 );
-    canvasPur1->Divide(2,2);
-    TCanvas* canvasPur2        = new TCanvas( "discrHighPurVsDeltaRCanvas_2", "b tag discriminator in high purity VS delta R", 1000, 800 );
-    canvasPur2->Divide(2,2);
-    TCanvas* canvasTagMass     = new TCanvas( "tagMassVsDeltaRCanvas", "tag mass VS delta R", 1000, 800 );
-    canvasTagMass->Divide(2,2);
-    TCanvas* canvasTagMassS1   = new TCanvas( "tagMassS1VsDeltaRCanvas", "tag mass S1 VS delta R", 1000, 800 );
-    canvasTagMassS1->Divide(2,2);
-    TCanvas* canvasTagMassS2   = new TCanvas( "tagMassS2VsDeltaRCanvas", "tag mass S2 VS delta R", 1000, 800 );
-    canvasTagMassS2->Divide(2,2);
-    TCanvas* canvasTagMassS3   = new TCanvas( "tagMassS3VsDeltaRCanvas", "tag mass S3 VS delta R", 1000, 800 );
-    canvasTagMassS3->Divide(2,2);
-    TCanvas* canvasJetVsParton = new TCanvas( "jetVsParton", "jet Et VS parton Pt", 1000, 800 );
-    canvasJetVsParton->Divide(2,2);
-    int padCounter=0;
-    for(;bDiscrHighEffMultiHistos_it!=bDiscrHighEffMultiHistos.end();
-	  ++bDiscrHighEffMultiHistos_it,
-	  ++nobDiscrHighEffMultiHistos_it,
-	  ++bDiscrHighPurMultiHistos_it,
-	  ++nobDiscrHighPurMultiHistos_it,
-	  ++tagMassS1MultiHistos_it,
-	  ++tagMassS2MultiHistos_it,
-	  ++tagMassS3MultiHistos_it,
-	  ++nobtagMassS1MultiHistos_it,
-	  ++nobtagMassS2MultiHistos_it,
-	  ++nobtagMassS3MultiHistos_it,
-	  ++jetEtVSbPtMultiProfiles_it,
-	  ++jetEtVSnobPtMultiProfiles_it,
-	  ++padCounter){
+  MultiStack<MultiTH1F,TH1F>* canvasdRTagMassS1_loose = new MultiStack<MultiTH1F,TH1F>( "tagMassS1_looseVsDeltaRCanvas",
+										      "tag mass S1 for loose b-tagging cut VS delta R", 
+										      1000, 800, 4, 3, 11, true );
+  MultiStack<MultiTH1F,TH1F>* canvasdRTagMassS2_loose = new MultiStack<MultiTH1F,TH1F>( "tagMassS2_looseVsDeltaRCanvas",
+										      "tag mass S2 for loose b-tagging cut VS delta R", 
+										      1000, 800, 4, 3, 11, true );
+  MultiStack<MultiTH1F,TH1F>* canvasdRTagMassS3_loose = new MultiStack<MultiTH1F,TH1F>( "tagMassS3_looseVsDeltaRCanvas",
+										      "tag mass S3 for loose b-tagging cut VS delta R", 
+										      1000, 800, 4, 3, 11, true );
+  MultiStack<MultiTH1F,TH1F>* canvasdRTagMassS1_medium = new MultiStack<MultiTH1F,TH1F>( "tagMassS1_mediumVsDeltaRCanvas",
+										       "tag mass S1 for medium b-tagging cut VS delta R", 
+										       1000, 800, 4, 3, 11, true );
+  MultiStack<MultiTH1F,TH1F>* canvasdRTagMassS2_medium = new MultiStack<MultiTH1F,TH1F>( "tagMassS2_mediumVsDeltaRCanvas",
+										       "tag mass S2 for medium b-tagging cut VS delta R", 
+										       1000, 800, 4, 3, 11, true );
+  MultiStack<MultiTH1F,TH1F>* canvasdRTagMassS3_medium = new MultiStack<MultiTH1F,TH1F>( "tagMassS3_mediumVsDeltaRCanvas",
+										       "tag mass S3 for medium b-tagging cut VS delta R", 
+										       1000, 800, 4, 3, 11, true );
+  MultiStack<MultiTH1F,TH1F>* canvasdRTagMassS1_tight = new MultiStack<MultiTH1F,TH1F>( "tagMassS1_tightVsDeltaRCanvas",
+										      "tag mass S1 for tight b-tagging cut VS delta R", 
+										      1000, 800, 4, 3, 11, true );
+  MultiStack<MultiTH1F,TH1F>* canvasdRTagMassS2_tight = new MultiStack<MultiTH1F,TH1F>( "tagMassS2_tightVsDeltaRCanvas",
+										      "tag mass S2 for tight b-tagging cut VS delta R", 
+										      1000, 800, 4, 3, 11, true );
+  MultiStack<MultiTH1F,TH1F>* canvasdRTagMassS3_tight = new MultiStack<MultiTH1F,TH1F>( "tagMassS3_tightVsDeltaRCanvas",
+										      "tag mass S3 for tight b-tagging cut VS delta R", 
+										      1000, 800, 4, 3, 11, true );
+  MultiStack<MultiTProfile,TProfile>* canvasdRJetVsParton= new MultiStack<MultiTProfile,TProfile>( "jetVsParton",
+												 "jet Et VS parton Pt", 
+												 1000, 800, 4, 3, 11, false );
+  MultiStack<MultiTProfile,TProfile>* canvasdRUncorrJetVsParton= new MultiStack<MultiTProfile,TProfile>( "uncorrJetVsParton",
+												       "jet uncorrected Et VS parton Pt", 
+												       1000, 800, 4, 3, 11, false );
 
-      stringstream dRstringstream;
-      dRstringstream<< dR_+dR_*(padCounter);
-      TString title = "discrHighEffVsDeltaRStack";
-      TString dRstring(dRstringstream.str()); 
-      THStack* stack = new THStack(title + dRstring,title + dRstring);
-      TLegend* legend = new TLegend( 0.55, 0.65, 0.76, 0.82 );
-      Double_t integral_b = (*bDiscrHighEffMultiHistos_it)->GetEntries();
-      Double_t integral_nob = (*nobDiscrHighEffMultiHistos_it)->GetEntries();
-      if ( integral_b != 0 && integral_nob != 0 ) {
-	(*bDiscrHighEffMultiHistos_it)->Scale(1./integral_b);
-	(*nobDiscrHighEffMultiHistos_it)->Scale(1./integral_nob);
-      }
-      (*nobDiscrHighEffMultiHistos_it)->SetLineColor(kRed);
-      stack->Add(*bDiscrHighEffMultiHistos_it);
-      stack->Add(*nobDiscrHighEffMultiHistos_it);
-      legend->AddEntry(*bDiscrHighEffMultiHistos_it, (*bDiscrHighEffMultiHistos_it)->GetName(), "l");
-      legend->AddEntry(*nobDiscrHighEffMultiHistos_it, (*nobDiscrHighEffMultiHistos_it)->GetName(), "l");
-      if(padCounter>1 && padCounter<6 ){
-	canvasEff1->cd(padCounter-1);
-	stack->Draw("nostack");
-	legend->Draw();
-      }
-      if(padCounter>5 && padCounter<10){
-	canvasEff2->cd(padCounter-5);
-	stack->Draw("nostack");
-	legend->Draw();
-      }
+  MultiStack<MultiTH1F,TH1F>* canvasjetNumTagMassS1  = new MultiStack<MultiTH1F,TH1F>( "tagMassS1VsDeltaRCanvas", 
+										 "tag mass S1 VS delta R",
+										 1000, 800, 4, 3, 11, true );
+  MultiStack<MultiTH1F,TH1F>* canvasjetNumTagMassS2  = new MultiStack<MultiTH1F,TH1F>( "tagMassS2VsDeltaRCanvas",
+										 "tag mass S2 VS delta R",
+										 1000, 800, 4, 3, 11, true );
+  MultiStack<MultiTH1F,TH1F>* canvasjetNumTagMassS3  = new MultiStack<MultiTH1F,TH1F>( "tagMassS3VsDeltaRCanvas", 
+										 "tag mass S3 VS delta R",
+										 1000, 800, 4, 3, 11, true );
 
-      
-      title = "discrHighPurVsDeltaRStack";
-      stack = new THStack(title + dRstring,title + dRstring);
-      legend = new TLegend( 0.55, 0.65, 0.76, 0.82 );
-      integral_b = (*bDiscrHighPurMultiHistos_it)->Integral();
-      integral_nob = (*nobDiscrHighPurMultiHistos_it)->Integral();
-      if ( integral_b != 0 && integral_nob != 0 ) {
-	(*bDiscrHighPurMultiHistos_it)->Scale(1./integral_b);
-	(*nobDiscrHighPurMultiHistos_it)->Scale(1./integral_nob);
-      }
-      (*nobDiscrHighPurMultiHistos_it)->SetLineColor(kRed);
-      stack->Add(*bDiscrHighPurMultiHistos_it);
-      stack->Add(*nobDiscrHighPurMultiHistos_it);
-      legend->AddEntry(*bDiscrHighPurMultiHistos_it, (*bDiscrHighPurMultiHistos_it)->GetName(), "l");
-      legend->AddEntry(*nobDiscrHighPurMultiHistos_it, (*nobDiscrHighPurMultiHistos_it)->GetName(), "l");
-      if(padCounter>1 && padCounter<6 ){
-	canvasPur1->cd(padCounter-1);
-	stack->Draw("nostack");
-	legend->Draw();
-      }
-      if(padCounter>5 && padCounter<10){ 
-	canvasPur2->cd(padCounter-5);
-	stack->Draw("nostack");
-	legend->Draw();
-      }
+  MultiStack<MultiTH1F,TH1F>* canvasjetNumTagMassS1_loose = new MultiStack<MultiTH1F,TH1F>( "tagMassS1_looseVsJetNumCanvas",
+										      "tag mass S1 for loose b-tagging cut VS good jet number cut ", 
+										      1000, 800, 4, 1, 5, true );
+  MultiStack<MultiTH1F,TH1F>* canvasjetNumTagMassS2_loose = new MultiStack<MultiTH1F,TH1F>( "tagMassS2_looseVsJetNumCanvas",
+										      "tag mass S2 for loose b-tagging cut VS good jet number cut ", 
+										      1000, 800, 4, 1, 5, true );
+  MultiStack<MultiTH1F,TH1F>* canvasjetNumTagMassS3_loose = new MultiStack<MultiTH1F,TH1F>( "tagMassS3_looseVsJetNumCanvas",
+										      "tag mass S3 for loose b-tagging cut VS good jet number cut ", 
+										      1000, 800, 4, 1, 5, true );
+  MultiStack<MultiTH1F,TH1F>* canvasjetNumTagMassS1_medium = new MultiStack<MultiTH1F,TH1F>( "tagMassS1_mediumVsJetNumCanvas",
+										       "tag mass S1 for medium b-tagging cut VS good jet number cut ", 
+										       1000, 800, 4, 1, 5, true );
+  MultiStack<MultiTH1F,TH1F>* canvasjetNumTagMassS2_medium = new MultiStack<MultiTH1F,TH1F>( "tagMassS2_mediumVsJetNumCanvas",
+										       "tag mass S2 for medium b-tagging cut VS good jet number cut ", 
+										       1000, 800, 4, 1, 5, true );
+  MultiStack<MultiTH1F,TH1F>* canvasjetNumTagMassS3_medium = new MultiStack<MultiTH1F,TH1F>( "tagMassS3_mediumVsJetNumCanvas",
+										       "tag mass S3 for medium b-tagging cut VS good jet number cut ", 
+										       1000, 800, 4, 1, 5, true );
+  MultiStack<MultiTH1F,TH1F>* canvasjetNumTagMassS1_tight = new MultiStack<MultiTH1F,TH1F>( "tagMassS1_tightVsJetNumCanvas",
+										      "tag mass S1 for tight b-tagging cut VS good jet number cut ", 
+										      1000, 800, 4, 1, 5, true );
+  MultiStack<MultiTH1F,TH1F>* canvasjetNumTagMassS2_tight = new MultiStack<MultiTH1F,TH1F>( "tagMassS2_tightVsJetNumCanvas",
+										      "tag mass S2 for tight b-tagging cut VS good jet number cut ", 
+										      1000, 800, 4, 1, 5, true );
+  MultiStack<MultiTH1F,TH1F>* canvasjetNumTagMassS3_tight = new MultiStack<MultiTH1F,TH1F>( "tagMassS3_tightVsJetNumCanvas",
+										      "tag mass S3 for tight b-tagging cut VS good jet number cut ", 
+										      1000, 800, 4, 1, 5, true );
 
-      title = "tagMassVsDeltaRStack";
-      stack = new THStack(title + dRstring,title + dRstring);
-      legend = new TLegend( 0.55, 0.65, 0.76, 0.82 );
-      Double_t integral_s1 = (*tagMassS1MultiHistos_it)->GetEntries();
-      Double_t integral_s2 = (*tagMassS2MultiHistos_it)->GetEntries();
-      Double_t integral_s3 = (*tagMassS3MultiHistos_it)->GetEntries();
-      if ( integral_s1 != 0 && integral_s2 != 0 && integral_s3 != 0) {
-	(*tagMassS1MultiHistos_it)->Scale(1./integral_s1);
-	(*tagMassS2MultiHistos_it)->Scale(1./integral_s2);
-	(*tagMassS3MultiHistos_it)->Scale(1./integral_s3);
-      }
-      (*tagMassS2MultiHistos_it)->SetLineColor(kBlue);
-      (*tagMassS3MultiHistos_it)->SetLineColor(kGreen);
-      stack->Add(*tagMassS1MultiHistos_it);
-      stack->Add(*tagMassS2MultiHistos_it);
-      stack->Add(*tagMassS3MultiHistos_it);
-      legend->AddEntry(*tagMassS1MultiHistos_it, (*tagMassS1MultiHistos_it)->GetName(), "l");
-      legend->AddEntry(*tagMassS2MultiHistos_it, (*tagMassS2MultiHistos_it)->GetName(), "l");
-      legend->AddEntry(*tagMassS3MultiHistos_it, (*tagMassS3MultiHistos_it)->GetName(), "l");
-      if(padCounter>1 && padCounter<6){
-	canvasTagMass->cd(padCounter-1);
-	stack->Draw("nostack");
-	legend->Draw();
-      }
+  canvasdREff->Fill(MultidR_bDiscrHighEff,MultidR_nobDiscrHighEff);
+  canvasdRPur->Fill(MultidR_bDiscrHighPur,MultidR_nobDiscrHighPur);
+  canvasdRTagMassS1->Fill(MultidR_tagMassS1,MultidR_nobtagMassS1);
+  canvasdRTagMassS1_loose->Fill(MultidR_tagMassS1_loose,MultidR_nobtagMassS1_loose);
+  canvasdRTagMassS1_medium->Fill(MultidR_tagMassS1_medium,MultidR_nobtagMassS1_medium);
+  canvasdRTagMassS1_tight->Fill(MultidR_tagMassS1_tight,MultidR_nobtagMassS1_tight);
+  canvasdRTagMassS2->Fill(MultidR_tagMassS2,MultidR_nobtagMassS2);
+  canvasdRTagMassS2_loose->Fill(MultidR_tagMassS2_loose,MultidR_nobtagMassS2_loose);
+  canvasdRTagMassS2_medium->Fill(MultidR_tagMassS2_medium,MultidR_nobtagMassS2_medium);
+  canvasdRTagMassS2_tight->Fill(MultidR_tagMassS2_tight,MultidR_nobtagMassS2_tight);
+  canvasdRTagMassS3->Fill(MultidR_tagMassS3,MultidR_nobtagMassS3);
+  canvasdRTagMassS3_loose->Fill(MultidR_tagMassS3_loose,MultidR_nobtagMassS3_loose);
+  canvasdRTagMassS3_medium->Fill(MultidR_tagMassS3_medium,MultidR_nobtagMassS3_medium);
+  canvasdRTagMassS3_tight->Fill(MultidR_tagMassS3_tight,MultidR_nobtagMassS3_tight);
+  canvasdRJetVsParton->Fill(MultidR_jetEtVSbPt,MultidR_jetEtVSnobPt);
+  canvasdRUncorrJetVsParton->Fill(MultidR_jetUncorrEtVSbPt,MultidR_jetUncorrEtVSnobPt);
 
-      title = "tagMassS1VsDeltaRStack";
-      stack = new THStack(title + dRstring,title + dRstring);
-      legend = new TLegend( 0.55, 0.65, 0.76, 0.82 );
-      Double_t integral_nobs1 = (*nobtagMassS1MultiHistos_it)->GetEntries();
-      if ( integral_s1 != 0 && integral_nos1 ) {
-	(*nobtagMassS1MultiHistos_it)->Scale(1./integral_nos1);
-      }
-      (*nobtagMassS1MultiHistos_it)->SetLineColor(kRed);
-      stack->Add(*tagMassS1MultiHistos_it);
-      stack->Add(*tagMassS2MultiHistos_it);
-      stack->Add(*tagMassS3MultiHistos_it);
-      legend->AddEntry(*tagMassS1MultiHistos_it, (*tagMassS1MultiHistos_it)->GetName(), "l");
-      legend->AddEntry(*tagMassS2MultiHistos_it, (*tagMassS2MultiHistos_it)->GetName(), "l");
-      legend->AddEntry(*tagMassS3MultiHistos_it, (*tagMassS3MultiHistos_it)->GetName(), "l");
-      if(padCounter>1 && padCounter<6){
-	canvasTagMass->cd(padCounter-1);
-	stack->Draw("nostack");
-	legend->Draw();
-      }
+  canvasjetNumTagMassS1->Fill(MultijetNum_tagMassS1,MultijetNum_nobtagMassS1);
+  canvasjetNumTagMassS1_loose->Fill(MultijetNum_tagMassS1_loose,MultijetNum_nobtagMassS1_loose);
+  canvasjetNumTagMassS1_medium->Fill(MultijetNum_tagMassS1_medium,MultijetNum_nobtagMassS1_medium);
+  canvasjetNumTagMassS1_tight->Fill(MultijetNum_tagMassS1_tight,MultijetNum_nobtagMassS1_tight);
+  canvasjetNumTagMassS2->Fill(MultijetNum_tagMassS2,MultijetNum_nobtagMassS2);
+  canvasjetNumTagMassS2_loose->Fill(MultijetNum_tagMassS2_loose,MultijetNum_nobtagMassS2_loose);
+  canvasjetNumTagMassS2_medium->Fill(MultijetNum_tagMassS2_medium,MultijetNum_nobtagMassS2_medium);
+  canvasjetNumTagMassS2_tight->Fill(MultijetNum_tagMassS2_tight,MultijetNum_nobtagMassS2_tight);
+  canvasjetNumTagMassS3->Fill(MultijetNum_tagMassS3,MultijetNum_nobtagMassS3);
+  canvasjetNumTagMassS3_loose->Fill(MultijetNum_tagMassS3_loose,MultijetNum_nobtagMassS3_loose);
+  canvasjetNumTagMassS3_medium->Fill(MultijetNum_tagMassS3_medium,MultijetNum_nobtagMassS3_medium);
+  canvasjetNumTagMassS3_tight->Fill(MultijetNum_tagMassS3_tight,MultijetNum_nobtagMassS3_tight);
 
-    }
-    canvasEff1->Write();
-    canvasEff2->Write();
-    canvasPur1->Write();
-    canvasPur2->Write();
-    canvasTagMass->Write();
+  canvasdREff->Write();
+  canvasdRPur->Write();
+  canvasdRTagMassS1->Write();
+  canvasdRTagMassS1_loose->Write();
+  canvasdRTagMassS1_medium->Write();
+  canvasdRTagMassS1_tight->Write();
+  canvasdRTagMassS2->Write();
+  canvasdRTagMassS2_loose->Write();
+  canvasdRTagMassS2_medium->Write();
+  canvasdRTagMassS2_tight->Write();
+  canvasdRTagMassS3->Write();
+  canvasdRTagMassS3_loose->Write();
+  canvasdRTagMassS3_medium->Write();
+  canvasdRTagMassS3_tight->Write();
+  canvasdRJetVsParton->Write();
+  canvasdRUncorrJetVsParton->Write();
 
-    Multi_bDiscrHighEff->Write();
-    Multi_bDiscrHighPur->Write();
-    Multi_nobDiscrHighEff->Write();
-    Multi_nobDiscrHighPur->Write();
-    Multi_tagMassS1->Write();
-    Multi_tagMassS2->Write();
-    Multi_tagMassS3->Write();
-    Multi_jetEtVSbPt->Write();
-  }
+  /*
+  canvasjetNumTagMassS1->Write();
+  canvasjetNumTagMassS1_loose->Write();
+  canvasjetNumTagMassS1_medium->Write();
+  canvasjetNumTagMassS1_tight->Write();
+  canvasjetNumTagMassS2->Write();
+  canvasjetNumTagMassS2_loose->Write();
+  canvasjetNumTagMassS2_medium->Write();
+  canvasjetNumTagMassS2_tight->Write();
+  canvasjetNumTagMassS3->Write();
+  canvasjetNumTagMassS3_loose->Write();
+  canvasjetNumTagMassS3_medium->Write();
+  canvasjetNumTagMassS3_tight->Write();
+  */
 
-  //define this as a plug-in
-  DEFINE_FWK_MODULE(TDAna);
+  MultidR_bDiscrHighEff->Write();
+  MultidR_bDiscrHighPur->Write();
+  MultidR_nobDiscrHighEff->Write();
+  MultidR_nobDiscrHighPur->Write();
+  MultidR_tagMassS1->Write();
+  MultidR_tagMassS2->Write();
+  MultidR_tagMassS3->Write();
+  MultidR_tagMassS1_loose->Write();
+  MultidR_tagMassS2_loose->Write();
+  MultidR_tagMassS3_loose->Write();
+  MultidR_tagMassS1_medium->Write();
+  MultidR_tagMassS2_medium->Write();
+  MultidR_tagMassS3_medium->Write();
+  MultidR_tagMassS1_tight->Write();
+  MultidR_tagMassS2_tight->Write();
+  MultidR_tagMassS3_tight->Write();
+  MultidR_nobtagMassS1->Write();
+  MultidR_nobtagMassS2->Write();
+  MultidR_nobtagMassS3->Write();
+  MultidR_nobtagMassS1_loose->Write();
+  MultidR_nobtagMassS2_loose->Write();
+  MultidR_nobtagMassS3_loose->Write();
+  MultidR_nobtagMassS1_medium->Write();
+  MultidR_nobtagMassS2_medium->Write();
+  MultidR_nobtagMassS3_medium->Write();
+  MultidR_nobtagMassS1_tight->Write();
+  MultidR_nobtagMassS2_tight->Write();
+  MultidR_nobtagMassS3_tight->Write();
+  MultidR_jetEtVSbPt->Write();
+  MultidR_jetEtVSnobPt->Write();
+  MultidR_jetUncorrEtVSbPt->Write();
+  MultidR_jetUncorrEtVSnobPt->Write();
+
+  /*
+  MultijetNum_tagMassS1->Write();
+  MultijetNum_tagMassS2->Write();
+  MultijetNum_tagMassS3->Write();
+  MultijetNum_tagMassS1_loose->Write();
+  MultijetNum_tagMassS2_loose->Write();
+  MultijetNum_tagMassS3_loose->Write();
+  MultijetNum_tagMassS1_medium->Write();
+  MultijetNum_tagMassS2_medium->Write();
+  MultijetNum_tagMassS3_medium->Write();
+  MultijetNum_tagMassS1_tight->Write();
+  MultijetNum_tagMassS2_tight->Write();
+  MultijetNum_tagMassS3_tight->Write();
+  MultijetNum_nobtagMassS1->Write();
+  MultijetNum_nobtagMassS2->Write();
+  MultijetNum_nobtagMassS3->Write();
+  MultijetNum_nobtagMassS1_loose->Write();
+  MultijetNum_nobtagMassS2_loose->Write();
+  MultijetNum_nobtagMassS3_loose->Write();
+  MultijetNum_nobtagMassS1_medium->Write();
+  MultijetNum_nobtagMassS2_medium->Write();
+  MultijetNum_nobtagMassS3_medium->Write();
+  MultijetNum_nobtagMassS1_tight->Write();
+  MultijetNum_nobtagMassS2_tight->Write();
+  MultijetNum_nobtagMassS3_tight->Write();
+  */
+}
+
+//define this as a plug-in
+DEFINE_FWK_MODULE(TDAna);
