@@ -1,0 +1,9 @@
+source = PoolSource {
+  untracked vstring fileNames = {
+    "file:/data/demattia/QCD_FILES/W_3JETS_100ptw300/W_3jets_100ptw300_30.root",
+    "file:/data/demattia/QCD_FILES/W_3JETS_100ptw300/W_3jets_100ptw300_31.root",
+    "file:/data/demattia/QCD_FILES/W_3JETS_100ptw300/W_3jets_100ptw300_12.root",
+    "file:/data/demattia/QCD_FILES/W_3JETS_100ptw300/W_3jets_100ptw300_33.root",
+    "file:/data/demattia/QCD_FILES/W_3JETS_100ptw300/W_3jets_100ptw300_34.root",
+  }
+}

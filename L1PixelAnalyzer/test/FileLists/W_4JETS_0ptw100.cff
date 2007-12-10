@@ -1,0 +1,5 @@
+source = PoolSource {
+  untracked vstring fileNames = {
+    "file:/data/demattia/QCD_FILES/W_4JETS_0ptw100/W_4jets_0ptw100_1.root"
+  }
+}
