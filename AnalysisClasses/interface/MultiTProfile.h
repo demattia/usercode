@@ -60,7 +60,7 @@ class MultiTProfile {
   void Write();
 
   /// Returns vector of internal histograms
-  std::vector<TProfile*> multiProfiles() const {
+  std::vector<TProfile*> multiProfiles() const;
 
  private:
   TDirectory * Directory_;
