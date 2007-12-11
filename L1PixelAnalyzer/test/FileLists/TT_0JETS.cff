@@ -28,6 +28,6 @@ source = PoolSource {
     "file:/data/demattia/QCD_FILES/TT_0JETS/tt_0jets_5.root",
     "file:/data/demattia/QCD_FILES/TT_0JETS/tt_0jets_6.root",
     "file:/data/demattia/QCD_FILES/TT_0JETS/tt_0jets_7.root",
-    "file:/data/demattia/QCD_FILES/TT_0JETS/tt_0jets_9.root",
+    "file:/data/demattia/QCD_FILES/TT_0JETS/tt_0jets_9.root"
   }
 }
