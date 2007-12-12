@@ -1,0 +1,7 @@
+source = PoolSource {
+  untracked vstring fileNames = {
+    "file:/data/demattia/QCD_FILES/SINGLETOP_TQ_TQB_LHC_MU/SingleTop_tq_tqb_lhc_mu_10.root",
+    "file:/data/demattia/QCD_FILES/SINGLETOP_TQ_TQB_LHC_MU/SingleTop_tq_tqb_lhc_mu_11.root",
+    "file:/data/demattia/QCD_FILES/SINGLETOP_TQ_TQB_LHC_MU/SingleTop_tq_tqb_lhc_mu_1.root"
+  }
+}
