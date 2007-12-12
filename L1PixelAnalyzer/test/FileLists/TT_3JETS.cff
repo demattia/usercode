@@ -2,18 +2,14 @@ source = PoolSource {
   untracked vstring fileNames = {
     "file:/data/demattia/QCD_FILES/TT_3JETS/TT_3JETS_10.root",
     "file:/data/demattia/QCD_FILES/TT_3JETS/TT_3JETS_11.root",
-    "file:/data/demattia/QCD_FILES/TT_3JETS/TT_3JETS_12.root",
-    "file:/data/demattia/QCD_FILES/TT_3JETS/TT_3JETS_13.root",
-    "file:/data/demattia/QCD_FILES/TT_3JETS/TT_3JETS_14.root",
-    "file:/data/demattia/QCD_FILES/TT_3JETS/TT_3JETS_15.root",
-    "file:/data/demattia/QCD_FILES/TT_3JETS/TT_3JETS_16.root",
-    "file:/data/demattia/QCD_FILES/TT_3JETS/TT_3JETS_17.root",
-    "file:/data/demattia/QCD_FILES/TT_3JETS/TT_3JETS_23.root",
-    "file:/data/demattia/QCD_FILES/TT_3JETS/TT_3JETS_26.root",
-    "file:/data/demattia/QCD_FILES/TT_3JETS/TT_3JETS_29.root",
+    "file:/data/demattia/QCD_FILES/TT_3JETS/TT_3JETS_1.root",
     "file:/data/demattia/QCD_FILES/TT_3JETS/TT_3JETS_2.root",
     "file:/data/demattia/QCD_FILES/TT_3JETS/TT_3JETS_3.root",
     "file:/data/demattia/QCD_FILES/TT_3JETS/TT_3JETS_4.root",
-    "file:/data/demattia/QCD_FILES/TT_3JETS/TT_3JETS_5.root"
+    "file:/data/demattia/QCD_FILES/TT_3JETS/TT_3JETS_5.root",
+    "file:/data/demattia/QCD_FILES/TT_3JETS/TT_3JETS_6.root",
+    "file:/data/demattia/QCD_FILES/TT_3JETS/TT_3JETS_7.root",
+    "file:/data/demattia/QCD_FILES/TT_3JETS/TT_3JETS_8.root",
+    "file:/data/demattia/QCD_FILES/TT_3JETS/TT_3JETS_9.root"
   }
 }
