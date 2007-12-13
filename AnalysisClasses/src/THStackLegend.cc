@@ -1,3 +1,4 @@
+
 #ifndef THSTACKLEGEND_CC
 #define THSTACKLEGEND_CC
 
@@ -21,11 +22,11 @@
 //   ++counter_;
 // }
 
-TH1F* THStackLegend::Add(const TH1F * HISTO, const char* LEGEND, const bool & NORMALIZE, const char * FILL) {
-  TH1F * HISTO_ = new TH1F(*HISTO);
+TH1* THStackLegend::Add(const TH1 * HISTO, const char* LEGEND, const bool & NORMALIZE, const char * FILL) {
+  //  TH1 * HISTO_ = new TH1(*HISTO);
+  TH1 * HISTO_ = (TH1*)HISTO->Clone();
   // Do not save this histogram in the current directory
   HISTO_->SetDirectory(0);
-  //  TH1F * HISTO_ = (TH1F*)HISTO->Clone();
 
   if (NORMALIZE) {
     Double_t integral = HISTO_->Integral();
