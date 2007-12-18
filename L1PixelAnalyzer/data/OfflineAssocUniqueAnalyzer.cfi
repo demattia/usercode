@@ -1,0 +1,33 @@
+module OfflineAssocUniqueAna = OfflineAssocUniqueAnalyzer {
+
+  untracked string OutputName                   = "OfflineAssocUniqueAnalyzer.root"
+  untracked string HiVarName                    = "HiVariables"
+
+  // Labels for the objects to be opened
+  untracked InputTag CenJets                    = offlineProd:cenJets
+  untracked InputTag ForJets                    = offlineProd:forJets
+  untracked InputTag TauJets                    = offlineProd:tauJets
+  untracked InputTag L1MEt                      = offlineProd:l1MEt
+  untracked InputTag OfflineJets                = offlineProd:offlineJets
+  untracked InputTag OfflineMEt                 = offlineProd:offlineMEt
+  untracked InputTag MCParticles                = offlineProd:MCParticles
+  untracked InputTag SimplePixelJets            = offlineProd:simplePixelJets
+  untracked InputTag GlobalMuons                = offlineProd:globalMuons
+  untracked InputTag SimpleElectrons            = offlineProd:simpleElectrons
+  untracked InputTag SimpleTaus                 = offlineProd:simpleTaus
+  untracked InputTag Summary                    = offlineProd:summary
+
+  untracked uint32 TracksMinimumNum_in_PixelJet = 3
+  // To select one value use min = 0.x and max = 0.x+0.1 (eg 0.4 and 0.5),
+  // this way only the first value will be processed.
+  untracked double MinDz = 0.4
+  untracked double MaxDz = 0.5
+
+  // Select if the pixelTrigger must be put in AND
+  untracked bool noPixel                        = true
+
+  // Select wether to put the cen and tau jets is a single collection or keep them separate.
+  untracked bool singleColl                     = false
+
+  untracked string OutputEffFileName            = "Efficiency_file.txt"
+}

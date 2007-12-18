@@ -56,6 +56,11 @@ class Vertex {
     return objnumber_;
   }
 
+  /// Return the vector of pointers to the objects used to build this vertex
+  std::vector<const T1*> constituents() const {
+    return vec_obj_ptr;
+  }
+
   /// To allow ordering in Pt
   bool operator< ( const Vertex<T1> & comp_vertex ) const {
     return pt() < comp_vertex.pt();
