@@ -44,9 +44,9 @@ void Ana_all (TString pippo)
 
   double Lumfactor = 100000; // 100/fb of luminosity assumed in histograms
   
-  TTH->cd();
-  double minx=MEtSigS->GetBinLowEdge(1);
-  double maxx=50.*MEtSigS->GetBinWidth(1);
+  TH1F * H = dynamic_cast<TH1D*>(TTH->Get(pippo));
+  double minx=H->GetBinLowEdge(1);
+  double maxx=50.*H->GetBinWidth(1);
   TH1D * Histo_QCD = new TH1D ( pippo+"_QCD", "", 50, minx, maxx );
   TH1D * Histo_TTH = new TH1D ( pippo+"_TTH", "", 50, minx, maxx );
   TH1D * Histo_TT = new TH1D ( pippo+"_TT", "", 50, minx, maxx );
