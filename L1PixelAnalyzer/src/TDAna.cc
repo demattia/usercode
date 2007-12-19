@@ -369,8 +369,6 @@ TDAna::TDAna(const edm::ParameterSet& iConfig) :
 
   PTagFile.close();
 
-  njsss=0.;
-
 }
 
 
@@ -957,9 +955,6 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	    }
 	  }
 
-	  cout << "In QCD loop: NJ=" << iJmax << " icomb= " << icomb 
-	       << " it123= " << it1 << it2 << it3 << " NHEM=" << NHEM 
-	       << " PTOT=" << PTOT << endl;
 	  // Search for a H signal in the remaining jets
 	  // -------------------------------------------
 	  if ( it1+it2+it3>0 ) {
@@ -993,7 +988,6 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 		}
 	      }
 	    }
-	    cout << "Ih1 ih2= " << ih1 << ih2 << " mass=" << m45best << endl;
 	    
 	    // Compute mass of jets not selected in triplet of top and doublet of H decay
 	    // --------------------------------------------------------------------------
@@ -1048,7 +1042,6 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 		  }
 		}      
 	      }
-	      cout << "Mbbnohmax = " << mbbnohmax << endl;
 	    }      
 	  } // end if it1+it2+it3>0      
 	  
@@ -1116,7 +1109,6 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	    // Apply trigger requirement
 	    // -------------------------
 	    if ( response && NJetsCut && NHEM>=2 ) {
-	      cout << "Filling with PTOT=" << PTOT << endl;
 	      NJets_->Fill(goodIc5Jets,PTOT);
 	      UncorrHt_->Fill(UncorrHt,PTOT);
 	      CorrHt_->Fill(CorrHt,PTOT);
@@ -1217,7 +1209,6 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 		}
 		
 		if ( NHEM>=4 ) {
-		  if ( iJ==7 )njsss+=PTOT;
 		  NJetsSSS_->Fill(goodIc5Jets,PTOT);
 		  UncorrHtSSS_->Fill(UncorrHt,PTOT);
 		  CorrHtSSS_->Fill(CorrHt,PTOT);
@@ -1803,8 +1794,6 @@ void TDAna::endJob() {
   UncorrMEt_SumEtJ_->Write();
   CorrMEt_SumEtJ_->Write();
   MEt_SumEtJ_->Write();
-
-  cout << "Entries for nj==7: " << njsss << endl;
 
 }
 

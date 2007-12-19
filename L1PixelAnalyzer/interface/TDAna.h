@@ -24,7 +24,7 @@
 //
 // Original Author:  Marco De Mattia
 //         Created:  Tue May  8 13:05:37 CEST 2007
-// $Id: TDAna.h,v 1.2 2007/12/06 12:08:22 tosi Exp $
+// $Id: TDAna.h,v 1.3 2007/12/10 12:27:41 tosi Exp $
 //
 //
 
@@ -44,7 +44,7 @@
 
 // Root includes
 // -------------
-#include "TH1F.h"
+#include "TH1D.h"
 #include "TH2F.h"
 #include "TProfile.h"
 #include "TFile.h"
@@ -176,42 +176,161 @@ class TDAna : public edm::EDAnalyzer {
   edm::InputTag summaryLabel_;
 
   unsigned int numTkCut_;
+  bool QCD_;
   std::string OutputEffFileName;
 
-  TH1F * uncorr_JetPt_IC5_;
-  TH1F * corr_JetPt_IC5_;
-  TH1F * JetNumber_IC5_;
+  TH1D * uncorr_JetPt_IC5_;
+  TH1D * corr_JetPt_IC5_;
+  TH1D * JetNumber_IC5_;
 
-  TH1F * MEt_CorrIC5_Pt_;
-  TH1F * MEt_CorrIC5_Phi_;
-  TH1F * MEt_CorrIC5_SumEt_;
-  TH1F * MEt_CorrIC5_mEtSig_;
+  TH1D * MEt_CorrIC5_Pt_;
+  TH1D * MEt_CorrIC5_Phi_;
+  TH1D * MEt_CorrIC5_SumEt_;
+  TH1D * MEt_CorrIC5_mEtSig_;
 
-  TH1F * PixelJet_dz_;
-  TH1F * PixelJet_Num_;
-  TH1F * PixelJet_Track_Num_;
+  TH1D * PixelJet_dz_;
+  TH1D * PixelJet_Num_;
+  TH1D * PixelJet_Track_Num_;
 
-  // Means
-  MultiTH1F * Multi_Vertex_Dz_;
-  MultiTH1F * Multi_Prim_Second_Vertex_Dz_;
-  MultiTH1F * Multi_Vertex_Num_;
 
-  MultiTH1F * Multi_PrimVNum_;
-  MultiTH1F * Multi_PrimVPt_;
-  MultiTH1F * Multi_PrimVEta_;
-  MultiTH1F * Multi_PrimVPhi_;
+  TH1D * DPhimin_;
 
-  MultiTH1F * Multi_SecVNum_;
-  MultiTH1F * Multi_SecVPt_;
-  MultiTH1F * Multi_SecVEta_;
-  MultiTH1F * Multi_SecVPhi_;
+  TH1D * NJets_;
+  TH1D * UncorrSumEt_;
+  TH1D * UncorrHt_;
+  TH1D * CorrSumEt_;
+  TH1D * CorrHt_;
+  TH1D * GoodSumEt_;
+  TH1D * GoodHt_;
+  TH1D * GoodHt2_;
+  TH1D * MEt_;
+  TH1D * MEtSig_;
+  TH1D * MEtSigNew_;
+  TH1D * MEtDPM_;
+  TH1D * MEtDP1_;
+  TH1D * MEtDP2_;
+  TH1D * MEtDP3_;
+  TH1D * UncorrMEtSig_;
+  TH1D * CorrMEtSig_;
+  TH1D * M3best_;
+  TH1D * Mwbest_;
+  TH1D * Chi2mass_;
+  TH1D * M45best_;
+  TH1D * Chi2ext_;
+  TH2D * MEx_SumEt_;
+  TH1D * DP12_;
+  TH1D * DPbb_;
+  TH1D * M_others_;
+  TH1D * Mbbnoh_;
+  TH1D * DPbbnoh_;
+  TH1D * M8_;
+  TH1D * C8_;
 
-  MultiTH1F * Multi_AllSecVNum_;
-  MultiTH1F * Multi_AllSecVPt_;
-  MultiTH1F * Multi_AllSecVEta_;
-  MultiTH1F * Multi_AllSecVPhi_;
+  TH1D * NJetsS_;
+  TH1D * UncorrSumEtS_;
+  TH1D * UncorrHtS_;
+  TH1D * CorrSumEtS_;
+  TH1D * CorrHtS_;
+  TH1D * GoodSumEtS_;
+  TH1D * GoodHtS_;
+  TH1D * GoodHt2S_;
+  TH1D * MEtS_;
+  TH1D * MEtSigS_;
+  TH1D * MEtSigNewS_;
+  TH1D * MEtDPMS_;
+  TH1D * MEtDP1S_; 
+  TH1D * MEtDP2S_;
+  TH1D * MEtDP3S_;
+  TH1D * UncorrMEtSigS_;
+  TH1D * CorrMEtSigS_;
+  TH1D * M3bestS_;
+  TH1D * MwbestS_;
+  TH1D * Chi2massS_;
+  TH1D * M45bestS_;
+  TH1D * Chi2extS_;
+  TH2D * MEx_SumEtS_;
+  TH1D * DP12S_;
+  TH1D * DPbbS_;
+  TH1D * M_othersS_;
+  TH1D * MbbnohS_;
+  TH1D * DPbbnohS_;
+  TH1D * M8S_;
+  TH1D * C8S_;
 
-  TH1F * DPhimin_;
+  TH1D * NJetsSS_;
+  TH1D * UncorrSumEtSS_;
+  TH1D * UncorrHtSS_;
+  TH1D * CorrSumEtSS_;
+  TH1D * CorrHtSS_;
+  TH1D * GoodSumEtSS_;
+  TH1D * GoodHtSS_;
+  TH1D * GoodHt2SS_;
+  TH1D * MEtSS_;
+  TH1D * MEtSigSS_;
+  TH1D * MEtSigNewSS_;
+  TH1D * MEtDPMSS_;
+  TH1D * MEtDP1SS_;
+  TH1D * MEtDP2SS_;
+  TH1D * MEtDP3SS_;
+  TH1D * UncorrMEtSigSS_;
+  TH1D * CorrMEtSigSS_;
+  TH1D * M3bestSS_;
+  TH1D * MwbestSS_;
+  TH1D * Chi2massSS_;
+  TH1D * M45bestSS_;
+  TH1D * Chi2extSS_;
+  TH2D * MEx_SumEtSS_;
+  TH1D * DP12SS_;
+  TH1D * DPbbSS_;
+  TH1D * M_othersSS_;
+  TH1D * MbbnohSS_;
+  TH1D * DPbbnohSS_;
+  TH1D * M8SS_;
+  TH1D * C8SS_;
+
+  TH1D * NJetsSSS_;
+  TH1D * UncorrSumEtSSS_;
+  TH1D * UncorrHtSSS_;
+  TH1D * CorrSumEtSSS_;
+  TH1D * CorrHtSSS_;
+  TH1D * GoodSumEtSSS_;
+  TH1D * GoodHtSSS_;
+  TH1D * GoodHt2SSS_;
+  TH1D * MEtSSS_;
+  TH1D * MEtSigSSS_;
+  TH1D * MEtSigNewSSS_;
+  TH1D * MEtDPMSSS_;
+  TH1D * MEtDP1SSS_;
+  TH1D * MEtDP2SSS_;
+  TH1D * MEtDP3SSS_;
+  TH1D * UncorrMEtSigSSS_;
+  TH1D * CorrMEtSigSSS_;
+  TH1D * M3bestSSS_;
+  TH1D * MwbestSSS_;
+  TH1D * Chi2massSSS_;
+  TH1D * M45bestSSS_;
+  TH1D * Chi2extSSS_;
+  TH2D * MEx_SumEtSSS_;
+  TH1D * DP12SSS_;
+  TH1D * DPbbSSS_;
+  TH1D * M_othersSSS_;
+  TH1D * MbbnohSSS_;
+  TH1D * DPbbnohSSS_;
+  TH1D * M8SSS_;
+  TH1D * C8SSS_;
+  TH1D * N4NJSSS_;
+  TH1D * E4NJSSS_;
+
+  TH2D * UncorrMEt_SumEt_;
+  TH2D * CorrMEt_SumEt_; 
+  TH2D * MEt_SumEt_; 
+  TH2D * UncorrMEt_SumEtC_; 
+  TH2D * CorrMEt_SumEtC_; 
+  TH2D * MEt_SumEtC_; 
+  TH2D * UncorrMEt_SumEtJ_; 
+  TH2D * CorrMEt_SumEtJ_; 
+  TH2D * MEt_SumEtJ_; 
+
 
   // Trigger efficiency counters
   // Multijet
@@ -270,13 +389,17 @@ class TDAna : public edm::EDAnalyzer {
   int jetMin_;
   int jetMax_;
 
+  float loose_;
+  float medium_;
+  float tight_;
+
   // Pixel trigger efficiency
-  TH1F ** EffMultijetPixel_;
-  TH1F ** EffMultijetPixelEt1_;
-  TH1F ** EffMultijetPixelEt2_;
-  TH1F ** EffMultijetPixelEt3_;
-  TH1F ** EffMultijetPixelEt4_;
-  TH1F ** EffMEtJetPixel_;
+  TH1D ** EffMultijetPixel_;
+  TH1D ** EffMultijetPixelEt1_;
+  TH1D ** EffMultijetPixelEt2_;
+  TH1D ** EffMultijetPixelEt3_;
+  TH1D ** EffMultijetPixelEt4_;
+  TH1D ** EffMEtJetPixel_;
   int EffMultijetPixelSize_;
   int EffMultijetPixelSizeEt1_;
   int EffMultijetPixelSizeEt2_;
@@ -291,8 +414,8 @@ class TDAna : public edm::EDAnalyzer {
   int ** EffMEtJetPixelArray_;
 
   // Offline efficiency
-  TH1F ** offlineEffMultijetPixel_;
-  TH1F ** offlineEffMEtJetPixel_;
+  TH1D ** offlineEffMultijetPixel_;
+  TH1D ** offlineEffMEtJetPixel_;
   int offlineEffMultijetPixelSize_;
   int offlineEffMEtJetPixelSize_;
   int ** offlineEffMultijetPixelArray_;
@@ -313,74 +436,43 @@ class TDAna : public edm::EDAnalyzer {
   int *numgoodpjeff_5_;
   int *numgoodpjeff_6_;
 
-  TH1F * EffNumGoodPj_;
-  TH1F * EffNumGoodPj_3_;
-  TH1F * EffNumGoodPj_4_;
-  TH1F * EffNumGoodPj_5_;
-  TH1F * EffNumGoodPj_6_;
-
-
-  // b tag discriminator histograms
-  MultiTH1F * MultidR_bDiscrHighEff;
-  MultiTH1F * MultidR_bDiscrHighPur;
-  MultiTH1F * MultidR_nobDiscrHighEff;
-  MultiTH1F * MultidR_nobDiscrHighPur;
-  MultiTH1F * MultidR_tagMassS1;
-  MultiTH1F * MultidR_tagMassS2;
-  MultiTH1F * MultidR_tagMassS3;
-  MultiTH1F * MultidR_nobtagMassS1;
-  MultiTH1F * MultidR_nobtagMassS2;
-  MultiTH1F * MultidR_nobtagMassS3;
-  MultiTH1F * MultidR_tagMassS1_loose;
-  MultiTH1F * MultidR_tagMassS2_loose;
-  MultiTH1F * MultidR_tagMassS3_loose;
-  MultiTH1F * MultidR_nobtagMassS1_loose;
-  MultiTH1F * MultidR_nobtagMassS2_loose;
-  MultiTH1F * MultidR_nobtagMassS3_loose;
-  MultiTH1F * MultidR_tagMassS1_medium;
-  MultiTH1F * MultidR_tagMassS2_medium;
-  MultiTH1F * MultidR_tagMassS3_medium;
-  MultiTH1F * MultidR_nobtagMassS1_medium;
-  MultiTH1F * MultidR_nobtagMassS2_medium;
-  MultiTH1F * MultidR_nobtagMassS3_medium;
-  MultiTH1F * MultidR_tagMassS1_tight;
-  MultiTH1F * MultidR_tagMassS2_tight;
-  MultiTH1F * MultidR_tagMassS3_tight;
-  MultiTH1F * MultidR_nobtagMassS1_tight;
-  MultiTH1F * MultidR_nobtagMassS2_tight;
-  MultiTH1F * MultidR_nobtagMassS3_tight;
-  MultiTProfile * MultidR_jetEtVSbPt;
-  MultiTProfile * MultidR_jetEtVSnobPt;
-  MultiTProfile * MultidR_jetUncorrEtVSbPt;
-  MultiTProfile * MultidR_jetUncorrEtVSnobPt;
-
-  MultiTH1F * MultijetNum_tagMassS1;
-  MultiTH1F * MultijetNum_tagMassS2;
-  MultiTH1F * MultijetNum_tagMassS3;
-  MultiTH1F * MultijetNum_nobtagMassS1;
-  MultiTH1F * MultijetNum_nobtagMassS2;
-  MultiTH1F * MultijetNum_nobtagMassS3;
-  MultiTH1F * MultijetNum_tagMassS1_loose;
-  MultiTH1F * MultijetNum_tagMassS2_loose;
-  MultiTH1F * MultijetNum_tagMassS3_loose;
-  MultiTH1F * MultijetNum_nobtagMassS1_loose;
-  MultiTH1F * MultijetNum_nobtagMassS2_loose;
-  MultiTH1F * MultijetNum_nobtagMassS3_loose;
-  MultiTH1F * MultijetNum_tagMassS1_medium;
-  MultiTH1F * MultijetNum_tagMassS2_medium;
-  MultiTH1F * MultijetNum_tagMassS3_medium;
-  MultiTH1F * MultijetNum_nobtagMassS1_medium;
-  MultiTH1F * MultijetNum_nobtagMassS2_medium;
-  MultiTH1F * MultijetNum_nobtagMassS3_medium;
-  MultiTH1F * MultijetNum_tagMassS1_tight;
-  MultiTH1F * MultijetNum_tagMassS2_tight;
-  MultiTH1F * MultijetNum_tagMassS3_tight;
-  MultiTH1F * MultijetNum_nobtagMassS1_tight;
-  MultiTH1F * MultijetNum_nobtagMassS2_tight;
-  MultiTH1F * MultijetNum_nobtagMassS3_tight;
+  TH1D * EffNumGoodPj_;
+  TH1D * EffNumGoodPj_3_;
+  TH1D * EffNumGoodPj_4_;
+  TH1D * EffNumGoodPj_5_;
+  TH1D * EffNumGoodPj_6_;
 
   // b tag discriminator histograms
-  TH1F * deltaR;
+  TH1D * deltaR;
 
+  // PTag numbers
+  // ------------
+  double N0HETL[1000];
+  double N1HETL[1000];
+  double N0HETM[1000];
+  double N1HETM[1000];
+  double N0HETT[1000];
+  double N1HETT[1000];
+  double N0HPTL[1000];
+  double N1HPTL[1000];
+  double N0HPTM[1000];
+  double N1HPTM[1000];
+  double N0HPTT[1000];
+  double N1HPTT[1000];
+
+  double PHETL[1000];
+  double PHETM[1000];
+  double PHETT[1000];
+  double PHPTL[1000];
+  double PHPTM[1000];
+  double PHPTT[1000];
+  double PHETLS[1000];
+  double PHETMS[1000];
+  double PHETTS[1000];
+  double PHPTLS[1000];
+  double PHPTMS[1000];
+  double PHPTTS[1000];
+
+  double njsss;
   // ----------member data ---------------------------
 };
