@@ -24,7 +24,7 @@
 //
 // Original Author:  Marco De Mattia
 //         Created:  Tue May  8 13:05:37 CEST 2007
-// $Id: TDAna.h,v 1.3 2007/12/10 12:27:41 tosi Exp $
+// $Id: TDAna.h,v 1.4 2007/12/19 10:24:30 dorigo Exp $
 //
 //
 
@@ -195,6 +195,8 @@ class TDAna : public edm::EDAnalyzer {
 
   TH1D * DPhimin_;
 
+  // My histograms
+  // -------------
   TH1D * NJets_;
   TH1D * UncorrSumEt_;
   TH1D * UncorrHt_;
@@ -320,6 +322,134 @@ class TDAna : public edm::EDAnalyzer {
   TH1D * C8SSS_;
   TH1D * N4NJSSS_;
   TH1D * E4NJSSS_;
+
+  // Error histograms
+  // ----------------
+  TH1D * NJetsW_;
+  TH1D * UncorrSumEtW_;
+  TH1D * UncorrHtW_;
+  TH1D * CorrSumEtW_;
+  TH1D * CorrHtW_;
+  TH1D * GoodSumEtW_;
+  TH1D * GoodHtW_;
+  TH1D * GoodHt2W_;
+  TH1D * MEtW_;
+  TH1D * MEtSigW_;
+  TH1D * MEtSigNewW_;
+  TH1D * MEtDPMW_;
+  TH1D * MEtDP1W_;
+  TH1D * MEtDP2W_;
+  TH1D * MEtDP3W_;
+  TH1D * UncorrMEtSigW_;
+  TH1D * CorrMEtSigW_;
+  TH1D * M3bestW_;
+  TH1D * MwbestW_;
+  TH1D * Chi2massW_;
+  TH1D * M45bestW_;
+  TH1D * Chi2extW_;
+  TH2D * MEx_SumEtW_;
+  TH1D * DP12W_;
+  TH1D * DPbbW_;
+  TH1D * M_othersW_;
+  TH1D * MbbnohW_;
+  TH1D * DPbbnohW_;
+  TH1D * M8W_;
+  TH1D * C8W_;
+
+  TH1D * NJetsSW_;
+  TH1D * UncorrSumEtSW_;
+  TH1D * UncorrHtSW_;
+  TH1D * CorrSumEtSW_;
+  TH1D * CorrHtSW_;
+  TH1D * GoodSumEtSW_;
+  TH1D * GoodHtSW_;
+  TH1D * GoodHt2SW_;
+  TH1D * MEtSW_;
+  TH1D * MEtSigSW_;
+  TH1D * MEtSigNewSW_;
+  TH1D * MEtDPMSW_;
+  TH1D * MEtDP1SW_; 
+  TH1D * MEtDP2SW_;
+  TH1D * MEtDP3SW_;
+  TH1D * UncorrMEtSigSW_;
+  TH1D * CorrMEtSigSW_;
+  TH1D * M3bestSW_;
+  TH1D * MwbestSW_;
+  TH1D * Chi2massSW_;
+  TH1D * M45bestSW_;
+  TH1D * Chi2extSW_;
+  TH2D * MEx_SumEtSW_;
+  TH1D * DP12SW_;
+  TH1D * DPbbSW_;
+  TH1D * M_othersSW_;
+  TH1D * MbbnohSW_;
+  TH1D * DPbbnohSW_;
+  TH1D * M8SW_;
+  TH1D * C8SW_;
+
+  TH1D * NJetsSSW_;
+  TH1D * UncorrSumEtSSW_;
+  TH1D * UncorrHtSSW_;
+  TH1D * CorrSumEtSSW_;
+  TH1D * CorrHtSSW_;
+  TH1D * GoodSumEtSSW_;
+  TH1D * GoodHtSSW_;
+  TH1D * GoodHt2SSW_;
+  TH1D * MEtSSW_;
+  TH1D * MEtSigSSW_;
+  TH1D * MEtSigNewSSW_;
+  TH1D * MEtDPMSSW_;
+  TH1D * MEtDP1SSW_;
+  TH1D * MEtDP2SSW_;
+  TH1D * MEtDP3SSW_;
+  TH1D * UncorrMEtSigSSW_;
+  TH1D * CorrMEtSigSSW_;
+  TH1D * M3bestSSW_;
+  TH1D * MwbestSSW_;
+  TH1D * Chi2massSSW_;
+  TH1D * M45bestSSW_;
+  TH1D * Chi2extSSW_;
+  TH2D * MEx_SumEtSSW_;
+  TH1D * DP12SSW_;
+  TH1D * DPbbSSW_;
+  TH1D * M_othersSSW_;
+  TH1D * MbbnohSSW_;
+  TH1D * DPbbnohSSW_;
+  TH1D * M8SSW_;
+  TH1D * C8SSW_;
+
+  TH1D * NJetsSSSW_;
+  TH1D * UncorrSumEtSSSW_;
+  TH1D * UncorrHtSSSW_;
+  TH1D * CorrSumEtSSSW_;
+  TH1D * CorrHtSSSW_;
+  TH1D * GoodSumEtSSSW_;
+  TH1D * GoodHtSSSW_;
+  TH1D * GoodHt2SSSW_;
+  TH1D * MEtSSSW_;
+  TH1D * MEtSigSSSW_;
+  TH1D * MEtSigNewSSSW_;
+  TH1D * MEtDPMSSSW_;
+  TH1D * MEtDP1SSSW_;
+  TH1D * MEtDP2SSSW_;
+  TH1D * MEtDP3SSSW_;
+  TH1D * UncorrMEtSigSSSW_;
+  TH1D * CorrMEtSigSSSW_;
+  TH1D * M3bestSSSW_;
+  TH1D * MwbestSSSW_;
+  TH1D * Chi2massSSSW_;
+  TH1D * M45bestSSSW_;
+  TH1D * Chi2extSSSW_;
+  TH2D * MEx_SumEtSSSW_;
+  TH1D * DP12SSSW_;
+  TH1D * DPbbSSSW_;
+  TH1D * M_othersSSSW_;
+  TH1D * MbbnohSSSW_;
+  TH1D * DPbbnohSSSW_;
+  TH1D * M8SSSW_;
+  TH1D * C8SSSW_;
+  TH1D * N4NJSSSW_;
+  TH1D * E4NJSSSW_;
 
   TH2D * UncorrMEt_SumEt_;
   TH2D * CorrMEt_SumEt_; 

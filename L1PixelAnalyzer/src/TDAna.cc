@@ -190,6 +190,132 @@ TDAna::TDAna(const edm::ParameterSet& iConfig) :
   N4NJSSS_ = new TH1D ( "N4NJSSS", "N of 4HEL tags vs N jets", 20, 0, 20 );
   E4NJSSS_ = new TH1D ( "E4NJSSS", "Efficiency of 4HEL tags vs N jets", 20, 0, 20 );
 
+  NJetsW_ = new TH1D ( "NJetsW", "Number of selected jets", 20, 0, 20 );
+  UncorrHtW_ = new TH1D ( "UncorrHtW", "Ht with uncorrected jets", 50, 0, 4000 );
+  CorrHtW_ = new TH1D ( "CorrHtW", "Ht with corrected jets", 50, 0, 4000 );
+  GoodHtW_ = new TH1D ( "GoodHtW", "Ht with corrected good jets", 50, 0, 4000 );
+  GoodHt2W_ = new TH1D ( "GoodHt2W", "Ht with corrected good jets and corr MEt", 50, 0, 4000 );
+  UncorrSumEtW_ = new TH1D ( "UncorrSumEtW", "SumEt with uncorrected jets", 50, 0, 4000 );
+  CorrSumEtW_ = new TH1D ( "CorrSumEtW", "SumEt with corrected jets", 50, 0, 4000 );
+  GoodSumEtW_ = new TH1D ( "GoodSumEtW", "SumEt with selected jets", 50, 0, 4000 );
+  MEtW_ = new TH1D ( "MEtW", "MEt", 50, 0, 500 );
+  MEtSigW_ = new TH1D ( "MEtSigW", "MEtSig", 50, 0, 20 );
+  MEtSigNewW_ = new TH1D ( "MEtSigNewW", "MEtSig with tuned resolution", 50, 0., 20. );
+  MEtDPMW_ = new TH1D ( "MEtDPMW", "MEtDPM", 50, 0, 3.2 );
+  MEtDP1W_ = new TH1D ( "MEtDP1W", "MEtDP1", 50, 0, 3.2 );
+  MEtDP2W_ = new TH1D ( "MEtDP2W", "MEtDP2", 50, 0, 3.2 );
+  MEtDP3W_ = new TH1D ( "MEtDP3W", "MEtDP3", 50, 0, 3.2 );
+  UncorrMEtSigW_ = new TH1D ( "UncorrMEtSigW", "MEtSig", 50, 0, 20 );
+  CorrMEtSigW_ = new TH1D ( "CorrMEtSigW", "MEtSig", 50, 0, 20 );
+  M3bestW_ = new TH1D ( "M3bestW", "M3best", 50, 0, 300 );
+  MwbestW_ = new TH1D ( "MwbestW", "Mwbest", 50, 0, 200 );
+  Chi2massW_ = new TH1D ( "Chi2massW", "Chi2mass", 50, 0, 50 );
+  M45bestW_ = new TH1D ( "M45bestW", "M45best", 50, 0, 300 );
+  Chi2extW_ = new TH1D ( "Chi2extW", "Chi2ext", 50, 0, 50 );
+  MEx_SumEtW_ = new TH2D ( "MEx_SumEtW", "MEx vs SumEt", 50, 0., 2000., 50, -200., 200. );
+  DP12W_ = new TH1D ( "DP12W", "Delta phi jet 1 jet 2", 50, 0., 3.2 );
+  DPbbW_ = new TH1D ( "DPbbW", "Delta phi bb", 50, 0., 3.2 );
+  M_othersW_ = new TH1D ( "M_othersW", "Mass of other jets", 50, 0., 1500. );
+  MbbnohW_ = new TH1D ( "MbbnohW", "Mass of b pair not from h", 50, 0., 800 );
+  DPbbnohW_ = new TH1D ( "DPbbnohW", "Delta phi of b pair not from h", 50, 0., 3.2 );
+  M8W_ = new TH1D ( "M8W", "Mass 8 jets", 50, 0., 2000.) ;
+  C8W_ = new TH1D ( "C8W", "Centrality 8 jets", 50, 0., 1.2 );
+
+  NJetsSW_ = new TH1D ( "NJetsSW", "Number of selected jets", 20, 0, 20 );
+  UncorrHtSW_ = new TH1D ( "UncorrHtSW", "Ht with uncorrected jets", 50, 0, 4000 );
+  CorrHtSW_ = new TH1D ( "CorrHtSW", "Ht with corrected jets", 50, 0, 4000 );
+  GoodHtSW_ = new TH1D ( "GoodHtSW", "Ht with corrected good jets", 50, 0, 4000 );
+  GoodHt2SW_ = new TH1D ( "GoodHt2SW", "Ht with corrected good jets and corr MEt", 50, 0, 4000 );
+  UncorrSumEtSW_ = new TH1D ( "UncorrSumEtSW", "SumEt with uncorrected jets", 50, 0, 4000 );
+  CorrSumEtSW_ = new TH1D ( "CorrSumEtSW", "SumEt with corrected jets", 50, 0, 4000 );
+  GoodSumEtSW_ = new TH1D ( "GoodSumEtSW", "SumEt with selected jets", 50, 0, 4000 );
+  MEtSW_ = new TH1D ( "MEtSW", "MEt", 50, 0, 500 );
+  MEtSigSW_ = new TH1D ( "MEtSigSW", "MEtSig", 50, 0, 20 );
+  MEtSigNewSW_ = new TH1D ( "MEtSigNewSW", "MEtSig with tuned resolution", 50, 0., 20. );
+  MEtDPMSW_ = new TH1D ( "MEtDPMSW", "MEtDPM", 50, 0, 3.2 );
+  MEtDP1SW_ = new TH1D ( "MEtDP1SW", "MEtDP1S", 50, 0, 3.2 );
+  MEtDP2SW_ = new TH1D ( "MEtDP2SW", "MEtDP2S", 50, 0, 3.2 );
+  MEtDP3SW_ = new TH1D ( "MEtDP3SW", "MEtDP3S", 50, 0, 3.2 );
+  UncorrMEtSigSW_ = new TH1D ( "UncorrMEtSigSW", "MEtSig", 50, 0, 20 );
+  CorrMEtSigSW_ = new TH1D ( "CorrMEtSigSW", "MEtSig", 50, 0, 20 );
+  M3bestSW_ = new TH1D ( "M3bestSW", "M3bestS", 50, 0, 300 );
+  MwbestSW_ = new TH1D ( "MwbestSW", "MwbestS", 50, 0, 200 );
+  Chi2massSW_ = new TH1D ( "Chi2massSW", "Chi2massS", 50, 0, 50 );
+  M45bestSW_ = new TH1D ( "M45bestSW", "M45best", 50, 0, 300 );
+  Chi2extSW_ = new TH1D ( "Chi2extSW", "Chi2ext", 50, 0, 50 );
+  MEx_SumEtSW_ = new TH2D ( "MEx_SumEtSW", "MEx vs SumEt", 50, 0., 2000., 50, -200., 200. );
+  DP12SW_ = new TH1D ( "DP12SW", "Delta phi jet 1 jet 2", 50, 0., 3.2 );
+  DPbbSW_ = new TH1D ( "DPbbSW", "Delta phi bb", 50, 0., 3.2 );
+  M_othersSW_ = new TH1D ( "M_othersSW", "Mass of other jets", 50, 0., 1500. );
+  MbbnohSW_ = new TH1D ( "MbbnohSW", "Mass of b pair not from h", 50, 0., 800 );
+  DPbbnohSW_ = new TH1D ( "DPbbnohSW", "Delta phi of b pair not from h", 50, 0., 3.2 );
+  M8SW_ = new TH1D ( "M8SW", "Mass 8 jets", 50, 0., 2000.) ;
+  C8SW_ = new TH1D ( "C8SW", "Centrality 8 jets", 50, 0., 1.2 );
+
+  NJetsSSW_ = new TH1D ( "NJetsSSW", "Number of selected jets", 20, 0, 20 );
+  UncorrHtSSW_ = new TH1D ( "UncorrHtSSW", "Ht with uncorrected jets", 50, 0, 4000 );
+  CorrHtSSW_ = new TH1D ( "CorrHtSSW", "Ht with corrected jets", 50, 0, 4000 );
+  GoodHtSSW_ = new TH1D ( "GoodHtSSW", "Ht with corrected good jets", 50, 0, 4000 );
+  GoodHt2SSW_ = new TH1D ( "GoodHt2SSW", "Ht with corrected good jets and corr MEt", 50, 0, 4000 );
+  UncorrSumEtSSW_ = new TH1D ( "UncorrSumEtSSW", "SumEt with uncorrected jets", 50, 0, 4000 );
+  CorrSumEtSSW_ = new TH1D ( "CorrSumEtSSW", "SumEt with corrected jets", 50, 0, 4000 );
+  GoodSumEtSSW_ = new TH1D ( "GoodSumEtSSW", "SumEt with selected jets", 50, 0, 4000 );
+  MEtSSW_ = new TH1D ( "MEtSSW", "MEt", 50, 0, 500 );
+  MEtSigSSW_ = new TH1D ( "MEtSigSSW", "MEtSig", 50, 0, 20 );
+  MEtSigNewSSW_ = new TH1D ( "MEtSigNewSSW", "MEtSig with tuned resolution", 50, 0., 20. );
+  MEtDPMSSW_ = new TH1D ( "MEtDPMSSW", "MEtDPMSS", 50, 0, 3.2 );
+  MEtDP1SSW_ = new TH1D ( "MEtDP1SSW", "MEtDP1SS", 50, 0, 3.2 );
+  MEtDP2SSW_ = new TH1D ( "MEtDP2SSW", "MEtDP2SS", 50, 0, 3.2 );
+  MEtDP3SSW_ = new TH1D ( "MEtDP3SSW", "MEtDP3SS", 50, 0, 3.2 );
+  UncorrMEtSigSSW_ = new TH1D ( "UncorrMEtSigSSW", "UncorrMEtSigSS", 50, 0, 20 );
+  CorrMEtSigSSW_ = new TH1D ( "CorrMEtSigSSW", "CorrMEtSigSS", 50, 0, 20 );
+  M3bestSSW_ = new TH1D ( "M3bestSSW", "M3bestSS", 50, 0, 300 );
+  MwbestSSW_ = new TH1D ( "MwbestSSW", "MwbestSS", 50, 0, 200 );
+  Chi2massSSW_ = new TH1D ( "Chi2massSSW", "Chi2massSS", 50, 0, 50 );
+  M45bestSSW_ = new TH1D ( "M45bestSSW", "M45best", 50, 0, 300 );
+  Chi2extSSW_ = new TH1D ( "Chi2extSSW", "Chi2ext", 50, 0, 50 );
+  MEx_SumEtSSW_ = new TH2D ( "MEx_SumEtSSW", "MEx vs SumEt", 50, 0., 2000., 50, -200., 200. );
+  DP12SSW_ = new TH1D ( "DP12SSW", "Delta phi jet 1 jet 2", 50, 0., 3.2 );
+  DPbbSSW_ = new TH1D ( "DPbbSSW", "Delta phi bb", 50, 0., 3.2 );
+  M_othersSSW_ = new TH1D ( "M_othersSSW", "Mass of other jets", 50, 0., 1500. );
+  MbbnohSSW_ = new TH1D ( "MbbnohSSW", "Mass of b pair not from h", 50, 0., 800 );
+  DPbbnohSSW_ = new TH1D ( "DPbbnohSSW", "Delta phi of b pair not from h", 50, 0., 3.2 );
+  M8SSW_ = new TH1D ( "M8SSW", "Mass 8 jets", 50, 0., 2000.) ;
+  C8SSW_ = new TH1D ( "C8SSW", "Centrality 8 jets", 50, 0., 1.2 );
+
+  NJetsSSSW_ = new TH1D ( "NJetsSSSW", "Number of selected jets", 20, 0, 20 );
+  UncorrHtSSSW_ = new TH1D ( "UncorrHtSSSW", "Ht with uncorrected jets", 50, 0, 4000 );
+  CorrHtSSSW_ = new TH1D ( "CorrHtSSSW", "Ht with corrected jets", 50, 0, 4000 );
+  GoodHtSSSW_ = new TH1D ( "GoodHtSSSW", "Ht with corrected good jets", 50, 0, 4000 );
+  GoodHt2SSSW_ = new TH1D ( "GoodHt2SSSW", "Ht with corrected good jets and corr MEt", 50, 0, 4000 );
+  UncorrSumEtSSSW_ = new TH1D ( "UncorrSumEtSSSW", "SumEt with uncorrected jets", 50, 0, 4000 );
+  CorrSumEtSSSW_ = new TH1D ( "CorrSumEtSSSW", "SumEt with corrected jets", 50, 0, 4000 );
+  GoodSumEtSSSW_ = new TH1D ( "GoodSumEtSSSW", "SumEt with selected jets", 50, 0, 4000 );
+  MEtSSSW_ = new TH1D ( "MEtSSSW", "MEt", 50, 0, 500 );
+  MEtSigSSSW_ = new TH1D ( "MEtSigSSSW", "MEtSig", 50, 0, 20 );
+  MEtSigNewSSSW_ = new TH1D ( "MEtSigNewSSSW", "MEtSig with tuned resolution", 50, 0., 20. );
+  MEtDPMSSSW_ = new TH1D ( "MEtDPMSSSW", "MEtDPMSSS", 50, 0, 3.2 );
+  MEtDP1SSSW_ = new TH1D ( "MEtDP1SSSW", "MEtDP1SSS", 50, 0, 3.2 );
+  MEtDP2SSSW_ = new TH1D ( "MEtDP2SSSW", "MEtDP2SSS", 50, 0, 3.2 );
+  MEtDP3SSSW_ = new TH1D ( "MEtDP3SSSW", "MEtDP3SSS", 50, 0, 3.2 );
+  UncorrMEtSigSSSW_ = new TH1D ( "UncorrMEtSigSSSW", "UncorrMEtSigSSS", 50, 0, 20 );
+  CorrMEtSigSSSW_ = new TH1D ( "CorrMEtSigSSSW", "CorrMEtSigSSS", 50, 0, 20 );
+  M3bestSSSW_ = new TH1D ( "M3bestSSSW", "M3bestSSS", 50, 0, 300 );
+  MwbestSSSW_ = new TH1D ( "MwbestSSSW", "MwbestSSS", 50, 0, 200 );
+  Chi2massSSSW_ = new TH1D ( "Chi2massSSSW", "Chi2massSSS", 50, 0, 50 );
+  M45bestSSSW_ = new TH1D ( "M45bestSSSW", "M45best", 50, 0, 300 );
+  Chi2extSSSW_ = new TH1D ( "Chi2extSSSW", "Chi2ext", 50, 0, 50 );
+  MEx_SumEtSSSW_ = new TH2D ( "MEx_SumEtSSSW", "MEx vs SumEt", 50, 0., 2000., 50, -200., 200. );
+  DP12SSSW_ = new TH1D ( "DP12SSSW", "Delta phi jet 1 jet 2", 50, 0., 3.2 );
+  DPbbSSSW_ = new TH1D ( "DPbbSSSW", "Delta phi bb", 50, 0., 3.2 );
+  M_othersSSSW_ = new TH1D ( "M_othersSSSW", "Mass of other jets", 50, 0., 1500. );
+  MbbnohSSSW_ = new TH1D ( "MbbnohSSSW", "Mass of b pair not from h", 50, 0., 800 );
+  DPbbnohSSSW_ = new TH1D ( "DPbbnohSSSW", "Delta phi of b pair not from h", 50, 0., 3.2 );
+  M8SSSW_ = new TH1D ( "M8SSSW", "Mass 8 jets", 50, 0., 2000.) ;
+  C8SSSW_ = new TH1D ( "C8SSSW", "Centrality 8 jets", 50, 0., 1.2 );
+  N4NJSSSW_ = new TH1D ( "N4NJSSSW", "N of 4HEL tags vs N jets", 20, 0, 20 );
+  E4NJSSSW_ = new TH1D ( "E4NJSSSW", "Efficiency of 4HEL tags vs N jets", 20, 0, 20 );
+
   UncorrMEt_SumEt_ = new TH2D ( "UncorrMEt_SumEt", "MEt vs SumEt", 100, 0, 4000, 100, 0, 1000 );
   CorrMEt_SumEt_ = new TH2D ( "CorrMEt_SumEt", "MEt vs SumEt", 100, 0, 4000, 100, 0, 1000 );
   MEt_SumEt_ = new TH2D ( "MEt_SumEt", "MEt vs SumEt", 100, 0, 4000, 100, 0, 1000 );
@@ -856,6 +982,7 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	// -----------------------------------------------
 	double n=(double)icomb;
 	double PTOT=1.;
+	double PTOTE2=0.;
 	NHEM=0;
 
 	for ( int j=iJmax-1; j>=0; j-- ) {
@@ -863,12 +990,15 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	    JHEM[j]=true;
 	    n-=pow(2.,j);
 	    PTOT=PTOT*PHETM[JBin[j]];
+	    PTOTE2+=pow(PHETMS[JBin[j]]/PHETM[JBin[j]],2);
 	    NHEM++;
 	  } else {
 	    JHEM[j]=false;
 	    PTOT=PTOT*(1.-PHETM[JBin[j]]);
+	    PTOTE2+=pow(PHETMS[JBin[j]]/(1.-PHETM[JBin[j]]),2);
 	  }
 	}
+	PTOTE2=PTOTE2*pow(PTOT,2);
 
 	if ( NHEM>=2 ) {
 
@@ -1096,6 +1226,10 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	  if ( caloMET->sumEt()>0 ) metsignew = caloMET->et()/(sqrt(2)*0.8033*pow(caloMET->sumEt(),0.5004));
 	  
 	  if ( PTOT>0 ) {
+
+	    // Fill regular histograms
+	    // -----------------------
+
 	    UncorrMEt_SumEt_->Fill(caloMET->sumEt(),UncorrMEt,PTOT);
 	    CorrMEt_SumEt_->Fill(caloMET->sumEt(),CorrMEt,PTOT);
 	    MEt_SumEt_->Fill(caloMET->sumEt(),caloMET->et(),PTOT);
@@ -1243,8 +1377,160 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 		}
 
 	      }
+	    } 
+
+	    // Fill error histograms now
+	    // -------------------------
+
+	    UncorrMEt_SumEt_->Fill(caloMET->sumEt(),UncorrMEt,PTOTE2);
+	    CorrMEt_SumEt_->Fill(caloMET->sumEt(),CorrMEt,PTOTE2);
+	    MEt_SumEt_->Fill(caloMET->sumEt(),caloMET->et(),PTOTE2);
+	    UncorrMEt_SumEtC_->Fill(CorrSumEt,UncorrMEt,PTOTE2);
+	    CorrMEt_SumEtC_->Fill(CorrSumEt,CorrMEt,PTOTE2);
+	    MEt_SumEtC_->Fill(CorrSumEt,caloMET->et(),PTOTE2);
+	    UncorrMEt_SumEtJ_->Fill(GoodSumEt,UncorrMEt,PTOTE2);
+	    CorrMEt_SumEtJ_->Fill(GoodSumEt,CorrMEt,PTOTE2);
+	    MEt_SumEtJ_->Fill(GoodSumEt,caloMET->et(),PTOTE2);
+	    
+	    // Apply trigger requirement
+	    // -------------------------
+	    if ( response && NJetsCut && NHEM>=2 ) {
+	      NJetsW_->Fill(goodIc5Jets,PTOTE2);
+	      UncorrHtW_->Fill(UncorrHt,PTOTE2);
+	      CorrHtW_->Fill(CorrHt,PTOTE2);
+	      GoodHtW_->Fill(GoodHt,PTOTE2);
+	      GoodHt2W_->Fill(GoodHt2,PTOTE2);
+	      UncorrSumEtW_->Fill(UncorrSumEt,PTOTE2);
+	      CorrSumEtW_->Fill(CorrSumEt,PTOTE2);
+	      GoodSumEtW_->Fill(GoodSumEt,PTOTE2);
+	      MEtW_->Fill(caloMET->et(),PTOTE2);
+	      MEtSigW_->Fill(caloMET->mEtSig(),PTOTE2);
+	      MEtSigNewW_->Fill(metsignew,PTOTE2);
+	      MEtDPMW_->Fill(dpmin,PTOTE2);
+	      MEtDP1W_->Fill(dp1st,PTOTE2);
+	      MEtDP2W_->Fill(dp2nd,PTOTE2);
+	      MEtDP3W_->Fill(dp3rd,PTOTE2);
+	      UncorrMEtSigW_->Fill(UncorrMEtSig,PTOTE2);
+	      CorrMEtSigW_->Fill(CorrMEtSig,PTOTE2);
+	      M3bestW_->Fill(m3best,PTOTE2);
+	      MwbestW_->Fill(mwbest,PTOTE2);
+	      Chi2massW_->Fill(chi2,PTOTE2);
+	      M45bestW_->Fill(m45best,PTOTE2);
+	      Chi2extW_->Fill(chi2ext,PTOTE2);
+	      MEx_SumEtW_->Fill(caloMET->sumEt(),caloMET->et()*cos(caloMET->phi()),PTOTE2);
+	      MEx_SumEtW_->Fill(caloMET->sumEt(),caloMET->et()*sin(caloMET->phi()),PTOTE2);
+	      DP12W_->Fill(dp12,PTOTE2);
+	      DPbbW_->Fill(dpbb,PTOTE2);
+	      M_othersW_->Fill(m_others,PTOTE2);
+	      MbbnohW_->Fill(mbbnohmax,PTOTE2);
+	      DPbbnohW_->Fill(dpbbnohmax,PTOTE2);
+	      M8W_->Fill(m8,PTOTE2);
+	      C8W_->Fill(c8,PTOTE2);
+	      
+	      if ( MEtSigCut ) {
+		NJetsSW_->Fill(goodIc5Jets,PTOTE2);
+		UncorrHtSW_->Fill(UncorrHt,PTOTE2);
+		CorrHtSW_->Fill(CorrHt,PTOTE2);
+		GoodHtSW_->Fill(GoodHt,PTOTE2);
+		GoodHt2SW_->Fill(GoodHt2,PTOTE2);
+		UncorrSumEtSW_->Fill(UncorrSumEt,PTOTE2);
+		CorrSumEtSW_->Fill(CorrSumEt,PTOTE2);
+		GoodSumEtSW_->Fill(GoodSumEt,PTOTE2);
+		MEtSW_->Fill(caloMET->et(),PTOTE2);
+		MEtSigSW_->Fill(caloMET->mEtSig(),PTOTE2);
+		MEtSigNewSW_->Fill(metsignew,PTOTE2);
+		MEtDPMSW_->Fill(dpmin,PTOTE2);
+		MEtDP1SW_->Fill(dp1st,PTOTE2);
+		MEtDP2SW_->Fill(dp2nd,PTOTE2);
+		MEtDP3SW_->Fill(dp3rd,PTOTE2);
+		UncorrMEtSigSW_->Fill(UncorrMEtSig,PTOTE2);
+		CorrMEtSigSW_->Fill(CorrMEtSig,PTOTE2);
+		M3bestSW_->Fill(m3best,PTOTE2);
+		MwbestSW_->Fill(mwbest,PTOTE2);
+		Chi2massSW_->Fill(chi2,PTOTE2);
+		M45bestSW_->Fill(m45best,PTOTE2);
+		Chi2extSW_->Fill(chi2ext,PTOTE2);
+		MEx_SumEtSW_->Fill(caloMET->sumEt(),caloMET->et()*cos(caloMET->phi()),PTOTE2);
+		MEx_SumEtSW_->Fill(caloMET->sumEt(),caloMET->et()*sin(caloMET->phi()),PTOTE2);
+		DP12SW_->Fill(dp12,PTOTE2);
+		DPbbSW_->Fill(dpbb,PTOTE2);
+		M_othersSW_->Fill(m_others,PTOTE2);
+		MbbnohSW_->Fill(mbbnohmax,PTOTE2);
+		DPbbnohSW_->Fill(dpbbnohmax,PTOTE2);
+		M8SW_->Fill(m8,PTOTE2);
+		C8SW_->Fill(c8,PTOTE2);
+	      
+		if ( NHEM>=3 ) {
+		  NJetsSSW_->Fill(goodIc5Jets,PTOTE2);
+		  UncorrHtSSW_->Fill(UncorrHt,PTOTE2);
+		  CorrHtSSW_->Fill(CorrHt,PTOTE2);
+		  GoodHtSSW_->Fill(GoodHt,PTOTE2);
+		  GoodHt2SSW_->Fill(GoodHt2,PTOTE2);
+		  UncorrSumEtSSW_->Fill(UncorrSumEt,PTOTE2);
+		  CorrSumEtSSW_->Fill(CorrSumEt,PTOTE2);
+		  GoodSumEtSSW_->Fill(GoodSumEt,PTOTE2);
+		  MEtSSW_->Fill(caloMET->et(),PTOTE2);
+		  MEtSigSSW_->Fill(caloMET->mEtSig(),PTOTE2);
+		  MEtSigNewSSW_->Fill(metsignew,PTOTE2);
+		  MEtDPMSSW_->Fill(dpmin,PTOTE2);
+		  MEtDP1SSW_->Fill(dp1st,PTOTE2);
+		  MEtDP2SSW_->Fill(dp2nd,PTOTE2);
+		  MEtDP3SSW_->Fill(dp3rd,PTOTE2);
+		  UncorrMEtSigSSW_->Fill(UncorrMEtSig,PTOTE2);
+		  CorrMEtSigSSW_->Fill(CorrMEtSig,PTOTE2);
+		  M3bestSSW_->Fill(m3best,PTOTE2);
+		  MwbestSSW_->Fill(mwbest,PTOTE2);
+		  Chi2massSSW_->Fill(chi2,PTOTE2);
+		  M45bestSSW_->Fill(m45best,PTOTE2);
+		  Chi2extSSW_->Fill(chi2ext,PTOTE2);
+		  MEx_SumEtSSW_->Fill(caloMET->sumEt(),caloMET->et()*cos(caloMET->phi()),PTOTE2);
+		  MEx_SumEtSSW_->Fill(caloMET->sumEt(),caloMET->et()*sin(caloMET->phi()),PTOTE2);
+		  DP12SSW_->Fill(dp12,PTOTE2);
+		  DPbbSSW_->Fill(dpbb,PTOTE2);
+		  M_othersSSW_->Fill(m_others,PTOTE2);      
+		  MbbnohSSW_->Fill(mbbnohmax,PTOTE2);
+		  DPbbnohSSW_->Fill(dpbbnohmax,PTOTE2);
+		  M8SSW_->Fill(m8,PTOTE2);
+		  C8SSW_->Fill(c8,PTOTE2);
+		}
+		
+		if ( NHEM>=4 ) {
+		  NJetsSSSW_->Fill(goodIc5Jets,PTOTE2);
+		  UncorrHtSSSW_->Fill(UncorrHt,PTOTE2);
+		  CorrHtSSSW_->Fill(CorrHt,PTOTE2);
+		  GoodHtSSSW_->Fill(GoodHt,PTOTE2);
+		  GoodHt2SSSW_->Fill(GoodHt2,PTOTE2);
+		  UncorrSumEtSSSW_->Fill(UncorrSumEt,PTOTE2);
+		  CorrSumEtSSSW_->Fill(CorrSumEt,PTOTE2);
+		  GoodSumEtSSSW_->Fill(GoodSumEt,PTOTE2);
+		  MEtSSSW_->Fill(caloMET->et(),PTOTE2);
+		  MEtSigSSSW_->Fill(caloMET->mEtSig(),PTOTE2);
+		  MEtSigNewSSSW_->Fill(metsignew,PTOTE2);
+		  MEtDPMSSSW_->Fill(dpmin,PTOTE2);
+		  MEtDP1SSSW_->Fill(dp1st,PTOTE2);
+		  MEtDP2SSSW_->Fill(dp2nd,PTOTE2);
+		  MEtDP3SSSW_->Fill(dp3rd,PTOTE2);
+		  UncorrMEtSigSSSW_->Fill(UncorrMEtSig,PTOTE2);
+		  CorrMEtSigSSSW_->Fill(CorrMEtSig,PTOTE2);
+		  M3bestSSSW_->Fill(m3best,PTOTE2);
+		  MwbestSSSW_->Fill(mwbest,PTOTE2);
+		  Chi2massSSSW_->Fill(chi2,PTOTE2);
+		  M45bestSSSW_->Fill(m45best,PTOTE2);
+		  Chi2extSSSW_->Fill(chi2ext,PTOTE2);
+		  MEx_SumEtSSSW_->Fill(caloMET->sumEt(),caloMET->et()*cos(caloMET->phi()),PTOTE2);
+		  MEx_SumEtSSSW_->Fill(caloMET->sumEt(),caloMET->et()*sin(caloMET->phi()),PTOTE2);
+		  DP12SSSW_->Fill(dp12,PTOTE2);
+		  DPbbSSSW_->Fill(dpbb,PTOTE2);
+		  M_othersSSSW_->Fill(m_others,PTOTE2);      
+		  MbbnohSSSW_->Fill(mbbnohmax,PTOTE2);
+		  DPbbnohSSSW_->Fill(dpbbnohmax,PTOTE2);
+		  M8SSSW_->Fill(m8,PTOTE2);
+		  C8SSSW_->Fill(c8,PTOTE2);
+		}
+	      }
 	    }
-	  }
+
+	  } // end if PTOT>0
 	}  // end if ntags>=2
 
       } // end for tag combinatorial
@@ -1782,6 +2068,140 @@ void TDAna::endJob() {
   C8SSS_->Write();
   N4NJSSS_->Write();
   E4NJSSS_->Write();
+
+  // Histograms with errors squared
+  // ------------------------------
+  NJetsW_->Write();
+  UncorrHtW_->Write();
+  CorrHtW_->Write();
+  GoodHtW_->Write();
+  GoodHt2W_->Write();
+  UncorrSumEtW_->Write();
+  CorrSumEtW_->Write();
+  GoodSumEtW_->Write();
+  MEtW_->Write();
+  MEtSigW_->Write();
+  MEtSigNewW_->Write();
+  MEtDPMW_->Write();
+  MEtDP1W_->Write();
+  MEtDP2W_->Write();
+  MEtDP3W_->Write();
+  UncorrMEtSigW_->Write();
+  CorrMEtSigW_->Write();
+  M3bestW_->Write();
+  MwbestW_->Write();
+  Chi2massW_->Write();
+  M45bestW_->Write();
+  Chi2extW_->Write();
+  MEx_SumEtW_->Write();
+  DP12W_->Write();
+  DPbbW_->Write();
+  M_othersW_->Write();
+  MbbnohW_->Write();
+  DPbbnohW_->Write();
+  M8W_->Write();
+  C8W_->Write();
+  
+  // Histograms for events passing trigger and NJet cut
+  // --------------------------------------------------
+  NJetsSW_->Write();
+  UncorrHtSW_->Write();
+  CorrHtSW_->Write();
+  GoodHtSW_->Write();
+  GoodHt2SW_->Write();
+  UncorrSumEtSW_->Write();
+  CorrSumEtSW_->Write();
+  GoodSumEtSW_->Write();
+  MEtSW_->Write();
+  MEtSigSW_->Write();
+  MEtSigNewSW_->Write();
+  MEtDPMSW_->Write();
+  MEtDP1SW_->Write();
+  MEtDP2SW_->Write();
+  MEtDP3SW_->Write();
+  UncorrMEtSigSW_->Write();
+  CorrMEtSigSW_->Write();
+  M3bestSW_->Write();
+  MwbestSW_->Write();
+  Chi2massSW_->Write();
+  M45bestSW_->Write();
+  Chi2extSW_->Write();
+  MEx_SumEtSW_->Write();
+  DP12SW_->Write();
+  DPbbSW_->Write();
+  M_othersSW_->Write();
+  MbbnohSW_->Write();
+  DPbbnohSW_->Write();
+  M8SW_->Write();
+  C8SW_->Write();
+
+  // Histograms for events passing trigger, NJet, and METS cut
+  // ---------------------------------------------------------
+  NJetsSSW_->Write();
+  UncorrHtSSW_->Write();
+  CorrHtSSW_->Write();
+  GoodHtSSW_->Write();
+  GoodHt2SSW_->Write();
+  UncorrSumEtSSW_->Write();
+  CorrSumEtSSW_->Write();
+  GoodSumEtSSW_->Write();
+  MEtSSW_->Write();
+  MEtSigSSW_->Write();
+  MEtSigNewSSW_->Write();
+  MEtDPMSSW_->Write();
+  MEtDP1SSW_->Write();
+  MEtDP2SSW_->Write();
+  MEtDP3SSW_->Write();
+  UncorrMEtSigSSW_->Write();
+  CorrMEtSigSSW_->Write();
+  M3bestSSW_->Write();
+  MwbestSSW_->Write();
+  Chi2massSSW_->Write();
+  M45bestSSW_->Write();
+  Chi2extSSW_->Write();
+  MEx_SumEtSSW_->Write();
+  DP12SSW_->Write();
+  DPbbSSW_->Write();
+  M_othersSSW_->Write();
+  MbbnohSSW_->Write();
+  DPbbnohSSW_->Write();
+  M8SSW_->Write();
+  C8SSW_->Write();
+
+  // Histograms for events passing trigger, NJet, and METS cut
+  // ---------------------------------------------------------
+  NJetsSSSW_->Write();
+  UncorrHtSSSW_->Write();
+  CorrHtSSSW_->Write();
+  GoodHtSSSW_->Write();
+  GoodHt2SSSW_->Write();
+  UncorrSumEtSSSW_->Write();
+  CorrSumEtSSSW_->Write();
+  GoodSumEtSSSW_->Write();
+  MEtSSSW_->Write();
+  MEtSigSSSW_->Write();
+  MEtSigNewSSSW_->Write();
+  MEtDPMSSSW_->Write();
+  MEtDP1SSSW_->Write();
+  MEtDP2SSSW_->Write();
+  MEtDP3SSSW_->Write();
+  UncorrMEtSigSSSW_->Write();
+  CorrMEtSigSSSW_->Write();
+  M3bestSSSW_->Write();
+  MwbestSSSW_->Write();
+  Chi2massSSSW_->Write();
+  M45bestSSSW_->Write();
+  Chi2extSSSW_->Write();
+  MEx_SumEtSSSW_->Write();
+  DP12SSSW_->Write();
+  DPbbSSSW_->Write();
+  M_othersSSSW_->Write();
+  MbbnohSSSW_->Write();
+  DPbbnohSSSW_->Write();
+  M8SSSW_->Write();
+  C8SSSW_->Write();
+  N4NJSSSW_->Write();
+  E4NJSSSW_->Write();
   
   // Profile plots of MET vs SumEt
   // -----------------------------
