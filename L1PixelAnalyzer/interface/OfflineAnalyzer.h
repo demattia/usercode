@@ -24,7 +24,7 @@
 //
 // Original Author:  Marco De Mattia
 //         Created:  Tue May  8 13:05:37 CEST 2007
-// $Id: OfflineAnalyzer.h,v 1.2 2007/11/22 16:42:56 demattia Exp $
+// $Id: OfflineAnalyzer.h,v 1.3 2007/12/04 11:15:09 demattia Exp $
 //
 //
 
@@ -176,6 +176,8 @@ class OfflineAnalyzer : public edm::EDAnalyzer {
   unsigned int numTkCut_;
   double minDz_;
   double maxDz_;
+  bool doTrigger_;
+  bool extendedInfo_;
   std::string OutputEffFileName;
 
   TH1F * uncorr_JetPt_IC5_;

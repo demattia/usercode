@@ -53,6 +53,7 @@ OfflineAssocUniqueAnalyzer::OfflineAssocUniqueAnalyzer(const edm::ParameterSet& 
   minDz_( iConfig.getUntrackedParameter<double>( "MinDz" ) ),
   maxDz_( iConfig.getUntrackedParameter<double>( "MaxDz" ) ),
   noPixel_( iConfig.getUntrackedParameter<bool>( "noPixel" ) ),
+  extendedInfo_( iConfig.getUntrackedParameter<bool>( "extendedInfo" ) ),
   singleColl_( iConfig.getUntrackedParameter<bool>( "singleColl" ) ),
   OutputEffFileName( iConfig.getUntrackedParameter<string>( "OutputEffFileName" ) )
 {
@@ -81,7 +82,7 @@ OfflineAssocUniqueAnalyzer::OfflineAssocUniqueAnalyzer(const edm::ParameterSet& 
   PixelJet_Track_Num_ = new TH1F( "PixelJet_Track_Num", "Number of pixeltracks in pixeljets", 15, 0, 15 );
 
   // Pixel trigger efficiency
-  int dzIndexSize = 10;
+  int dzIndexSize = 30;
   //  int dzIndexSize = int((maxDz_ - minDz_)*10);
   cout << "int((maxDz_ - minDz_)*10) = " << int((maxDz_ - minDz_)*10) << endl;
   int dRindexSize = 10;
@@ -1137,24 +1138,32 @@ void OfflineAssocUniqueAnalyzer::endJob() {
   Multi_Assoc_DR_->Write();
 
   // Pixel trigger efficiency
-  ofstream multijetPixelEffFile( "multijetPixelEff.txt" );
-  ofstream mEtJetPixelEffFile( "mEtJetPixelEff.txt" );
-  ofstream offlineMultijetPixelEffFile( "offlineMultijetPixelEff.txt" );
-  ofstream offlineMEtJetPixelEffFile( "offlineMEtJetPixelEff.txt" );
+  auto_ptr<ofstream> multijetPixelEffFile;
+  auto_ptr<ofstream> mEtJetPixelEffFile;
+  auto_ptr<ofstream> offlineMultijetPixelEffFile;
+  auto_ptr<ofstream> offlineMEtJetPixelEffFile;
+  if ( extendedInfo_ ) {
+    multijetPixelEffFile.reset( new ofstream( "multijetPixelEff.txt" ) );
+    mEtJetPixelEffFile.reset( new ofstream( "mEtJetPixelEff.txt" ) );
+    offlineMultijetPixelEffFile.reset( new ofstream( "offlineMultijetPixelEff.txt" ) );
+    offlineMEtJetPixelEffFile.reset( new ofstream( "offlineMEtJetPixelEff.txt" ) );
+  }
   for ( int PVnum=0; PVnum<4; ++PVnum ) {
     for ( int multijetCount=0; multijetCount<EffMultijetPixelSize_; ++multijetCount ) {
       float multijetPixelEff = float((EffMultijetPixelArray_[PVnum])[multijetCount])/float(eventcounter_);
       float multijetPixelEffErr = sqrt(float((EffMultijetPixelArray_[PVnum])[multijetCount]))/float(eventcounter_);
       EffMultijetPixel_[PVnum]->SetBinContent( multijetCount+1, multijetPixelEff );
       EffMultijetPixel_[PVnum]->SetBinError( multijetCount+1, multijetPixelEffErr );
-      multijetPixelEffFile << "For PVnum ="<<PVnum<<" and i = "<< multijetCount <<" Eff = " << multijetPixelEff << " +- " << multijetPixelEffErr << endl;
 
       float offlineMultijetPixelEff = float((offlineEffMultijetPixelArray_[PVnum])[multijetCount])/float(eventcounter_);
       float offlineMultijetPixelEffErr = sqrt(float((offlineEffMultijetPixelArray_[PVnum])[multijetCount]))/float(eventcounter_);
       offlineEffMultijetPixel_[PVnum]->SetBinContent( multijetCount+1, offlineMultijetPixelEff );
       offlineEffMultijetPixel_[PVnum]->SetBinError( multijetCount+1, offlineMultijetPixelEffErr );
-      offlineMultijetPixelEffFile << "For PVnum ="<<PVnum<<" and i = "<< multijetCount <<" offline eff = " << offlineMultijetPixelEff << " +- " << offlineMultijetPixelEffErr << endl;
 
+      if ( extendedInfo_ ) {
+        *multijetPixelEffFile << "For PVnum ="<<PVnum<<" and i = "<< multijetCount <<" Eff = " << multijetPixelEff << " +- " << multijetPixelEffErr << endl;
+        *offlineMultijetPixelEffFile << "For PVnum ="<<PVnum<<" and i = "<< multijetCount <<" offline eff = " << offlineMultijetPixelEff << " +- " << offlineMultijetPixelEffErr << endl;
+      }
     }
     // Et1
     for ( int multijetCount=0; multijetCount<EffMultijetPixelSizeEt1_; ++multijetCount ) {
@@ -1162,7 +1171,9 @@ void OfflineAssocUniqueAnalyzer::endJob() {
       float multijetPixelEffErrEt1 = sqrt(float((EffMultijetPixelArrayEt1_[PVnum])[multijetCount]))/float(eventcounter_);
       EffMultijetPixelEt1_[PVnum]->SetBinContent( multijetCount+1, multijetPixelEffEt1 );
       EffMultijetPixelEt1_[PVnum]->SetBinError( multijetCount+1, multijetPixelEffErrEt1 );
-      multijetPixelEffFile << "For PVnum ="<<PVnum<<" and i = "<< multijetCount <<" Eff for Et1 = " << multijetPixelEffEt1 << " +- " << multijetPixelEffErrEt1 << endl;
+      if ( extendedInfo_ ) {
+        *multijetPixelEffFile << "For PVnum ="<<PVnum<<" and i = "<< multijetCount <<" Eff for Et1 = " << multijetPixelEffEt1 << " +- " << multijetPixelEffErrEt1 << endl;
+      }
     }
     // Et2
     for ( int multijetCount=0; multijetCount<EffMultijetPixelSizeEt2_; ++multijetCount ) {
@@ -1170,7 +1181,9 @@ void OfflineAssocUniqueAnalyzer::endJob() {
       float multijetPixelEffErrEt2 = sqrt(float((EffMultijetPixelArrayEt2_[PVnum])[multijetCount]))/float(eventcounter_);
       EffMultijetPixelEt2_[PVnum]->SetBinContent( multijetCount+1, multijetPixelEffEt2 );
       EffMultijetPixelEt2_[PVnum]->SetBinError( multijetCount+1, multijetPixelEffErrEt2 );
-      multijetPixelEffFile << "For PVnum ="<<PVnum<<" and i = "<< multijetCount <<" Eff for Et2 = " << multijetPixelEffEt2 << " +- " << multijetPixelEffErrEt2 << endl;
+      if ( extendedInfo_ ) {
+        *multijetPixelEffFile << "For PVnum ="<<PVnum<<" and i = "<< multijetCount <<" Eff for Et2 = " << multijetPixelEffEt2 << " +- " << multijetPixelEffErrEt2 << endl;
+      }
     }
     // Et3
     for ( int multijetCount=0; multijetCount<EffMultijetPixelSizeEt3_; ++multijetCount ) {
@@ -1178,7 +1191,9 @@ void OfflineAssocUniqueAnalyzer::endJob() {
       float multijetPixelEffErrEt3 = sqrt(float((EffMultijetPixelArrayEt3_[PVnum])[multijetCount]))/float(eventcounter_);
       EffMultijetPixelEt3_[PVnum]->SetBinContent( multijetCount+1, multijetPixelEffEt3 );
       EffMultijetPixelEt3_[PVnum]->SetBinError( multijetCount+1, multijetPixelEffErrEt3 );
-      multijetPixelEffFile << "For PVnum ="<<PVnum<<" and i = "<< multijetCount <<" Eff for Et3 = " << multijetPixelEffEt3 << " +- " << multijetPixelEffErrEt3 << endl;
+      if ( extendedInfo_ ) {
+        *multijetPixelEffFile << "For PVnum ="<<PVnum<<" and i = "<< multijetCount <<" Eff for Et3 = " << multijetPixelEffEt3 << " +- " << multijetPixelEffErrEt3 << endl;
+      }
     }
     // Et4
     for ( int multijetCount=0; multijetCount<EffMultijetPixelSizeEt4_; ++multijetCount ) {
@@ -1186,7 +1201,9 @@ void OfflineAssocUniqueAnalyzer::endJob() {
       float multijetPixelEffErrEt4 = sqrt(float((EffMultijetPixelArrayEt4_[PVnum])[multijetCount]))/float(eventcounter_);
       EffMultijetPixelEt4_[PVnum]->SetBinContent( multijetCount+1, multijetPixelEffEt4 );
       EffMultijetPixelEt4_[PVnum]->SetBinError( multijetCount+1, multijetPixelEffErrEt4 );
-      multijetPixelEffFile << "For PVnum ="<<PVnum<<" and i = "<< multijetCount <<" Eff for Et4 = " << multijetPixelEffEt4 << " +- " << multijetPixelEffErrEt4 << endl;
+      if ( extendedInfo_ ) {
+        *multijetPixelEffFile << "For PVnum ="<<PVnum<<" and i = "<< multijetCount <<" Eff for Et4 = " << multijetPixelEffEt4 << " +- " << multijetPixelEffErrEt4 << endl;
+      }
     }
 
     for ( int mEtJetCount=0; mEtJetCount<EffMEtJetPixelSize_; ++mEtJetCount ) {
@@ -1194,14 +1211,24 @@ void OfflineAssocUniqueAnalyzer::endJob() {
       float mEtJetPixelEffErr = sqrt(float((EffMEtJetPixelArray_[PVnum])[mEtJetCount]))/float(eventcounter_);
       EffMEtJetPixel_[PVnum]->SetBinContent( mEtJetCount+1, mEtJetPixelEff );
       EffMEtJetPixel_[PVnum]->SetBinError( mEtJetCount+1, mEtJetPixelEffErr );
-      mEtJetPixelEffFile << "For PVnum = "<<PVnum<<" and i = "<< mEtJetCount <<" Eff = " << mEtJetPixelEff << " +- " << mEtJetPixelEffErr << endl;
 
       float offlineMEtJetPixelEff = float((offlineEffMEtJetPixelArray_[PVnum])[mEtJetCount])/float(eventcounter_);
       float offlineMEtJetPixelEffErr = sqrt(float((offlineEffMEtJetPixelArray_[PVnum])[mEtJetCount]))/float(eventcounter_);
       offlineEffMEtJetPixel_[PVnum]->SetBinContent( mEtJetCount+1, offlineMEtJetPixelEff );
       offlineEffMEtJetPixel_[PVnum]->SetBinError( mEtJetCount+1, offlineMEtJetPixelEffErr );
-      offlineMEtJetPixelEffFile << "For PVnum = "<<PVnum<<" and i = "<< mEtJetCount <<" offline eff = " << offlineMEtJetPixelEff << " +- " << offlineMEtJetPixelEffErr << endl;
+
+      if ( extendedInfo_ ) {
+        *mEtJetPixelEffFile << "For PVnum = "<<PVnum<<" and i = "<< mEtJetCount <<" Eff = " << mEtJetPixelEff << " +- " << mEtJetPixelEffErr << endl;
+        *offlineMEtJetPixelEffFile << "For PVnum = "<<PVnum<<" and i = "<< mEtJetCount <<" offline eff = " << offlineMEtJetPixelEff << " +- " << offlineMEtJetPixelEffErr << endl;
+      }
     }
+  }
+
+  if ( extendedInfo_ ) {
+    multijetPixelEffFile->close();
+    mEtJetPixelEffFile->close();
+    offlineMultijetPixelEffFile->close();
+    offlineMEtJetPixelEffFile->close();
   }
 
   // PixelTrigger alone efficiency

@@ -1,6 +1,6 @@
-module OfflineAssocUniqueAna = OfflineAssocUniqueAnalyzer {
+module OfflineAssocAna = OfflineAssocAnalyzer {
 
-  untracked string OutputName                   = "OfflineAssocUniqueAnalyzer.root"
+  untracked string OutputName                   = "OfflineAssocAnalyzer.root"
   untracked string HiVarName                    = "HiVariables"
 
   // Labels for the objects to be opened
@@ -23,14 +23,7 @@ module OfflineAssocUniqueAna = OfflineAssocUniqueAnalyzer {
   untracked double MinDz = 0.4
   untracked double MaxDz = 0.5
 
-  // Select if the pixelTrigger must be put in AND
   untracked bool noPixel                        = true
-
-  // If true, all the cut values are written in output files
-  untracked bool extendedInfo                   = false
-
-  // Select wether to put the cen and tau jets is a single collection or keep them separate.
-  untracked bool singleColl                     = false
 
   untracked string OutputEffFileName            = "Efficiency_file.txt"
 }

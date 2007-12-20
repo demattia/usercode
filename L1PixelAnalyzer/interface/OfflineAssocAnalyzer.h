@@ -1,9 +1,9 @@
 // -*- C++ -*-
 //
-// Package:    OfflineAssocUniqueAnalyzer
-// Class:      OfflineAssocUniqueAnalyzer
+// Package:    OfflineAssocAnalyzer
+// Class:      OfflineAssocAnalyzer
 // 
-/**\class OfflineAssocUniqueAnalyzer OfflineAssocUniqueAnalyzer.cc AnalysisExamples/OfflineAssocUniqueAnalyzer/src/OfflineAssocUniqueAnalyzer.cc
+/**\class OfflineAssocAnalyzer OfflineAssocAnalyzer.cc AnalysisExamples/OfflineAssocAnalyzer/src/OfflineAssocAnalyzer.cc
 
  Description: <one line class summary>
 
@@ -24,7 +24,7 @@
 //
 // Original Author:  Marco De Mattia
 //         Created:  Tue May  8 13:05:37 CEST 2007
-// $Id: OfflineAssocUniqueAnalyzer.h,v 1.1 2007/12/18 09:08:38 demattia Exp $
+// $Id: OfflineAssocAnalyzer.h,v 1.3 2007/12/04 11:15:09 demattia Exp $
 //
 //
 
@@ -128,10 +128,10 @@
 // class declaration
 //
 
-class OfflineAssocUniqueAnalyzer : public edm::EDAnalyzer {
+class OfflineAssocAnalyzer : public edm::EDAnalyzer {
  public:
-  explicit OfflineAssocUniqueAnalyzer(const edm::ParameterSet&);
-  ~OfflineAssocUniqueAnalyzer();
+  explicit OfflineAssocAnalyzer(const edm::ParameterSet&);
+  ~OfflineAssocAnalyzer();
 
 
  private:
@@ -144,7 +144,7 @@ class OfflineAssocUniqueAnalyzer : public edm::EDAnalyzer {
   int eventcounter_;
 
   // Declare as static so that only one exists, even if more
-  // than one OfflineAssocUniqueAnalyzer object is created
+  // than one OfflineAssocAnalyzer object is created
   static L1Trig L1Trigger;
 
   edm::ParameterSet conf_;
@@ -152,7 +152,7 @@ class OfflineAssocUniqueAnalyzer : public edm::EDAnalyzer {
 
   // Declare here, since it does not have a default constructor
   // it will be initialized with an initialization list ( in
-  // the OfflineAssocUniqueAnalyzer constructor ).
+  // the OfflineAssocAnalyzer constructor ).
   //  HiVariables HiVar;
 
   // Use a dynamic construction, or the TFile problem will crash the job
@@ -180,12 +180,6 @@ class OfflineAssocUniqueAnalyzer : public edm::EDAnalyzer {
   // Select if the pixelTrigger must be done.
   // If false only the association will be done.
   bool noPixel_;
-
-  bool extendedInfo_;
-
-  // Select wether to put all the cen+tau jets in a
-  // single collection or keep them separate.
-  bool singleColl_;
 
   std::string OutputEffFileName;
 
@@ -222,8 +216,6 @@ class OfflineAssocUniqueAnalyzer : public edm::EDAnalyzer {
   MultiTH1F * Multi_AllSecVPt_;
   MultiTH1F * Multi_AllSecVEta_;
   MultiTH1F * Multi_AllSecVPhi_;
-
-  MultiTH1F * Multi_Assoc_DR_;
 
   TH1F * DPhimin_;
 

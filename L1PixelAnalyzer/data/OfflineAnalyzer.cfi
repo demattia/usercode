@@ -23,5 +23,11 @@ module OfflineAna = OfflineAnalyzer {
   untracked double MinDz = 0.4
   untracked double MaxDz = 0.5
 
+  // Select if the optimization of the pixel trigger must be done
+  untracked bool doTrigger                      = true
+
+  // If true, all the cut values are written in output files
+  untracked bool extendedInfo                   = false
+
   untracked string OutputEffFileName            = "Efficiency_file.txt"
 }
