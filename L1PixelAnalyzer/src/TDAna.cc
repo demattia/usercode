@@ -94,6 +94,9 @@ TDAna::TDAna(const edm::ParameterSet& iConfig) :
   DPbbnoh_ = new TH1D ( "DPbbnoh", "Delta phi of b pair not from h", 50, 0., 3.2 );
   M8_ = new TH1D ( "M8", "Mass 8 jets", 50, 0., 2000.) ;
   C8_ = new TH1D ( "C8", "Centrality 8 jets", 50, 0., 1.2 );
+  M45bestall_ = new TH1D ( "M45bestall", "M45best", 50, 0, 300 );
+  Chi2extall_ = new TH1D ( "Chi2extall", "Chi2ext", 50, 0, 50 );
+  DPbball_ = new TH1D ( "DPbball", "Delta phi bb", 50, 0., 3.2 );
 
   NJetsS_ = new TH1D ( "NJetsS", "Number of selected jets", 20, 0, 20 );
   UncorrHtS_ = new TH1D ( "UncorrHtS", "Ht with uncorrected jets", 50, 0, 4000 );
@@ -125,6 +128,9 @@ TDAna::TDAna(const edm::ParameterSet& iConfig) :
   DPbbnohS_ = new TH1D ( "DPbbnohS", "Delta phi of b pair not from h", 50, 0., 3.2 );
   M8S_ = new TH1D ( "M8S", "Mass 8 jets", 50, 0., 2000.) ;
   C8S_ = new TH1D ( "C8S", "Centrality 8 jets", 50, 0., 1.2 );
+  M45bestallS_ = new TH1D ( "M45bestallS", "M45best", 50, 0, 300 );
+  Chi2extallS_ = new TH1D ( "Chi2extallS", "Chi2ext", 50, 0, 50 );
+  DPbballS_ = new TH1D ( "DPbballS", "Delta phi bb", 50, 0., 3.2 );
 
   NJetsSS_ = new TH1D ( "NJetsSS", "Number of selected jets", 20, 0, 20 );
   UncorrHtSS_ = new TH1D ( "UncorrHtSS", "Ht with uncorrected jets", 50, 0, 4000 );
@@ -156,6 +162,9 @@ TDAna::TDAna(const edm::ParameterSet& iConfig) :
   DPbbnohSS_ = new TH1D ( "DPbbnohSS", "Delta phi of b pair not from h", 50, 0., 3.2 );
   M8SS_ = new TH1D ( "M8SS", "Mass 8 jets", 50, 0., 2000.) ;
   C8SS_ = new TH1D ( "C8SS", "Centrality 8 jets", 50, 0., 1.2 );
+  M45bestallSS_ = new TH1D ( "M45bestallSS", "M45best", 50, 0, 300 );
+  Chi2extallSS_ = new TH1D ( "Chi2extallSS", "Chi2ext", 50, 0, 50 );
+  DPbballSS_ = new TH1D ( "DPbballSS", "Delta phi bb", 50, 0., 3.2 );
 
   NJetsSSS_ = new TH1D ( "NJetsSSS", "Number of selected jets", 20, 0, 20 );
   UncorrHtSSS_ = new TH1D ( "UncorrHtSSS", "Ht with uncorrected jets", 50, 0, 4000 );
@@ -187,6 +196,9 @@ TDAna::TDAna(const edm::ParameterSet& iConfig) :
   DPbbnohSSS_ = new TH1D ( "DPbbnohSSS", "Delta phi of b pair not from h", 50, 0., 3.2 );
   M8SSS_ = new TH1D ( "M8SSS", "Mass 8 jets", 50, 0., 2000.) ;
   C8SSS_ = new TH1D ( "C8SSS", "Centrality 8 jets", 50, 0., 1.2 );
+  M45bestallSSS_ = new TH1D ( "M45bestallSSS", "M45best", 50, 0, 300 );
+  Chi2extallSSS_ = new TH1D ( "Chi2extallSSS", "Chi2ext", 50, 0, 50 );
+  DPbballSSS_ = new TH1D ( "DPbballSSS", "Delta phi bb", 50, 0., 3.2 );
   N4NJSSS_ = new TH1D ( "N4NJSSS", "N of 4HEL tags vs N jets", 20, 0, 20 );
   E4NJSSS_ = new TH1D ( "E4NJSSS", "Efficiency of 4HEL tags vs N jets", 20, 0, 20 );
 
@@ -220,6 +232,9 @@ TDAna::TDAna(const edm::ParameterSet& iConfig) :
   DPbbnohW_ = new TH1D ( "DPbbnohW", "Delta phi of b pair not from h", 50, 0., 3.2 );
   M8W_ = new TH1D ( "M8W", "Mass 8 jets", 50, 0., 2000.) ;
   C8W_ = new TH1D ( "C8W", "Centrality 8 jets", 50, 0., 1.2 );
+  M45bestallW_ = new TH1D ( "M45bestallW", "M45best", 50, 0, 300 );
+  Chi2extallW_ = new TH1D ( "Chi2extallW", "Chi2ext", 50, 0, 50 );
+  DPbballW_ = new TH1D ( "DPbballW", "Delta phi bb", 50, 0., 3.2 );
 
   NJetsSW_ = new TH1D ( "NJetsSW", "Number of selected jets", 20, 0, 20 );
   UncorrHtSW_ = new TH1D ( "UncorrHtSW", "Ht with uncorrected jets", 50, 0, 4000 );
@@ -251,6 +266,9 @@ TDAna::TDAna(const edm::ParameterSet& iConfig) :
   DPbbnohSW_ = new TH1D ( "DPbbnohSW", "Delta phi of b pair not from h", 50, 0., 3.2 );
   M8SW_ = new TH1D ( "M8SW", "Mass 8 jets", 50, 0., 2000.) ;
   C8SW_ = new TH1D ( "C8SW", "Centrality 8 jets", 50, 0., 1.2 );
+  M45bestallSW_ = new TH1D ( "M45bestallSW", "M45best", 50, 0, 300 );
+  Chi2extallSW_ = new TH1D ( "Chi2extallSW", "Chi2ext", 50, 0, 50 );
+  DPbballSW_ = new TH1D ( "DPbballSW", "Delta phi bb", 50, 0., 3.2 );
 
   NJetsSSW_ = new TH1D ( "NJetsSSW", "Number of selected jets", 20, 0, 20 );
   UncorrHtSSW_ = new TH1D ( "UncorrHtSSW", "Ht with uncorrected jets", 50, 0, 4000 );
@@ -282,6 +300,9 @@ TDAna::TDAna(const edm::ParameterSet& iConfig) :
   DPbbnohSSW_ = new TH1D ( "DPbbnohSSW", "Delta phi of b pair not from h", 50, 0., 3.2 );
   M8SSW_ = new TH1D ( "M8SSW", "Mass 8 jets", 50, 0., 2000.) ;
   C8SSW_ = new TH1D ( "C8SSW", "Centrality 8 jets", 50, 0., 1.2 );
+  M45bestallSSW_ = new TH1D ( "M45bestallSSW", "M45best", 50, 0, 300 );
+  Chi2extallSSW_ = new TH1D ( "Chi2extallSSW", "Chi2ext", 50, 0, 50 );
+  DPbballSSW_ = new TH1D ( "DPbballSSW", "Delta phi bb", 50, 0., 3.2 );
 
   NJetsSSSW_ = new TH1D ( "NJetsSSSW", "Number of selected jets", 20, 0, 20 );
   UncorrHtSSSW_ = new TH1D ( "UncorrHtSSSW", "Ht with uncorrected jets", 50, 0, 4000 );
@@ -315,6 +336,9 @@ TDAna::TDAna(const edm::ParameterSet& iConfig) :
   C8SSSW_ = new TH1D ( "C8SSSW", "Centrality 8 jets", 50, 0., 1.2 );
   N4NJSSSW_ = new TH1D ( "N4NJSSSW", "N of 4HEL tags vs N jets", 20, 0, 20 );
   E4NJSSSW_ = new TH1D ( "E4NJSSSW", "Efficiency of 4HEL tags vs N jets", 20, 0, 20 );
+  M45bestallSSSW_ = new TH1D ( "M45bestallSSSW", "M45best", 50, 0, 300 );
+  Chi2extallSSSW_ = new TH1D ( "Chi2extallSSSW", "Chi2ext", 50, 0, 50 );
+  DPbballSSSW_ = new TH1D ( "DPbballSSSW", "Delta phi bb", 50, 0., 3.2 );
 
   UncorrMEt_SumEt_ = new TH2D ( "UncorrMEt_SumEt", "MEt vs SumEt", 100, 0, 4000, 100, 0, 1000 );
   CorrMEt_SumEt_ = new TH2D ( "CorrMEt_SumEt", "MEt vs SumEt", 100, 0, 4000, 100, 0, 1000 );
@@ -761,15 +785,19 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   double UncorrSumEy=0;
   double UncorrSumEt=0;  // SumEt with all jets before corrections
   double UncorrHt=0;     // Ht with all jets before corrections
+  double UncorrHt0=0;     // Ht with all jets before corrections
 
   double CorrSumEx=0;
   double CorrSumEy=0;
   double CorrSumEt=0;    // SumEt with all jets after corrections 
   double CorrHt=0;       // Ht with all jets after corrections
+  double CorrHt0=0;       // Ht with all jets after corrections
 
   double GoodSumEt=0;    // SumEt with all selected jets
   double GoodHt=0;       // Ht with all selected jets
   double GoodHt2=0;      // Ht with all selected jets and standard MET
+  double GoodHt0=0;       // Ht with all selected jets
+  double GoodHt20=0;      // Ht with all selected jets and standard MET
 
   double dpmin=20;  // DP min MET / selected jets
   double dp1st=20;  // DP MET/leading jet
@@ -781,8 +809,11 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   double chi2=1000;   // Chiquadro costruito con le due masse qui sopra
   double m45best=-999;
   double chi2ext=1000;
+  double m45bestall=-999;
+  double chi2extall=1000;
   double dp12 = 0;        // Delta phi jet 1 jet 2
   double dpbb = 0;    // delta phi bb
+  double dpbball = 0;    // delta phi bb
   double m_others = -999; // mass of jets not part of best triplet and pair
   double mbbnohmax = -999; // mass of b pair with highest mass excluding b-jets from h decay
   double dpbbnohmax = 0; // angle of b pair with highest mass excluding b-jets from h decay
@@ -804,7 +835,7 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   double Jphi[100];
   double JHET[100];
   double JHPT[100];
-  int JN1[100];
+  int    JN1[100];
   int    JBin[100];
   bool   JHEM[100];
   double NHSJ = 8; // number of jets from hard subprocess  <---- VERY IMPORTANT PARAMETER
@@ -825,19 +856,19 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
       UncorrSumEx+=cal->uncorrEt()*cos(cal->phi());
       UncorrSumEy+=cal->uncorrEt()*sin(cal->phi());
       UncorrSumEt+=cal->uncorrEt();
-      UncorrHt+=cal->uncorrEt();
+      UncorrHt0+=cal->uncorrEt();
       CorrSumEx+=cal->et()*cos(cal->phi());
       CorrSumEy+=cal->et()*sin(cal->phi());
       CorrSumEt+=cal->et();
-      CorrHt+=cal->et();
+      CorrHt0+=cal->et();
 
       if ( cal->et() >= 30. && fabs( cal->eta() ) < 2.5 ) {
         goodIc5Jets=goodIc5Jets+1;
 	if ( cal->discriminatorHighEff() > loose_ ) NTagsL++;
 	if ( cal->discriminatorHighEff() > medium_ ) NTagsM++;
 	if ( cal->discriminatorHighEff() > tight_ ) NTagsT++;
-	GoodHt+=cal->et();
-	GoodHt2+=cal->et();
+	GoodHt0+=cal->et();
+	GoodHt20+=cal->et();
 	GoodSumEt+=cal->et();
 	double dp = 3.1415926-fabs(fabs(cal->phi()-caloMET->phi())-3.1415926);
 	if ( dp<dpmin ) dpmin=dp;
@@ -944,32 +975,15 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	
 	// Reset all variables
 	// -------------------
-	UncorrSumEx=0;
-	UncorrSumEy=0;
-	UncorrSumEt=0;  // SumEt with all jets before corrections
-	UncorrHt=0;     // Ht with all jets before corrections
-	
-	CorrSumEx=0;
-	CorrSumEy=0;
-	CorrSumEt=0;    // SumEt with all jets after corrections 
-	CorrHt=0;       // Ht with all jets after corrections
-	
-	GoodSumEt=0;    // SumEt with all selected jets
-	GoodHt=0;       // Ht with all selected jets
-	GoodHt2=0;      // Ht with all selected jets and standard MET
-	
-	dpmin=20;  // DP min MET / selected jets
-	dp1st=20;  // DP MET/leading jet
-	dp2nd=20;  // DP MET/2nd leading jet
-	dp3rd=20;  // DP MET/3rd leading jet
-	
 	m3best=-999; // Massa del tripletto piu' vicino a 172 GeV
 	mwbest=-999;    // Massa del doppietto piu' vicino a 80.4 GeV tra i tre nel tripletto definito sopra
 	chi2=1000;   // Chiquadro costruito con le due masse qui sopra
-	m45best=-999;
-	chi2ext=1000;
-	dp12 = 0;        // Delta phi jet 1 jet 2
-	dpbb = 0;    // delta phi bb
+	m45best=-999; // mass of two b-tags closest to 120 GeV not in triplet
+	chi2ext=1000; // chi2 computed by adding contribution from distance to 120 GeV
+	dpbb = 0;    // delta phi bb of pair above
+	m45bestall=-999;  // Same as above, without bothering to exclude jets in triplet
+	chi2extall=1000;  // Same as above
+	dpbball = 0;    // delta phi bb as above
 	m_others = -999; // mass of jets not part of best triplet and pair
 	mbbnohmax = -999; // mass of b pair with highest mass excluding b-jets from h decay
 	dpbbnohmax = 0; // angle of b pair with highest mass excluding b-jets from h decay
@@ -1118,7 +1132,34 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 		}
 	      }
 	    }
-	    
+	    // Now redo the same, on all b-jets regardless of best triplet
+	    // -----------------------------------------------------------
+	    for ( int ii=0; ii<iJ-1 && ii<NHSJ-1; ii++ ) {
+	      for ( int jj=ii+1; jj<iJ && jj<NHSJ; jj++ ) { // limit to NHSJ the number of jets from h.s.
+		// Demand that both b-jets from H be tagged
+		// ----------------------------------------
+		if ( JHEM[ii] && JHEM[jj] ) {
+		  px4=JEt[ii]*cos(Jphi[ii]);
+		  px5=JEt[jj]*cos(Jphi[jj]);
+		  py4=JEt[ii]*sin(Jphi[ii]);
+		  py5=JEt[jj]*sin(Jphi[jj]);
+		  pz4=JEt[ii]/tan(2*atan(exp(-Jeta[ii])));
+		  pz5=JEt[jj]/tan(2*atan(exp(-Jeta[jj])));
+		  e4 =sqrt(px4*px4+py4*py4+pz4*pz4);
+		  e5 =sqrt(px5*px5+py5*py5+pz5*pz5);
+		  m45=(e4+e5)*(e4+e5)-(px4+px5)*(px4+px5)-(py4+py5)*(py4+py5)-(pz4+pz5)*(pz4+pz5);
+		  if ( m45>0 ) m45=sqrt(m45);
+		  if ( fabs(m45-120)<fabs(m45best-120) ) {
+		    m45bestall=m45;
+		    double addchi=0;
+		    if ( ii==it1 || ii==it2 || ii==it3 || jj==it1 || jj==it2 || jj==it3 ) addchi=3; 
+		    chi2extall=sqrt(chi2*chi2+(m45bestall-120)*(m45bestall-120)/200+addchi*addchi);
+		    dpbball=3.145926-fabs(fabs(Jphi[ii]-Jphi[jj])-3.1415926);
+		  }
+		}
+	      }
+	    }
+
 	    // Compute mass of jets not selected in triplet of top and doublet of H decay
 	    // --------------------------------------------------------------------------
 	    if ( ih1+ih2>0 ) {
@@ -1210,10 +1251,10 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	  // ---------------------------
 	  double UncorrMEt =sqrt(UncorrSumEx*UncorrSumEx+UncorrSumEy*UncorrSumEy);
 	  double CorrMEt = sqrt(CorrSumEx*CorrSumEx+CorrSumEy*CorrSumEy);
-	  UncorrHt+=UncorrMEt;
-	  CorrHt+=CorrMEt;
-	  GoodHt+=CorrMEt;
-	  GoodHt2+=caloMET->et();
+	  UncorrHt=UncorrHt0+UncorrMEt;
+	  CorrHt=CorrHt0+CorrMEt;
+	  GoodHt=GoodHt0+CorrMEt;
+	  GoodHt2=GoodHt20+caloMET->et();
 	  
 	  double UncorrMEtSig=0;
 	  if ( UncorrSumEt>0 ) UncorrMEtSig = UncorrMEt/sqrt(UncorrSumEt);
@@ -1229,7 +1270,6 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 
 	    // Fill regular histograms
 	    // -----------------------
-
 	    UncorrMEt_SumEt_->Fill(caloMET->sumEt(),UncorrMEt,PTOT);
 	    CorrMEt_SumEt_->Fill(caloMET->sumEt(),CorrMEt,PTOT);
 	    MEt_SumEt_->Fill(caloMET->sumEt(),caloMET->et(),PTOT);
@@ -1274,6 +1314,9 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	      DPbbnoh_->Fill(dpbbnohmax,PTOT);
 	      M8_->Fill(m8,PTOT);
 	      C8_->Fill(c8,PTOT);
+	      M45bestall_->Fill(m45bestall,PTOT);
+	      Chi2extall_->Fill(chi2extall,PTOT);
+	      DPbball_->Fill(dpbball,PTOT);
 	      
 	      if ( MEtSigCut ) {
 		NJetsS_->Fill(goodIc5Jets,PTOT);
@@ -1307,6 +1350,9 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 		DPbbnohS_->Fill(dpbbnohmax,PTOT);
 		M8S_->Fill(m8,PTOT);
 		C8S_->Fill(c8,PTOT);
+		M45bestallS_->Fill(m45bestall,PTOT);
+		Chi2extallS_->Fill(chi2extall,PTOT);
+		DPbballS_->Fill(dpbball,PTOT);
 	      
 		if ( NHEM>=3 ) {
 		  NJetsSS_->Fill(goodIc5Jets,PTOT);
@@ -1340,6 +1386,9 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 		  DPbbnohSS_->Fill(dpbbnohmax,PTOT);
 		  M8SS_->Fill(m8,PTOT);
 		  C8SS_->Fill(c8,PTOT);
+		  M45bestallSS_->Fill(m45bestall,PTOT);
+		  Chi2extallSS_->Fill(chi2extall,PTOT);
+		  DPbballSS_->Fill(dpbball,PTOT);
 		}
 		
 		if ( NHEM>=4 ) {
@@ -1374,6 +1423,9 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 		  DPbbnohSSS_->Fill(dpbbnohmax,PTOT);
 		  M8SSS_->Fill(m8,PTOT);
 		  C8SSS_->Fill(c8,PTOT);
+		  M45bestallSSS_->Fill(m45bestall,PTOT);
+		  Chi2extallSSS_->Fill(chi2extall,PTOT);
+		  DPbballSSS_->Fill(dpbball,PTOT);
 		}
 
 	      }
@@ -1426,6 +1478,9 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	      DPbbnohW_->Fill(dpbbnohmax,PTOTE2);
 	      M8W_->Fill(m8,PTOTE2);
 	      C8W_->Fill(c8,PTOTE2);
+	      M45bestallW_->Fill(m45bestall,PTOTE2);
+	      Chi2extallW_->Fill(chi2extall,PTOTE2);
+	      DPbballW_->Fill(dpbball,PTOTE2);
 	      
 	      if ( MEtSigCut ) {
 		NJetsSW_->Fill(goodIc5Jets,PTOTE2);
@@ -1459,6 +1514,9 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 		DPbbnohSW_->Fill(dpbbnohmax,PTOTE2);
 		M8SW_->Fill(m8,PTOTE2);
 		C8SW_->Fill(c8,PTOTE2);
+		M45bestallSW_->Fill(m45bestall,PTOTE2);
+		Chi2extallSW_->Fill(chi2extall,PTOTE2);
+		DPbballSW_->Fill(dpbball,PTOTE2);
 	      
 		if ( NHEM>=3 ) {
 		  NJetsSSW_->Fill(goodIc5Jets,PTOTE2);
@@ -1492,6 +1550,9 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 		  DPbbnohSSW_->Fill(dpbbnohmax,PTOTE2);
 		  M8SSW_->Fill(m8,PTOTE2);
 		  C8SSW_->Fill(c8,PTOTE2);
+		  M45bestallSSW_->Fill(m45bestall,PTOTE2);
+		  Chi2extallSSW_->Fill(chi2extall,PTOTE2);
+		  DPbballSSW_->Fill(dpbball,PTOTE2);
 		}
 		
 		if ( NHEM>=4 ) {
@@ -1526,6 +1587,9 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 		  DPbbnohSSSW_->Fill(dpbbnohmax,PTOTE2);
 		  M8SSSW_->Fill(m8,PTOTE2);
 		  C8SSSW_->Fill(c8,PTOTE2);
+		  M45bestallSSSW_->Fill(m45bestall,PTOTE2);
+		  Chi2extallSSSW_->Fill(chi2extall,PTOTE2);
+		  DPbballSSSW_->Fill(dpbball,PTOTE2);
 		}
 	      }
 	    }
@@ -1652,7 +1716,34 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	    }
 	  }
 	}
-
+	// Now redo the same, on all b-jets regardless of best triplet
+	// -----------------------------------------------------------
+	for ( int ii=0; ii<iJ-1 && ii<NHSJ-1; ii++ ) {
+	  for ( int jj=ii+1; jj<iJ && jj<NHSJ; jj++ ) { // limit to NHSJ the number of jets from h.s.
+	    // Demand that both b-jets from H be tagged
+	    // ----------------------------------------
+	    if ( JHEM[ii] && JHEM[jj] ) {
+	      px4=JEt[ii]*cos(Jphi[ii]);
+	      px5=JEt[jj]*cos(Jphi[jj]);
+	      py4=JEt[ii]*sin(Jphi[ii]);
+	      py5=JEt[jj]*sin(Jphi[jj]);
+	      pz4=JEt[ii]/tan(2*atan(exp(-Jeta[ii])));
+	      pz5=JEt[jj]/tan(2*atan(exp(-Jeta[jj])));
+	      e4 =sqrt(px4*px4+py4*py4+pz4*pz4);
+	      e5 =sqrt(px5*px5+py5*py5+pz5*pz5);
+	      m45=(e4+e5)*(e4+e5)-(px4+px5)*(px4+px5)-(py4+py5)*(py4+py5)-(pz4+pz5)*(pz4+pz5);
+	      if ( m45>0 ) m45=sqrt(m45);
+	      if ( fabs(m45-120)<fabs(m45best-120) ) {
+		m45bestall=m45;
+		double addchi=0;
+		if ( ii==it1 || ii==it2 || ii==it3 || jj==it1 || jj==it2 || jj==it3 ) addchi=3; 
+		chi2extall=sqrt(chi2*chi2+(m45bestall-120)*(m45bestall-120)/200+addchi*addchi);
+		dpbball=3.145926-fabs(fabs(Jphi[ii]-Jphi[jj])-3.1415926);
+	      }
+	    }
+	  }
+	}
+	
 	// Compute mass of jets not selected in triplet of top and doublet of H decay
 	// --------------------------------------------------------------------------
 	if ( ih1+ih2>0 ) {
@@ -1802,6 +1893,9 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	DPbbnoh_->Fill(dpbbnohmax);
 	M8_->Fill(m8);
 	C8_->Fill(c8);
+	M45bestall_->Fill(m45bestall);
+	Chi2extall_->Fill(chi2extall);
+	DPbball_->Fill(dpbball);
 	
 	if ( MEtSigCut ) {
 	  NJetsS_->Fill(goodIc5Jets);
@@ -1835,6 +1929,9 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	  DPbbnohS_->Fill(dpbbnohmax);
 	  M8S_->Fill(m8);
 	  C8S_->Fill(c8);
+	  M45bestallS_->Fill(m45bestall);
+	  Chi2extallS_->Fill(chi2extall);
+	  DPbballS_->Fill(dpbball);
 	  
 	  if ( NHEM>=3 ) {
 	    NJetsSS_->Fill(goodIc5Jets);
@@ -1868,6 +1965,9 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	    DPbbnohSS_->Fill(dpbbnohmax);
 	    M8SS_->Fill(m8);
 	    C8SS_->Fill(c8);
+	    M45bestallSS_->Fill(m45bestall);
+	    Chi2extallSS_->Fill(chi2extall);
+	    DPbballSS_->Fill(dpbball);
 	  }
 	  
 	  if ( NHEM>=4 ) {
@@ -1902,6 +2002,10 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	    DPbbnohSSS_->Fill(dpbbnohmax);
 	    M8SSS_->Fill(m8);
 	    C8SSS_->Fill(c8);
+	    M45bestallSSS_->Fill(m45bestall);
+	    Chi2extallSSS_->Fill(chi2extall);
+	    DPbballSSS_->Fill(dpbball);
+
 	    // Study number of events with 4HEM tags vs N jets on which to look for them
 	    // -------------------------------------------------------------------------
 	    if ( NHEM>=4 ) {
@@ -1967,6 +2071,9 @@ void TDAna::endJob() {
   DPbbnoh_->Write();
   M8_->Write();
   C8_->Write();
+  M45bestall_->Write();
+  Chi2extall_->Write();
+  DPbball_->Write();
   
   // Histograms for events passing trigger and NJet cut
   // --------------------------------------------------
@@ -2000,6 +2107,9 @@ void TDAna::endJob() {
   DPbbnohS_->Write();
   M8S_->Write();
   C8S_->Write();
+  M45bestallS_->Write();
+  Chi2extallS_->Write();
+  DPbballS_->Write();
 
   // Histograms for events passing trigger, NJet, and METS cut
   // ---------------------------------------------------------
@@ -2033,6 +2143,9 @@ void TDAna::endJob() {
   DPbbnohSS_->Write();
   M8SS_->Write();
   C8SS_->Write();
+  M45bestallSS_->Write();
+  Chi2extallSS_->Write();
+  DPbballSS_->Write();
 
   // Histograms for events passing trigger, NJet, and METS cut
   // ---------------------------------------------------------
@@ -2066,6 +2179,9 @@ void TDAna::endJob() {
   DPbbnohSSS_->Write();
   M8SSS_->Write();
   C8SSS_->Write();
+  M45bestallSSS_->Write();
+  Chi2extallSSS_->Write();
+  DPbballSSS_->Write();
   N4NJSSS_->Write();
   E4NJSSS_->Write();
 
@@ -2101,6 +2217,9 @@ void TDAna::endJob() {
   DPbbnohW_->Write();
   M8W_->Write();
   C8W_->Write();
+  M45bestallW_->Write();
+  Chi2extallW_->Write();
+  DPbballW_->Write();
   
   // Histograms for events passing trigger and NJet cut
   // --------------------------------------------------
@@ -2134,6 +2253,9 @@ void TDAna::endJob() {
   DPbbnohSW_->Write();
   M8SW_->Write();
   C8SW_->Write();
+  M45bestallSW_->Write();
+  Chi2extallSW_->Write();
+  DPbballSW_->Write();
 
   // Histograms for events passing trigger, NJet, and METS cut
   // ---------------------------------------------------------
@@ -2167,6 +2289,9 @@ void TDAna::endJob() {
   DPbbnohSSW_->Write();
   M8SSW_->Write();
   C8SSW_->Write();
+  M45bestallSSW_->Write();
+  Chi2extallSSW_->Write();
+  DPbballSSW_->Write();
 
   // Histograms for events passing trigger, NJet, and METS cut
   // ---------------------------------------------------------
@@ -2200,6 +2325,9 @@ void TDAna::endJob() {
   DPbbnohSSSW_->Write();
   M8SSSW_->Write();
   C8SSSW_->Write();
+  M45bestallSSSW_->Write();
+  Chi2extallSSSW_->Write();
+  DPbballSSSW_->Write();
   N4NJSSSW_->Write();
   E4NJSSSW_->Write();
   

@@ -24,7 +24,7 @@
 //
 // Original Author:  Marco De Mattia
 //         Created:  Tue May  8 13:05:37 CEST 2007
-// $Id: TDAna.h,v 1.4 2007/12/19 10:24:30 dorigo Exp $
+// $Id: TDAna.h,v 1.5 2007/12/19 10:54:11 dorigo Exp $
 //
 //
 
@@ -227,6 +227,9 @@ class TDAna : public edm::EDAnalyzer {
   TH1D * DPbbnoh_;
   TH1D * M8_;
   TH1D * C8_;
+  TH1D * M45bestall_;
+  TH1D * Chi2extall_;
+  TH1D * DPbball_;
 
   TH1D * NJetsS_;
   TH1D * UncorrSumEtS_;
@@ -258,6 +261,9 @@ class TDAna : public edm::EDAnalyzer {
   TH1D * DPbbnohS_;
   TH1D * M8S_;
   TH1D * C8S_;
+  TH1D * M45bestallS_;
+  TH1D * Chi2extallS_;
+  TH1D * DPbballS_;
 
   TH1D * NJetsSS_;
   TH1D * UncorrSumEtSS_;
@@ -289,6 +295,9 @@ class TDAna : public edm::EDAnalyzer {
   TH1D * DPbbnohSS_;
   TH1D * M8SS_;
   TH1D * C8SS_;
+  TH1D * M45bestallSS_;
+  TH1D * Chi2extallSS_;
+  TH1D * DPbballSS_;
 
   TH1D * NJetsSSS_;
   TH1D * UncorrSumEtSSS_;
@@ -320,6 +329,9 @@ class TDAna : public edm::EDAnalyzer {
   TH1D * DPbbnohSSS_;
   TH1D * M8SSS_;
   TH1D * C8SSS_;
+  TH1D * M45bestallSSS_;
+  TH1D * Chi2extallSSS_;
+  TH1D * DPbballSSS_;
   TH1D * N4NJSSS_;
   TH1D * E4NJSSS_;
 
@@ -355,6 +367,9 @@ class TDAna : public edm::EDAnalyzer {
   TH1D * DPbbnohW_;
   TH1D * M8W_;
   TH1D * C8W_;
+  TH1D * M45bestallW_;
+  TH1D * Chi2extallW_;
+  TH1D * DPbballW_;
 
   TH1D * NJetsSW_;
   TH1D * UncorrSumEtSW_;
@@ -386,6 +401,9 @@ class TDAna : public edm::EDAnalyzer {
   TH1D * DPbbnohSW_;
   TH1D * M8SW_;
   TH1D * C8SW_;
+  TH1D * M45bestallSW_;
+  TH1D * Chi2extallSW_;
+  TH1D * DPbballSW_;
 
   TH1D * NJetsSSW_;
   TH1D * UncorrSumEtSSW_;
@@ -417,6 +435,9 @@ class TDAna : public edm::EDAnalyzer {
   TH1D * DPbbnohSSW_;
   TH1D * M8SSW_;
   TH1D * C8SSW_;
+  TH1D * M45bestallSSW_;
+  TH1D * Chi2extallSSW_;
+  TH1D * DPbballSSW_;
 
   TH1D * NJetsSSSW_;
   TH1D * UncorrSumEtSSSW_;
@@ -448,6 +469,9 @@ class TDAna : public edm::EDAnalyzer {
   TH1D * DPbbnohSSSW_;
   TH1D * M8SSSW_;
   TH1D * C8SSSW_;
+  TH1D * M45bestallSSSW_;
+  TH1D * Chi2extallSSSW_;
+  TH1D * DPbballSSSW_;
   TH1D * N4NJSSSW_;
   TH1D * E4NJSSSW_;
 
