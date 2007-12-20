@@ -24,7 +24,7 @@
 //
 // Original Author:  Marco De Mattia
 //         Created:  Tue May  8 13:05:37 CEST 2007
-// $Id: TDAna.h,v 1.5 2007/12/19 10:54:11 dorigo Exp $
+// $Id: TDAna.h,v 1.6 2007/12/20 12:13:21 dorigo Exp $
 //
 //
 
@@ -230,6 +230,10 @@ class TDAna : public edm::EDAnalyzer {
   TH1D * M45bestall_;
   TH1D * Chi2extall_;
   TH1D * DPbball_;
+  TH1D * SumHED4_;
+  TH1D * SumHPD4_;
+  TH1D * SumHED6_;
+  TH1D * SumHPD6_;
 
   TH1D * NJetsS_;
   TH1D * UncorrSumEtS_;
@@ -264,6 +268,10 @@ class TDAna : public edm::EDAnalyzer {
   TH1D * M45bestallS_;
   TH1D * Chi2extallS_;
   TH1D * DPbballS_;
+  TH1D * SumHED4S_;
+  TH1D * SumHPD4S_;
+  TH1D * SumHED6S_;
+  TH1D * SumHPD6S_;
 
   TH1D * NJetsSS_;
   TH1D * UncorrSumEtSS_;
@@ -298,6 +306,10 @@ class TDAna : public edm::EDAnalyzer {
   TH1D * M45bestallSS_;
   TH1D * Chi2extallSS_;
   TH1D * DPbballSS_;
+  TH1D * SumHED4SS_;
+  TH1D * SumHPD4SS_;
+  TH1D * SumHED6SS_;
+  TH1D * SumHPD6SS_;
 
   TH1D * NJetsSSS_;
   TH1D * UncorrSumEtSSS_;
@@ -332,6 +344,11 @@ class TDAna : public edm::EDAnalyzer {
   TH1D * M45bestallSSS_;
   TH1D * Chi2extallSSS_;
   TH1D * DPbballSSS_;
+  TH1D * SumHED4SSS_;
+  TH1D * SumHPD4SSS_;
+  TH1D * SumHED6SSS_;
+  TH1D * SumHPD6SSS_;
+
   TH1D * N4NJSSS_;
   TH1D * E4NJSSS_;
 
@@ -370,6 +387,10 @@ class TDAna : public edm::EDAnalyzer {
   TH1D * M45bestallW_;
   TH1D * Chi2extallW_;
   TH1D * DPbballW_;
+  TH1D * SumHED4W_;
+  TH1D * SumHPD4W_;
+  TH1D * SumHED6W_;
+  TH1D * SumHPD6W_;
 
   TH1D * NJetsSW_;
   TH1D * UncorrSumEtSW_;
@@ -404,6 +425,10 @@ class TDAna : public edm::EDAnalyzer {
   TH1D * M45bestallSW_;
   TH1D * Chi2extallSW_;
   TH1D * DPbballSW_;
+  TH1D * SumHED4SW_;
+  TH1D * SumHPD4SW_;
+  TH1D * SumHED6SW_;
+  TH1D * SumHPD6SW_;
 
   TH1D * NJetsSSW_;
   TH1D * UncorrSumEtSSW_;
@@ -438,6 +463,10 @@ class TDAna : public edm::EDAnalyzer {
   TH1D * M45bestallSSW_;
   TH1D * Chi2extallSSW_;
   TH1D * DPbballSSW_;
+  TH1D * SumHED4SSW_;
+  TH1D * SumHPD4SSW_;
+  TH1D * SumHED6SSW_;
+  TH1D * SumHPD6SSW_;
 
   TH1D * NJetsSSSW_;
   TH1D * UncorrSumEtSSSW_;
@@ -472,6 +501,11 @@ class TDAna : public edm::EDAnalyzer {
   TH1D * M45bestallSSSW_;
   TH1D * Chi2extallSSSW_;
   TH1D * DPbballSSSW_;
+  TH1D * SumHED4SSSW_;
+  TH1D * SumHPD4SSSW_;
+  TH1D * SumHED6SSSW_;
+  TH1D * SumHPD6SSSW_;
+
   TH1D * N4NJSSSW_;
   TH1D * E4NJSSSW_;
 
