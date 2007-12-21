@@ -60,7 +60,7 @@ TDAna::TDAna(const edm::ParameterSet& iConfig) :
 
   // Load file with smoothed histograms to use for Likelihood definition
   // -------------------------------------------------------------------
-  FunctionFile = new TFile ("functionfile.root");
+  TFile * FunctionFile = new TFile ("functionfile.root");
   FunctionFile->cd();
   C8SS_sig = dynamic_cast<TH1D*> ( FunctionFile->Get("C8SS_sig"));
   C8SS_bgr = dynamic_cast<TH1D*> ( FunctionFile->Get("C8SS_bgr"));

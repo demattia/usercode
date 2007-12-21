@@ -24,7 +24,7 @@
 //
 // Original Author:  Marco De Mattia
 //         Created:  Tue May  8 13:05:37 CEST 2007
-// $Id: TDAna.h,v 1.7 2007/12/20 14:05:26 dorigo Exp $
+// $Id: TDAna.h,v 1.8 2007/12/21 12:48:15 dorigo Exp $
 //
 //
 
@@ -195,6 +195,11 @@ class TDAna : public edm::EDAnalyzer {
 
   TH1D * DPhimin_;
 
+  // Function histograms
+  // -------------------
+  TH1D * C8SS_sig;
+  TH1D * C8SS_bgr;
+  
   // My histograms
   // -------------
   TH1D * NJets_;
@@ -734,6 +739,12 @@ class TDAna : public edm::EDAnalyzer {
   float loose_;
   float medium_;
   float tight_;
+
+  double l;
+  TH1D * L_;
+  TH1D * LS_;
+  TH1D * LSS_;
+  TH1D * LSSS_;
 
   // Pixel trigger efficiency
   TH1D ** EffMultijetPixel_;
