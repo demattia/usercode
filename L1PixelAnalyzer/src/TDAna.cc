@@ -1937,10 +1937,10 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
       // ---------------------------
       double UncorrMEt =sqrt(UncorrSumEx*UncorrSumEx+UncorrSumEy*UncorrSumEy);
       double CorrMEt = sqrt(CorrSumEx*CorrSumEx+CorrSumEy*CorrSumEy);
-      UncorrHt+=UncorrMEt;
-      CorrHt+=CorrMEt;
-      GoodHt+=CorrMEt;
-      GoodHt2+=caloMET->et();
+      UncorrHt=UncorrHt0+UncorrMEt;
+      CorrHt=CorrHt0+CorrMEt;
+      GoodHt=GoodHt0+CorrMEt;
+      GoodHt2=GoodHt20+caloMET->et();
       
       double UncorrMEtSig=0;
       if ( UncorrSumEt>0 ) UncorrMEtSig = UncorrMEt/sqrt(UncorrSumEt);
