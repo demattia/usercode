@@ -56,11 +56,23 @@ TDAna::TDAna(const edm::ParameterSet& iConfig) :
   // Now do what ever initialization is needed
   // -----------------------------------------
   eventcounter_=0;
+
+
+  // Load file with smoothed histograms to use for Likelihood definition
+  // -------------------------------------------------------------------
+  FunctionFile = new TFile ("functionfile.root");
+  FunctionFile->cd();
+  C8SS_sig = dynamic_cast<TH1D*> ( FunctionFile->Get("C8SS_sig"));
+  C8SS_bgr = dynamic_cast<TH1D*> ( FunctionFile->Get("C8SS_bgr"));
+
   OutputFile = new TFile((conf_.getUntrackedParameter<std::string>("OutputName")).c_str() ,
 			 "RECREATE","L1TrigPixelAnaOutput");
   // The file must be opened first, so that becomes the default position for all the histograms
   // ------------------------------------------------------------------------------------------
   OutputFile->cd();
+
+  
+
 
   // Histograms
   // ----------
@@ -539,6 +551,14 @@ TDAna::TDAna(const edm::ParameterSet& iConfig) :
   medium_ = 5.3; // high eff -> 50.30% b / 10.77% c / 0.92% uds /  0.98% g / 0.96% udsg // P.Schilling 23/10/07
   tight_  = 4.8; // high pur -> 31.94% b /  2.93% c / 0.10% uds /  0.11% g / 0.10% udsg // P.Schilling 23/10/07
 
+  // Relative Likelihood
+  // -------------------       
+  l=0.;
+  L_    = new TH1D ("L", "Likelihood 2t passing sel", 100, 0., 10. );
+  LS_   = new TH1D ("LS", "Likelihood 2t passing sel", 100, 0., 10. );
+  LSS_  = new TH1D ("LSS", "Likelihood 2t passing sel", 100, 0., 10. );
+  LSSS_ = new TH1D ("LSSS", "Likelihood 2t passing sel", 100, 0., 10. );
+
   // Read PTag file
   // --------------
   for ( int i=0; i<1000; i++ ) {
@@ -888,7 +908,7 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   // -------
   bool response_for = false;
   L1Trigger.Fill( vec_TriggerForJet );
-  response_for = L1Trigger.Response();
+   response_for = L1Trigger.Response();
   
   // Tau
   // ---
@@ -2456,6 +2476,36 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
     std::cout << "ATTENTION: Jet collection empty" << std::endl;
   }    
 
+  // Compute Likelihood
+  // ------------------
+  double r=1.;
+  l=0.;
+  int bx = (int)((c8/1.2)*50)+1;
+  if ( bx>=1 && bx<=50 ) {
+    double fs = C8SS_sig->GetBinContent(bx);
+    double fb = C8SS_bgr->GetBinContent(bx);
+    if (fb>0 ) {
+      r = fs/fb;
+    }
+  }
+  l += log(r);
+
+  if ( response && NJetsCut && NHEM>=2 ) {
+    L_->Fill(l);
+    if ( MEtSigCut ) {
+      LS_->Fill(l);
+      if ( NHEM>=3 ) {
+	LSS_->Fill(l);
+      }
+      if ( NHEM>=4 ) {
+	LSSS_->Fill(l);
+      }
+    }
+  }
+
+
+
+
 }
 
 // ------------ method called once each job just before starting event loop  ------------
@@ -2957,6 +3007,13 @@ void TDAna::endJob() {
   UncorrMEt_SumEtJ_->Write();
   CorrMEt_SumEtJ_->Write();
   MEt_SumEtJ_->Write();
+
+  // Likelihood
+  // ----------
+  L_->Write();
+  LS_->Write();
+  LSS_->Write();
+  LSSS_->Write();
 
 }
 
