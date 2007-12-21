@@ -102,6 +102,44 @@ TDAna::TDAna(const edm::ParameterSet& iConfig) :
   SumHED6_ = new TH1D ( "SumHED6", "Sum of HED in 6 jets", 50, 0., 100. );
   SumHPD6_ = new TH1D ( "SumHPD6", "Sum of HPD in 6 jets", 50, 0., 50. );
 
+  NJetsN_ = new TH1D ( "NJetsN", "Number of selected jets", 20, 0, 20 );
+  UncorrHtN_ = new TH1D ( "UncorrHtN", "Ht with uncorrected jets", 50, 0, 4000 );
+  CorrHtN_ = new TH1D ( "CorrHtN", "Ht with corrected jets", 50, 0, 4000 );
+  GoodHtN_ = new TH1D ( "GoodHtN", "Ht with corrected good jets", 50, 0, 4000 );
+  GoodHt2N_ = new TH1D ( "GoodHt2N", "Ht with corrected good jets and corr MEt", 50, 0, 4000 );
+  UncorrSumEtN_ = new TH1D ( "UncorrSumEtN", "SumEt with uncorrected jets", 50, 0, 4000 );
+  CorrSumEtN_ = new TH1D ( "CorrSumEtN", "SumEt with corrected jets", 50, 0, 4000 );
+  GoodSumEtN_ = new TH1D ( "GoodSumEtN", "SumEt with selected jets", 50, 0, 4000 );
+  MEtN_ = new TH1D ( "MEtN", "MEt", 50, 0, 500 );
+  MEtSigN_ = new TH1D ( "MEtSigN", "MEtSig", 50, 0, 20 );
+  MEtSigNewN_ = new TH1D ( "MEtSigNewN", "MEtSig with tuned resolution", 50, 0., 20. );
+  MEtDPMN_ = new TH1D ( "MEtDPMN", "MEtDPM", 50, 0, 3.2 );
+  MEtDP1N_ = new TH1D ( "MEtDP1N", "MEtDP1", 50, 0, 3.2 );
+  MEtDP2N_ = new TH1D ( "MEtDP2N", "MEtDP2", 50, 0, 3.2 );
+  MEtDP3N_ = new TH1D ( "MEtDP3N", "MEtDP3", 50, 0, 3.2 );
+  UncorrMEtSigN_ = new TH1D ( "UncorrMEtSigN", "MEtSig", 50, 0, 20 );
+  CorrMEtSigN_ = new TH1D ( "CorrMEtSigN", "MEtSig", 50, 0, 20 );
+  M3bestN_ = new TH1D ( "M3bestN", "M3best", 50, 0, 300 );
+  MwbestN_ = new TH1D ( "MwbestN", "Mwbest", 50, 0, 200 );
+  Chi2massN_ = new TH1D ( "Chi2massN", "Chi2mass", 50, 0, 50 );
+  M45bestN_ = new TH1D ( "M45bestN", "M45best", 50, 0, 300 );
+  Chi2extN_ = new TH1D ( "Chi2extN", "Chi2ext", 50, 0, 50 );
+  MEx_SumEtN_ = new TH2D ( "MEx_SumEtN", "MEx vs SumEt", 50, 0., 2000., 50, -200., 200. );
+  DP12N_ = new TH1D ( "DP12N", "Delta phi jet 1 jet 2", 50, 0., 3.2 );
+  DPbbN_ = new TH1D ( "DPbbN", "Delta phi bb", 50, 0., 3.2 );
+  M_othersN_ = new TH1D ( "M_othersN", "Mass of other jets", 50, 0., 1500. );
+  MbbnohN_ = new TH1D ( "MbbnohN", "Mass of b pair not from h", 50, 0., 800 );
+  DPbbnohN_ = new TH1D ( "DPbbnohN", "Delta phi of b pair not from h", 50, 0., 3.2 );
+  M8N_ = new TH1D ( "M8N", "Mass 8 jets", 50, 0., 2000.) ;
+  C8N_ = new TH1D ( "C8N", "Centrality 8 jets", 50, 0., 1.2 );
+  M45bestallN_ = new TH1D ( "M45bestallN", "M45best", 50, 0, 300 );
+  Chi2extallN_ = new TH1D ( "Chi2extallN", "Chi2ext", 50, 0, 50 );
+  DPbballN_ = new TH1D ( "DPbballN", "Delta phi bb", 50, 0., 3.2 );
+  SumHED4N_ = new TH1D ( "SumHED4N", "Sum of HED in 4 jets", 50, 0., 100. );
+  SumHPD4N_ = new TH1D ( "SumHPD4N", "Sum of HPD in 4 jets", 50, 0., 50. );
+  SumHED6N_ = new TH1D ( "SumHED6N", "Sum of HED in 6 jets", 50, 0., 100. );
+  SumHPD6N_ = new TH1D ( "SumHPD6N", "Sum of HPD in 6 jets", 50, 0., 50. );
+
   NJetsS_ = new TH1D ( "NJetsS", "Number of selected jets", 20, 0, 20 );
   UncorrHtS_ = new TH1D ( "UncorrHtS", "Ht with uncorrected jets", 50, 0, 4000 );
   CorrHtS_ = new TH1D ( "CorrHtS", "Ht with corrected jets", 50, 0, 4000 );
@@ -139,6 +177,44 @@ TDAna::TDAna(const edm::ParameterSet& iConfig) :
   SumHPD4S_ = new TH1D ( "SumHPD4S", "Sum of HPD in 4 jets", 50, 0., 50. );
   SumHED6S_ = new TH1D ( "SumHED6S", "Sum of HED in 6 jets", 50, 0., 100. );
   SumHPD6S_ = new TH1D ( "SumHPD6S", "Sum of HPD in 6 jets", 50, 0., 50. );
+
+  NJetsSN_ = new TH1D ( "NJetsSN", "Number of selected jets", 20, 0, 20 );
+  UncorrHtSN_ = new TH1D ( "UncorrHtSN", "Ht with uncorrected jets", 50, 0, 4000 );
+  CorrHtSN_ = new TH1D ( "CorrHtSN", "Ht with corrected jets", 50, 0, 4000 );
+  GoodHtSN_ = new TH1D ( "GoodHtSN", "Ht with corrected good jets", 50, 0, 4000 );
+  GoodHt2SN_ = new TH1D ( "GoodHt2SN", "Ht with corrected good jets and corr MEt", 50, 0, 4000 );
+  UncorrSumEtSN_ = new TH1D ( "UncorrSumEtSN", "SumEt with uncorrected jets", 50, 0, 4000 );
+  CorrSumEtSN_ = new TH1D ( "CorrSumEtSN", "SumEt with corrected jets", 50, 0, 4000 );
+  GoodSumEtSN_ = new TH1D ( "GoodSumEtSN", "SumEt with selected jets", 50, 0, 4000 );
+  MEtSN_ = new TH1D ( "MEtSN", "MEt", 50, 0, 500 );
+  MEtSigSN_ = new TH1D ( "MEtSigSN", "MEtSig", 50, 0, 20 );
+  MEtSigNewSN_ = new TH1D ( "MEtSigNewSN", "MEtSig with tuned resolution", 50, 0., 20. );
+  MEtDPMSN_ = new TH1D ( "MEtDPMSN", "MEtDPM", 50, 0, 3.2 );
+  MEtDP1SN_ = new TH1D ( "MEtDP1SN", "MEtDP1S", 50, 0, 3.2 );
+  MEtDP2SN_ = new TH1D ( "MEtDP2SN", "MEtDP2S", 50, 0, 3.2 );
+  MEtDP3SN_ = new TH1D ( "MEtDP3SN", "MEtDP3S", 50, 0, 3.2 );
+  UncorrMEtSigSN_ = new TH1D ( "UncorrMEtSigSN", "MEtSig", 50, 0, 20 );
+  CorrMEtSigSN_ = new TH1D ( "CorrMEtSigSN", "MEtSig", 50, 0, 20 );
+  M3bestSN_ = new TH1D ( "M3bestSN", "M3bestS", 50, 0, 300 );
+  MwbestSN_ = new TH1D ( "MwbestSN", "MwbestS", 50, 0, 200 );
+  Chi2massSN_ = new TH1D ( "Chi2massSN", "Chi2massS", 50, 0, 50 );
+  M45bestSN_ = new TH1D ( "M45bestSN", "M45best", 50, 0, 300 );
+  Chi2extSN_ = new TH1D ( "Chi2extSN", "Chi2ext", 50, 0, 50 );
+  MEx_SumEtSN_ = new TH2D ( "MEx_SumEtSN", "MEx vs SumEt", 50, 0., 2000., 50, -200., 200. );
+  DP12SN_ = new TH1D ( "DP12SN", "Delta phi jet 1 jet 2", 50, 0., 3.2 );
+  DPbbSN_ = new TH1D ( "DPbbSN", "Delta phi bb", 50, 0., 3.2 );
+  M_othersSN_ = new TH1D ( "M_othersSN", "Mass of other jets", 50, 0., 1500. );
+  MbbnohSN_ = new TH1D ( "MbbnohSN", "Mass of b pair not from h", 50, 0., 800 );
+  DPbbnohSN_ = new TH1D ( "DPbbnohSN", "Delta phi of b pair not from h", 50, 0., 3.2 );
+  M8SN_ = new TH1D ( "M8SN", "Mass 8 jets", 50, 0., 2000.) ;
+  C8SN_ = new TH1D ( "C8SN", "Centrality 8 jets", 50, 0., 1.2 );
+  M45bestallSN_ = new TH1D ( "M45bestallSN", "M45best", 50, 0, 300 );
+  Chi2extallSN_ = new TH1D ( "Chi2extallSN", "Chi2ext", 50, 0, 50 );
+  DPbballSN_ = new TH1D ( "DPbballSN", "Delta phi bb", 50, 0., 3.2 );
+  SumHED4SN_ = new TH1D ( "SumHED4SN", "Sum of HED in 4 jets", 50, 0., 100. );
+  SumHPD4SN_ = new TH1D ( "SumHPD4SN", "Sum of HPD in 4 jets", 50, 0., 50. );
+  SumHED6SN_ = new TH1D ( "SumHED6SN", "Sum of HED in 6 jets", 50, 0., 100. );
+  SumHPD6SN_ = new TH1D ( "SumHPD6SN", "Sum of HPD in 6 jets", 50, 0., 50. );
 
   NJetsSS_ = new TH1D ( "NJetsSS", "Number of selected jets", 20, 0, 20 );
   UncorrHtSS_ = new TH1D ( "UncorrHtSS", "Ht with uncorrected jets", 50, 0, 4000 );
@@ -178,6 +254,44 @@ TDAna::TDAna(const edm::ParameterSet& iConfig) :
   SumHED6SS_ = new TH1D ( "SumHED6SS", "Sum of HED in 6 jets", 50, 0., 100. );
   SumHPD6SS_ = new TH1D ( "SumHPD6SS", "Sum of HPD in 6 jets", 50, 0., 50. );
 
+  NJetsSSN_ = new TH1D ( "NJetsSSN", "Number of selected jets", 20, 0, 20 );
+  UncorrHtSSN_ = new TH1D ( "UncorrHtSSN", "Ht with uncorrected jets", 50, 0, 4000 );
+  CorrHtSSN_ = new TH1D ( "CorrHtSSN", "Ht with corrected jets", 50, 0, 4000 );
+  GoodHtSSN_ = new TH1D ( "GoodHtSSN", "Ht with corrected good jets", 50, 0, 4000 );
+  GoodHt2SSN_ = new TH1D ( "GoodHt2SSN", "Ht with corrected good jets and corr MEt", 50, 0, 4000 );
+  UncorrSumEtSSN_ = new TH1D ( "UncorrSumEtSSN", "SumEt with uncorrected jets", 50, 0, 4000 );
+  CorrSumEtSSN_ = new TH1D ( "CorrSumEtSSN", "SumEt with corrected jets", 50, 0, 4000 );
+  GoodSumEtSSN_ = new TH1D ( "GoodSumEtSSN", "SumEt with selected jets", 50, 0, 4000 );
+  MEtSSN_ = new TH1D ( "MEtSSN", "MEt", 50, 0, 500 );
+  MEtSigSSN_ = new TH1D ( "MEtSigSSN", "MEtSig", 50, 0, 20 );
+  MEtSigNewSSN_ = new TH1D ( "MEtSigNewSSN", "MEtSig with tuned resolution", 50, 0., 20. );
+  MEtDPMSSN_ = new TH1D ( "MEtDPMSSN", "MEtDPMSSN", 50, 0, 3.2 );
+  MEtDP1SSN_ = new TH1D ( "MEtDP1SSN", "MEtDP1SSN", 50, 0, 3.2 );
+  MEtDP2SSN_ = new TH1D ( "MEtDP2SSN", "MEtDP2SSN", 50, 0, 3.2 );
+  MEtDP3SSN_ = new TH1D ( "MEtDP3SSN", "MEtDP3SSN", 50, 0, 3.2 );
+  UncorrMEtSigSSN_ = new TH1D ( "UncorrMEtSigSSN", "UncorrMEtSigSSN", 50, 0, 20 );
+  CorrMEtSigSSN_ = new TH1D ( "CorrMEtSigSSN", "CorrMEtSigSSN", 50, 0, 20 );
+  M3bestSSN_ = new TH1D ( "M3bestSSN", "M3bestSSN", 50, 0, 300 );
+  MwbestSSN_ = new TH1D ( "MwbestSSN", "MwbestSSN", 50, 0, 200 );
+  Chi2massSSN_ = new TH1D ( "Chi2massSSN", "Chi2massSSN", 50, 0, 50 );
+  M45bestSSN_ = new TH1D ( "M45bestSSN", "M45best", 50, 0, 300 );
+  Chi2extSSN_ = new TH1D ( "Chi2extSSN", "Chi2ext", 50, 0, 50 );
+  MEx_SumEtSSN_ = new TH2D ( "MEx_SumEtSSN", "MEx vs SumEt", 50, 0., 2000., 50, -200., 200. );
+  DP12SSN_ = new TH1D ( "DP12SSN", "Delta phi jet 1 jet 2", 50, 0., 3.2 );
+  DPbbSSN_ = new TH1D ( "DPbbSSN", "Delta phi bb", 50, 0., 3.2 );
+  M_othersSSN_ = new TH1D ( "M_othersSSN", "Mass of other jets", 50, 0., 1500. );
+  MbbnohSSN_ = new TH1D ( "MbbnohSSN", "Mass of b pair not from h", 50, 0., 800 );
+  DPbbnohSSN_ = new TH1D ( "DPbbnohSSN", "Delta phi of b pair not from h", 50, 0., 3.2 );
+  M8SSN_ = new TH1D ( "M8SSN", "Mass 8 jets", 50, 0., 2000.) ;
+  C8SSN_ = new TH1D ( "C8SSN", "Centrality 8 jets", 50, 0., 1.2 );
+  M45bestallSSN_ = new TH1D ( "M45bestallSSN", "M45best", 50, 0, 300 );
+  Chi2extallSSN_ = new TH1D ( "Chi2extallSSN", "Chi2ext", 50, 0, 50 );
+  DPbballSSN_ = new TH1D ( "DPbballSSN", "Delta phi bb", 50, 0., 3.2 );
+  SumHED4SSN_ = new TH1D ( "SumHED4SSN", "Sum of HED in 4 jets", 50, 0., 100. );
+  SumHPD4SSN_ = new TH1D ( "SumHPD4SSN", "Sum of HPD in 4 jets", 50, 0., 50. );
+  SumHED6SSN_ = new TH1D ( "SumHED6SSN", "Sum of HED in 6 jets", 50, 0., 100. );
+  SumHPD6SSN_ = new TH1D ( "SumHPD6SSN", "Sum of HPD in 6 jets", 50, 0., 50. );
+
   NJetsSSS_ = new TH1D ( "NJetsSSS", "Number of selected jets", 20, 0, 20 );
   UncorrHtSSS_ = new TH1D ( "UncorrHtSSS", "Ht with uncorrected jets", 50, 0, 4000 );
   CorrHtSSS_ = new TH1D ( "CorrHtSSS", "Ht with corrected jets", 50, 0, 4000 );
@@ -215,6 +329,44 @@ TDAna::TDAna(const edm::ParameterSet& iConfig) :
   SumHPD4SSS_ = new TH1D ( "SumHPD4SSS", "Sum of HPD in 4 jets", 50, 0., 50. );
   SumHED6SSS_ = new TH1D ( "SumHED6SSS", "Sum of HED in 6 jets", 50, 0., 100. );
   SumHPD6SSS_ = new TH1D ( "SumHPD6SSS", "Sum of HPD in 6 jets", 50, 0., 50. );
+
+  NJetsSSSN_ = new TH1D ( "NJetsSSSN", "Number of selected jets", 20, 0, 20 );
+  UncorrHtSSSN_ = new TH1D ( "UncorrHtSSSN", "Ht with uncorrected jets", 50, 0, 4000 );
+  CorrHtSSSN_ = new TH1D ( "CorrHtSSSN", "Ht with corrected jets", 50, 0, 4000 );
+  GoodHtSSSN_ = new TH1D ( "GoodHtSSSN", "Ht with corrected good jets", 50, 0, 4000 );
+  GoodHt2SSSN_ = new TH1D ( "GoodHt2SSSN", "Ht with corrected good jets and corr MEt", 50, 0, 4000 );
+  UncorrSumEtSSSN_ = new TH1D ( "UncorrSumEtSSSN", "SumEt with uncorrected jets", 50, 0, 4000 );
+  CorrSumEtSSSN_ = new TH1D ( "CorrSumEtSSSN", "SumEt with corrected jets", 50, 0, 4000 );
+  GoodSumEtSSSN_ = new TH1D ( "GoodSumEtSSSN", "SumEt with selected jets", 50, 0, 4000 );
+  MEtSSSN_ = new TH1D ( "MEtSSSN", "MEt", 50, 0, 500 );
+  MEtSigSSSN_ = new TH1D ( "MEtSigSSSN", "MEtSig", 50, 0, 20 );
+  MEtSigNewSSSN_ = new TH1D ( "MEtSigNewSSSN", "MEtSig with tuned resolution", 50, 0., 20. );
+  MEtDPMSSSN_ = new TH1D ( "MEtDPMSSSN", "MEtDPMSSSN", 50, 0, 3.2 );
+  MEtDP1SSSN_ = new TH1D ( "MEtDP1SSSN", "MEtDP1SSSN", 50, 0, 3.2 );
+  MEtDP2SSSN_ = new TH1D ( "MEtDP2SSSN", "MEtDP2SSSN", 50, 0, 3.2 );
+  MEtDP3SSSN_ = new TH1D ( "MEtDP3SSSN", "MEtDP3SSSN", 50, 0, 3.2 );
+  UncorrMEtSigSSSN_ = new TH1D ( "UncorrMEtSigSSSN", "UncorrMEtSigSSSN", 50, 0, 20 );
+  CorrMEtSigSSSN_ = new TH1D ( "CorrMEtSigSSSN", "CorrMEtSigSSSN", 50, 0, 20 );
+  M3bestSSSN_ = new TH1D ( "M3bestSSSN", "M3bestSSSN", 50, 0, 300 );
+  MwbestSSSN_ = new TH1D ( "MwbestSSSN", "MwbestSSSN", 50, 0, 200 );
+  Chi2massSSSN_ = new TH1D ( "Chi2massSSSN", "Chi2massSSSN", 50, 0, 50 );
+  M45bestSSSN_ = new TH1D ( "M45bestSSSN", "M45best", 50, 0, 300 );
+  Chi2extSSSN_ = new TH1D ( "Chi2extSSSN", "Chi2ext", 50, 0, 50 );
+  MEx_SumEtSSSN_ = new TH2D ( "MEx_SumEtSSSN", "MEx vs SumEt", 50, 0., 2000., 50, -200., 200. );
+  DP12SSSN_ = new TH1D ( "DP12SSSN", "Delta phi jet 1 jet 2", 50, 0., 3.2 );
+  DPbbSSSN_ = new TH1D ( "DPbbSSSN", "Delta phi bb", 50, 0., 3.2 );
+  M_othersSSSN_ = new TH1D ( "M_othersSSSN", "Mass of other jets", 50, 0., 1500. );
+  MbbnohSSSN_ = new TH1D ( "MbbnohSSSN", "Mass of b pair not from h", 50, 0., 800 );
+  DPbbnohSSSN_ = new TH1D ( "DPbbnohSSSN", "Delta phi of b pair not from h", 50, 0., 3.2 );
+  M8SSSN_ = new TH1D ( "M8SSSN", "Mass 8 jets", 50, 0., 2000.) ;
+  C8SSSN_ = new TH1D ( "C8SSSN", "Centrality 8 jets", 50, 0., 1.2 );
+  M45bestallSSSN_ = new TH1D ( "M45bestallSSSN", "M45best", 50, 0, 300 );
+  Chi2extallSSSN_ = new TH1D ( "Chi2extallSSSN", "Chi2ext", 50, 0, 50 );
+  DPbballSSSN_ = new TH1D ( "DPbballSSSN", "Delta phi bb", 50, 0., 3.2 );
+  SumHED4SSSN_ = new TH1D ( "SumHED4SSSN", "Sum of HED in 4 jets", 50, 0., 100. );
+  SumHPD4SSSN_ = new TH1D ( "SumHPD4SSSN", "Sum of HPD in 4 jets", 50, 0., 50. );
+  SumHED6SSSN_ = new TH1D ( "SumHED6SSSN", "Sum of HED in 6 jets", 50, 0., 100. );
+  SumHPD6SSSN_ = new TH1D ( "SumHPD6SSSN", "Sum of HPD in 6 jets", 50, 0., 50. );
 
   N4NJSSS_ = new TH1D ( "N4NJSSS", "N of 4HEL tags vs N jets", 20, 0, 20 );
   E4NJSSS_ = new TH1D ( "E4NJSSS", "Efficiency of 4HEL tags vs N jets", 20, 0, 20 );
@@ -1046,18 +1198,19 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	
 	// Reset all variables
 	// -------------------
-	m3best=-999; // Massa del tripletto piu' vicino a 172 GeV
-	mwbest=-999;    // Massa del doppietto piu' vicino a 80.4 GeV tra i tre nel tripletto definito sopra
-	chi2=1000;   // Chiquadro costruito con le due masse qui sopra
+	m3best=-999;  // Massa del tripletto piu' vicino a 172 GeV
+	mwbest=-999;  // Massa del doppietto piu' vicino a 80.4 GeV 
+	              // tra i tre nel tripletto definito sopra
+	chi2=1000;    // Chiquadro costruito con le due masse qui sopra
 	m45best=-999; // mass of two b-tags closest to 120 GeV not in triplet
 	chi2ext=1000; // chi2 computed by adding contribution from distance to 120 GeV
-	dpbb = 0;    // delta phi bb of pair above
+	dpbb = 0;     // delta phi bb of pair above
 	m45bestall=-999;  // Same as above, without bothering to exclude jets in triplet
 	chi2extall=1000;  // Same as above
-	dpbball = 0;    // delta phi bb as above
-	m_others = -999; // mass of jets not part of best triplet and pair
+	dpbball = 0;      // delta phi bb as above
+	m_others = -999;  // mass of jets not part of best triplet and pair
 	mbbnohmax = -999; // mass of b pair with highest mass excluding b-jets from h decay
-	dpbbnohmax = 0; // angle of b pair with highest mass excluding b-jets from h decay
+	dpbbnohmax = 0;   // angle of b pair with highest mass excluding b-jets from h decay
 	
 	m8=0;
 	set=0;
@@ -1335,7 +1488,8 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	  // Missing Et significance computed with tuned resolution function
 	  // ---------------------------------------------------------------
 	  double metsignew=0;
-	  if ( caloMET->sumEt()>0 ) metsignew = caloMET->et()/(sqrt(2)*0.8033*pow(caloMET->sumEt(),0.5004));
+	  if ( caloMET->sumEt()>0 ) 
+	    metsignew = caloMET->et()/(sqrt(2)*0.8033*pow(caloMET->sumEt(),0.5004));
 	  
 	  if ( PTOT>0 ) {
 
@@ -1392,6 +1546,45 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	      SumHPD4_->Fill(sumhpd4,PTOT);
 	      SumHED6_->Fill(sumhed6,PTOT);
 	      SumHPD6_->Fill(sumhpd6,PTOT);
+
+	      NJetsN_->Fill(goodIc5Jets);
+	      UncorrHtN_->Fill(UncorrHt);
+	      CorrHtN_->Fill(CorrHt);
+	      GoodHtN_->Fill(GoodHt);
+	      GoodHt2N_->Fill(GoodHt2);
+	      UncorrSumEtN_->Fill(UncorrSumEt);
+	      CorrSumEtN_->Fill(CorrSumEt);
+	      GoodSumEtN_->Fill(GoodSumEt);
+	      MEtN_->Fill(caloMET->et());
+	      MEtSigN_->Fill(caloMET->mEtSig());
+	      MEtSigNewN_->Fill(metsignew);
+	      MEtDPMN_->Fill(dpmin);
+	      MEtDP1N_->Fill(dp1st);
+	      MEtDP2N_->Fill(dp2nd);
+	      MEtDP3N_->Fill(dp3rd);
+	      UncorrMEtSigN_->Fill(UncorrMEtSig);
+	      CorrMEtSigN_->Fill(CorrMEtSig);
+	      M3bestN_->Fill(m3best);
+	      MwbestN_->Fill(mwbest);
+	      Chi2massN_->Fill(chi2);
+	      M45bestN_->Fill(m45best);
+	      Chi2extN_->Fill(chi2ext);
+	      MEx_SumEtN_->Fill(caloMET->sumEt(),caloMET->et()*cos(caloMET->phi()));
+	      MEx_SumEtN_->Fill(caloMET->sumEt(),caloMET->et()*sin(caloMET->phi()));
+	      DP12N_->Fill(dp12);
+	      DPbbN_->Fill(dpbb);
+	      M_othersN_->Fill(m_others);
+	      MbbnohN_->Fill(mbbnohmax);
+	      DPbbnohN_->Fill(dpbbnohmax);
+	      M8N_->Fill(m8);
+	      C8N_->Fill(c8);
+	      M45bestallN_->Fill(m45bestall);
+	      Chi2extallN_->Fill(chi2extall);
+	      DPbballN_->Fill(dpbball);
+	      SumHED4N_->Fill(sumhed4);
+	      SumHPD4N_->Fill(sumhpd4);
+	      SumHED6N_->Fill(sumhed6);
+	      SumHPD6N_->Fill(sumhpd6);
 	      
 	      if ( MEtSigCut ) {
 		NJetsS_->Fill(goodIc5Jets,PTOT);
@@ -1432,6 +1625,45 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 		SumHPD4S_->Fill(sumhpd4,PTOT);
 		SumHED6S_->Fill(sumhed6,PTOT);
 		SumHPD6S_->Fill(sumhpd6,PTOT);
+
+		NJetsSN_->Fill(goodIc5Jets);
+		UncorrHtSN_->Fill(UncorrHt);
+		CorrHtSN_->Fill(CorrHt);
+		GoodHtSN_->Fill(GoodHt);
+		GoodHt2SN_->Fill(GoodHt2);
+		UncorrSumEtSN_->Fill(UncorrSumEt);
+		CorrSumEtSN_->Fill(CorrSumEt);
+		GoodSumEtSN_->Fill(GoodSumEt);
+		MEtSN_->Fill(caloMET->et());
+		MEtSigSN_->Fill(caloMET->mEtSig());
+		MEtSigNewSN_->Fill(metsignew);
+		MEtDPMSN_->Fill(dpmin);
+		MEtDP1SN_->Fill(dp1st);
+		MEtDP2SN_->Fill(dp2nd);
+		MEtDP3SN_->Fill(dp3rd);
+		UncorrMEtSigSN_->Fill(UncorrMEtSig);
+		CorrMEtSigSN_->Fill(CorrMEtSig);
+		M3bestSN_->Fill(m3best);
+		MwbestSN_->Fill(mwbest);
+		Chi2massSN_->Fill(chi2);
+		M45bestSN_->Fill(m45best);
+		Chi2extSN_->Fill(chi2ext);
+		MEx_SumEtSN_->Fill(caloMET->sumEt(),caloMET->et()*cos(caloMET->phi()));
+		MEx_SumEtSN_->Fill(caloMET->sumEt(),caloMET->et()*sin(caloMET->phi()));
+		DP12SN_->Fill(dp12);
+		DPbbSN_->Fill(dpbb);
+		M_othersSN_->Fill(m_others);
+		MbbnohSN_->Fill(mbbnohmax);
+		DPbbnohSN_->Fill(dpbbnohmax);
+		M8SN_->Fill(m8);
+		C8SN_->Fill(c8);
+		M45bestallSN_->Fill(m45bestall);
+		Chi2extallSN_->Fill(chi2extall);
+		DPbballSN_->Fill(dpbball);
+		SumHED4SN_->Fill(sumhed4);
+		SumHPD4SN_->Fill(sumhpd4);
+		SumHED6SN_->Fill(sumhed6);
+		SumHPD6SN_->Fill(sumhpd6);
 	      
 		if ( NHEM>=3 ) {
 		  NJetsSS_->Fill(goodIc5Jets,PTOT);
@@ -1472,6 +1704,45 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 		  SumHPD4SS_->Fill(sumhpd4,PTOT);
 		  SumHED6SS_->Fill(sumhed6,PTOT);
 		  SumHPD6SS_->Fill(sumhpd6,PTOT);
+
+		  NJetsSSN_->Fill(goodIc5Jets);
+		  UncorrHtSSN_->Fill(UncorrHt);
+		  CorrHtSSN_->Fill(CorrHt);
+		  GoodHtSSN_->Fill(GoodHt);
+		  GoodHt2SSN_->Fill(GoodHt2);
+		  UncorrSumEtSSN_->Fill(UncorrSumEt);
+		  CorrSumEtSSN_->Fill(CorrSumEt);
+		  GoodSumEtSSN_->Fill(GoodSumEt);
+		  MEtSSN_->Fill(caloMET->et());
+		  MEtSigSSN_->Fill(caloMET->mEtSig());
+		  MEtSigNewSSN_->Fill(metsignew);
+		  MEtDPMSSN_->Fill(dpmin);
+		  MEtDP1SSN_->Fill(dp1st);
+		  MEtDP2SSN_->Fill(dp2nd);
+		  MEtDP3SSN_->Fill(dp3rd);
+		  UncorrMEtSigSSN_->Fill(UncorrMEtSig);
+		  CorrMEtSigSSN_->Fill(CorrMEtSig);
+		  M3bestSSN_->Fill(m3best);
+		  MwbestSSN_->Fill(mwbest);
+		  Chi2massSSN_->Fill(chi2);
+		  M45bestSSN_->Fill(m45best);
+		  Chi2extSSN_->Fill(chi2ext);
+		  MEx_SumEtSSN_->Fill(caloMET->sumEt(),caloMET->et()*cos(caloMET->phi()));
+		  MEx_SumEtSSN_->Fill(caloMET->sumEt(),caloMET->et()*sin(caloMET->phi()));
+		  DP12SSN_->Fill(dp12);
+		  DPbbSSN_->Fill(dpbb);
+		  M_othersSSN_->Fill(m_others);      
+		  MbbnohSSN_->Fill(mbbnohmax);
+		  DPbbnohSSN_->Fill(dpbbnohmax);
+		  M8SSN_->Fill(m8);
+		  C8SSN_->Fill(c8);
+		  M45bestallSSN_->Fill(m45bestall);
+		  Chi2extallSSN_->Fill(chi2extall);
+		  DPbballSSN_->Fill(dpbball);
+		  SumHED4SSN_->Fill(sumhed4);
+		  SumHPD4SSN_->Fill(sumhpd4);
+		  SumHED6SSN_->Fill(sumhed6);
+		  SumHPD6SSN_->Fill(sumhpd6);
 		}
 		
 		if ( NHEM>=4 ) {
@@ -1513,6 +1784,45 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 		  SumHPD4SSS_->Fill(sumhpd4,PTOT);
 		  SumHED6SSS_->Fill(sumhed6,PTOT);
 		  SumHPD6SSS_->Fill(sumhpd6,PTOT);
+
+		  NJetsSSSN_->Fill(goodIc5Jets);
+		  UncorrHtSSSN_->Fill(UncorrHt);
+		  CorrHtSSSN_->Fill(CorrHt);
+		  GoodHtSSSN_->Fill(GoodHt);
+		  GoodHt2SSSN_->Fill(GoodHt2);
+		  UncorrSumEtSSSN_->Fill(UncorrSumEt);
+		  CorrSumEtSSSN_->Fill(CorrSumEt);
+		  GoodSumEtSSSN_->Fill(GoodSumEt);
+		  MEtSSSN_->Fill(caloMET->et());
+		  MEtSigSSSN_->Fill(caloMET->mEtSig());
+		  MEtSigNewSSSN_->Fill(metsignew);
+		  MEtDPMSSSN_->Fill(dpmin);
+		  MEtDP1SSSN_->Fill(dp1st);
+		  MEtDP2SSSN_->Fill(dp2nd);
+		  MEtDP3SSSN_->Fill(dp3rd);
+		  UncorrMEtSigSSSN_->Fill(UncorrMEtSig);
+		  CorrMEtSigSSSN_->Fill(CorrMEtSig);
+		  M3bestSSSN_->Fill(m3best);
+		  MwbestSSSN_->Fill(mwbest);
+		  Chi2massSSSN_->Fill(chi2);
+		  M45bestSSSN_->Fill(m45best);
+		  Chi2extSSSN_->Fill(chi2ext);
+		  MEx_SumEtSSSN_->Fill(caloMET->sumEt(),caloMET->et()*cos(caloMET->phi()));
+		  MEx_SumEtSSSN_->Fill(caloMET->sumEt(),caloMET->et()*sin(caloMET->phi()));
+		  DP12SSSN_->Fill(dp12);
+		  DPbbSSSN_->Fill(dpbb);
+		  M_othersSSSN_->Fill(m_others);      
+		  MbbnohSSSN_->Fill(mbbnohmax);
+		  DPbbnohSSSN_->Fill(dpbbnohmax);
+		  M8SSSN_->Fill(m8);
+		  C8SSSN_->Fill(c8);
+		  M45bestallSSSN_->Fill(m45bestall);
+		  Chi2extallSSSN_->Fill(chi2extall);
+		  DPbballSSSN_->Fill(dpbball);
+		  SumHED4SSSN_->Fill(sumhed4);
+		  SumHPD4SSSN_->Fill(sumhpd4);
+		  SumHED6SSSN_->Fill(sumhed6);
+		  SumHPD6SSSN_->Fill(sumhpd6);
 		}
 
 	      }
@@ -2197,6 +2507,44 @@ void TDAna::endJob() {
   SumHPD4_->Write();
   SumHED6_->Write();
   SumHPD6_->Write();
+
+  NJetsN_->Write();
+  UncorrHtN_->Write();
+  CorrHtN_->Write();
+  GoodHtN_->Write();
+  GoodHt2N_->Write();
+  UncorrSumEtN_->Write();
+  CorrSumEtN_->Write();
+  GoodSumEtN_->Write();
+  MEtN_->Write();
+  MEtSigN_->Write();
+  MEtSigNewN_->Write();
+  MEtDPMN_->Write();
+  MEtDP1N_->Write();
+  MEtDP2N_->Write();
+  MEtDP3N_->Write();
+  UncorrMEtSigN_->Write();
+  CorrMEtSigN_->Write();
+  M3bestN_->Write();
+  MwbestN_->Write();
+  Chi2massN_->Write();
+  M45bestN_->Write();
+  Chi2extN_->Write();
+  MEx_SumEtN_->Write();
+  DP12N_->Write();
+  DPbbN_->Write();
+  M_othersN_->Write();
+  MbbnohN_->Write();
+  DPbbnohN_->Write();
+  M8N_->Write();
+  C8N_->Write();
+  M45bestallN_->Write();
+  Chi2extallN_->Write();
+  DPbballN_->Write();
+  SumHED4N_->Write();
+  SumHPD4N_->Write();
+  SumHED6N_->Write();
+  SumHPD6N_->Write();
   
   // Histograms for events passing trigger and NJet cut
   // --------------------------------------------------
@@ -2238,6 +2586,44 @@ void TDAna::endJob() {
   SumHED6S_->Write();
   SumHPD6S_->Write();
 
+  NJetsSN_->Write();
+  UncorrHtSN_->Write();
+  CorrHtSN_->Write();
+  GoodHtSN_->Write();
+  GoodHt2SN_->Write();
+  UncorrSumEtSN_->Write();
+  CorrSumEtSN_->Write();
+  GoodSumEtSN_->Write();
+  MEtSN_->Write();
+  MEtSigSN_->Write();
+  MEtSigNewSN_->Write();
+  MEtDPMSN_->Write();
+  MEtDP1SN_->Write();
+  MEtDP2SN_->Write();
+  MEtDP3SN_->Write();
+  UncorrMEtSigSN_->Write();
+  CorrMEtSigSN_->Write();
+  M3bestSN_->Write();
+  MwbestSN_->Write();
+  Chi2massSN_->Write();
+  M45bestSN_->Write();
+  Chi2extSN_->Write();
+  MEx_SumEtSN_->Write();
+  DP12SN_->Write();
+  DPbbSN_->Write();
+  M_othersSN_->Write();
+  MbbnohSN_->Write();
+  DPbbnohSN_->Write();
+  M8SN_->Write();
+  C8SN_->Write();
+  M45bestallSN_->Write();
+  Chi2extallSN_->Write();
+  DPbballSN_->Write();
+  SumHED4SN_->Write();
+  SumHPD4SN_->Write();
+  SumHED6SN_->Write();
+  SumHPD6SN_->Write();
+
   // Histograms for events passing trigger, NJet, and METS cut
   // ---------------------------------------------------------
   NJetsSS_->Write();
@@ -2278,6 +2664,44 @@ void TDAna::endJob() {
   SumHED6SS_->Write();
   SumHPD6SS_->Write();
 
+  NJetsSSN_->Write();
+  UncorrHtSSN_->Write();
+  CorrHtSSN_->Write();
+  GoodHtSSN_->Write();
+  GoodHt2SSN_->Write();
+  UncorrSumEtSSN_->Write();
+  CorrSumEtSSN_->Write();
+  GoodSumEtSSN_->Write();
+  MEtSSN_->Write();
+  MEtSigSSN_->Write();
+  MEtSigNewSSN_->Write();
+  MEtDPMSSN_->Write();
+  MEtDP1SSN_->Write();
+  MEtDP2SSN_->Write();
+  MEtDP3SSN_->Write();
+  UncorrMEtSigSSN_->Write();
+  CorrMEtSigSSN_->Write();
+  M3bestSSN_->Write();
+  MwbestSSN_->Write();
+  Chi2massSSN_->Write();
+  M45bestSSN_->Write();
+  Chi2extSSN_->Write();
+  MEx_SumEtSSN_->Write();
+  DP12SSN_->Write();
+  DPbbSSN_->Write();
+  M_othersSSN_->Write();
+  MbbnohSSN_->Write();
+  DPbbnohSSN_->Write();
+  M8SSN_->Write();
+  C8SSN_->Write();
+  M45bestallSSN_->Write();
+  Chi2extallSSN_->Write();
+  DPbballSSN_->Write();
+  SumHED4SSN_->Write();
+  SumHPD4SSN_->Write();
+  SumHED6SSN_->Write();
+  SumHPD6SSN_->Write();
+
   // Histograms for events passing trigger, NJet, and METS cut
   // ---------------------------------------------------------
   NJetsSSS_->Write();
@@ -2317,6 +2741,44 @@ void TDAna::endJob() {
   SumHPD4SSS_->Write();
   SumHED6SSS_->Write();
   SumHPD6SSS_->Write();
+
+  NJetsSSSN_->Write();
+  UncorrHtSSSN_->Write();
+  CorrHtSSSN_->Write();
+  GoodHtSSSN_->Write();
+  GoodHt2SSSN_->Write();
+  UncorrSumEtSSSN_->Write();
+  CorrSumEtSSSN_->Write();
+  GoodSumEtSSSN_->Write();
+  MEtSSSN_->Write();
+  MEtSigSSSN_->Write();
+  MEtSigNewSSSN_->Write();
+  MEtDPMSSSN_->Write();
+  MEtDP1SSSN_->Write();
+  MEtDP2SSSN_->Write();
+  MEtDP3SSSN_->Write();
+  UncorrMEtSigSSSN_->Write();
+  CorrMEtSigSSSN_->Write();
+  M3bestSSSN_->Write();
+  MwbestSSSN_->Write();
+  Chi2massSSSN_->Write();
+  M45bestSSSN_->Write();
+  Chi2extSSSN_->Write();
+  MEx_SumEtSSSN_->Write();
+  DP12SSSN_->Write();
+  DPbbSSSN_->Write();
+  M_othersSSSN_->Write();
+  MbbnohSSSN_->Write();
+  DPbbnohSSSN_->Write();
+  M8SSSN_->Write();
+  C8SSSN_->Write();
+  M45bestallSSSN_->Write();
+  Chi2extallSSSN_->Write();
+  DPbballSSSN_->Write();
+  SumHED4SSSN_->Write();
+  SumHPD4SSSN_->Write();
+  SumHED6SSSN_->Write();
+  SumHPD6SSSN_->Write();
 
   N4NJSSS_->Write();
   E4NJSSS_->Write();

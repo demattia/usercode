@@ -24,7 +24,7 @@
 //
 // Original Author:  Marco De Mattia
 //         Created:  Tue May  8 13:05:37 CEST 2007
-// $Id: TDAna.h,v 1.6 2007/12/20 12:13:21 dorigo Exp $
+// $Id: TDAna.h,v 1.7 2007/12/20 14:05:26 dorigo Exp $
 //
 //
 
@@ -351,6 +351,160 @@ class TDAna : public edm::EDAnalyzer {
 
   TH1D * N4NJSSS_;
   TH1D * E4NJSSS_;
+
+  // Histograms with number of entries
+  // ---------------------------------
+  TH1D * NJetsN_;
+  TH1D * UncorrSumEtN_;
+  TH1D * UncorrHtN_;
+  TH1D * CorrSumEtN_;
+  TH1D * CorrHtN_;
+  TH1D * GoodSumEtN_;
+  TH1D * GoodHtN_;
+  TH1D * GoodHt2N_;
+  TH1D * MEtN_;
+  TH1D * MEtSigN_;
+  TH1D * MEtSigNewN_;
+  TH1D * MEtDPMN_;
+  TH1D * MEtDP1N_;
+  TH1D * MEtDP2N_;
+  TH1D * MEtDP3N_;
+  TH1D * UncorrMEtSigN_;
+  TH1D * CorrMEtSigN_;
+  TH1D * M3bestN_;
+  TH1D * MwbestN_;
+  TH1D * Chi2massN_;
+  TH1D * M45bestN_;
+  TH1D * Chi2extN_;
+  TH2D * MEx_SumEtN_;
+  TH1D * DP12N_;
+  TH1D * DPbbN_;
+  TH1D * M_othersN_;
+  TH1D * MbbnohN_;
+  TH1D * DPbbnohN_;
+  TH1D * M8N_;
+  TH1D * C8N_;
+  TH1D * M45bestallN_;
+  TH1D * Chi2extallN_;
+  TH1D * DPbballN_;
+  TH1D * SumHED4N_;
+  TH1D * SumHPD4N_;
+  TH1D * SumHED6N_;
+  TH1D * SumHPD6N_;
+
+  TH1D * NJetsSN_;
+  TH1D * UncorrSumEtSN_;
+  TH1D * UncorrHtSN_;
+  TH1D * CorrSumEtSN_;
+  TH1D * CorrHtSN_;
+  TH1D * GoodSumEtSN_;
+  TH1D * GoodHtSN_;
+  TH1D * GoodHt2SN_;
+  TH1D * MEtSN_;
+  TH1D * MEtSigSN_;
+  TH1D * MEtSigNewSN_;
+  TH1D * MEtDPMSN_;
+  TH1D * MEtDP1SN_; 
+  TH1D * MEtDP2SN_;
+  TH1D * MEtDP3SN_;
+  TH1D * UncorrMEtSigSN_;
+  TH1D * CorrMEtSigSN_;
+  TH1D * M3bestSN_;
+  TH1D * MwbestSN_;
+  TH1D * Chi2massSN_;
+  TH1D * M45bestSN_;
+  TH1D * Chi2extSN_;
+  TH2D * MEx_SumEtSN_;
+  TH1D * DP12SN_;
+  TH1D * DPbbSN_;
+  TH1D * M_othersSN_;
+  TH1D * MbbnohSN_;
+  TH1D * DPbbnohSN_;
+  TH1D * M8SN_;
+  TH1D * C8SN_;
+  TH1D * M45bestallSN_;
+  TH1D * Chi2extallSN_;
+  TH1D * DPbballSN_;
+  TH1D * SumHED4SN_;
+  TH1D * SumHPD4SN_;
+  TH1D * SumHED6SN_;
+  TH1D * SumHPD6SN_;
+
+  TH1D * NJetsSSN_;
+  TH1D * UncorrSumEtSSN_;
+  TH1D * UncorrHtSSN_;
+  TH1D * CorrSumEtSSN_;
+  TH1D * CorrHtSSN_;
+  TH1D * GoodSumEtSSN_;
+  TH1D * GoodHtSSN_;
+  TH1D * GoodHt2SSN_;
+  TH1D * MEtSSN_;
+  TH1D * MEtSigSSN_;
+  TH1D * MEtSigNewSSN_;
+  TH1D * MEtDPMSSN_;
+  TH1D * MEtDP1SSN_;
+  TH1D * MEtDP2SSN_;
+  TH1D * MEtDP3SSN_;
+  TH1D * UncorrMEtSigSSN_;
+  TH1D * CorrMEtSigSSN_;
+  TH1D * M3bestSSN_;
+  TH1D * MwbestSSN_;
+  TH1D * Chi2massSSN_;
+  TH1D * M45bestSSN_;
+  TH1D * Chi2extSSN_;
+  TH2D * MEx_SumEtSSN_;
+  TH1D * DP12SSN_;
+  TH1D * DPbbSSN_;
+  TH1D * M_othersSSN_;
+  TH1D * MbbnohSSN_;
+  TH1D * DPbbnohSSN_;
+  TH1D * M8SSN_;
+  TH1D * C8SSN_;
+  TH1D * M45bestallSSN_;
+  TH1D * Chi2extallSSN_;
+  TH1D * DPbballSSN_;
+  TH1D * SumHED4SSN_;
+  TH1D * SumHPD4SSN_;
+  TH1D * SumHED6SSN_;
+  TH1D * SumHPD6SSN_;
+
+  TH1D * NJetsSSSN_;
+  TH1D * UncorrSumEtSSSN_;
+  TH1D * UncorrHtSSSN_;
+  TH1D * CorrSumEtSSSN_;
+  TH1D * CorrHtSSSN_;
+  TH1D * GoodSumEtSSSN_;
+  TH1D * GoodHtSSSN_;
+  TH1D * GoodHt2SSSN_;
+  TH1D * MEtSSSN_;
+  TH1D * MEtSigSSSN_;
+  TH1D * MEtSigNewSSSN_;
+  TH1D * MEtDPMSSSN_;
+  TH1D * MEtDP1SSSN_;
+  TH1D * MEtDP2SSSN_;
+  TH1D * MEtDP3SSSN_;
+  TH1D * UncorrMEtSigSSSN_;
+  TH1D * CorrMEtSigSSSN_;
+  TH1D * M3bestSSSN_;
+  TH1D * MwbestSSSN_;
+  TH1D * Chi2massSSSN_;
+  TH1D * M45bestSSSN_;
+  TH1D * Chi2extSSSN_;
+  TH2D * MEx_SumEtSSSN_;
+  TH1D * DP12SSSN_;
+  TH1D * DPbbSSSN_;
+  TH1D * M_othersSSSN_;
+  TH1D * MbbnohSSSN_;
+  TH1D * DPbbnohSSSN_;
+  TH1D * M8SSSN_;
+  TH1D * C8SSSN_;
+  TH1D * M45bestallSSSN_;
+  TH1D * Chi2extallSSSN_;
+  TH1D * DPbballSSSN_;
+  TH1D * SumHED4SSSN_;
+  TH1D * SumHPD4SSSN_;
+  TH1D * SumHED6SSSN_;
+  TH1D * SumHPD6SSSN_;
 
   // Error histograms
   // ----------------
