@@ -2082,20 +2082,20 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	    if ( response && NJetsCut && NHEM>=2 ) {
 	      L_->Fill(rel_lik,PTOT);
 	      LW_->Fill(rel_lik,PTOTE2);
-	      LN_->Fill(rel_lik);
+	      LN_->Fill(rel_lik,weight_N);
 	      if ( MEtSigCut ) {
 		LS_->Fill(rel_lik,PTOT);
 		LSW_->Fill(rel_lik,PTOTE2);
-		LSN_->Fill(rel_lik);
+		LSN_->Fill(rel_lik,weight_N);
 		if ( NHEM>=3 ) {
 		  LSS_->Fill(rel_lik,PTOT);
 		  LSSW_->Fill(rel_lik,PTOTE2);
-		  LSSN_->Fill(rel_lik);
+		  LSSN_->Fill(rel_lik,weight_N);
 		}
 		if ( NHEM>=4 ) {
 		  LSSS_->Fill(rel_lik,PTOT);
 		  LSSSW_->Fill(rel_lik,PTOTE2);
-		  LSSSN_->Fill(rel_lik);
+		  LSSSN_->Fill(rel_lik,weight_N);
 		}
 	      }
 	    }
