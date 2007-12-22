@@ -19,7 +19,7 @@
 //
 // Original Author:  Marco De Mattia
 //         Created:  Tue May  8 13:05:37 CEST 2007
-// $Id: TDAna.h,v 1.9 2007/12/21 15:01:42 dorigo Exp $
+// $Id: TDAna.h,v 1.10 2007/12/22 14:01:36 dorigo Exp $
 //
 //
 
@@ -683,6 +683,14 @@ class TDAna : public edm::EDAnalyzer {
   TH1D * LS_;
   TH1D * LSS_;
   TH1D * LSSS_;
+  TH1D * LW_;
+  TH1D * LSW_;
+  TH1D * LSSW_;
+  TH1D * LSSSW_;
+  TH1D * LN_;
+  TH1D * LSN_;
+  TH1D * LSSN_;
+  TH1D * LSSSN_;
 
   // PTag numbers
   // ------------

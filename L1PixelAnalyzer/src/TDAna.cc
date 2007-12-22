@@ -573,6 +573,14 @@ TDAna::TDAna(const edm::ParameterSet& iConfig) :
   LS_   = new TH1D ("LS", "Likelihood 2t passing sel", 100, -10., 10. );
   LSS_  = new TH1D ("LSS", "Likelihood 2t passing sel", 100, -10., 10. );
   LSSS_ = new TH1D ("LSSS", "Likelihood 2t passing sel", 100, -10., 10. );
+  LW_    = new TH1D ("LW", "Likelihood 2t passing sel", 100, -10., 10. );
+  LSW_   = new TH1D ("LSW", "Likelihood 2t passing sel", 100, -10., 10. );
+  LSSW_  = new TH1D ("LSSW", "Likelihood 2t passing sel", 100, -10., 10. );
+  LSSSW_ = new TH1D ("LSSSW", "Likelihood 2t passing sel", 100, -10., 10. );
+  LN_    = new TH1D ("LN", "Likelihood 2t passing sel", 100, -10., 10. );
+  LSN_   = new TH1D ("LSN", "Likelihood 2t passing sel", 100, -10., 10. );
+  LSSN_  = new TH1D ("LSSN", "Likelihood 2t passing sel", 100, -10., 10. );
+  LSSSN_ = new TH1D ("LSSSN", "Likelihood 2t passing sel", 100, -10., 10. );
 
   // Read PTag file
   // --------------
@@ -2046,6 +2054,52 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	      }
 	    }
 
+	    // Compute Likelihood
+	    // ------------------
+	    double r=1.0;
+	    double fs=0.;
+	    double fb=0.;
+	    rel_lik = 0.;
+	    int bx[8];
+	    bx[0]= (int)((c8/1.2)*50)+1;
+	    bx[1]= (int)((m45bestall/300.)*50)+1;
+	    bx[2]= (int)(chi2extall)+1;
+	    bx[3]= (int)((metsig/20.)*50)+1;
+	    bx[4]= (int)((m8/2000)*50.)+1;
+	    bx[5]= (int)((met/500.)*50)+1;
+	    bx[6]= (int)((dp12/3.2)*50.)+1;
+	    bx[7]= (int)((dp2nd/3.2)*50)+1;
+	    for ( int ivar=0; ivar<8; ivar++ ) {
+	      if ( bx[ivar]>=1 && bx[ivar]<=50 ) {
+		fs = HSS_sig[ivar]->GetBinContent(bx[ivar]);
+		fb = HSS_bgr[ivar]->GetBinContent(bx[ivar]);
+		if (fb>0 ) {
+		  r *= fs/fb;
+		}
+	      }
+	    }
+	    rel_lik += log(r);	    
+	    if ( response && NJetsCut && NHEM>=2 ) {
+	      L_->Fill(rel_lik,PTOT);
+	      LW_->Fill(rel_lik,PTOTE2);
+	      LN_->Fill(rel_lik);
+	      if ( MEtSigCut ) {
+		LS_->Fill(rel_lik,PTOT);
+		LSW_->Fill(rel_lik,PTOTE2);
+		LSN_->Fill(rel_lik);
+		if ( NHEM>=3 ) {
+		  LSS_->Fill(rel_lik,PTOT);
+		  LSSW_->Fill(rel_lik,PTOTE2);
+		  LSSN_->Fill(rel_lik);
+		}
+		if ( NHEM>=4 ) {
+		  LSSS_->Fill(rel_lik,PTOT);
+		  LSSSW_->Fill(rel_lik,PTOTE2);
+		  LSSSN_->Fill(rel_lik);
+		}
+	      }
+	    }
+
 	  } // end if PTOT>0
 	}  // end if ntags>=2
 
@@ -2490,51 +2544,50 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	  }
 	}
       }
+
+      // Compute Likelihood
+      // ------------------
+      double r=1.0;
+      double fs=0.;
+      double fb=0.;
+      rel_lik = 0.;
+      int bx[8];
+      bx[0]= (int)((c8/1.2)*50)+1;
+      bx[1]= (int)((m45bestall/300.)*50)+1;
+      bx[2]= (int)(chi2extall)+1;
+      bx[3]= (int)((metsig/20.)*50)+1;
+      bx[4]= (int)((m8/2000)*50.)+1;
+      bx[5]= (int)((met/500.)*50)+1;
+      bx[6]= (int)((dp12/3.2)*50.)+1;
+      bx[7]= (int)((dp2nd/3.2)*50)+1;
+      for ( int ivar=0; ivar<8; ivar++ ) {
+	if ( bx[ivar]>=1 && bx[ivar]<=50 ) {
+	  fs = HSS_sig[ivar]->GetBinContent(bx[ivar]);
+	  fb = HSS_bgr[ivar]->GetBinContent(bx[ivar]);
+	  if (fb>0 ) {
+	    r *= fs/fb;
+	  }
+	}
+      }
+      rel_lik += log(r);
+      if ( response && NJetsCut && NHEM>=2 ) {
+	L_->Fill(rel_lik);
+	if ( MEtSigCut ) {
+	  LS_->Fill(rel_lik);
+	  if ( NHEM>=3 ) {
+	    LSS_->Fill(rel_lik);
+	  }
+	  if ( NHEM>=4 ) {
+	    LSSS_->Fill(rel_lik);
+	  }
+	}
+      }
+
     }
   } // end if caloJETS.size()
   else {
     std::cout << "ATTENTION: Jet collection empty" << std::endl;
   }    
-
-  // Compute Likelihood
-  // ------------------
-  double r=1.0;
-  double fs=0.;
-  double fb=0.;
-  rel_lik = 0.;
-  int bx[8];
-  bx[0]= (int)((c8/1.2)*50)+1;
-  bx[1]= (int)((m45bestall/300.)*50)+1;
-  bx[2]= (int)(chi2extall)+1;
-  bx[3]= (int)((metsig/20.)*50)+1;
-  bx[4]= (int)((m8/2000)*50.)+1;
-  bx[5]= (int)((met/500.)*50)+1;
-  bx[6]= (int)((dp12/3.2)*50.)+1;
-  bx[7]= (int)((dp2nd/3.2)*50)+1;
-  for ( int ivar=0; ivar<8; ivar++ ) {
-    if ( bx[ivar]>=1 && bx[ivar]<=50 ) {
-      fs = HSS_sig[ivar]->GetBinContent(bx[ivar]);
-      fb = HSS_bgr[ivar]->GetBinContent(bx[ivar]);
-      if (fb>0 ) {
-	r *= fs/fb;
-      }
-    }
-  }
-  
-  rel_lik += log(r);
-  
-  if ( response && NJetsCut && NHEM>=2 ) {
-    L_->Fill(rel_lik);
-    if ( MEtSigCut ) {
-      LS_->Fill(rel_lik);
-      if ( NHEM>=3 ) {
-	LSS_->Fill(rel_lik);
-      }
-      if ( NHEM>=4 ) {
-	LSSS_->Fill(rel_lik);
-      }
-    }
-  }
 
 
 }
@@ -3045,6 +3098,14 @@ void TDAna::endJob() {
   LS_->Write();
   LSS_->Write();
   LSSS_->Write();
+  LW_->Write();
+  LSW_->Write();
+  LSSW_->Write();
+  LSSSW_->Write();
+  LN_->Write();
+  LSN_->Write();
+  LSSN_->Write();
+  LSSSN_->Write();
 
 }
 
