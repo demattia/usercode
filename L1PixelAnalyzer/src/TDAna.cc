@@ -60,16 +60,33 @@ TDAna::TDAna(const edm::ParameterSet& iConfig) :
 
   // Load file with smoothed histograms to use for Likelihood definition
   // -------------------------------------------------------------------
-  TFile * FunctionFile = new TFile ("functionfile.root");
+  TFile * FunctionFile = new TFile ("functionfileSS.root");
   FunctionFile->cd();
-  C8SS_sig = dynamic_cast<TH1D*> ( FunctionFile->Get("C8SS_sig"));
-  C8SS_bgr = dynamic_cast<TH1D*> ( FunctionFile->Get("C8SS_bgr"));
+  HSS_sig[0] = dynamic_cast<TH1D*> ( FunctionFile->Get("C8SS_sig"));
+  HSS_bgr[0] = dynamic_cast<TH1D*> ( FunctionFile->Get("C8SS_bgr"));
+  HSS_sig[1] = dynamic_cast<TH1D*> ( FunctionFile->Get("M45bestallSS_sig"));
+  HSS_bgr[1] = dynamic_cast<TH1D*> ( FunctionFile->Get("M45bestallSS_bgr"));
+  HSS_sig[2] = dynamic_cast<TH1D*> ( FunctionFile->Get("Chi2extallSS_sig"));
+  HSS_bgr[2] = dynamic_cast<TH1D*> ( FunctionFile->Get("Chi2extallSS_bgr"));
+  HSS_sig[3] = dynamic_cast<TH1D*> ( FunctionFile->Get("MEtSigSS_sig"));
+  HSS_bgr[3] = dynamic_cast<TH1D*> ( FunctionFile->Get("MEtSigSS_bgr"));
+  HSS_sig[4] = dynamic_cast<TH1D*> ( FunctionFile->Get("M8SS_sig"));
+  HSS_bgr[4] = dynamic_cast<TH1D*> ( FunctionFile->Get("M8SS_bgr"));
+  HSS_sig[5] = dynamic_cast<TH1D*> ( FunctionFile->Get("MEtSS_sig"));
+  HSS_bgr[5] = dynamic_cast<TH1D*> ( FunctionFile->Get("MEtSS_bgr"));
+  HSS_sig[6] = dynamic_cast<TH1D*> ( FunctionFile->Get("DP12SS_sig"));
+  HSS_bgr[6] = dynamic_cast<TH1D*> ( FunctionFile->Get("DP12SS_bgr"));
+  HSS_sig[7] = dynamic_cast<TH1D*> ( FunctionFile->Get("MEtDP2SS_sig"));
+  HSS_bgr[7] = dynamic_cast<TH1D*> ( FunctionFile->Get("MEtDP2SS_bgr"));
 
+  // File for output histograms
+  // --------------------------
   OutputFile = new TFile((conf_.getUntrackedParameter<std::string>("OutputName")).c_str() ,
 			 "RECREATE","L1TrigPixelAnaOutput");
+
   // The file must be opened first, so that becomes the default position for all the histograms
   // ------------------------------------------------------------------------------------------
-  OutputFile->cd();
+  OutputFile->cd(); 
 
   // Histograms
   // ----------
@@ -550,7 +567,8 @@ TDAna::TDAna(const edm::ParameterSet& iConfig) :
 
   // Relative Likelihood
   // -------------------       
-  l=0.;
+  rel_lik = 0.;
+
   L_    = new TH1D ("L", "Likelihood 2t passing sel", 100, -10., 10. );
   LS_   = new TH1D ("LS", "Likelihood 2t passing sel", 100, -10., 10. );
   LSS_  = new TH1D ("LSS", "Likelihood 2t passing sel", 100, -10., 10. );
@@ -730,9 +748,8 @@ TDAna::~TDAna()
   // (e.g. close files, deallocate resources etc.)
   // -----------------------------------------------------------
 
-  // Draw the histograms
-  // -------------------
-
+  // Write out the file
+  // ------------------
   OutputFile->Write();
 
 }
@@ -971,6 +988,10 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   edm::Handle<OfflineMEt> caloMET;
   iEvent.getByLabel( offlineMEtLabel_, caloMET );
 
+  double met = caloMET->et();
+  double metsig = caloMET->mEtSig();
+  double metphi = caloMET->phi();
+
   // HiVariables
   // -----------
   edm::Handle<OfflineJetCollection> caloJets;
@@ -1076,7 +1097,7 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	GoodHt0+=cal->et();
 	GoodHt20+=cal->et();
 	GoodSumEt+=cal->et();
-	double dp = 3.1415926-fabs(fabs(cal->phi()-caloMET->phi())-3.1415926);
+	double dp = 3.1415926-fabs(fabs(cal->phi()-metphi)-3.1415926);
 	if ( dp<dpmin ) dpmin=dp;
 	goodIc5JetVec.push_back(*cal);
 
@@ -1132,9 +1153,9 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
     // Compute delta phi angles
     // ------------------------
     if ( iJ>1 ) dp12 = 3.1415926-fabs(fabs(Jphi[0]-Jphi[1])-3.1415926);
-    if ( iJ>0 ) dp1st= 3.1415926-fabs(fabs(Jphi[0]-caloMET->phi())-3.1415926);
-    if ( iJ>1 ) dp2nd= 3.1415926-fabs(fabs(Jphi[1]-caloMET->phi())-3.1415926);
-    if ( iJ>2 ) dp3rd= 3.1415926-fabs(fabs(Jphi[2]-caloMET->phi())-3.1415926);
+    if ( iJ>0 ) dp1st= 3.1415926-fabs(fabs(Jphi[0]-metphi)-3.1415926);
+    if ( iJ>1 ) dp2nd= 3.1415926-fabs(fabs(Jphi[1]-metphi)-3.1415926);
+    if ( iJ>2 ) dp3rd= 3.1415926-fabs(fabs(Jphi[2]-metphi)-3.1415926);
 
     // Compute sum of discriminants
     // ----------------------------
@@ -1486,7 +1507,7 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	  // Offline cuts
 	  // ------------
 	  if ( iJ >= 5 ) NJetsCut = true;
-	  if ( caloMET->mEtSig()>3 ) MEtSigCut = true;
+	  if ( metsig>3 ) MEtSigCut = true;
 	  
 	  // Fill kinematical histograms
 	  // ---------------------------
@@ -1495,7 +1516,7 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	  UncorrHt=UncorrHt0+UncorrMEt;
 	  CorrHt=CorrHt0+CorrMEt;
 	  GoodHt=GoodHt0+CorrMEt;
-	  GoodHt2=GoodHt20+caloMET->et();
+	  GoodHt2=GoodHt20+met;
 	  
 	  double UncorrMEtSig=0;
 	  if ( UncorrSumEt>0 ) UncorrMEtSig = UncorrMEt/sqrt(UncorrSumEt);
@@ -1506,7 +1527,7 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	  // ---------------------------------------------------------------
 	  double metsignew=0;
 	  if ( caloMET->sumEt()>0 ) 
-	    metsignew = caloMET->et()/(sqrt(2)*0.8033*pow(caloMET->sumEt(),0.5004));
+	    metsignew = met/(sqrt(2)*0.8033*pow(caloMET->sumEt(),0.5004));
 	  
 	  if ( PTOT>0 ) {
 	    double weight_N = 1./pow (2.,iJmax);
@@ -1515,13 +1536,13 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	    // -----------------------
 	    UncorrMEt_SumEt_->Fill(caloMET->sumEt(),UncorrMEt,PTOT);
 	    CorrMEt_SumEt_->Fill(caloMET->sumEt(),CorrMEt,PTOT);
-	    MEt_SumEt_->Fill(caloMET->sumEt(),caloMET->et(),PTOT);
+	    MEt_SumEt_->Fill(caloMET->sumEt(),met,PTOT);
 	    UncorrMEt_SumEtC_->Fill(CorrSumEt,UncorrMEt,PTOT);
 	    CorrMEt_SumEtC_->Fill(CorrSumEt,CorrMEt,PTOT);
-	    MEt_SumEtC_->Fill(CorrSumEt,caloMET->et(),PTOT);
+	    MEt_SumEtC_->Fill(CorrSumEt,met,PTOT);
 	    UncorrMEt_SumEtJ_->Fill(GoodSumEt,UncorrMEt,PTOT);
 	    CorrMEt_SumEtJ_->Fill(GoodSumEt,CorrMEt,PTOT);
-	    MEt_SumEtJ_->Fill(GoodSumEt,caloMET->et(),PTOT);
+	    MEt_SumEtJ_->Fill(GoodSumEt,met,PTOT);
 	    
 	    // Apply trigger requirement
 	    // -------------------------
@@ -1534,8 +1555,8 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	      UncorrSumEt_->Fill(UncorrSumEt,PTOT);
 	      CorrSumEt_->Fill(CorrSumEt,PTOT);
 	      GoodSumEt_->Fill(GoodSumEt,PTOT);
-	      MEt_->Fill(caloMET->et(),PTOT);
-	      MEtSig_->Fill(caloMET->mEtSig(),PTOT);
+	      MEt_->Fill(met,PTOT);
+	      MEtSig_->Fill(metsig,PTOT);
 	      MEtSigNew_->Fill(metsignew,PTOT);
 	      MEtDPM_->Fill(dpmin,PTOT);
 	      MEtDP1_->Fill(dp1st,PTOT);
@@ -1548,8 +1569,8 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	      Chi2mass_->Fill(chi2,PTOT);
 	      M45best_->Fill(m45best,PTOT);
 	      Chi2ext_->Fill(chi2ext,PTOT);
-	      MEx_SumEt_->Fill(caloMET->sumEt(),caloMET->et()*cos(caloMET->phi()),PTOT);
-	      MEx_SumEt_->Fill(caloMET->sumEt(),caloMET->et()*sin(caloMET->phi()),PTOT);
+	      MEx_SumEt_->Fill(caloMET->sumEt(),met*cos(metphi),PTOT);
+	      MEx_SumEt_->Fill(caloMET->sumEt(),met*sin(metphi),PTOT);
 	      DP12_->Fill(dp12,PTOT);
 	      DPbb_->Fill(dpbb,PTOT);
 	      M_others_->Fill(m_others,PTOT);
@@ -1573,8 +1594,8 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	      UncorrSumEtN_->Fill(UncorrSumEt,weight_N);
 	      CorrSumEtN_->Fill(CorrSumEt,weight_N);
 	      GoodSumEtN_->Fill(GoodSumEt,weight_N);
-	      MEtN_->Fill(caloMET->et(),weight_N);
-	      MEtSigN_->Fill(caloMET->mEtSig(),weight_N);
+	      MEtN_->Fill(met,weight_N);
+	      MEtSigN_->Fill(metsig,weight_N);
 	      MEtSigNewN_->Fill(metsignew,weight_N);
 	      MEtDPMN_->Fill(dpmin,weight_N);
 	      MEtDP1N_->Fill(dp1st,weight_N);
@@ -1587,8 +1608,8 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	      Chi2massN_->Fill(chi2,weight_N);
 	      M45bestN_->Fill(m45best,weight_N);
 	      Chi2extN_->Fill(chi2ext,weight_N);
-	      MEx_SumEtN_->Fill(caloMET->sumEt(),caloMET->et()*cos(caloMET->phi()),weight_N);
-	      MEx_SumEtN_->Fill(caloMET->sumEt(),caloMET->et()*sin(caloMET->phi()),weight_N);
+	      MEx_SumEtN_->Fill(caloMET->sumEt(),met*cos(metphi),weight_N);
+	      MEx_SumEtN_->Fill(caloMET->sumEt(),met*sin(metphi),weight_N);
 	      DP12N_->Fill(dp12,weight_N);
 	      DPbbN_->Fill(dpbb,weight_N);
 	      M_othersN_->Fill(m_others,weight_N);
@@ -1613,8 +1634,8 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 		UncorrSumEtS_->Fill(UncorrSumEt,PTOT);
 		CorrSumEtS_->Fill(CorrSumEt,PTOT);
 		GoodSumEtS_->Fill(GoodSumEt,PTOT);
-		MEtS_->Fill(caloMET->et(),PTOT);
-		MEtSigS_->Fill(caloMET->mEtSig(),PTOT);
+		MEtS_->Fill(met,PTOT);
+		MEtSigS_->Fill(metsig,PTOT);
 		MEtSigNewS_->Fill(metsignew,PTOT);
 		MEtDPMS_->Fill(dpmin,PTOT);
 		MEtDP1S_->Fill(dp1st,PTOT);
@@ -1627,8 +1648,8 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 		Chi2massS_->Fill(chi2,PTOT);
 		M45bestS_->Fill(m45best,PTOT);
 		Chi2extS_->Fill(chi2ext,PTOT);
-		MEx_SumEtS_->Fill(caloMET->sumEt(),caloMET->et()*cos(caloMET->phi()),PTOT);
-		MEx_SumEtS_->Fill(caloMET->sumEt(),caloMET->et()*sin(caloMET->phi()),PTOT);
+		MEx_SumEtS_->Fill(caloMET->sumEt(),met*cos(metphi),PTOT);
+		MEx_SumEtS_->Fill(caloMET->sumEt(),met*sin(metphi),PTOT);
 		DP12S_->Fill(dp12,PTOT);
 		DPbbS_->Fill(dpbb,PTOT);
 		M_othersS_->Fill(m_others,PTOT);
@@ -1652,8 +1673,8 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 		UncorrSumEtSN_->Fill(UncorrSumEt,weight_N);
 		CorrSumEtSN_->Fill(CorrSumEt,weight_N);
 		GoodSumEtSN_->Fill(GoodSumEt,weight_N);
-		MEtSN_->Fill(caloMET->et(),weight_N);
-		MEtSigSN_->Fill(caloMET->mEtSig(),weight_N);
+		MEtSN_->Fill(met,weight_N);
+		MEtSigSN_->Fill(metsig,weight_N);
 		MEtSigNewSN_->Fill(metsignew,weight_N);
 		MEtDPMSN_->Fill(dpmin,weight_N);
 		MEtDP1SN_->Fill(dp1st,weight_N);
@@ -1666,8 +1687,8 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 		Chi2massSN_->Fill(chi2,weight_N);
 		M45bestSN_->Fill(m45best,weight_N);
 		Chi2extSN_->Fill(chi2ext,weight_N);
-		MEx_SumEtSN_->Fill(caloMET->sumEt(),caloMET->et()*cos(caloMET->phi()),weight_N);
-		MEx_SumEtSN_->Fill(caloMET->sumEt(),caloMET->et()*sin(caloMET->phi()),weight_N);
+		MEx_SumEtSN_->Fill(caloMET->sumEt(),met*cos(metphi),weight_N);
+		MEx_SumEtSN_->Fill(caloMET->sumEt(),met*sin(metphi),weight_N);
 		DP12SN_->Fill(dp12,weight_N);
 		DPbbSN_->Fill(dpbb,weight_N);
 		M_othersSN_->Fill(m_others,weight_N);
@@ -1692,8 +1713,8 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 		  UncorrSumEtSS_->Fill(UncorrSumEt,PTOT);
 		  CorrSumEtSS_->Fill(CorrSumEt,PTOT);
 		  GoodSumEtSS_->Fill(GoodSumEt,PTOT);
-		  MEtSS_->Fill(caloMET->et(),PTOT);
-		  MEtSigSS_->Fill(caloMET->mEtSig(),PTOT);
+		  MEtSS_->Fill(met,PTOT);
+		  MEtSigSS_->Fill(metsig,PTOT);
 		  MEtSigNewSS_->Fill(metsignew,PTOT);
 		  MEtDPMSS_->Fill(dpmin,PTOT);
 		  MEtDP1SS_->Fill(dp1st,PTOT);
@@ -1706,8 +1727,8 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 		  Chi2massSS_->Fill(chi2,PTOT);
 		  M45bestSS_->Fill(m45best,PTOT);
 		  Chi2extSS_->Fill(chi2ext,PTOT);
-		  MEx_SumEtSS_->Fill(caloMET->sumEt(),caloMET->et()*cos(caloMET->phi()),PTOT);
-		  MEx_SumEtSS_->Fill(caloMET->sumEt(),caloMET->et()*sin(caloMET->phi()),PTOT);
+		  MEx_SumEtSS_->Fill(caloMET->sumEt(),met*cos(metphi),PTOT);
+		  MEx_SumEtSS_->Fill(caloMET->sumEt(),met*sin(metphi),PTOT);
 		  DP12SS_->Fill(dp12,PTOT);
 		  DPbbSS_->Fill(dpbb,PTOT);
 		  M_othersSS_->Fill(m_others,PTOT);      
@@ -1731,8 +1752,8 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 		  UncorrSumEtSSN_->Fill(UncorrSumEt,weight_N);
 		  CorrSumEtSSN_->Fill(CorrSumEt,weight_N);
 		  GoodSumEtSSN_->Fill(GoodSumEt,weight_N);
-		  MEtSSN_->Fill(caloMET->et(),weight_N);
-		  MEtSigSSN_->Fill(caloMET->mEtSig(),weight_N);
+		  MEtSSN_->Fill(met,weight_N);
+		  MEtSigSSN_->Fill(metsig,weight_N);
 		  MEtSigNewSSN_->Fill(metsignew,weight_N);
 		  MEtDPMSSN_->Fill(dpmin,weight_N);
 		  MEtDP1SSN_->Fill(dp1st,weight_N);
@@ -1745,8 +1766,8 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 		  Chi2massSSN_->Fill(chi2,weight_N);
 		  M45bestSSN_->Fill(m45best,weight_N);
 		  Chi2extSSN_->Fill(chi2ext,weight_N);
-		  MEx_SumEtSSN_->Fill(caloMET->sumEt(),caloMET->et()*cos(caloMET->phi()),weight_N);
-		  MEx_SumEtSSN_->Fill(caloMET->sumEt(),caloMET->et()*sin(caloMET->phi()),weight_N);
+		  MEx_SumEtSSN_->Fill(caloMET->sumEt(),met*cos(metphi),weight_N);
+		  MEx_SumEtSSN_->Fill(caloMET->sumEt(),met*sin(metphi),weight_N);
 		  DP12SSN_->Fill(dp12,weight_N);
 		  DPbbSSN_->Fill(dpbb,weight_N);
 		  M_othersSSN_->Fill(m_others,weight_N);      
@@ -1772,8 +1793,8 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 		  UncorrSumEtSSS_->Fill(UncorrSumEt,PTOT);
 		  CorrSumEtSSS_->Fill(CorrSumEt,PTOT);
 		  GoodSumEtSSS_->Fill(GoodSumEt,PTOT);
-		  MEtSSS_->Fill(caloMET->et(),PTOT);
-		  MEtSigSSS_->Fill(caloMET->mEtSig(),PTOT);
+		  MEtSSS_->Fill(met,PTOT);
+		  MEtSigSSS_->Fill(metsig,PTOT);
 		  MEtSigNewSSS_->Fill(metsignew,PTOT);
 		  MEtDPMSSS_->Fill(dpmin,PTOT);
 		  MEtDP1SSS_->Fill(dp1st,PTOT);
@@ -1786,8 +1807,8 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 		  Chi2massSSS_->Fill(chi2,PTOT);
 		  M45bestSSS_->Fill(m45best,PTOT);
 		  Chi2extSSS_->Fill(chi2ext,PTOT);
-		  MEx_SumEtSSS_->Fill(caloMET->sumEt(),caloMET->et()*cos(caloMET->phi()),PTOT);
-		  MEx_SumEtSSS_->Fill(caloMET->sumEt(),caloMET->et()*sin(caloMET->phi()),PTOT);
+		  MEx_SumEtSSS_->Fill(caloMET->sumEt(),met*cos(metphi),PTOT);
+		  MEx_SumEtSSS_->Fill(caloMET->sumEt(),met*sin(metphi),PTOT);
 		  DP12SSS_->Fill(dp12,PTOT);
 		  DPbbSSS_->Fill(dpbb,PTOT);
 		  M_othersSSS_->Fill(m_others,PTOT);      
@@ -1811,8 +1832,8 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 		  UncorrSumEtSSSN_->Fill(UncorrSumEt,weight_N);
 		  CorrSumEtSSSN_->Fill(CorrSumEt,weight_N);
 		  GoodSumEtSSSN_->Fill(GoodSumEt,weight_N);
-		  MEtSSSN_->Fill(caloMET->et(),weight_N);
-		  MEtSigSSSN_->Fill(caloMET->mEtSig(),weight_N);
+		  MEtSSSN_->Fill(met,weight_N);
+		  MEtSigSSSN_->Fill(metsig,weight_N);
 		  MEtSigNewSSSN_->Fill(metsignew,weight_N);
 		  MEtDPMSSSN_->Fill(dpmin,weight_N);
 		  MEtDP1SSSN_->Fill(dp1st,weight_N);
@@ -1825,8 +1846,8 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 		  Chi2massSSSN_->Fill(chi2,weight_N);
 		  M45bestSSSN_->Fill(m45best,weight_N);
 		  Chi2extSSSN_->Fill(chi2ext,weight_N);
-		  MEx_SumEtSSSN_->Fill(caloMET->sumEt(),caloMET->et()*cos(caloMET->phi()),weight_N);
-		  MEx_SumEtSSSN_->Fill(caloMET->sumEt(),caloMET->et()*sin(caloMET->phi()),weight_N);
+		  MEx_SumEtSSSN_->Fill(caloMET->sumEt(),met*cos(metphi),weight_N);
+		  MEx_SumEtSSSN_->Fill(caloMET->sumEt(),met*sin(metphi),weight_N);
 		  DP12SSSN_->Fill(dp12,weight_N);
 		  DPbbSSSN_->Fill(dpbb,weight_N);
 		  M_othersSSSN_->Fill(m_others,weight_N);      
@@ -1851,13 +1872,13 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 
 	    UncorrMEt_SumEt_->Fill(caloMET->sumEt(),UncorrMEt,PTOTE2);
 	    CorrMEt_SumEt_->Fill(caloMET->sumEt(),CorrMEt,PTOTE2);
-	    MEt_SumEt_->Fill(caloMET->sumEt(),caloMET->et(),PTOTE2);
+	    MEt_SumEt_->Fill(caloMET->sumEt(),met,PTOTE2);
 	    UncorrMEt_SumEtC_->Fill(CorrSumEt,UncorrMEt,PTOTE2);
 	    CorrMEt_SumEtC_->Fill(CorrSumEt,CorrMEt,PTOTE2);
-	    MEt_SumEtC_->Fill(CorrSumEt,caloMET->et(),PTOTE2);
+	    MEt_SumEtC_->Fill(CorrSumEt,met,PTOTE2);
 	    UncorrMEt_SumEtJ_->Fill(GoodSumEt,UncorrMEt,PTOTE2);
 	    CorrMEt_SumEtJ_->Fill(GoodSumEt,CorrMEt,PTOTE2);
-	    MEt_SumEtJ_->Fill(GoodSumEt,caloMET->et(),PTOTE2);
+	    MEt_SumEtJ_->Fill(GoodSumEt,met,PTOTE2);
 	    
 	    // Apply trigger requirement
 	    // -------------------------
@@ -1870,8 +1891,8 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	      UncorrSumEtW_->Fill(UncorrSumEt,PTOTE2);
 	      CorrSumEtW_->Fill(CorrSumEt,PTOTE2);
 	      GoodSumEtW_->Fill(GoodSumEt,PTOTE2);
-	      MEtW_->Fill(caloMET->et(),PTOTE2);
-	      MEtSigW_->Fill(caloMET->mEtSig(),PTOTE2);
+	      MEtW_->Fill(met,PTOTE2);
+	      MEtSigW_->Fill(metsig,PTOTE2);
 	      MEtSigNewW_->Fill(metsignew,PTOTE2);
 	      MEtDPMW_->Fill(dpmin,PTOTE2);
 	      MEtDP1W_->Fill(dp1st,PTOTE2);
@@ -1884,8 +1905,8 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	      Chi2massW_->Fill(chi2,PTOTE2);
 	      M45bestW_->Fill(m45best,PTOTE2);
 	      Chi2extW_->Fill(chi2ext,PTOTE2);
-	      MEx_SumEtW_->Fill(caloMET->sumEt(),caloMET->et()*cos(caloMET->phi()),PTOTE2);
-	      MEx_SumEtW_->Fill(caloMET->sumEt(),caloMET->et()*sin(caloMET->phi()),PTOTE2);
+	      MEx_SumEtW_->Fill(caloMET->sumEt(),met*cos(metphi),PTOTE2);
+	      MEx_SumEtW_->Fill(caloMET->sumEt(),met*sin(metphi),PTOTE2);
 	      DP12W_->Fill(dp12,PTOTE2);
 	      DPbbW_->Fill(dpbb,PTOTE2);
 	      M_othersW_->Fill(m_others,PTOTE2);
@@ -1910,8 +1931,8 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 		UncorrSumEtSW_->Fill(UncorrSumEt,PTOTE2);
 		CorrSumEtSW_->Fill(CorrSumEt,PTOTE2);
 		GoodSumEtSW_->Fill(GoodSumEt,PTOTE2);
-		MEtSW_->Fill(caloMET->et(),PTOTE2);
-		MEtSigSW_->Fill(caloMET->mEtSig(),PTOTE2);
+		MEtSW_->Fill(met,PTOTE2);
+		MEtSigSW_->Fill(metsig,PTOTE2);
 		MEtSigNewSW_->Fill(metsignew,PTOTE2);
 		MEtDPMSW_->Fill(dpmin,PTOTE2);
 		MEtDP1SW_->Fill(dp1st,PTOTE2);
@@ -1924,8 +1945,8 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 		Chi2massSW_->Fill(chi2,PTOTE2);
 		M45bestSW_->Fill(m45best,PTOTE2);
 		Chi2extSW_->Fill(chi2ext,PTOTE2);
-		MEx_SumEtSW_->Fill(caloMET->sumEt(),caloMET->et()*cos(caloMET->phi()),PTOTE2);
-		MEx_SumEtSW_->Fill(caloMET->sumEt(),caloMET->et()*sin(caloMET->phi()),PTOTE2);
+		MEx_SumEtSW_->Fill(caloMET->sumEt(),met*cos(metphi),PTOTE2);
+		MEx_SumEtSW_->Fill(caloMET->sumEt(),met*sin(metphi),PTOTE2);
 		DP12SW_->Fill(dp12,PTOTE2);
 		DPbbSW_->Fill(dpbb,PTOTE2);
 		M_othersSW_->Fill(m_others,PTOTE2);
@@ -1950,8 +1971,8 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 		  UncorrSumEtSSW_->Fill(UncorrSumEt,PTOTE2);
 		  CorrSumEtSSW_->Fill(CorrSumEt,PTOTE2);
 		  GoodSumEtSSW_->Fill(GoodSumEt,PTOTE2);
-		  MEtSSW_->Fill(caloMET->et(),PTOTE2);
-		  MEtSigSSW_->Fill(caloMET->mEtSig(),PTOTE2);
+		  MEtSSW_->Fill(met,PTOTE2);
+		  MEtSigSSW_->Fill(metsig,PTOTE2);
 		  MEtSigNewSSW_->Fill(metsignew,PTOTE2);
 		  MEtDPMSSW_->Fill(dpmin,PTOTE2);
 		  MEtDP1SSW_->Fill(dp1st,PTOTE2);
@@ -1964,8 +1985,8 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 		  Chi2massSSW_->Fill(chi2,PTOTE2);
 		  M45bestSSW_->Fill(m45best,PTOTE2);
 		  Chi2extSSW_->Fill(chi2ext,PTOTE2);
-		  MEx_SumEtSSW_->Fill(caloMET->sumEt(),caloMET->et()*cos(caloMET->phi()),PTOTE2);
-		  MEx_SumEtSSW_->Fill(caloMET->sumEt(),caloMET->et()*sin(caloMET->phi()),PTOTE2);
+		  MEx_SumEtSSW_->Fill(caloMET->sumEt(),met*cos(metphi),PTOTE2);
+		  MEx_SumEtSSW_->Fill(caloMET->sumEt(),met*sin(metphi),PTOTE2);
 		  DP12SSW_->Fill(dp12,PTOTE2);
 		  DPbbSSW_->Fill(dpbb,PTOTE2);
 		  M_othersSSW_->Fill(m_others,PTOTE2);      
@@ -1991,8 +2012,8 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 		  UncorrSumEtSSSW_->Fill(UncorrSumEt,PTOTE2);
 		  CorrSumEtSSSW_->Fill(CorrSumEt,PTOTE2);
 		  GoodSumEtSSSW_->Fill(GoodSumEt,PTOTE2);
-		  MEtSSSW_->Fill(caloMET->et(),PTOTE2);
-		  MEtSigSSSW_->Fill(caloMET->mEtSig(),PTOTE2);
+		  MEtSSSW_->Fill(met,PTOTE2);
+		  MEtSigSSSW_->Fill(metsig,PTOTE2);
 		  MEtSigNewSSSW_->Fill(metsignew,PTOTE2);
 		  MEtDPMSSSW_->Fill(dpmin,PTOTE2);
 		  MEtDP1SSSW_->Fill(dp1st,PTOTE2);
@@ -2005,8 +2026,8 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 		  Chi2massSSSW_->Fill(chi2,PTOTE2);
 		  M45bestSSSW_->Fill(m45best,PTOTE2);
 		  Chi2extSSSW_->Fill(chi2ext,PTOTE2);
-		  MEx_SumEtSSSW_->Fill(caloMET->sumEt(),caloMET->et()*cos(caloMET->phi()),PTOTE2);
-		  MEx_SumEtSSSW_->Fill(caloMET->sumEt(),caloMET->et()*sin(caloMET->phi()),PTOTE2);
+		  MEx_SumEtSSSW_->Fill(caloMET->sumEt(),met*cos(metphi),PTOTE2);
+		  MEx_SumEtSSSW_->Fill(caloMET->sumEt(),met*sin(metphi),PTOTE2);
 		  DP12SSSW_->Fill(dp12,PTOTE2);
 		  DPbbSSSW_->Fill(dpbb,PTOTE2);
 		  M_othersSSSW_->Fill(m_others,PTOTE2);      
@@ -2151,6 +2172,7 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	// -----------------------------------------------------------
 	for ( int ii=0; ii<iJ-1 && ii<NHSJ-1; ii++ ) {
 	  for ( int jj=ii+1; jj<iJ && jj<NHSJ; jj++ ) { // limit to NHSJ the number of jets from h.s.
+
 	    // Demand that both b-jets from H be tagged
 	    // ----------------------------------------
 	    if ( JHEM[ii] && JHEM[jj] ) {
@@ -2259,7 +2281,7 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
       // Offline cuts
       // ------------
       if ( iJ >= 5 ) NJetsCut = true;
-      if ( caloMET->mEtSig()>3 ) MEtSigCut = true;
+      if ( metsig>3 ) MEtSigCut = true;
       
       // Fill kinematical histograms
       // ---------------------------
@@ -2268,7 +2290,7 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
       UncorrHt=UncorrHt0+UncorrMEt;
       CorrHt=CorrHt0+CorrMEt;
       GoodHt=GoodHt0+CorrMEt;
-      GoodHt2=GoodHt20+caloMET->et();
+      GoodHt2=GoodHt20+met;
       
       double UncorrMEtSig=0;
       if ( UncorrSumEt>0 ) UncorrMEtSig = UncorrMEt/sqrt(UncorrSumEt);
@@ -2278,17 +2300,17 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
       // Missing Et significance computed with tuned resolution function
       // ---------------------------------------------------------------
       double metsignew=0;
-      if ( caloMET->sumEt()>0 ) metsignew = caloMET->et()/(sqrt(2)*0.8033*pow(caloMET->sumEt(),0.5004));
+      if ( caloMET->sumEt()>0 ) metsignew = met/(sqrt(2)*0.8033*pow(caloMET->sumEt(),0.5004));
       
       UncorrMEt_SumEt_->Fill(caloMET->sumEt(),UncorrMEt);
       CorrMEt_SumEt_->Fill(caloMET->sumEt(),CorrMEt);
-      MEt_SumEt_->Fill(caloMET->sumEt(),caloMET->et());
+      MEt_SumEt_->Fill(caloMET->sumEt(),met);
       UncorrMEt_SumEtC_->Fill(CorrSumEt,UncorrMEt);
       CorrMEt_SumEtC_->Fill(CorrSumEt,CorrMEt);
-      MEt_SumEtC_->Fill(CorrSumEt,caloMET->et());
+      MEt_SumEtC_->Fill(CorrSumEt,met);
       UncorrMEt_SumEtJ_->Fill(GoodSumEt,UncorrMEt);
       CorrMEt_SumEtJ_->Fill(GoodSumEt,CorrMEt);
-      MEt_SumEtJ_->Fill(GoodSumEt,caloMET->et());
+      MEt_SumEtJ_->Fill(GoodSumEt,met);
       
       // Apply trigger requirement
       // -------------------------
@@ -2301,8 +2323,8 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	UncorrSumEt_->Fill(UncorrSumEt);
 	CorrSumEt_->Fill(CorrSumEt);
 	GoodSumEt_->Fill(GoodSumEt);
-	MEt_->Fill(caloMET->et());
-	MEtSig_->Fill(caloMET->mEtSig());
+	MEt_->Fill(met);
+	MEtSig_->Fill(metsig);
 	MEtSigNew_->Fill(metsignew);
 	MEtDPM_->Fill(dpmin);
 	MEtDP1_->Fill(dp1st);
@@ -2315,8 +2337,8 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	Chi2mass_->Fill(chi2);
 	M45best_->Fill(m45best);
 	Chi2ext_->Fill(chi2ext);
-	MEx_SumEt_->Fill(caloMET->sumEt(),caloMET->et()*cos(caloMET->phi()));
-	MEx_SumEt_->Fill(caloMET->sumEt(),caloMET->et()*sin(caloMET->phi()));
+	MEx_SumEt_->Fill(caloMET->sumEt(),met*cos(metphi));
+	MEx_SumEt_->Fill(caloMET->sumEt(),met*sin(metphi));
 	DP12_->Fill(dp12);
 	DPbb_->Fill(dpbb);
 	M_others_->Fill(m_others);
@@ -2341,8 +2363,8 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	  UncorrSumEtS_->Fill(UncorrSumEt);
 	  CorrSumEtS_->Fill(CorrSumEt);
 	  GoodSumEtS_->Fill(GoodSumEt);
-	  MEtS_->Fill(caloMET->et());
-	  MEtSigS_->Fill(caloMET->mEtSig());
+	  MEtS_->Fill(met);
+	  MEtSigS_->Fill(metsig);
 	  MEtSigNewS_->Fill(metsignew);
 	  MEtDPMS_->Fill(dpmin);
 	  MEtDP1S_->Fill(dp1st);
@@ -2355,8 +2377,8 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	  Chi2massS_->Fill(chi2);
 	  M45bestS_->Fill(m45best);
 	  Chi2extS_->Fill(chi2ext);
-	  MEx_SumEtS_->Fill(caloMET->sumEt(),caloMET->et()*cos(caloMET->phi()));
-	  MEx_SumEtS_->Fill(caloMET->sumEt(),caloMET->et()*sin(caloMET->phi()));
+	  MEx_SumEtS_->Fill(caloMET->sumEt(),met*cos(metphi));
+	  MEx_SumEtS_->Fill(caloMET->sumEt(),met*sin(metphi));
 	  DP12S_->Fill(dp12);
 	  DPbbS_->Fill(dpbb);
 	  M_othersS_->Fill(m_others);
@@ -2381,8 +2403,8 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	    UncorrSumEtSS_->Fill(UncorrSumEt);
 	    CorrSumEtSS_->Fill(CorrSumEt);
 	    GoodSumEtSS_->Fill(GoodSumEt);
-	    MEtSS_->Fill(caloMET->et());
-	    MEtSigSS_->Fill(caloMET->mEtSig());
+	    MEtSS_->Fill(met);
+	    MEtSigSS_->Fill(metsig);
 	    MEtSigNewSS_->Fill(metsignew);
 	    MEtDPMSS_->Fill(dpmin);
 	    MEtDP1SS_->Fill(dp1st);
@@ -2395,8 +2417,8 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	    Chi2massSS_->Fill(chi2);
 	    M45bestSS_->Fill(m45best);
 	    Chi2extSS_->Fill(chi2ext);
-	    MEx_SumEtSS_->Fill(caloMET->sumEt(),caloMET->et()*cos(caloMET->phi()));
-	    MEx_SumEtSS_->Fill(caloMET->sumEt(),caloMET->et()*sin(caloMET->phi()));
+	    MEx_SumEtSS_->Fill(caloMET->sumEt(),met*cos(metphi));
+	    MEx_SumEtSS_->Fill(caloMET->sumEt(),met*sin(metphi));
 	    DP12SS_->Fill(dp12);
 	    DPbbSS_->Fill(dpbb);
 	    M_othersSS_->Fill(m_others);      
@@ -2422,8 +2444,8 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	    UncorrSumEtSSS_->Fill(UncorrSumEt);
 	    CorrSumEtSSS_->Fill(CorrSumEt);
 	    GoodSumEtSSS_->Fill(GoodSumEt);
-	    MEtSSS_->Fill(caloMET->et());
-	    MEtSigSSS_->Fill(caloMET->mEtSig());
+	    MEtSSS_->Fill(met);
+	    MEtSigSSS_->Fill(metsig);
 	    MEtSigNewSSS_->Fill(metsignew);
 	    MEtDPMSSS_->Fill(dpmin);
 	    MEtDP1SSS_->Fill(dp1st);
@@ -2436,8 +2458,8 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	    Chi2massSSS_->Fill(chi2);
 	    M45bestSSS_->Fill(m45best);
 	    Chi2extSSS_->Fill(chi2ext);
-	    MEx_SumEtSSS_->Fill(caloMET->sumEt(),caloMET->et()*cos(caloMET->phi()));
-	    MEx_SumEtSSS_->Fill(caloMET->sumEt(),caloMET->et()*sin(caloMET->phi()));
+	    MEx_SumEtSSS_->Fill(caloMET->sumEt(),met*cos(metphi));
+	    MEx_SumEtSSS_->Fill(caloMET->sumEt(),met*sin(metphi));
 	    DP12SSS_->Fill(dp12);
 	    DPbbSSS_->Fill(dpbb);
 	    M_othersSSS_->Fill(m_others);      
@@ -2476,49 +2498,55 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 
   // Compute Likelihood
   // ------------------
-  double r=1.;
+  double r=1.0;
   double fs=0.;
   double fb=0.;
-  l=0.;
-  int bx = (int)((c8/1.2)*50)+1;
-  if ( bx>=1 && bx<=50 ) {
-    fs = C8SS_sig->GetBinContent(bx);
-    fb = C8SS_bgr->GetBinContent(bx);
-    if (fb>0 ) {
-      r = fs/fb;
+  rel_lik = 0.;
+  int bx[8];
+  bx[0]= (int)((c8/1.2)*50)+1;
+  bx[1]= (int)((m45bestall/300.)*50)+1;
+  bx[2]= (int)(chi2extall)+1;
+  bx[3]= (int)((metsig/20.)*50)+1;
+  bx[4]= (int)((m8/2000)*50.)+1;
+  bx[5]= (int)((met/500.)*50)+1;
+  bx[6]= (int)((dp12/3.2)*50.)+1;
+  bx[7]= (int)((dp2nd/3.2)*50)+1;
+  for ( int ivar=0; ivar<8; ivar++ ) {
+    if ( bx[ivar]>=1 && bx[ivar]<=50 ) {
+      fs = HSS_sig[ivar]->GetBinContent(bx[ivar]);
+      fb = HSS_bgr[ivar]->GetBinContent(bx[ivar]);
+      if (fb>0 ) {
+	r *= fs/fb;
+      }
     }
   }
-  l += log(r);
-  if ( eventcounter_/100 == float(eventcounter_)/100. ) {
-    std::cout << l << " " << r << " " << bx << " " << fs << " " << fb << std::endl;
-  }
+  
+  rel_lik += log(r);
   
   if ( response && NJetsCut && NHEM>=2 ) {
-    L_->Fill(l);
+    L_->Fill(rel_lik);
     if ( MEtSigCut ) {
-      LS_->Fill(l);
+      LS_->Fill(rel_lik);
       if ( NHEM>=3 ) {
-	LSS_->Fill(l);
+	LSS_->Fill(rel_lik);
       }
       if ( NHEM>=4 ) {
-	LSSS_->Fill(l);
+	LSSS_->Fill(rel_lik);
       }
     }
   }
-  
-
 
 
 }
 
-// ------------ method called once each job just before starting event loop  ------------
-// --------------------------------------------------------------------------------------
+//       method called once each job just before starting event loop  
+// -------------------------------------------------------------------------
 void TDAna::beginJob(const edm::EventSetup&) {
 }
 
 
-// ------------ method called once each job just after ending the event loop  ------------
-// ---------------------------------------------------------------------------------------
+//       method called once each job just after ending the event loop 
+// -------------------------------------------------------------------------
 void TDAna::endJob() {
 
   // Histograms for events passing trigger

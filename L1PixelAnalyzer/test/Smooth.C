@@ -160,7 +160,10 @@ void Smooth (TString sel)
 
   } // end of ivar loop
 
-  TFile * Smoothed = new TFile("functionfile.root","RECREATE");
+  TString fname;
+  fname="functionfile"+sel+".root";
+
+  TFile * Smoothed = new TFile(fname,"RECREATE");
   Smoothed->cd();
 
   TCanvas * b = new TCanvas ("b", "Kinematics comparison", 400, 400 );

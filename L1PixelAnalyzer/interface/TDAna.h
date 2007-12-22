@@ -15,24 +15,21 @@
  - MC informations         <---------------------------------- to do
  - B tagging               <---------------------------------- to do
 
- Evaluates:
- - DPhimin between MET and closest (in phi) offline jet
- - association of MC partons to offline jets            <----- to do
- - association of btags to offline jets                 <----- to do
-
 */
 //
 // Original Author:  Marco De Mattia
 //         Created:  Tue May  8 13:05:37 CEST 2007
-// $Id: TDAna.h,v 1.8 2007/12/21 12:48:15 dorigo Exp $
+// $Id: TDAna.h,v 1.9 2007/12/21 15:01:42 dorigo Exp $
 //
 //
 
-// system include files
+// System include files
+// --------------------
 #include <memory>
 #include <vector>
 
-// user include files
+// User include files
+// ------------------
 #include "FWCore/Framework/interface/Frameworkfwd.h"
 #include "FWCore/Framework/interface/EDAnalyzer.h"
 
@@ -42,15 +39,15 @@
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
 #include "FWCore/ParameterSet/interface/InputTag.h"
 
-// Root includes
-// -------------
+// Root include files
+// ------------------
 #include "TH1D.h"
 #include "TH2F.h"
 #include "TProfile.h"
 #include "TFile.h"
 
-// Data includes
-// -------------
+// Data include files
+// ------------------
 
 // // // GCT and RCT data formats
 // // #include "DataFormats/L1GlobalCaloTrigger/interface/L1GctCollections.h"
@@ -116,9 +113,11 @@
 
 
 // Associator for the jets
+// -----------------------
 #include "AnalysisExamples/AnalysisClasses/interface/AssociatorEt.h"
 
 // L1Trigger evaluator
+// -------------------
 #include "AnalysisExamples/AnalysisClasses/interface/L1Trig.h"
 #include "AnalysisExamples/AnalysisClasses/interface/HiVariables.h"
 #include "AnalysisExamples/AnalysisClasses/interface/MultiTH1F.h"
@@ -126,10 +125,8 @@
 #include "AnalysisExamples/AnalysisClasses/interface/MultiStack.h"
 #include "AnalysisExamples/AnalysisClasses/interface/L1PixelTrig.h"
 
-//
-// class declaration
-//
-
+// Class declaration
+// -----------------
 class TDAna : public edm::EDAnalyzer {
  public:
   explicit TDAna(const edm::ParameterSet&);
@@ -147,8 +144,9 @@ class TDAna : public edm::EDAnalyzer {
 
   // Declare as static so that only one exists, even if more
   // than one TDAna object is created
+  // -------------------------------------------------------
   static L1Trig L1Trigger;
-
+  
   edm::ParameterSet conf_;
   TFile* OutputFile;
 
@@ -188,17 +186,11 @@ class TDAna : public edm::EDAnalyzer {
   TH1D * MEt_CorrIC5_SumEt_;
   TH1D * MEt_CorrIC5_mEtSig_;
 
-  TH1D * PixelJet_dz_;
-  TH1D * PixelJet_Num_;
-  TH1D * PixelJet_Track_Num_;
-
-
-  TH1D * DPhimin_;
 
   // Function histograms
   // -------------------
-  TH1D * C8SS_sig;
-  TH1D * C8SS_bgr;
+  TH1D * HSS_sig[8];
+  TH1D * HSS_bgr[8];
   
   // My histograms
   // -------------
@@ -678,125 +670,19 @@ class TDAna : public edm::EDAnalyzer {
   TH2D * CorrMEt_SumEtJ_; 
   TH2D * MEt_SumEtJ_; 
 
-
-  // Trigger efficiency counters
-  // Multijet
-  int Eff_;
-  int Eff_et1_;
-  int Eff_et2_;
-  int Eff_et3_;
-  int Eff_et4_;
-
-  int Eff_cen_;
-  int Eff_cen_et1_;
-  int Eff_cen_et2_;
-  int Eff_cen_et3_;
-  int Eff_cen_et4_;
-
-  int Eff_tau_;
-  int Eff_tau_et1_;
-  int Eff_tau_et2_;
-  int Eff_tau_et3_;
-  int Eff_tau_et4_;
-
-  int Eff_for_;
-  int Eff_for_et1_;
-  int Eff_for_et2_;
-  int Eff_for_et3_;
-  int Eff_for_et4_;
-
-  int Eff_nofor_;
-  int Eff_nofor_et1_;
-  int Eff_nofor_et2_;
-  int Eff_nofor_et3_;
-  int Eff_nofor_et4_;
-
-  // MEt+Jet
-  int Eff_MEtJet_;
-  int Eff_MEtJet_cen_;
-  int Eff_MEtJet_tau_;
-  int Eff_MEtJet_for_;
-  int Eff_MEtJet_nofor_;
-  // Tau
-  int Eff_tautrig_;
-  int Eff_tautrig_single_;
-  int Eff_tautrig_ditau_;
-
-  // Offline
-  int offlineEffMultijet_;
-  int offlineEffMEtJet_;
-  int offlineEffTauTrig_;
-
-  double dz_;
-  double dzmax_;
-  int bins_;
-  double dR_;
-  double dRmax_;
-  int jets_;
-  int jetMin_;
-  int jetMax_;
-
   float loose_;
   float medium_;
   float tight_;
 
-  double l;
+  double rel_lik;
+  double njsss;
+
+  // Likelihood histograms
+  // ---------------------
   TH1D * L_;
   TH1D * LS_;
   TH1D * LSS_;
   TH1D * LSSS_;
-
-  // Pixel trigger efficiency
-  TH1D ** EffMultijetPixel_;
-  TH1D ** EffMultijetPixelEt1_;
-  TH1D ** EffMultijetPixelEt2_;
-  TH1D ** EffMultijetPixelEt3_;
-  TH1D ** EffMultijetPixelEt4_;
-  TH1D ** EffMEtJetPixel_;
-  int EffMultijetPixelSize_;
-  int EffMultijetPixelSizeEt1_;
-  int EffMultijetPixelSizeEt2_;
-  int EffMultijetPixelSizeEt3_;
-  int EffMultijetPixelSizeEt4_;
-  int EffMEtJetPixelSize_;
-  int ** EffMultijetPixelArray_;
-  int ** EffMultijetPixelArrayEt1_;
-  int ** EffMultijetPixelArrayEt2_;
-  int ** EffMultijetPixelArrayEt3_;
-  int ** EffMultijetPixelArrayEt4_;
-  int ** EffMEtJetPixelArray_;
-
-  // Offline efficiency
-  TH1D ** offlineEffMultijetPixel_;
-  TH1D ** offlineEffMEtJetPixel_;
-  int offlineEffMultijetPixelSize_;
-  int offlineEffMEtJetPixelSize_;
-  int ** offlineEffMultijetPixelArray_;
-  int ** offlineEffMEtJetPixelArray_;
-
-  // Directory in the root file to hold the multiple histograms
-  TDirectory *DirVertexDz_;
-
-  // PixelTrigger alone efficiency
-  int pixelTrig_3_;
-  int pixelTrig_4_;
-  int pixelTrig_5_;
-  int pixelTrig_6_;
-
-  int *numgoodpjeff_;
-  int *numgoodpjeff_3_;
-  int *numgoodpjeff_4_;
-  int *numgoodpjeff_5_;
-  int *numgoodpjeff_6_;
-
-  TH1D * EffNumGoodPj_;
-  TH1D * EffNumGoodPj_3_;
-  TH1D * EffNumGoodPj_4_;
-  TH1D * EffNumGoodPj_5_;
-  TH1D * EffNumGoodPj_6_;
-
-  // b tag discriminator histograms
-  TH1D * deltaR;
 
   // PTag numbers
   // ------------
@@ -826,6 +712,4 @@ class TDAna : public edm::EDAnalyzer {
   double PHPTMS[1000];
   double PHPTTS[1000];
 
-  double njsss;
-  // ----------member data ---------------------------
 };
