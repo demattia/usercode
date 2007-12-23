@@ -19,7 +19,7 @@
 //
 // Original Author:  Marco De Mattia
 //         Created:  Tue May  8 13:05:37 CEST 2007
-// $Id: TDAna.h,v 1.10 2007/12/22 14:01:36 dorigo Exp $
+// $Id: TDAna.h,v 1.11 2007/12/22 16:48:03 dorigo Exp $
 //
 //
 
@@ -189,8 +189,8 @@ class TDAna : public edm::EDAnalyzer {
 
   // Function histograms
   // -------------------
-  TH1D * HSS_sig[8];
-  TH1D * HSS_bgr[8];
+  TH1D * HSS_sig[11];
+  TH1D * HSS_bgr[11];
   
   // My histograms
   // -------------
@@ -222,6 +222,8 @@ class TDAna : public edm::EDAnalyzer {
   TH1D * M_others_;
   TH1D * Mbbnoh_;
   TH1D * DPbbnoh_;
+  TH1D * M6_;
+  TH1D * C6_;
   TH1D * M8_;
   TH1D * C8_;
   TH1D * M45bestall_;
@@ -231,6 +233,8 @@ class TDAna : public edm::EDAnalyzer {
   TH1D * SumHPD4_;
   TH1D * SumHED6_;
   TH1D * SumHPD6_;
+  TH1D * HED_;
+  TH1D * HPD_;
 
   TH1D * NJetsS_;
   TH1D * UncorrSumEtS_;
@@ -260,6 +264,8 @@ class TDAna : public edm::EDAnalyzer {
   TH1D * M_othersS_;
   TH1D * MbbnohS_;
   TH1D * DPbbnohS_;
+  TH1D * M6S_;
+  TH1D * C6S_;
   TH1D * M8S_;
   TH1D * C8S_;
   TH1D * M45bestallS_;
@@ -269,6 +275,8 @@ class TDAna : public edm::EDAnalyzer {
   TH1D * SumHPD4S_;
   TH1D * SumHED6S_;
   TH1D * SumHPD6S_;
+  TH1D * HEDS_;
+  TH1D * HPDS_;
 
   TH1D * NJetsSS_;
   TH1D * UncorrSumEtSS_;
@@ -298,6 +306,8 @@ class TDAna : public edm::EDAnalyzer {
   TH1D * M_othersSS_;
   TH1D * MbbnohSS_;
   TH1D * DPbbnohSS_;
+  TH1D * M6SS_;
+  TH1D * C6SS_;
   TH1D * M8SS_;
   TH1D * C8SS_;
   TH1D * M45bestallSS_;
@@ -307,6 +317,8 @@ class TDAna : public edm::EDAnalyzer {
   TH1D * SumHPD4SS_;
   TH1D * SumHED6SS_;
   TH1D * SumHPD6SS_;
+  TH1D * HEDSS_;
+  TH1D * HPDSS_;
 
   TH1D * NJetsSSS_;
   TH1D * UncorrSumEtSSS_;
@@ -336,6 +348,8 @@ class TDAna : public edm::EDAnalyzer {
   TH1D * M_othersSSS_;
   TH1D * MbbnohSSS_;
   TH1D * DPbbnohSSS_;
+  TH1D * M6SSS_;
+  TH1D * C6SSS_;
   TH1D * M8SSS_;
   TH1D * C8SSS_;
   TH1D * M45bestallSSS_;
@@ -345,6 +359,8 @@ class TDAna : public edm::EDAnalyzer {
   TH1D * SumHPD4SSS_;
   TH1D * SumHED6SSS_;
   TH1D * SumHPD6SSS_;
+  TH1D * HEDSSS_;
+  TH1D * HPDSSS_;
 
   TH1D * N4NJSSS_;
   TH1D * E4NJSSS_;
@@ -379,6 +395,8 @@ class TDAna : public edm::EDAnalyzer {
   TH1D * M_othersN_;
   TH1D * MbbnohN_;
   TH1D * DPbbnohN_;
+  TH1D * M6N_;
+  TH1D * C6N_;
   TH1D * M8N_;
   TH1D * C8N_;
   TH1D * M45bestallN_;
@@ -417,6 +435,8 @@ class TDAna : public edm::EDAnalyzer {
   TH1D * M_othersSN_;
   TH1D * MbbnohSN_;
   TH1D * DPbbnohSN_;
+  TH1D * M6SN_;
+  TH1D * C6SN_;
   TH1D * M8SN_;
   TH1D * C8SN_;
   TH1D * M45bestallSN_;
@@ -455,6 +475,8 @@ class TDAna : public edm::EDAnalyzer {
   TH1D * M_othersSSN_;
   TH1D * MbbnohSSN_;
   TH1D * DPbbnohSSN_;
+  TH1D * M6SSN_;
+  TH1D * C6SSN_;
   TH1D * M8SSN_;
   TH1D * C8SSN_;
   TH1D * M45bestallSSN_;
@@ -493,6 +515,8 @@ class TDAna : public edm::EDAnalyzer {
   TH1D * M_othersSSSN_;
   TH1D * MbbnohSSSN_;
   TH1D * DPbbnohSSSN_;
+  TH1D * M6SSSN_;
+  TH1D * C6SSSN_;
   TH1D * M8SSSN_;
   TH1D * C8SSSN_;
   TH1D * M45bestallSSSN_;
@@ -533,6 +557,8 @@ class TDAna : public edm::EDAnalyzer {
   TH1D * M_othersW_;
   TH1D * MbbnohW_;
   TH1D * DPbbnohW_;
+  TH1D * M6W_;
+  TH1D * C6W_;
   TH1D * M8W_;
   TH1D * C8W_;
   TH1D * M45bestallW_;
@@ -571,6 +597,8 @@ class TDAna : public edm::EDAnalyzer {
   TH1D * M_othersSW_;
   TH1D * MbbnohSW_;
   TH1D * DPbbnohSW_;
+  TH1D * M6SW_;
+  TH1D * C6SW_;
   TH1D * M8SW_;
   TH1D * C8SW_;
   TH1D * M45bestallSW_;
@@ -609,6 +637,8 @@ class TDAna : public edm::EDAnalyzer {
   TH1D * M_othersSSW_;
   TH1D * MbbnohSSW_;
   TH1D * DPbbnohSSW_;
+  TH1D * M6SSW_;
+  TH1D * C6SSW_;
   TH1D * M8SSW_;
   TH1D * C8SSW_;
   TH1D * M45bestallSSW_;
@@ -647,6 +677,8 @@ class TDAna : public edm::EDAnalyzer {
   TH1D * M_othersSSSW_;
   TH1D * MbbnohSSSW_;
   TH1D * DPbbnohSSSW_;
+  TH1D * M6SSSW_;
+  TH1D * C6SSSW_;
   TH1D * M8SSSW_;
   TH1D * C8SSSW_;
   TH1D * M45bestallSSSW_;

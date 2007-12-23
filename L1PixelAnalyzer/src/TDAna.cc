@@ -62,22 +62,28 @@ TDAna::TDAna(const edm::ParameterSet& iConfig) :
   // -------------------------------------------------------------------
   TFile * FunctionFile = new TFile ("functionfileSS.root");
   FunctionFile->cd();
-  HSS_sig[0] = dynamic_cast<TH1D*> ( FunctionFile->Get("C8SS_sig"));
-  HSS_bgr[0] = dynamic_cast<TH1D*> ( FunctionFile->Get("C8SS_bgr"));
-  HSS_sig[1] = dynamic_cast<TH1D*> ( FunctionFile->Get("M45bestallSS_sig"));
-  HSS_bgr[1] = dynamic_cast<TH1D*> ( FunctionFile->Get("M45bestallSS_bgr"));
-  HSS_sig[2] = dynamic_cast<TH1D*> ( FunctionFile->Get("Chi2extallSS_sig"));
-  HSS_bgr[2] = dynamic_cast<TH1D*> ( FunctionFile->Get("Chi2extallSS_bgr"));
-  HSS_sig[3] = dynamic_cast<TH1D*> ( FunctionFile->Get("MEtSigSS_sig"));
-  HSS_bgr[3] = dynamic_cast<TH1D*> ( FunctionFile->Get("MEtSigSS_bgr"));
-  HSS_sig[4] = dynamic_cast<TH1D*> ( FunctionFile->Get("M8SS_sig"));
-  HSS_bgr[4] = dynamic_cast<TH1D*> ( FunctionFile->Get("M8SS_bgr"));
-  HSS_sig[5] = dynamic_cast<TH1D*> ( FunctionFile->Get("MEtSS_sig"));
-  HSS_bgr[5] = dynamic_cast<TH1D*> ( FunctionFile->Get("MEtSS_bgr"));
-  HSS_sig[6] = dynamic_cast<TH1D*> ( FunctionFile->Get("DP12SS_sig"));
-  HSS_bgr[6] = dynamic_cast<TH1D*> ( FunctionFile->Get("DP12SS_bgr"));
-  HSS_sig[7] = dynamic_cast<TH1D*> ( FunctionFile->Get("MEtDP2SS_sig"));
-  HSS_bgr[7] = dynamic_cast<TH1D*> ( FunctionFile->Get("MEtDP2SS_bgr"));
+  HSS_sig[0] = dynamic_cast<TH1D*> ( FunctionFile->Get("C8SS_sigS"));
+  HSS_bgr[0] = dynamic_cast<TH1D*> ( FunctionFile->Get("C8SS_bgrS"));
+  HSS_sig[1] = dynamic_cast<TH1D*> ( FunctionFile->Get("M45bestallSS_sigS"));
+  HSS_bgr[1] = dynamic_cast<TH1D*> ( FunctionFile->Get("M45bestallSS_bgrS"));
+  HSS_sig[2] = dynamic_cast<TH1D*> ( FunctionFile->Get("Chi2extallSS_sigS"));
+  HSS_bgr[2] = dynamic_cast<TH1D*> ( FunctionFile->Get("Chi2extallSS_bgrS"));
+  HSS_sig[3] = dynamic_cast<TH1D*> ( FunctionFile->Get("MEtSigSS_sigS"));
+  HSS_bgr[3] = dynamic_cast<TH1D*> ( FunctionFile->Get("MEtSigSS_bgrS"));
+  HSS_sig[4] = dynamic_cast<TH1D*> ( FunctionFile->Get("M8SS_sigS"));
+  HSS_bgr[4] = dynamic_cast<TH1D*> ( FunctionFile->Get("M8SS_bgrS"));
+  HSS_sig[5] = dynamic_cast<TH1D*> ( FunctionFile->Get("MEtSS_sigS"));
+  HSS_bgr[5] = dynamic_cast<TH1D*> ( FunctionFile->Get("MEtSS_bgrS"));
+  HSS_sig[6] = dynamic_cast<TH1D*> ( FunctionFile->Get("DP12SS_sigS"));
+  HSS_bgr[6] = dynamic_cast<TH1D*> ( FunctionFile->Get("DP12SS_bgrS"));
+  HSS_sig[7] = dynamic_cast<TH1D*> ( FunctionFile->Get("MEtDP2SS_sigS"));
+  HSS_bgr[7] = dynamic_cast<TH1D*> ( FunctionFile->Get("MEtDP2SS_bgrS"));
+  HSS_sig[8] = dynamic_cast<TH1D*> ( FunctionFile->Get("C6SS_sigS"));
+  HSS_bgr[8] = dynamic_cast<TH1D*> ( FunctionFile->Get("C6SS_bgrS"));
+  HSS_sig[9] = dynamic_cast<TH1D*> ( FunctionFile->Get("M6SS_sigS"));
+  HSS_bgr[9] = dynamic_cast<TH1D*> ( FunctionFile->Get("M6SS_bgrS"));
+  HSS_sig[10]= dynamic_cast<TH1D*> ( FunctionFile->Get("CorrSumEtSS_sigS"));
+  HSS_bgr[10]= dynamic_cast<TH1D*> ( FunctionFile->Get("CorrSumEtSS_bgrS"));
 
   // File for output histograms
   // --------------------------
@@ -1029,6 +1035,7 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   edm::Handle<OfflineMEt> caloMET;
   iEvent.getByLabel( offlineMEtLabel_, caloMET );
 
+  double sumet = caloMET->sumEt();
   double met = caloMET->et();
   double metsig = caloMET->mEtSig();
   double metphi = caloMET->phi();
@@ -1592,17 +1599,17 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	  // Missing Et significance computed with tuned resolution function
 	  // ---------------------------------------------------------------
 	  double metsignew=0;
-	  if ( caloMET->sumEt()>0 ) 
-	    metsignew = met/(sqrt(2)*0.8033*pow(caloMET->sumEt(),0.5004));
+	  if ( sumet>0 ) 
+	    metsignew = met/(sqrt(2)*0.8033*pow(sumet,0.5004));
 	  
 	  if ( PTOT>0 ) {
 	    double weight_N = 1./pow (2.,iJmax);
 
 	    // Fill regular histograms
 	    // -----------------------
-	    UncorrMEt_SumEt_->Fill(caloMET->sumEt(),UncorrMEt,PTOT);
-	    CorrMEt_SumEt_->Fill(caloMET->sumEt(),CorrMEt,PTOT);
-	    MEt_SumEt_->Fill(caloMET->sumEt(),met,PTOT);
+	    UncorrMEt_SumEt_->Fill(sumet,UncorrMEt,PTOT);
+	    CorrMEt_SumEt_->Fill(sumet,CorrMEt,PTOT);
+	    MEt_SumEt_->Fill(sumet,met,PTOT);
 	    UncorrMEt_SumEtC_->Fill(CorrSumEt,UncorrMEt,PTOT);
 	    CorrMEt_SumEtC_->Fill(CorrSumEt,CorrMEt,PTOT);
 	    MEt_SumEtC_->Fill(CorrSumEt,met,PTOT);
@@ -1635,8 +1642,8 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	      Chi2mass_->Fill(chi2,PTOT);
 	      M45best_->Fill(m45best,PTOT);
 	      Chi2ext_->Fill(chi2ext,PTOT);
-	      MEx_SumEt_->Fill(caloMET->sumEt(),met*cos(metphi),PTOT);
-	      MEx_SumEt_->Fill(caloMET->sumEt(),met*sin(metphi),PTOT);
+	      MEx_SumEt_->Fill(sumet,met*cos(metphi),PTOT);
+	      MEx_SumEt_->Fill(sumet,met*sin(metphi),PTOT);
 	      DP12_->Fill(dp12,PTOT);
 	      DPbb_->Fill(dpbb,PTOT);
 	      M_others_->Fill(m_others,PTOT);
@@ -1680,8 +1687,8 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	      Chi2massN_->Fill(chi2,weight_N);
 	      M45bestN_->Fill(m45best,weight_N);
 	      Chi2extN_->Fill(chi2ext,weight_N);
-	      MEx_SumEtN_->Fill(caloMET->sumEt(),met*cos(metphi),weight_N);
-	      MEx_SumEtN_->Fill(caloMET->sumEt(),met*sin(metphi),weight_N);
+	      MEx_SumEtN_->Fill(sumet,met*cos(metphi),weight_N);
+	      MEx_SumEtN_->Fill(sumet,met*sin(metphi),weight_N);
 	      DP12N_->Fill(dp12,weight_N);
 	      DPbbN_->Fill(dpbb,weight_N);
 	      M_othersN_->Fill(m_others,weight_N);
@@ -1722,8 +1729,8 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 		Chi2massS_->Fill(chi2,PTOT);
 		M45bestS_->Fill(m45best,PTOT);
 		Chi2extS_->Fill(chi2ext,PTOT);
-		MEx_SumEtS_->Fill(caloMET->sumEt(),met*cos(metphi),PTOT);
-		MEx_SumEtS_->Fill(caloMET->sumEt(),met*sin(metphi),PTOT);
+		MEx_SumEtS_->Fill(sumet,met*cos(metphi),PTOT);
+		MEx_SumEtS_->Fill(sumet,met*sin(metphi),PTOT);
 		DP12S_->Fill(dp12,PTOT);
 		DPbbS_->Fill(dpbb,PTOT);
 		M_othersS_->Fill(m_others,PTOT);
@@ -1767,8 +1774,8 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 		Chi2massSN_->Fill(chi2,weight_N);
 		M45bestSN_->Fill(m45best,weight_N);
 		Chi2extSN_->Fill(chi2ext,weight_N);
-		MEx_SumEtSN_->Fill(caloMET->sumEt(),met*cos(metphi),weight_N);
-		MEx_SumEtSN_->Fill(caloMET->sumEt(),met*sin(metphi),weight_N);
+		MEx_SumEtSN_->Fill(sumet,met*cos(metphi),weight_N);
+		MEx_SumEtSN_->Fill(sumet,met*sin(metphi),weight_N);
 		DP12SN_->Fill(dp12,weight_N);
 		DPbbSN_->Fill(dpbb,weight_N);
 		M_othersSN_->Fill(m_others,weight_N);
@@ -1809,8 +1816,8 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 		  Chi2massSS_->Fill(chi2,PTOT);
 		  M45bestSS_->Fill(m45best,PTOT);
 		  Chi2extSS_->Fill(chi2ext,PTOT);
-		  MEx_SumEtSS_->Fill(caloMET->sumEt(),met*cos(metphi),PTOT);
-		  MEx_SumEtSS_->Fill(caloMET->sumEt(),met*sin(metphi),PTOT);
+		  MEx_SumEtSS_->Fill(sumet,met*cos(metphi),PTOT);
+		  MEx_SumEtSS_->Fill(sumet,met*sin(metphi),PTOT);
 		  DP12SS_->Fill(dp12,PTOT);
 		  DPbbSS_->Fill(dpbb,PTOT);
 		  M_othersSS_->Fill(m_others,PTOT);      
@@ -1854,8 +1861,8 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 		  Chi2massSSN_->Fill(chi2,weight_N);
 		  M45bestSSN_->Fill(m45best,weight_N);
 		  Chi2extSSN_->Fill(chi2ext,weight_N);
-		  MEx_SumEtSSN_->Fill(caloMET->sumEt(),met*cos(metphi),weight_N);
-		  MEx_SumEtSSN_->Fill(caloMET->sumEt(),met*sin(metphi),weight_N);
+		  MEx_SumEtSSN_->Fill(sumet,met*cos(metphi),weight_N);
+		  MEx_SumEtSSN_->Fill(sumet,met*sin(metphi),weight_N);
 		  DP12SSN_->Fill(dp12,weight_N);
 		  DPbbSSN_->Fill(dpbb,weight_N);
 		  M_othersSSN_->Fill(m_others,weight_N);      
@@ -1897,8 +1904,8 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 		  Chi2massSSS_->Fill(chi2,PTOT);
 		  M45bestSSS_->Fill(m45best,PTOT);
 		  Chi2extSSS_->Fill(chi2ext,PTOT);
-		  MEx_SumEtSSS_->Fill(caloMET->sumEt(),met*cos(metphi),PTOT);
-		  MEx_SumEtSSS_->Fill(caloMET->sumEt(),met*sin(metphi),PTOT);
+		  MEx_SumEtSSS_->Fill(sumet,met*cos(metphi),PTOT);
+		  MEx_SumEtSSS_->Fill(sumet,met*sin(metphi),PTOT);
 		  DP12SSS_->Fill(dp12,PTOT);
 		  DPbbSSS_->Fill(dpbb,PTOT);
 		  M_othersSSS_->Fill(m_others,PTOT);      
@@ -1942,8 +1949,8 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 		  Chi2massSSSN_->Fill(chi2,weight_N);
 		  M45bestSSSN_->Fill(m45best,weight_N);
 		  Chi2extSSSN_->Fill(chi2ext,weight_N);
-		  MEx_SumEtSSSN_->Fill(caloMET->sumEt(),met*cos(metphi),weight_N);
-		  MEx_SumEtSSSN_->Fill(caloMET->sumEt(),met*sin(metphi),weight_N);
+		  MEx_SumEtSSSN_->Fill(sumet,met*cos(metphi),weight_N);
+		  MEx_SumEtSSSN_->Fill(sumet,met*sin(metphi),weight_N);
 		  DP12SSSN_->Fill(dp12,weight_N);
 		  DPbbSSSN_->Fill(dpbb,weight_N);
 		  M_othersSSSN_->Fill(m_others,weight_N);      
@@ -1968,9 +1975,9 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	    // Fill error histograms now
 	    // -------------------------
 
-	    UncorrMEt_SumEt_->Fill(caloMET->sumEt(),UncorrMEt,PTOTE2);
-	    CorrMEt_SumEt_->Fill(caloMET->sumEt(),CorrMEt,PTOTE2);
-	    MEt_SumEt_->Fill(caloMET->sumEt(),met,PTOTE2);
+	    UncorrMEt_SumEt_->Fill(sumet,UncorrMEt,PTOTE2);
+	    CorrMEt_SumEt_->Fill(sumet,CorrMEt,PTOTE2);
+	    MEt_SumEt_->Fill(sumet,met,PTOTE2);
 	    UncorrMEt_SumEtC_->Fill(CorrSumEt,UncorrMEt,PTOTE2);
 	    CorrMEt_SumEtC_->Fill(CorrSumEt,CorrMEt,PTOTE2);
 	    MEt_SumEtC_->Fill(CorrSumEt,met,PTOTE2);
@@ -2003,8 +2010,8 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	      Chi2massW_->Fill(chi2,PTOTE2);
 	      M45bestW_->Fill(m45best,PTOTE2);
 	      Chi2extW_->Fill(chi2ext,PTOTE2);
-	      MEx_SumEtW_->Fill(caloMET->sumEt(),met*cos(metphi),PTOTE2);
-	      MEx_SumEtW_->Fill(caloMET->sumEt(),met*sin(metphi),PTOTE2);
+	      MEx_SumEtW_->Fill(sumet,met*cos(metphi),PTOTE2);
+	      MEx_SumEtW_->Fill(sumet,met*sin(metphi),PTOTE2);
 	      DP12W_->Fill(dp12,PTOTE2);
 	      DPbbW_->Fill(dpbb,PTOTE2);
 	      M_othersW_->Fill(m_others,PTOTE2);
@@ -2045,8 +2052,8 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 		Chi2massSW_->Fill(chi2,PTOTE2);
 		M45bestSW_->Fill(m45best,PTOTE2);
 		Chi2extSW_->Fill(chi2ext,PTOTE2);
-		MEx_SumEtSW_->Fill(caloMET->sumEt(),met*cos(metphi),PTOTE2);
-		MEx_SumEtSW_->Fill(caloMET->sumEt(),met*sin(metphi),PTOTE2);
+		MEx_SumEtSW_->Fill(sumet,met*cos(metphi),PTOTE2);
+		MEx_SumEtSW_->Fill(sumet,met*sin(metphi),PTOTE2);
 		DP12SW_->Fill(dp12,PTOTE2);
 		DPbbSW_->Fill(dpbb,PTOTE2);
 		M_othersSW_->Fill(m_others,PTOTE2);
@@ -2087,8 +2094,8 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 		  Chi2massSSW_->Fill(chi2,PTOTE2);
 		  M45bestSSW_->Fill(m45best,PTOTE2);
 		  Chi2extSSW_->Fill(chi2ext,PTOTE2);
-		  MEx_SumEtSSW_->Fill(caloMET->sumEt(),met*cos(metphi),PTOTE2);
-		  MEx_SumEtSSW_->Fill(caloMET->sumEt(),met*sin(metphi),PTOTE2);
+		  MEx_SumEtSSW_->Fill(sumet,met*cos(metphi),PTOTE2);
+		  MEx_SumEtSSW_->Fill(sumet,met*sin(metphi),PTOTE2);
 		  DP12SSW_->Fill(dp12,PTOTE2);
 		  DPbbSSW_->Fill(dpbb,PTOTE2);
 		  M_othersSSW_->Fill(m_others,PTOTE2);      
@@ -2130,8 +2137,8 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 		  Chi2massSSSW_->Fill(chi2,PTOTE2);
 		  M45bestSSSW_->Fill(m45best,PTOTE2);
 		  Chi2extSSSW_->Fill(chi2ext,PTOTE2);
-		  MEx_SumEtSSSW_->Fill(caloMET->sumEt(),met*cos(metphi),PTOTE2);
-		  MEx_SumEtSSSW_->Fill(caloMET->sumEt(),met*sin(metphi),PTOTE2);
+		  MEx_SumEtSSSW_->Fill(sumet,met*cos(metphi),PTOTE2);
+		  MEx_SumEtSSSW_->Fill(sumet,met*sin(metphi),PTOTE2);
 		  DP12SSSW_->Fill(dp12,PTOTE2);
 		  DPbbSSSW_->Fill(dpbb,PTOTE2);
 		  M_othersSSSW_->Fill(m_others,PTOTE2);      
@@ -2161,23 +2168,27 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	    double fs=0.;
 	    double fb=0.;
 	    rel_lik = 0.;
-	    int bx[8];
+	    int bx[11];
 	    bx[0]= (int)((c8/1.2)*50)+1;
 	    bx[1]= (int)((m45bestall/300.)*50)+1;
 	    bx[2]= (int)(chi2extall)+1;
 	    bx[3]= (int)((metsig/20.)*50)+1;
-	    bx[4]= (int)((m8/2000)*50.)+1;
+	    bx[4]= (int)((m8/2500.)*50.)+1;
 	    bx[5]= (int)((met/500.)*50)+1;
 	    bx[6]= (int)((dp12/3.2)*50.)+1;
 	    bx[7]= (int)((dp2nd/3.2)*50)+1;
-	    for ( int ivar=0; ivar<8; ivar++ ) {
+	    bx[8]= (int)((c6/1.2)*50)+1;
+	    bx[9]= (int)((m6/2500.)*50.)+1;
+	    bx[10]= (int)((sumet/4000.)*50)+1;
+	    for ( int ivar=0; ivar<11; ivar++ ) {
 	      if ( bx[ivar]>=1 && bx[ivar]<=50 ) {
 		fs = HSS_sig[ivar]->GetBinContent(bx[ivar]);
 		fb = HSS_bgr[ivar]->GetBinContent(bx[ivar]);
-		if (fb>0 ) {
+		if (fb>0 && fs>0 ) {
 		  r *= fs/fb;
 		} else {
-		  r *= 10.;  // Need to improve this kludge
+		  if ( fb==0 ) r *= 10.;  // Need to improve this kludge
+		  if ( fs==0 ) r *= 0.1; 
 		}
 	      }
 	    }
@@ -2459,7 +2470,7 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	m6=sqrt(m6);
 	c6=set/m6;
       }
-      
+
       ////////////////////////////////////////////////////////////////
       // Now fill histograms
       // -------------------
@@ -2485,11 +2496,11 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
       // Missing Et significance computed with tuned resolution function
       // ---------------------------------------------------------------
       double metsignew=0;
-      if ( caloMET->sumEt()>0 ) metsignew = met/(sqrt(2)*0.8033*pow(caloMET->sumEt(),0.5004));
+      if ( sumet>0 ) metsignew = met/(sqrt(2)*0.8033*pow(sumet,0.5004));
       
-      UncorrMEt_SumEt_->Fill(caloMET->sumEt(),UncorrMEt);
-      CorrMEt_SumEt_->Fill(caloMET->sumEt(),CorrMEt);
-      MEt_SumEt_->Fill(caloMET->sumEt(),met);
+      UncorrMEt_SumEt_->Fill(sumet,UncorrMEt);
+      CorrMEt_SumEt_->Fill(sumet,CorrMEt);
+      MEt_SumEt_->Fill(sumet,met);
       UncorrMEt_SumEtC_->Fill(CorrSumEt,UncorrMEt);
       CorrMEt_SumEtC_->Fill(CorrSumEt,CorrMEt);
       MEt_SumEtC_->Fill(CorrSumEt,met);
@@ -2522,8 +2533,8 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	Chi2mass_->Fill(chi2);
 	M45best_->Fill(m45best);
 	Chi2ext_->Fill(chi2ext);
-	MEx_SumEt_->Fill(caloMET->sumEt(),met*cos(metphi));
-	MEx_SumEt_->Fill(caloMET->sumEt(),met*sin(metphi));
+	MEx_SumEt_->Fill(sumet,met*cos(metphi));
+	MEx_SumEt_->Fill(sumet,met*sin(metphi));
 	DP12_->Fill(dp12);
 	DPbb_->Fill(dpbb);
 	M_others_->Fill(m_others);
@@ -2568,8 +2579,8 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	  Chi2massS_->Fill(chi2);
 	  M45bestS_->Fill(m45best);
 	  Chi2extS_->Fill(chi2ext);
-	  MEx_SumEtS_->Fill(caloMET->sumEt(),met*cos(metphi));
-	  MEx_SumEtS_->Fill(caloMET->sumEt(),met*sin(metphi));
+	  MEx_SumEtS_->Fill(sumet,met*cos(metphi));
+	  MEx_SumEtS_->Fill(sumet,met*sin(metphi));
 	  DP12S_->Fill(dp12);
 	  DPbbS_->Fill(dpbb);
 	  M_othersS_->Fill(m_others);
@@ -2614,8 +2625,8 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	    Chi2massSS_->Fill(chi2);
 	    M45bestSS_->Fill(m45best);
 	    Chi2extSS_->Fill(chi2ext);
-	    MEx_SumEtSS_->Fill(caloMET->sumEt(),met*cos(metphi));
-	    MEx_SumEtSS_->Fill(caloMET->sumEt(),met*sin(metphi));
+	    MEx_SumEtSS_->Fill(sumet,met*cos(metphi));
+	    MEx_SumEtSS_->Fill(sumet,met*sin(metphi));
 	    DP12SS_->Fill(dp12);
 	    DPbbSS_->Fill(dpbb);
 	    M_othersSS_->Fill(m_others);      
@@ -2661,8 +2672,8 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	    Chi2massSSS_->Fill(chi2);
 	    M45bestSSS_->Fill(m45best);
 	    Chi2extSSS_->Fill(chi2ext);
-	    MEx_SumEtSSS_->Fill(caloMET->sumEt(),met*cos(metphi));
-	    MEx_SumEtSSS_->Fill(caloMET->sumEt(),met*sin(metphi));
+	    MEx_SumEtSSS_->Fill(sumet,met*cos(metphi));
+	    MEx_SumEtSSS_->Fill(sumet,met*sin(metphi));
 	    DP12SSS_->Fill(dp12);
 	    DPbbSSS_->Fill(dpbb);
 	    M_othersSSS_->Fill(m_others);      
@@ -2706,7 +2717,7 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
       double fs=0.;
       double fb=0.;
       rel_lik = 0.;
-      int bx[8];
+      int bx[11];
       bx[0]= (int)((c8/1.2)*50)+1;
       bx[1]= (int)((m45bestall/300.)*50)+1;
       bx[2]= (int)(chi2extall)+1;
@@ -2715,16 +2726,28 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
       bx[5]= (int)((met/500.)*50)+1;
       bx[6]= (int)((dp12/3.2)*50.)+1;
       bx[7]= (int)((dp2nd/3.2)*50)+1;
-      for ( int ivar=0; ivar<8; ivar++ ) {
+      bx[8]= (int)((c6/1.2)*50)+1;
+      bx[9]= (int)((m6/2500.)*50.)+1;
+      bx[10]= (int)((sumet/4000.)*50)+1;
+      for ( int ivar=0; ivar<11; ivar++ ) {
 	if ( bx[ivar]>=1 && bx[ivar]<=50 ) {
 	  fs = HSS_sig[ivar]->GetBinContent(bx[ivar]);
 	  fb = HSS_bgr[ivar]->GetBinContent(bx[ivar]);
-	  if (fb>0 ) {
+	  if (fb>0 && fs>0 ) {
 	    r *= fs/fb;
+	  } else {
+	    if ( fb==0 ) r *= 10.;  // Need to improve this kludge
+	    if ( fs==0 ) r *= 0.1; 
 	  }
 	}
       }
-      rel_lik += log(r);
+      if ( r>=0 ) {
+	rel_lik += log(r);
+      } else {
+	rel_lik=-9.99;	    
+      }
+      if ( rel_lik<-10. ) rel_lik = -9.99;
+      if ( rel_lik>=10. ) rel_lik = 9.99;
       if ( response && NJetsCut && NHEM>=2 ) {
 	L_->Fill(rel_lik);
 	if ( MEtSigCut ) {
