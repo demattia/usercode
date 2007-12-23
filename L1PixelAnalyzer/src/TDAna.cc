@@ -130,7 +130,7 @@ TDAna::TDAna(const edm::ParameterSet& iConfig) :
   SumHED6_ = new TH1D ( "SumHED6", "Sum of HED in 6 jets", 50, 0., 100. );
   SumHPD6_ = new TH1D ( "SumHPD6", "Sum of HPD in 6 jets", 50, 0., 50. );
   HED_ = new TH1D ( "HED", "High eff discriminator", 100, 0., 20. );      // These do not require 
-  HPD_ = new TH1D ( "HED", "High eff discriminator", 100, 0., 20. );      // W and N histos
+  HPD_ = new TH1D ( "HPD", "High pur discriminator", 100, 0., 20. );      // W and N histos
 
   NJetsN_ = new TH1D ( "NJetsN", "Number of selected jets", 20, 0, 20 );
   UncorrHtN_ = new TH1D ( "UncorrHtN", "Ht with uncorrected jets", 50, 0, 4000 );
@@ -212,7 +212,7 @@ TDAna::TDAna(const edm::ParameterSet& iConfig) :
   SumHED6S_ = new TH1D ( "SumHED6S", "Sum of HED in 6 jets", 50, 0., 100. );
   SumHPD6S_ = new TH1D ( "SumHPD6S", "Sum of HPD in 6 jets", 50, 0., 50. );
   HEDS_ = new TH1D ( "HEDS", "High eff discriminator", 100, 0., 20. );       // These do not require
-  HPDS_ = new TH1D ( "HEDS", "High eff discriminator", 100, 0., 20. );       // W and N histos
+  HPDS_ = new TH1D ( "HPDS", "High eff discriminator", 100, 0., 20. );       // W and N histos
 
   NJetsSN_ = new TH1D ( "NJetsSN", "Number of selected jets", 20, 0, 20 );
   UncorrHtSN_ = new TH1D ( "UncorrHtSN", "Ht with uncorrected jets", 50, 0, 4000 );
@@ -294,7 +294,7 @@ TDAna::TDAna(const edm::ParameterSet& iConfig) :
   SumHED6SS_ = new TH1D ( "SumHED6SS", "Sum of HED in 6 jets", 50, 0., 100. );
   SumHPD6SS_ = new TH1D ( "SumHPD6SS", "Sum of HPD in 6 jets", 50, 0., 50. );
   HEDSS_ = new TH1D ( "HEDSS", "High eff discriminator", 100, 0., 20. );        // These do not require
-  HPDSS_ = new TH1D ( "HEDSS", "High eff discriminator", 100, 0., 20. );        // W and N histos
+  HPDSS_ = new TH1D ( "HPDSS", "High eff discriminator", 100, 0., 20. );        // W and N histos
 
   NJetsSSN_ = new TH1D ( "NJetsSSN", "Number of selected jets", 20, 0, 20 );
   UncorrHtSSN_ = new TH1D ( "UncorrHtSSN", "Ht with uncorrected jets", 50, 0, 4000 );
@@ -376,7 +376,7 @@ TDAna::TDAna(const edm::ParameterSet& iConfig) :
   SumHED6SSS_ = new TH1D ( "SumHED6SSS", "Sum of HED in 6 jets", 50, 0., 100. );
   SumHPD6SSS_ = new TH1D ( "SumHPD6SSS", "Sum of HPD in 6 jets", 50, 0., 50. );
   HEDSSS_ = new TH1D ( "HEDSSS_", "High eff discriminator", 100, 0., 20. );     // These do not require
-  HPDSSS_ = new TH1D ( "HEDSSS_", "High eff discriminator", 100, 0., 20. );     // corresponding W and N histos
+  HPDSSS_ = new TH1D ( "HPDSSS_", "High eff discriminator", 100, 0., 20. );     // corresponding W and N histos
 
   NJetsSSSN_ = new TH1D ( "NJetsSSSN", "Number of selected jets", 20, 0, 20 );
   UncorrHtSSSN_ = new TH1D ( "UncorrHtSSSN", "Ht with uncorrected jets", 50, 0, 4000 );
