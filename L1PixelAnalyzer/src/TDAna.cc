@@ -84,6 +84,15 @@ TDAna::TDAna(const edm::ParameterSet& iConfig) :
   HSS_bgr[9] = dynamic_cast<TH1D*> ( FunctionFile->Get("M6SS_bgrS"));
   HSS_sig[10]= dynamic_cast<TH1D*> ( FunctionFile->Get("CorrSumEtSS_sigS"));
   HSS_bgr[10]= dynamic_cast<TH1D*> ( FunctionFile->Get("CorrSumEtSS_bgrS"));
+  //  FunctionFile->Close();
+
+  // File with HED and HPD distributions from QCD jets
+  // -------------------------------------------------
+  TFile * HEDFile = new TFile ("HED.root");
+  HEDFile->cd();
+  HEDpdf = dynamic_cast<TH1D*> ( HEDFile->Get("HED"));
+  HPDpdf = dynamic_cast<TH1D*> ( HEDFile->Get("HPD"));
+  // HEDFile->Close();
 
   // File for output histograms
   // --------------------------
@@ -135,8 +144,8 @@ TDAna::TDAna(const edm::ParameterSet& iConfig) :
   SumHPD4_ = new TH1D ( "SumHPD4", "Sum of HPD in 4 jets", 50, 0., 50. );
   SumHED6_ = new TH1D ( "SumHED6", "Sum of HED in 6 jets", 50, 0., 100. );
   SumHPD6_ = new TH1D ( "SumHPD6", "Sum of HPD in 6 jets", 50, 0., 50. );
-  HED_ = new TH1D ( "HED", "High eff discriminator", 100, 0., 20. );      // These do not require 
-  HPD_ = new TH1D ( "HPD", "High pur discriminator", 100, 0., 20. );      // W and N histos
+  HED_ = new TH1D ( "HED", "High eff discriminator", 100, 0., 25. );      // These do not require 
+  HPD_ = new TH1D ( "HPD", "High pur discriminator", 100, 0., 25. );      // W and N histos
 
   NJetsN_ = new TH1D ( "NJetsN", "Number of selected jets", 20, 0, 20 );
   UncorrHtN_ = new TH1D ( "UncorrHtN", "Ht with uncorrected jets", 50, 0, 4000 );
@@ -177,6 +186,8 @@ TDAna::TDAna(const edm::ParameterSet& iConfig) :
   SumHPD4N_ = new TH1D ( "SumHPD4N", "Sum of HPD in 4 jets", 50, 0., 50. );
   SumHED6N_ = new TH1D ( "SumHED6N", "Sum of HED in 6 jets", 50, 0., 100. );
   SumHPD6N_ = new TH1D ( "SumHPD6N", "Sum of HPD in 6 jets", 50, 0., 50. );
+  HEDN_ = new TH1D ( "HEDN", "High eff discriminator", 100, 0., 25. );      // These do not require 
+  HPDN_ = new TH1D ( "HPDN", "High pur discriminator", 100, 0., 25. );      // W and N histos
 
   NJetsS_ = new TH1D ( "NJetsS", "Number of selected jets", 20, 0, 20 );
   UncorrHtS_ = new TH1D ( "UncorrHtS", "Ht with uncorrected jets", 50, 0, 4000 );
@@ -217,8 +228,8 @@ TDAna::TDAna(const edm::ParameterSet& iConfig) :
   SumHPD4S_ = new TH1D ( "SumHPD4S", "Sum of HPD in 4 jets", 50, 0., 50. );
   SumHED6S_ = new TH1D ( "SumHED6S", "Sum of HED in 6 jets", 50, 0., 100. );
   SumHPD6S_ = new TH1D ( "SumHPD6S", "Sum of HPD in 6 jets", 50, 0., 50. );
-  HEDS_ = new TH1D ( "HEDS", "High eff discriminator", 100, 0., 20. );       // These do not require
-  HPDS_ = new TH1D ( "HPDS", "High eff discriminator", 100, 0., 20. );       // W and N histos
+  HEDS_ = new TH1D ( "HEDS", "High eff discriminator", 100, 0., 25. );       // These do not require
+  HPDS_ = new TH1D ( "HPDS", "High eff discriminator", 100, 0., 25. );       // W and N histos
 
   NJetsSN_ = new TH1D ( "NJetsSN", "Number of selected jets", 20, 0, 20 );
   UncorrHtSN_ = new TH1D ( "UncorrHtSN", "Ht with uncorrected jets", 50, 0, 4000 );
@@ -259,6 +270,8 @@ TDAna::TDAna(const edm::ParameterSet& iConfig) :
   SumHPD4SN_ = new TH1D ( "SumHPD4SN", "Sum of HPD in 4 jets", 50, 0., 50. );
   SumHED6SN_ = new TH1D ( "SumHED6SN", "Sum of HED in 6 jets", 50, 0., 100. );
   SumHPD6SN_ = new TH1D ( "SumHPD6SN", "Sum of HPD in 6 jets", 50, 0., 50. );
+  HEDSN_ = new TH1D ( "HEDSN", "High eff discriminator", 100, 0., 25. );      // These do not require 
+  HPDSN_ = new TH1D ( "HPDSN", "High pur discriminator", 100, 0., 25. );      // W and N histos
 
   NJetsSS_ = new TH1D ( "NJetsSS", "Number of selected jets", 20, 0, 20 );
   UncorrHtSS_ = new TH1D ( "UncorrHtSS", "Ht with uncorrected jets", 50, 0, 4000 );
@@ -299,8 +312,8 @@ TDAna::TDAna(const edm::ParameterSet& iConfig) :
   SumHPD4SS_ = new TH1D ( "SumHPD4SS", "Sum of HPD in 4 jets", 50, 0., 50. );
   SumHED6SS_ = new TH1D ( "SumHED6SS", "Sum of HED in 6 jets", 50, 0., 100. );
   SumHPD6SS_ = new TH1D ( "SumHPD6SS", "Sum of HPD in 6 jets", 50, 0., 50. );
-  HEDSS_ = new TH1D ( "HEDSS", "High eff discriminator", 100, 0., 20. );        // These do not require
-  HPDSS_ = new TH1D ( "HPDSS", "High eff discriminator", 100, 0., 20. );        // W and N histos
+  HEDSS_ = new TH1D ( "HEDSS", "High eff discriminator", 100, 0., 25. );        // These do not require
+  HPDSS_ = new TH1D ( "HPDSS", "High eff discriminator", 100, 0., 25. );        // W and N histos
 
   NJetsSSN_ = new TH1D ( "NJetsSSN", "Number of selected jets", 20, 0, 20 );
   UncorrHtSSN_ = new TH1D ( "UncorrHtSSN", "Ht with uncorrected jets", 50, 0, 4000 );
@@ -341,6 +354,8 @@ TDAna::TDAna(const edm::ParameterSet& iConfig) :
   SumHPD4SSN_ = new TH1D ( "SumHPD4SSN", "Sum of HPD in 4 jets", 50, 0., 50. );
   SumHED6SSN_ = new TH1D ( "SumHED6SSN", "Sum of HED in 6 jets", 50, 0., 100. );
   SumHPD6SSN_ = new TH1D ( "SumHPD6SSN", "Sum of HPD in 6 jets", 50, 0., 50. );
+  HEDSSN_ = new TH1D ( "HEDSSN", "High eff discriminator", 100, 0., 25. );      // These do not require 
+  HPDSSN_ = new TH1D ( "HPDSSN", "High pur discriminator", 100, 0., 25. );      // W and N histos
 
   NJetsSSS_ = new TH1D ( "NJetsSSS", "Number of selected jets", 20, 0, 20 );
   UncorrHtSSS_ = new TH1D ( "UncorrHtSSS", "Ht with uncorrected jets", 50, 0, 4000 );
@@ -381,8 +396,8 @@ TDAna::TDAna(const edm::ParameterSet& iConfig) :
   SumHPD4SSS_ = new TH1D ( "SumHPD4SSS", "Sum of HPD in 4 jets", 50, 0., 50. );
   SumHED6SSS_ = new TH1D ( "SumHED6SSS", "Sum of HED in 6 jets", 50, 0., 100. );
   SumHPD6SSS_ = new TH1D ( "SumHPD6SSS", "Sum of HPD in 6 jets", 50, 0., 50. );
-  HEDSSS_ = new TH1D ( "HEDSSS_", "High eff discriminator", 100, 0., 20. );     // These do not require
-  HPDSSS_ = new TH1D ( "HPDSSS_", "High eff discriminator", 100, 0., 20. );     // corresponding W and N histos
+  HEDSSS_ = new TH1D ( "HEDSSS_", "High eff discriminator", 100, 0., 25. );     // These do not require
+  HPDSSS_ = new TH1D ( "HPDSSS_", "High eff discriminator", 100, 0., 25. );     // corresponding W and N histos
 
   NJetsSSSN_ = new TH1D ( "NJetsSSSN", "Number of selected jets", 20, 0, 20 );
   UncorrHtSSSN_ = new TH1D ( "UncorrHtSSSN", "Ht with uncorrected jets", 50, 0, 4000 );
@@ -423,6 +438,8 @@ TDAna::TDAna(const edm::ParameterSet& iConfig) :
   SumHPD4SSSN_ = new TH1D ( "SumHPD4SSSN", "Sum of HPD in 4 jets", 50, 0., 50. );
   SumHED6SSSN_ = new TH1D ( "SumHED6SSSN", "Sum of HED in 6 jets", 50, 0., 100. );
   SumHPD6SSSN_ = new TH1D ( "SumHPD6SSSN", "Sum of HPD in 6 jets", 50, 0., 50. );
+  HEDSSSN_ = new TH1D ( "HEDSSSN", "High eff discriminator", 100, 0., 25. );      // These do not require 
+  HPDSSSN_ = new TH1D ( "HPDSSSN", "High pur discriminator", 100, 0., 25. );      // W and N histos
 
   N4NJSSS_ = new TH1D ( "N4NJSSS", "N of 4HEL tags vs N jets", 20, 0, 20 );           // These are filled only for this
   E4NJSSS_ = new TH1D ( "E4NJSSS", "Efficiency of 4HEL tags vs N jets", 20, 0, 20 );  // selection and do not require W, N
@@ -466,6 +483,8 @@ TDAna::TDAna(const edm::ParameterSet& iConfig) :
   SumHPD4W_ = new TH1D ( "SumHPD4W", "Sum of HPD in 4 jets", 50, 0., 50. );
   SumHED6W_ = new TH1D ( "SumHED6W", "Sum of HED in 6 jets", 50, 0., 100. );
   SumHPD6W_ = new TH1D ( "SumHPD6W", "Sum of HPD in 6 jets", 50, 0., 50. );
+  HEDW_ = new TH1D ( "HEDW", "High eff discriminator", 100, 0., 25. );      // These do not require 
+  HPDW_ = new TH1D ( "HPDW", "High pur discriminator", 100, 0., 25. );      // W and N histos
 
   NJetsSW_ = new TH1D ( "NJetsSW", "Number of selected jets", 20, 0, 20 );
   UncorrHtSW_ = new TH1D ( "UncorrHtSW", "Ht with uncorrected jets", 50, 0, 4000 );
@@ -506,6 +525,8 @@ TDAna::TDAna(const edm::ParameterSet& iConfig) :
   SumHPD4SW_ = new TH1D ( "SumHPD4SW", "Sum of HPD in 4 jets", 50, 0., 50. );
   SumHED6SW_ = new TH1D ( "SumHED6SW", "Sum of HED in 6 jets", 50, 0., 100. );
   SumHPD6SW_ = new TH1D ( "SumHPD6SW", "Sum of HPD in 6 jets", 50, 0., 50. );
+  HEDSW_ = new TH1D ( "HEDSW", "High eff discriminator", 100, 0., 25. );      // These do not require 
+  HPDSW_ = new TH1D ( "HPDSW", "High pur discriminator", 100, 0., 25. );      // W and N histos
 
   NJetsSSW_ = new TH1D ( "NJetsSSW", "Number of selected jets", 20, 0, 20 );
   UncorrHtSSW_ = new TH1D ( "UncorrHtSSW", "Ht with uncorrected jets", 50, 0, 4000 );
@@ -546,6 +567,8 @@ TDAna::TDAna(const edm::ParameterSet& iConfig) :
   SumHPD4SSW_ = new TH1D ( "SumHPD4SSW", "Sum of HPD in 4 jets", 50, 0., 50. );
   SumHED6SSW_ = new TH1D ( "SumHED6SSW", "Sum of HED in 6 jets", 50, 0., 100. );
   SumHPD6SSW_ = new TH1D ( "SumHPD6SSW", "Sum of HPD in 6 jets", 50, 0., 50. );
+  HEDSSW_ = new TH1D ( "HEDSSW", "High eff discriminator", 100, 0., 25. );      // These do not require 
+  HPDSSW_ = new TH1D ( "HPDSSW", "High pur discriminator", 100, 0., 25. );      // W and N histos
 
   NJetsSSSW_ = new TH1D ( "NJetsSSSW", "Number of selected jets", 20, 0, 20 );
   UncorrHtSSSW_ = new TH1D ( "UncorrHtSSSW", "Ht with uncorrected jets", 50, 0, 4000 );
@@ -586,6 +609,8 @@ TDAna::TDAna(const edm::ParameterSet& iConfig) :
   SumHPD4SSSW_ = new TH1D ( "SumHPD4SSSW", "Sum of HPD in 4 jets", 50, 0., 50. );
   SumHED6SSSW_ = new TH1D ( "SumHED6SSSW", "Sum of HED in 6 jets", 50, 0., 100. );
   SumHPD6SSSW_ = new TH1D ( "SumHPD6SSSW", "Sum of HPD in 6 jets", 50, 0., 50. );
+  HEDSSSW_ = new TH1D ( "HEDSSSW", "High eff discriminator", 100, 0., 25. );      // These do not require 
+  HPDSSSW_ = new TH1D ( "HPDSSSW", "High pur discriminator", 100, 0., 25. );      // W and N histos
 
   N4NJSSSW_ = new TH1D ( "N4NJSSSW", "N of 4HEL tags vs N jets", 20, 0, 20 );
   E4NJSSSW_ = new TH1D ( "E4NJSSSW", "Efficiency of 4HEL tags vs N jets", 20, 0, 20 );
@@ -785,6 +810,8 @@ TDAna::TDAna(const edm::ParameterSet& iConfig) :
   }
 
   PTagFile.close();
+
+  cout << "Done with constructor" << endl;
 
 }
 
@@ -1207,38 +1234,9 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
     if ( iJ>1 ) dp2nd= 3.1415926-fabs(fabs(Jphi[1]-metphi)-3.1415926);
     if ( iJ>2 ) dp3rd= 3.1415926-fabs(fabs(Jphi[2]-metphi)-3.1415926);
 
-    // Compute sum of discriminants
-    // ----------------------------
     double hemax[100]={0.};
     double hpmax[100]={0.};
-    for ( int i=0; i<NHSJ; i++ ) {
-      hemax[i]=JHET[i];
-      hpmax[i]=JHPT[i];
-    }
-    for ( int times=0; times<NHSJ; times++ ) {
-      for ( int j=NHSJ-1; j>=1; j-- ) {
-	if ( hemax[j]>hemax[j-1] ) {
-	  double a1=hemax[j];
-	  hemax[j]=hemax[j-1];
-	  hemax[j-1]=a1;
-	}
-	if ( hpmax[j]>hpmax[j-1] ) {
-	  double a1=hpmax[j];
-	  hpmax[j]=hpmax[j-1];
-	  hpmax[j-1]=a1;
-	}
-      }
-    }
-    for ( int i=0; i<4 && i<NHSJ; i++ ) {
-      sumhed4+=hemax[i];
-      sumhpd4+=hpmax[i];
-    }
-    for ( int i=0; i<6 && i<NHSJ; i++ ) {
-      sumhed6+=hemax[i];
-      sumhpd6+=hpmax[i];
-    }
     
-
     if ( QCD_ ) { // This is for tag parametrization /////////////////////////////////////
 
       // Assign tag probability to each jet
@@ -1319,13 +1317,70 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	    PTOT=PTOT*PHETM[JBin[j]];
 	    PTOTE2+=pow(PHETMS[JBin[j]]/PHETM[JBin[j]],2);
 	    NHEM++;
+	    // Extract random HED and HPD values from QCD pdf
+	    // ----------------------------------------------
+	    double x=0.;
+	    for ( ; x<medium_; ) {
+	      x=HEDpdf->GetRandom();
+	    }   
+	    JHET[j]=x;
+	    x=0.;
+	    for ( ; x<tight_; ) {
+	      x=HPDpdf->GetRandom();
+	    }   
+	    JHPT[j]=x;
 	  } else {
 	    JHEM[j]=false;
 	    PTOT=PTOT*(1.-PHETM[JBin[j]]);
 	    PTOTE2+=pow(PHETMS[JBin[j]]/(1.-PHETM[JBin[j]]),2);
+	    // Extract random HED and HPD values from QCD pdf
+	    // ----------------------------------------------
+	    double x=29.9;
+	    for ( ; x>=medium_; ) {
+	      x=HEDpdf->GetRandom(); 
+	    }   
+	    JHET[j]=x;
+	    x=29.9;
+	    for ( ; x>=tight_; ) {
+	      x=HPDpdf->GetRandom();
+	    }   
+	    JHPT[j]=x;
 	  }
 	}
 	PTOTE2=PTOTE2*pow(PTOT,2);
+
+	sumhed4=0.;
+	sumhpd4=0.;
+	sumhed6=0.;
+	sumhpd6=0.;
+	// Compute sum of discriminants
+	// ----------------------------
+	for ( int i=0; i<NHSJ; i++ ) {
+	  hemax[i]=JHET[i];
+	  hpmax[i]=JHPT[i];
+	}
+	for ( int times=0; times<NHSJ; times++ ) {
+	  for ( int j=NHSJ-1; j>=1; j-- ) {
+	    if ( hemax[j]>hemax[j-1] ) {
+	      double a1=hemax[j];
+	      hemax[j]=hemax[j-1];
+	      hemax[j-1]=a1;
+	    }
+	    if ( hpmax[j]>hpmax[j-1] ) {
+	      double a1=hpmax[j];
+	      hpmax[j]=hpmax[j-1];
+	      hpmax[j-1]=a1;
+	    }
+	  }
+	}
+	for ( int i=0; i<4 && i<NHSJ; i++ ) {
+	  sumhed4+=hemax[i];
+	  sumhpd4+=hpmax[i];
+	}
+	for ( int i=0; i<6 && i<NHSJ; i++ ) {
+	  sumhed6+=hemax[i];
+	  sumhpd6+=hpmax[i];
+	}
 
 	if ( NHEM>=2 ) {
 
@@ -1661,8 +1716,8 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	      SumHED6_->Fill(sumhed6,PTOT);
 	      SumHPD6_->Fill(sumhpd6,PTOT);
 	      for ( int i=0; i<iJ && i<NHSJ; i++ ) {
-		HED_->Fill(JHET[i]);
-		HPD_->Fill(JHPT[i]);
+		HED_->Fill(JHET[i],PTOT);
+		HPD_->Fill(JHPT[i],PTOT);
 	      } 
 
 	      NJetsN_->Fill(goodIc5Jets,weight_N);
@@ -1705,6 +1760,10 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	      SumHPD4N_->Fill(sumhpd4,weight_N);
 	      SumHED6N_->Fill(sumhed6,weight_N);
 	      SumHPD6N_->Fill(sumhpd6,weight_N);
+	      for ( int i=0; i<iJ && i<NHSJ; i++ ) {
+		HEDN_->Fill(JHET[i],weight_N);
+		HPDN_->Fill(JHPT[i],weight_N);
+	      } 
 	      
 	      if ( MEtSigCut ) {
 		NJetsS_->Fill(goodIc5Jets,PTOT);
@@ -1748,8 +1807,8 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 		SumHED6S_->Fill(sumhed6,PTOT);
 		SumHPD6S_->Fill(sumhpd6,PTOT);
 		for ( int i=0; i<iJ && i<NHSJ; i++ ) {
-		  HEDS_->Fill(JHET[i]);
-		  HPDS_->Fill(JHPT[i]);
+		  HEDS_->Fill(JHET[i],PTOT);
+		  HPDS_->Fill(JHPT[i],PTOT);
 		} 
 
 		NJetsSN_->Fill(goodIc5Jets,weight_N);
@@ -1792,6 +1851,10 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 		SumHPD4SN_->Fill(sumhpd4,weight_N);
 		SumHED6SN_->Fill(sumhed6,weight_N);
 		SumHPD6SN_->Fill(sumhpd6,weight_N);
+		for ( int i=0; i<iJ && i<NHSJ; i++ ) {
+		  HEDSN_->Fill(JHET[i],weight_N);
+		  HPDSN_->Fill(JHPT[i],weight_N);
+		} 
 	      
 		if ( NHEM>=3 ) {
 		  NJetsSS_->Fill(goodIc5Jets,PTOT);
@@ -1835,8 +1898,8 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 		  SumHED6SS_->Fill(sumhed6,PTOT);
 		  SumHPD6SS_->Fill(sumhpd6,PTOT);
 		  for ( int i=0; i<iJ && i<NHSJ; i++ ) {
-		    HEDSS_->Fill(JHET[i]);
-		    HPDSS_->Fill(JHPT[i]);
+		    HEDSS_->Fill(JHET[i],PTOT);
+		    HPDSS_->Fill(JHPT[i],PTOT);
 		  } 
 
 		  NJetsSSN_->Fill(goodIc5Jets,weight_N);
@@ -1879,6 +1942,10 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 		  SumHPD4SSN_->Fill(sumhpd4,weight_N);
 		  SumHED6SSN_->Fill(sumhed6,weight_N);
 		  SumHPD6SSN_->Fill(sumhpd6,weight_N);
+		  for ( int i=0; i<iJ && i<NHSJ; i++ ) {
+		    HEDSSN_->Fill(JHET[i],weight_N);
+		    HPDSSN_->Fill(JHPT[i],weight_N);
+		  } 
 		}
 		
 		if ( NHEM>=4 ) {
@@ -1923,8 +1990,8 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 		  SumHED6SSS_->Fill(sumhed6,PTOT);
 		  SumHPD6SSS_->Fill(sumhpd6,PTOT);
 		  for ( int i=0; i<iJ && i<NHSJ; i++ ) {
-		    HEDSSS_->Fill(JHET[i]);
-		    HPDSSS_->Fill(JHPT[i]);
+		    HEDSSS_->Fill(JHET[i],PTOT);
+		    HPDSSS_->Fill(JHPT[i],PTOT);
 		  } 
 
 		  NJetsSSSN_->Fill(goodIc5Jets,weight_N);
@@ -1967,6 +2034,10 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 		  SumHPD4SSSN_->Fill(sumhpd4,weight_N);
 		  SumHED6SSSN_->Fill(sumhed6,weight_N);
 		  SumHPD6SSSN_->Fill(sumhpd6,weight_N);
+		  for ( int i=0; i<iJ && i<NHSJ; i++ ) {
+		    HEDSSSN_->Fill(JHET[i],weight_N);
+		    HPDSSSN_->Fill(JHPT[i],weight_N);
+		  } 
 		}
 
 	      }
@@ -2028,6 +2099,10 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	      SumHPD4W_->Fill(sumhpd4,PTOTE2);
 	      SumHED6W_->Fill(sumhed6,PTOTE2);
 	      SumHPD6W_->Fill(sumhpd6,PTOTE2);
+	      for ( int i=0; i<iJ && i<NHSJ; i++ ) {
+		HEDW_->Fill(JHET[i],PTOTE2);
+		HPDW_->Fill(JHPT[i],PTOTE2);
+	      } 
 	      
 	      if ( MEtSigCut ) {
 		NJetsSW_->Fill(goodIc5Jets,PTOTE2);
@@ -2070,6 +2145,10 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 		SumHPD4SW_->Fill(sumhpd4,PTOTE2);
 		SumHED6SW_->Fill(sumhed6,PTOTE2);
 		SumHPD6SW_->Fill(sumhpd6,PTOTE2);
+		for ( int i=0; i<iJ && i<NHSJ; i++ ) {
+		  HEDSW_->Fill(JHET[i],PTOTE2);
+		  HPDSW_->Fill(JHPT[i],PTOTE2);
+		} 
 	      
 		if ( NHEM>=3 ) {
 		  NJetsSSW_->Fill(goodIc5Jets,PTOTE2);
@@ -2112,6 +2191,10 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 		  SumHPD4SSW_->Fill(sumhpd4,PTOTE2);
 		  SumHED6SSW_->Fill(sumhed6,PTOTE2);
 		  SumHPD6SSW_->Fill(sumhpd6,PTOTE2);
+		  for ( int i=0; i<iJ && i<NHSJ; i++ ) {
+		    HEDSSW_->Fill(JHET[i],PTOTE2);
+		    HPDSSW_->Fill(JHPT[i],PTOTE2);
+		  } 
 		}
 		
 		if ( NHEM>=4 ) {
@@ -2155,6 +2238,10 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 		  SumHPD4SSSW_->Fill(sumhpd4,PTOTE2);
 		  SumHED6SSSW_->Fill(sumhed6,PTOTE2);
 		  SumHPD6SSSW_->Fill(sumhpd6,PTOTE2);
+		  for ( int i=0; i<iJ && i<NHSJ; i++ ) {
+		    HEDSSSW_->Fill(JHET[i],PTOTE2);
+		    HPDSSSW_->Fill(JHPT[i],PTOTE2);
+		  } 
 		}
 	      }
 	    }
@@ -2226,6 +2313,39 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
       } // end for tag combinatorial
       
     } else { // if not QCD /////////////////////////////////////////////
+
+      sumhed4=0.;
+      sumhpd4=0.;
+      sumhed6=0.;
+      sumhpd6=0.;
+      // Compute sum of discriminants
+      // ----------------------------
+      for ( int i=0; i<NHSJ; i++ ) {
+	hemax[i]=JHET[i];
+	hpmax[i]=JHPT[i];
+      }
+      for ( int times=0; times<NHSJ; times++ ) {
+	for ( int j=NHSJ-1; j>=1; j-- ) {
+	  if ( hemax[j]>hemax[j-1] ) {
+	    double a1=hemax[j];
+	    hemax[j]=hemax[j-1];
+	    hemax[j-1]=a1;
+	  }
+	  if ( hpmax[j]>hpmax[j-1] ) {
+	    double a1=hpmax[j];
+	    hpmax[j]=hpmax[j-1];
+	    hpmax[j-1]=a1;
+	  }
+	}
+      }
+      for ( int i=0; i<4 && i<NHSJ; i++ ) {
+	sumhed4+=hemax[i];
+	sumhpd4+=hpmax[i];
+      }
+      for ( int i=0; i<6 && i<NHSJ; i++ ) {
+	sumhed6+=hemax[i];
+	sumhpd6+=hpmax[i];
+      }
 
       // Compute best top and W masses and determine simple chi2
       // -------------------------------------------------------
@@ -2863,6 +2983,8 @@ void TDAna::endJob() {
   SumHPD4N_->Write();
   SumHED6N_->Write();
   SumHPD6N_->Write();
+  HEDN_->Write();
+  HPDN_->Write();
   
   // Histograms for events passing trigger and NJet cut
   // --------------------------------------------------
@@ -2947,6 +3069,8 @@ void TDAna::endJob() {
   SumHPD4SN_->Write();
   SumHED6SN_->Write();
   SumHPD6SN_->Write();
+  HEDSN_->Write();
+  HPDSN_->Write();
 
   // Histograms for events passing trigger, NJet, and METS cut
   // ---------------------------------------------------------
@@ -3031,6 +3155,8 @@ void TDAna::endJob() {
   SumHPD4SSN_->Write();
   SumHED6SSN_->Write();
   SumHPD6SSN_->Write();
+  HEDSSN_->Write();
+  HPDSSN_->Write();
 
   // Histograms for events passing trigger, NJet, and METS cut
   // ---------------------------------------------------------
@@ -3115,6 +3241,8 @@ void TDAna::endJob() {
   SumHPD4SSSN_->Write();
   SumHED6SSSN_->Write();
   SumHPD6SSSN_->Write();
+  HEDSSSN_->Write();
+  HPDSSSN_->Write();
 
   N4NJSSS_->Write();
   E4NJSSS_->Write();
@@ -3160,6 +3288,8 @@ void TDAna::endJob() {
   SumHPD4W_->Write();
   SumHED6W_->Write();
   SumHPD6W_->Write();
+  HEDW_->Write();
+  HPDW_->Write();
   
   // Histograms for events passing trigger and NJet cut
   // --------------------------------------------------
@@ -3202,6 +3332,8 @@ void TDAna::endJob() {
   SumHPD4SW_->Write();
   SumHED6SW_->Write();
   SumHPD6SW_->Write();
+  HEDSW_->Write();
+  HPDSW_->Write();
 
   // Histograms for events passing trigger, NJet, and METS cut
   // ---------------------------------------------------------
@@ -3244,6 +3376,8 @@ void TDAna::endJob() {
   SumHPD4SSW_->Write();
   SumHED6SSW_->Write();
   SumHPD6SSW_->Write();
+  HEDSSW_->Write();
+  HPDSSW_->Write();
 
   // Histograms for events passing trigger, NJet, and METS cut
   // ---------------------------------------------------------
@@ -3286,6 +3420,8 @@ void TDAna::endJob() {
   SumHPD4SSSW_->Write();
   SumHED6SSSW_->Write();
   SumHPD6SSSW_->Write();
+  HEDSSSW_->Write();
+  HPDSSSW_->Write();
 
   N4NJSSSW_->Write();
   E4NJSSSW_->Write();

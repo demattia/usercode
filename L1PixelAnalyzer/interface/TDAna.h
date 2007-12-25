@@ -19,7 +19,7 @@
 //
 // Original Author:  Marco De Mattia
 //         Created:  Tue May  8 13:05:37 CEST 2007
-// $Id: TDAna.h,v 1.11 2007/12/22 16:48:03 dorigo Exp $
+// $Id: TDAna.h,v 1.12 2007/12/23 23:12:57 dorigo Exp $
 //
 //
 
@@ -191,6 +191,8 @@ class TDAna : public edm::EDAnalyzer {
   // -------------------
   TH1D * HSS_sig[11];
   TH1D * HSS_bgr[11];
+  TH1D * HEDpdf;
+  TH1D * HPDpdf;
   
   // My histograms
   // -------------
@@ -406,6 +408,8 @@ class TDAna : public edm::EDAnalyzer {
   TH1D * SumHPD4N_;
   TH1D * SumHED6N_;
   TH1D * SumHPD6N_;
+  TH1D * HEDN_;
+  TH1D * HPDN_;
 
   TH1D * NJetsSN_;
   TH1D * UncorrSumEtSN_;
@@ -446,6 +450,8 @@ class TDAna : public edm::EDAnalyzer {
   TH1D * SumHPD4SN_;
   TH1D * SumHED6SN_;
   TH1D * SumHPD6SN_;
+  TH1D * HEDSN_;
+  TH1D * HPDSN_;
 
   TH1D * NJetsSSN_;
   TH1D * UncorrSumEtSSN_;
@@ -486,6 +492,8 @@ class TDAna : public edm::EDAnalyzer {
   TH1D * SumHPD4SSN_;
   TH1D * SumHED6SSN_;
   TH1D * SumHPD6SSN_;
+  TH1D * HEDSSN_;
+  TH1D * HPDSSN_;
 
   TH1D * NJetsSSSN_;
   TH1D * UncorrSumEtSSSN_;
@@ -526,6 +534,8 @@ class TDAna : public edm::EDAnalyzer {
   TH1D * SumHPD4SSSN_;
   TH1D * SumHED6SSSN_;
   TH1D * SumHPD6SSSN_;
+  TH1D * HEDSSSN_;
+  TH1D * HPDSSSN_;
 
   // Error histograms
   // ----------------
@@ -568,6 +578,8 @@ class TDAna : public edm::EDAnalyzer {
   TH1D * SumHPD4W_;
   TH1D * SumHED6W_;
   TH1D * SumHPD6W_;
+  TH1D * HEDW_;
+  TH1D * HPDW_;
 
   TH1D * NJetsSW_;
   TH1D * UncorrSumEtSW_;
@@ -608,6 +620,8 @@ class TDAna : public edm::EDAnalyzer {
   TH1D * SumHPD4SW_;
   TH1D * SumHED6SW_;
   TH1D * SumHPD6SW_;
+  TH1D * HEDSW_;
+  TH1D * HPDSW_;
 
   TH1D * NJetsSSW_;
   TH1D * UncorrSumEtSSW_;
@@ -648,6 +662,8 @@ class TDAna : public edm::EDAnalyzer {
   TH1D * SumHPD4SSW_;
   TH1D * SumHED6SSW_;
   TH1D * SumHPD6SSW_;
+  TH1D * HEDSSW_;
+  TH1D * HPDSSW_;
 
   TH1D * NJetsSSSW_;
   TH1D * UncorrSumEtSSSW_;
@@ -688,6 +704,8 @@ class TDAna : public edm::EDAnalyzer {
   TH1D * SumHPD4SSSW_;
   TH1D * SumHED6SSSW_;
   TH1D * SumHPD6SSSW_;
+  TH1D * HEDSSSW_;
+  TH1D * HPDSSSW_;
 
   TH1D * N4NJSSSW_;
   TH1D * E4NJSSSW_;
