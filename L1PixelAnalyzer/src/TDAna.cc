@@ -1,3 +1,46 @@
+//////////////////////////////////////////////////////////////////////////////
+//
+// TDAna.cc
+// latest version: 26/12/2007 TD 
+//
+// To do:
+//
+// 1) improve likelihood by adding variables included in it
+//    (add histograms at SS level, then modify Smooth.C code,
+//    run TDAna, run Smooth.C on rootple, run TDAna again with
+//    improved functionfileSS.root input)
+//    - Variables to add: chi2mass (seems to discriminate better than chi2extall!)  
+//    - NJets
+//    - GoodHt
+//    - M_others
+//    - tag information from tag mass
+//
+// 2) study other kinematical variables and possibly include them:
+//    - mass of bb system is not yet very well characterized: need to find 
+//      a better way to select the pair
+//    - sum of Delta R angles between closest b-tag pairs, E.G. loop on
+//      all b-tag jets, compute min(DR) among all, exclude pair, and if
+//      at least another pair exists add DR of them; maybe a better possible
+//      definition entails computing minimum sum of pair masses. The rationale
+//      is to find gluon splitting b-pairs and discriminate from more spread out
+//      b-jets as in signal topology
+//    - revert logic of M3, M2 selection by first choosing b-pair, then finding
+//      best triplet among remaining jets, and look for W boson within those
+//    - compute minimum dijet mass in triplet which gives best top mass
+//    - compute angle between best triplet momentum and best b-pair momentum
+//    - compute mass of those two vectors (just mass of five included jets)
+//    - compute average |eta| of first 8 jets
+// 
+// 3) Compute Q-value of signal vs sum of backgrounds for each variable separately
+//    and global likelihood.
+//    Then, optimize global likelihood by picking best variables trying to pick
+//    those with least correlation (e.g. choose either C6 or C8, not both).
+//
+// 4) define pseudoexperiments and produce 2-component fits of likelihood, extract
+//    distribution of signal significance.
+// 
+// --------------------------------------------------------------------------------
+//
 // #define DEBUG
 
 #include "AnalysisExamples/L1PixelAnalyzer/interface/TDAna.h"
@@ -633,18 +676,18 @@ TDAna::TDAna(const edm::ParameterSet& iConfig) :
   // -------------------       
   rel_lik = 0.;
 
-  L_    = new TH1D ("L", "Likelihood 2t passing sel", 100, -10., 10. );
-  LS_   = new TH1D ("LS", "Likelihood 2t passing sel", 100, -10., 10. );
-  LSS_  = new TH1D ("LSS", "Likelihood 2t passing sel", 100, -10., 10. );
-  LSSS_ = new TH1D ("LSSS", "Likelihood 2t passing sel", 100, -10., 10. );
-  LW_    = new TH1D ("LW", "Likelihood 2t passing sel", 100, -10., 10. );
-  LSW_   = new TH1D ("LSW", "Likelihood 2t passing sel", 100, -10., 10. );
-  LSSW_  = new TH1D ("LSSW", "Likelihood 2t passing sel", 100, -10., 10. );
-  LSSSW_ = new TH1D ("LSSSW", "Likelihood 2t passing sel", 100, -10., 10. );
-  LN_    = new TH1D ("LN", "Likelihood 2t passing sel", 100, -10., 10. );
-  LSN_   = new TH1D ("LSN", "Likelihood 2t passing sel", 100, -10., 10. );
-  LSSN_  = new TH1D ("LSSN", "Likelihood 2t passing sel", 100, -10., 10. );
-  LSSSN_ = new TH1D ("LSSSN", "Likelihood 2t passing sel", 100, -10., 10. );
+  L_    = new TH1D ("L", "Likelihood 2t passing sel", 50, -10., 10.  );
+  LS_   = new TH1D ("LS", "Likelihood 2t passing sel", 50, -10., 10.  );
+  LSS_  = new TH1D ("LSS", "Likelihood 2t passing sel", 50, -10., 10.  );
+  LSSS_ = new TH1D ("LSSS", "Likelihood 2t passing sel", 50, -10., 10.  );
+  LW_    = new TH1D ("LW", "Likelihood 2t passing sel", 50, -10., 10.  );
+  LSW_   = new TH1D ("LSW", "Likelihood 2t passing sel", 50, -10., 10.  );
+  LSSW_  = new TH1D ("LSSW", "Likelihood 2t passing sel", 50, -10., 10.  );
+  LSSSW_ = new TH1D ("LSSSW", "Likelihood 2t passing sel", 50, -10., 10.  );
+  LN_    = new TH1D ("LN", "Likelihood 2t passing sel", 50, -10., 10.  );
+  LSN_   = new TH1D ("LSN", "Likelihood 2t passing sel", 50, -10., 10.  );
+  LSSN_  = new TH1D ("LSSN", "Likelihood 2t passing sel", 50, -10., 10.  );
+  LSSSN_ = new TH1D ("LSSSN", "Likelihood 2t passing sel", 50, -10., 10.  );
 
   // Read PTag file
   // --------------
@@ -1517,7 +1560,7 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 		  e5 =sqrt(px5*px5+py5*py5+pz5*pz5);
 		  m45=(e4+e5)*(e4+e5)-(px4+px5)*(px4+px5)-(py4+py5)*(py4+py5)-(pz4+pz5)*(pz4+pz5);
 		  if ( m45>0 ) m45=sqrt(m45);
-		  if ( fabs(m45-120)<fabs(m45best-120) ) {
+		  if ( fabs(m45-120)<fabs(m45bestall-120) ) {
 		    m45bestall=m45;
 		    double addchi=0;
 		    if ( ii==it1 || ii==it2 || ii==it3 || jj==it1 || jj==it2 || jj==it3 ) addchi=3; 
@@ -2480,7 +2523,7 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	      e5 =sqrt(px5*px5+py5*py5+pz5*pz5);
 	      m45=(e4+e5)*(e4+e5)-(px4+px5)*(px4+px5)-(py4+py5)*(py4+py5)-(pz4+pz5)*(pz4+pz5);
 	      if ( m45>0 ) m45=sqrt(m45);
-	      if ( fabs(m45-120)<fabs(m45best-120) ) {
+	      if ( fabs(m45-120)<fabs(m45bestall-120) ) {
 		m45bestall=m45;
 		double addchi=0;
 		if ( ii==it1 || ii==it2 || ii==it3 || jj==it1 || jj==it2 || jj==it3 ) addchi=3; 
