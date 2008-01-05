@@ -82,16 +82,39 @@ module offlineProd = OfflineProducer {
   // qcd 170-230 -------------> 12
   // qcd 230-300 -------------> 13
   // qcd 300-380 -------------> 14
-  // qcd 380-470 -------------> 15
+  // qcd 380-incl ------------> 15
   // other -------------------> 16
   // other -------------------> 17
   // other -------------------> 18
   // other -------------------> 19
-  // W + 0 jets 0ptw100 ------> 20
+  // W + 0 jets --------------> 20
   // W + 1 jets 0ptw100 ------> 21
   // W + 2 jets 0ptw100 ------> 22
   // W + 3 jets 0ptw100 ------> 23
-  // W + >=4 jets 0ptw100 ----> 24
-  // other -------------------> 25
+  // W + 4 jets 0ptw100 ------> 24
+  // W + 5 jets 0ptw100 ------> 25
+
+  // W + 1 jets 100ptw300 ----> 27
+  // W + 2 jets 100ptw300 ----> 28
+  // W + 3 jets 100ptw300 ----> 29
+  // W + 4 jets 100ptw300 ----> 30
+  // W + 5 jets 100ptw300 ----> 31
+
+  // SingleTop tq+tqb e ------> 35
+  // SingleTop tq+tqb mu -----> 36
+  // SingleTop tq+tqb tau ----> 37
+
+  // ZnunuJets 0-15 ----------> 40
+  // ZnunuJets 15-20 ---------> 41
+  // ZnunuJets 20-30 ---------> 42
+  // ZnunuJets 30-50 ---------> 43
+  // ZnunuJets 50-80 ---------> 44
+  // ZnunuJets 80-120 --------> 45
+  // ZnunuJets 120-170 -------> 46
+  // ZnunuJets 170-230 -------> 47
+  // ZnunuJets 230-300 -------> 48
+  // ZnunuJets 300-380 -------> 49
+
+  // other -------------------> 60
   uint32 EventType                              = 6
 }
