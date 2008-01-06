@@ -99,7 +99,7 @@ void MultiTProfile::Write() {
   outfile_->cd();
 }
 
-std::vector<TProfile*> MultiTProfile::multiProfiles() const {
+std::vector<TProfile*> MultiTProfile::multiHistos() const {
   
   return vec_MultiHisto_;
 }

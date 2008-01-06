@@ -80,10 +80,12 @@ void MultiTH1F::Write() {
     StackLegend_->Add( MultiHisto_ptr, snum_.str().c_str(), true );
 
     // When the bin number is a multiple of one-tenth of the total number of bins
-    if ( float(num+1)/float(sparse) == (num+1)/sparse ) {
-      SparseStackLegend_->Add( MultiHisto_ptr, snum_.str().c_str(), true );
+    // Do this only of there at least 5 histograms
+    if ( sparse != 0 ) {
+      if ( float(num+1)/float(sparse) == (num+1)/sparse ) {
+        SparseStackLegend_->Add( MultiHisto_ptr, snum_.str().c_str(), true );
+      }
     }
-
     // Empty the ostringstream
     snum_.str("");
   }

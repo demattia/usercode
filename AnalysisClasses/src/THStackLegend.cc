@@ -113,16 +113,19 @@ TProfile* THStackLegend::Add(const TProfile * HISTO, const char* LEGEND, const b
 
 // }
 
-void THStackLegend::Draw(TString OPTION) const {
+void THStackLegend::Draw(TString OPTION) {
   canvas_->cd();
   stack_->Draw(OPTION);
   legend_->Draw();
+  drawn = true;
 }
 
 void THStackLegend::Write(TString OPTION) const {
-  canvas_->cd();
-  stack_->Draw(OPTION);
-  legend_->Draw();
+  if ( !drawn ) {
+    canvas_->cd();
+    stack_->Draw(OPTION);
+    legend_->Draw();
+  }
   canvas_->Write();
 }
 
