@@ -160,8 +160,8 @@ L1TrigPixelAnalyzer::L1TrigPixelAnalyzer(const edm::ParameterSet& iConfig) :
 
   // Generate histograms for the verteces
   // ------------------------------------
-  dz_ = 0.04;
-  bins_ = 20;
+  dz_ = 0.1;
+  bins_ = 30;
 
   dzmax_ = dz_ + dz_*(bins_);
 

@@ -446,6 +446,10 @@ OfflineProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 
         vec_MC_ptr->push_back( MCParticle( MCp->pt(), MCp->eta(), MCp->phi(), MCp->mass(), MCp->pdgId(), MCp->mother()->pdgId() ) );
       }
+      // Store also the case in which it is a b with mother != b, or a c with mother != b and c
+      else if ( ( pid == 5 && Mpid != 5 ) || ( pid == 4 && Mpid != 5 && Mpid != 4) ) {
+        vec_MC_ptr->push_back( MCParticle( MCp->pt(), MCp->eta(), MCp->phi(), MCp->mass(), MCp->pdgId(), MCp->mother()->pdgId() ) );
+      }
 
       // Count the number of nu
       if ( ( Mpid == 24 ) && ( pid ==12 || pid == 14 || pid == 16 ) ) {
