@@ -82,6 +82,16 @@ JetResMaker::JetResMaker(const edm::ParameterSet& iConfig) :
     sprintf ( name4, "Res_vs_pt%d", j );
     Res_vs_pt[j] = new TH1F ( name4, name4, 10, 0., 200. );
   }
+  // For l1Jet vs offlineJet
+  // ------
+  char name5[20];
+  char name6[20];
+  for ( int i=0; i<40; i++ ) {
+    sprintf ( name5, "l1Ptres%d", i );
+    l1Ptres[i] = new TH1F ( name5, name5, 100, -3., 1. );
+    sprintf ( name6, "l1Dr%d", i );
+    l1Dr[i] = new TH1F ( name6, name6, 100, 0., 0.5 );
+  }
 
   // Debug histograms
   // ----------------
@@ -93,6 +103,14 @@ JetResMaker::JetResMaker(const edm::ParameterSet& iConfig) :
   Nass = new TH1F ( "Nass", "Number of partons associated", 10, 0., 10. );
   Njtot = new TH1F ( "Njtot", "Total number of jets", 20, 0., 20. );
   Njgood= new TH1F ( "Njgood", "Number of good jets", 10, 0., 10. );
+  l1Ipt = new TH1F ( "Ipt", "Pt spectrum of associated L1 jets", 10, 0., 200. );
+  l1Ieta= new TH1F ( "Ieta", "eta spectrum of associated L1 jets", 4, 0., 4.8 ); 
+  l1Totptleft = new TH1F ( "Totptleft", "Total Pt of unassoc L1 jets", 50, 0., 200. );
+  l1Totptass = new TH1F ( "Totptass", "Total Pt of ass L1 jets", 50, 0., 200. );
+  l1Nleft = new TH1F ( "Nleft", "Number of L1 jets left out", 8, 0., 8. );
+  l1Nass = new TH1F ( "Nass", "Number of L1 jets associated", 8, 0., 8. );
+  l1Njtot = new TH1F ( "Njtot", "Total number of jets", 20, 0., 20. );
+  l1Njgood = new TH1F ( "Njgood", "Number of good jets", 10, 0., 10. );
 
   // White background for the canvases
   // ---------------------------------
@@ -278,14 +296,33 @@ void JetResMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
   map<const BaseJet*, const OfflineJet*>::const_iterator l1OffMap_it = l1JetOfflineJetMap->begin();
   for( ; l1OffMap_it != l1JetOfflineJetMap->end(); ++l1OffMap_it ) {
     goodAssocOfflineJets.push_back( *(l1OffMap_it->second) );
-    cout << "goodAssocOfflineJet et = " << l1OffMap_it->first->et() << endl;
+    //    cout << "goodAssocOfflineJet et = " << l1OffMap_it->first->et() << endl;
+
+    // Fill the histograms for goodL1Jet vs goodOfflineJet
+    const BaseJet * l1JetPtr = l1OffMap_it->first;
+    const OfflineJet * offlineJetPtr = l1OffMap_it->second;
+    int ipt = (int)(offlineJetPtr->et()/20.);
+    if ( ipt>9 ) ipt=9;
+    int ieta = (int)(fabs(offlineJetPtr->eta())/1.2);
+    if ( ieta>3 ) ieta=3;
+    float offlineJetEt = offlineJetPtr->et();
+    float l1JetEt = l1JetPtr->et();
+    l1Ptres[ipt*4+ieta]->Fill( (offlineJetEt - l1JetEt)/offlineJetEt );
+    float l1JetEta = l1JetPtr->eta();
+    float deta = offlineJetPtr->eta() - l1JetEta;
+    float dphi = pi - fabs(fabs(offlineJetPtr->phi()-l1JetPtr->phi())-pi);
+    float dr2 = deta*deta+dphi*dphi;
+    l1Dr[ipt*4+ieta]->Fill( sqrt(dr2) );
+    l1Ipt->Fill(l1JetEt);
+    l1Ieta->Fill(fabs(l1JetEta));
   }
+  sort( goodAssocOfflineJets.begin(), goodAssocOfflineJets.end(), EtSort<OfflineJet>() );
 
   // Associate this new collection the goodGenJets
   AssociatorEt<GenJet, OfflineJet> genOffAssociator( drmin );
   auto_ptr<map<const GenJet*, const OfflineJet*> > genJetOfflineJetMap( genOffAssociator.Associate( goodGenJets, goodAssocOfflineJets ) );
 
-  // Loop on the map and fill the histograms
+  // Loop on the map and fill the histograms for goodAssocOfflineJet vs genJet
   map<const GenJet*, const OfflineJet*>::const_iterator genOffMap_it = genJetOfflineJetMap->begin();
   for( ; genOffMap_it != genJetOfflineJetMap->end(); ++genOffMap_it ) {
     const GenJet * genJetPtr = genOffMap_it->first;
@@ -504,6 +541,138 @@ void JetResMaker::endJob() {
   Nass->Write();
   Totptleft->Write();
   Nleft->Write();
+  outfile->Close();
+
+  // Histograms for l1Jet vs offlineJet
+  // ----------------------------------
+  TCanvas * l1JetRes = new TCanvas( "l1JetRes", "Jet resolution plots", 900, 900 );
+  l1JetRes->SetFillColor(kNone);
+  l1JetRes->SetBorderSize(2);
+  l1JetRes->SetBorderMode(0);
+  l1JetRes->Divide(4,10);
+  for ( int i=0; i<10; i++ ) {
+    for ( int j=0; j<4; j++ ) {
+      l1JetRes->cd(i*4+j+1);
+      l1Ptres[i*4+j]->SetLabelSize(0.05);
+      l1Ptres[i*4+j]->SetTitleSize(0.05);
+      l1Ptres[i*4+j]->GetXaxis()->SetLabelSize(0.05);
+      l1Ptres[i*4+j]->GetYaxis()->SetLabelSize(0.05);
+      l1Ptres[i*4+j]->SetXTitle("DPt/Pt");
+      l1Ptres[i*4+j]->SetLineColor(kRed);
+      l1Ptres[i*4+j]->Draw();
+    }
+  }
+  l1JetRes->Print("Map_5cl1.eps");
+
+  TCanvas * l1JetResDr = new TCanvas( "l1JetResDr", "Jet resolution Dr plots", 900, 900 );
+  l1JetResDr->SetFillColor(kNone);
+  l1JetResDr->SetBorderSize(2);
+  l1JetResDr->SetBorderMode(0);
+  l1JetResDr->Divide(4,10);
+  for ( int i=0; i<10; i++ ) {
+    for ( int j=0; j<4; j++ ) {
+      l1JetResDr->cd(i*4+j+1);
+      l1Dr[i*4+j]->SetLabelSize(0.05);
+      l1Dr[i*4+j]->SetTitleSize(0.05);
+      l1Dr[i*4+j]->GetXaxis()->SetLabelSize(0.05);
+      l1Dr[i*4+j]->GetYaxis()->SetLabelSize(0.05);
+      l1Dr[i*4+j]->SetXTitle("Delta R");
+      l1Dr[i*4+j]->SetLineColor(kRed);
+      l1Dr[i*4+j]->SetFillStyle(1);
+      l1Dr[i*4+j]->SetFillColor(kRed);
+      l1Dr[i*4+j]->Draw();
+    }
+  }
+  l1JetResDr->Print("Map_5cl1_dr.eps");
+  l1JetResDr->Update();
+
+  TCanvas * l1Debug = new TCanvas( "l1Debug", "l1Debug histograms", 600, 600 );
+  l1Debug->SetFillColor(kNone);
+  l1Debug->SetBorderSize(2);
+  l1Debug->SetBorderMode(0);
+  l1Debug->Divide(2,4);
+  l1Debug->cd(1);
+  l1Ipt->SetLabelSize(0.05);
+  l1Ipt->SetTitleSize(0.05);
+  l1Ipt->GetXaxis()->SetLabelSize(0.05);
+  l1Ipt->GetYaxis()->SetLabelSize(0.05);
+  l1Ipt->SetXTitle("Pt (GeV)");
+  l1Ipt->SetLineColor(kRed);
+  l1Ipt->Draw("PE");
+  l1Debug->cd(2);
+  l1Ieta->SetLabelSize(0.05);
+  l1Ieta->SetTitleSize(0.05);
+  l1Ieta->GetXaxis()->SetLabelSize(0.05);
+  l1Ieta->GetYaxis()->SetLabelSize(0.05);
+  l1Ieta->SetXTitle("l1Ieta");
+  l1Ieta->SetLineColor(kRed);
+  l1Ieta->Draw("PE");
+  l1Debug->cd(3);
+  l1Totptass->SetLabelSize(0.05);
+  l1Totptass->SetTitleSize(0.05);
+  l1Totptass->GetXaxis()->SetLabelSize(0.05);
+  l1Totptass->GetYaxis()->SetLabelSize(0.05);
+  l1Totptass->SetXTitle("Pt (GeV)");
+  l1Totptass->SetLineColor(kRed);
+  l1Totptass->Draw("PE");
+  l1Debug->cd(4);
+  l1Nass->SetLabelSize(0.05);
+  l1Nass->SetTitleSize(0.05);
+  l1Nass->GetXaxis()->SetLabelSize(0.05);
+  l1Nass->GetYaxis()->SetLabelSize(0.05);
+  l1Nass->SetXTitle("partons ass");
+  l1Nass->SetLineColor(kRed);
+  l1Nass->Draw("PE");
+  l1Debug->cd(5);
+  l1Totptleft->SetLabelSize(0.05);
+  l1Totptleft->SetTitleSize(0.05);
+  l1Totptleft->GetXaxis()->SetLabelSize(0.05);
+  l1Totptleft->GetYaxis()->SetLabelSize(0.05);
+  l1Totptleft->SetXTitle("Pt left");
+  l1Totptleft->SetLineColor(kRed);
+  l1Totptleft->Draw("PE");
+  l1Debug->cd(6);
+  l1Nleft->SetLabelSize(0.05);
+  l1Nleft->SetTitleSize(0.05);
+  l1Nleft->GetXaxis()->SetLabelSize(0.05);
+  l1Nleft->GetYaxis()->SetLabelSize(0.05);
+  l1Nleft->SetXTitle("Partons left");
+  l1Nleft->SetLineColor(kRed);
+  l1Nleft->Draw("PE");
+  l1Debug->cd(7);
+  l1Njtot->SetLabelSize(0.05);
+  l1Njtot->SetTitleSize(0.05);
+  l1Njtot->GetXaxis()->SetLabelSize(0.05);
+  l1Njtot->GetYaxis()->SetLabelSize(0.05);
+  l1Njtot->SetXTitle("N all jets");
+  l1Njtot->SetLineColor(kRed);
+  l1Njtot->Draw("PE");
+  l1Debug->cd(8);
+  l1Njgood->SetLabelSize(0.05);
+  l1Njgood->SetTitleSize(0.05);
+  l1Njgood->GetXaxis()->SetLabelSize(0.05);
+  l1Njgood->GetYaxis()->SetLabelSize(0.05);
+  l1Njgood->SetXTitle("N good jets");
+  l1Njgood->SetLineColor(kRed);
+  l1Njgood->Draw();
+  l1Debug->Print("Map_5cl1_debug.eps");
+  l1Debug->Update();
+
+  // Write out histograms
+  // --------------------
+  TFile * l1Outfile = new TFile ("Map_5cl1.hist","RECREATE");
+
+  l1Outfile->cd();
+  for ( int i=0; i<40; i++ ) {
+    l1Ptres[i]->Write();
+    l1Dr[i]->Write();
+  }
+  l1Ipt->Write();
+  l1Ieta->Write();
+  l1Totptass->Write();
+  l1Nass->Write();
+  l1Totptleft->Write();
+  l1Nleft->Write();
   outfile->Close();
 
 }

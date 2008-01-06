@@ -16,7 +16,7 @@
 //
 // Original Author:  Marco De Mattia
 //         Created:  Tue May  8 13:05:37 CEST 2007
-// $Id: JetResMaker.h,v 1.2 2007/12/10 15:25:07 dorigo Exp $
+// $Id: JetResMaker.h,v 1.1 2008/01/06 10:44:36 demattia Exp $
 //
 //
 
@@ -99,6 +99,8 @@ private:
   TH1F * Dr[40];
   TH1F * Ave_vs_pt[4];
   TH1F * Res_vs_pt[4];
+  TH1F * l1Ptres[40];
+  TH1F * l1Dr[40];
 
   // Debug histos
   // ------------
@@ -110,6 +112,14 @@ private:
   TH1F * Nass;
   TH1F * Njtot;
   TH1F * Njgood;
+  TH1F * l1Ipt;
+  TH1F * l1Ieta;
+  TH1F * l1Totptleft;
+  TH1F * l1Totptass;
+  TH1F * l1Nleft;
+  TH1F * l1Nass;
+  TH1F * l1Njtot;
+  TH1F * l1Njgood;
 
   // Collections labels
   // ------------------
