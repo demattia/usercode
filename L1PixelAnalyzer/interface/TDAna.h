@@ -19,7 +19,7 @@
 //
 // Original Author:  Marco De Mattia
 //         Created:  Tue May  8 13:05:37 CEST 2007
-// $Id: TDAna.h,v 1.12 2007/12/23 23:12:57 dorigo Exp $
+// $Id: TDAna.h,v 1.13 2007/12/25 14:19:03 dorigo Exp $
 //
 //
 
@@ -726,6 +726,15 @@ class TDAna : public edm::EDAnalyzer {
 
   double rel_lik;
   double njsss;
+
+  double total[9][5];
+  double totalpass[9][5];
+  double grandtotaltt[5];
+  double grandtotalh[9];
+  double grandgrandtotal;
+  double grandtotalttpass[5];
+  double grandtotalhpass[9];
+  double grandgrandtotalpass;
 
   // Likelihood histograms
   // ---------------------

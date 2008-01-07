@@ -66,6 +66,8 @@
 #include <cmath>
 #include <memory>
 #include <string>
+#include <iostream>
+#include <iomanip>
 
 // Constants, enums and typedefs
 // -----------------------------
@@ -99,7 +101,20 @@ TDAna::TDAna(const edm::ParameterSet& iConfig) :
   // Now do what ever initialization is needed
   // -----------------------------------------
   eventcounter_=0;
-
+  for ( int i=0; i<9; i++ ) {
+    grandtotaltt[i]=0;
+    grandtotalttpass[i]=0;
+    for ( int j=0; j<5; j++ ) {
+      total[i][j]=0;
+      totalpass[i][j]=0;
+    }
+  }
+  for ( int j=0; j<5; j++ ) {
+    grandtotalh[j]=0;
+    grandtotalhpass[j]=0;
+  }
+  grandgrandtotal=0;
+  grandgrandtotalpass=0;
 
   // Load file with smoothed histograms to use for Likelihood definition
   // -------------------------------------------------------------------
@@ -484,8 +499,10 @@ TDAna::TDAna(const edm::ParameterSet& iConfig) :
   HEDSSSN_ = new TH1D ( "HEDSSSN", "High eff discriminator", 200, 0., 40. ); 
   HPDSSSN_ = new TH1D ( "HPDSSSN", "High pur discriminator", 200, 0., 40. ); 
 
-  N4NJSSS_ = new TH1D ( "N4NJSSS", "N of 4HEL tags vs N jets", 20, 0, 20 );           // These are filled only for this
-  E4NJSSS_ = new TH1D ( "E4NJSSS", "Efficiency of 4HEL tags vs N jets", 20, 0, 20 );  // selection and do not require W, N
+  N4NJSSS_ = new TH1D ( "N4NJSSS", "N of 4HEL tags vs N jets", 
+			20, 0, 20 );  // These are filled only for this
+  E4NJSSS_ = new TH1D ( "E4NJSSS", "Efficiency of 4HEL tags vs N jets", 
+			20, 0, 20 );  // selection and do not require W, N
 
   NJetsW_ = new TH1D ( "NJetsW", "Number of selected jets", 20, 0, 20 );
   UncorrHtW_ = new TH1D ( "UncorrHtW", "Ht with uncorrected jets", 50, 0, 4000 );
@@ -932,42 +949,6 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
     std::cout << "Event number " << eventcounter_ << std::endl;
   }
 
-//   // Take genParticleCandidates
-//   edm::Handle < MCParticleCollection > MCpartons;
-//   iEvent.getByLabel( MCParticleLabel_, MCpartons );
-
-//   // Take the mothers
-//   MCParticleCollection::const_iterator MCp = MCpartons->begin();
-
-//   //  int Zdaughters=0;
-//   //  int Zcounter=0;
-//   //  vector<int> HiggsDau;
-//   for ( ; MCp != MCpartons->end(); ++MCp ) {
-//     //    if(MCp->mPid()==25) HiggsDau.push_back(MCp->pid());
-//     //    if(MCp->mPid()==23) ++Zdaughters;
-//     //    if(MCp->pid()==23)  ++Zcounter;
-
-// #ifdef DEBUG
-//     std::cout << "For parton number = " << counter << std::endl;
-//     std::cout << "status = " << MCp->status() << std::endl;
-//     std::cout << "pdgId = " << MCp->pdgId() << std::endl;
-//     std::cout << "Et = " << MCp->et() << std::endl;
-//     std::cout << "Eta = " << MCp->eta() << std::endl;
-//     std::cout << "Phi = " << MCp->phi() << std::endl;
-//     std::cout << "Number of mothers = " << MCp->numberOfMothers() << std::endl;
-//     std::cout << "first mother = " << MCp->mother() << std::endl;
-//     std::cout << "Mother pdgId = " << MCp->mother()->pdgId() << std::endl;
-// #endif // DEBUG
-//   }
-//   // CHECK for Higgs BR: Higgs inclusive
-//   //  if(Zcounter!=0 || Zdaughters !=0) {
-//   //    cout << "number of Z mother: " << Zcounter << " <--> number of Z daughters: " << Zdaughters << endl;
-//   //    int iter=0;
-//   //    for(vector<int>::iterator HiggsDau_it = HiggsDau.begin(); HiggsDau_it != HiggsDau.end(); ++HiggsDau_it, ++iter)
-//   //      cout << "HiggsDaughters[" << iter << "]: " << *HiggsDau_it << endl;
-//   //  }
-
-
   // Pixel jets
   // ----------
   edm::Handle<SimplePixelJetCollection> pixelJetsHandle;
@@ -1094,7 +1075,59 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   iSetup.get<SetupRecord>().get(pSetup);
 #endif
   
-  
+
+  /////////////////////////////////// MC analysis ////////////////////////////
+
+  // Compute events in each final state
+  // ----------------------------------
+  // Take genParticleCandidates
+  // --------------------------
+  edm::Handle < MCParticleCollection > MCpartons;
+  iEvent.getByLabel( MCParticleLabel_, MCpartons );
+
+  // Take the mothers
+  // ----------------
+  int hdecay=0;
+  int tdecay=0;
+  int foundw=0;
+  // NB we know that the block is filled with top and antitop first, then Higgs
+  // So we need not worry about messing up W's from top and from H ...
+  // --------------------------------------------------------------------------
+  //int ipart=0;
+  for ( MCParticleCollection::const_iterator MCp = MCpartons->begin(); MCp != MCpartons->end(); ++MCp ) {
+    //ipart++;
+    //cout << ipart << " " << MCp->mPid() << " " << MCp->pid() << " " << foundw << endl;
+    // See if this is a daughter of the W
+    // ----------------------------------
+    if ( fabs(MCp->mPid())==24 && foundw<4 ) { // first two W's in list are always from t, tbar
+      // if ( fabs(MCp->pid())<6 ) tdecay+=0;
+      if ( fabs(MCp->pid())==11 ) tdecay+=1;
+      if ( fabs(MCp->pid())==13 ) tdecay+=2;
+      if ( fabs(MCp->pid())==15 ) tdecay+=4;
+      foundw++;
+    }
+    if ( MCp->mPid()==25 ) {
+      // See if this is a daughter of the Higgs
+      // --------------------------------------
+      if ( hdecay==0 ) { 
+	if ( fabs(MCp->pid())== 5 ) hdecay=1;
+	if ( fabs(MCp->pid())== 4 ) hdecay=2;
+	if ( fabs(MCp->pid())== 15 ) hdecay=3;
+	if ( fabs(MCp->pid())== 24 ) hdecay=4;
+      } 
+    }
+  }
+  total[tdecay][hdecay]++;
+  grandtotaltt[hdecay]++;
+  grandtotalh[tdecay]++;
+  grandgrandtotal++;
+  if ( response ) {
+    totalpass[tdecay][hdecay]++;
+    grandtotalttpass[hdecay]++;
+    grandtotalhpass[tdecay]++;
+    grandgrandtotalpass++;
+  }
+
   /////////////////////////////////////////////////////////////////////////////////////
 
   // Offline analysis
@@ -2942,6 +2975,126 @@ void TDAna::beginJob(const edm::EventSetup&) {
 //       method called once each job just after ending the event loop 
 // -------------------------------------------------------------------------
 void TDAna::endJob() {
+
+  // Write stats on decays
+  // ---------------------
+  double f0[5]={0.};
+  double sf0[5]={0.};
+  double f0t=0.;
+  double sf0t=0.;
+  TString Hname[5] = { "  H->others ", "    H->bb   ", "    H->cc   ", 
+		       " H->tau tau ", "    H->WW   " };
+  TString Tname[9] = { "tt->jjbjjb  ", "tt->evbjjb  ", "tt->mvbjjb  ", "tt->evbmvb  ", 
+		       "tt->tvbjjb  ", "tt->tvbevb  ", "tt->tvbmvb  ", "            ", "tt->tvbtvb  " };
+  // File with HEP table
+  // -------------------
+  ofstream decayfile("tthdecays.asc");
+  decayfile << endl;
+  decayfile << "            " << Hname[1] << "  " << Hname[2] << "  " << Hname[3] << "  " 
+	    << Hname[4] << "  " << Hname[0] << "   Total   " << endl;
+  decayfile << "--------------------------------------------------" 
+	    << "-------------------------------------" << endl;
+  for ( int tdecay=0; tdecay<9; tdecay++ ) {
+    if ( tdecay!=7 ) {
+      cout << endl;
+      cout << Tname[tdecay] << " : " << endl;
+      cout << "--------------" << endl;
+      if ( grandtotalh[tdecay]>0 ) {
+	f0t = grandtotalhpass[tdecay]/grandtotalh[tdecay];
+	sf0t = sqrt(f0t*(1-f0t)/grandtotalh[tdecay]);
+      }
+      cout << "Total       " << setprecision(6) << grandtotalhpass[tdecay] << "/" 
+	   << grandtotalh[tdecay] << " = " 
+	   << "(" <<setprecision(5) << f0t*100. << "+-" 
+	   << setprecision(5) << sf0t*100. << ") %" << endl;
+      for ( int hdecay=0; hdecay<5; hdecay++ ) {
+	if ( total[tdecay][hdecay]>0 ) {
+	  f0[hdecay] = totalpass[tdecay][hdecay]/total[tdecay][hdecay];
+	  sf0[hdecay] = sqrt(f0[hdecay]*(1-f0[hdecay])/total[tdecay][hdecay]);
+	}
+	cout << Hname[hdecay] << setprecision(6) << totalpass[tdecay][hdecay] << "/" 
+	 << total[tdecay][hdecay] << " = " << "(" << setprecision(5) << f0[hdecay]*100. 
+	     << "+-" << setprecision(5) << sf0[hdecay]*100. << ") %" << endl;
+      } 
+      
+      decayfile << Tname[tdecay] << setprecision(6) << setw(7) << totalpass[tdecay][1] << "/" 
+		<< setprecision(6) << total[tdecay][1] << " "  << setprecision(6) 
+		<< setw(8) << totalpass[tdecay][2] << "/" 
+		<< setprecision(6) << total[tdecay][2] << " "  << setprecision(6) 
+		<< setw(8) << totalpass[tdecay][3] << "/" 
+		<< setprecision(6) << total[tdecay][3] << " "  << setprecision(6) 
+		<< setw(8) << totalpass[tdecay][4] << "/" 
+		<< setprecision(6) << total[tdecay][4] << " "  << setprecision(6) 
+		<< setw(8) << totalpass[tdecay][0] << "/" 
+		<< setprecision(6) << total[tdecay][0] << " "  << setprecision(6) 
+		<< setw(8) << grandtotalhpass[tdecay] << "/" 
+		<< setprecision(6) << grandtotalh[tdecay] << endl;
+      decayfile << "            "  
+		<< setprecision(5) << setw(5) << f0[1]*100. << "+-" << setprecision(4) << sf0[1]*100. << " " 
+		<< setprecision(5) << setw(5) << f0[2]*100. << "+-" << setprecision(4) << sf0[2]*100. << " " 
+		<< setprecision(5) << setw(5) << f0[3]*100. << "+-" << setprecision(4) << sf0[3]*100. << " " 
+		<< setprecision(5) << setw(5) << f0[4]*100. << "+-" << setprecision(4) << sf0[4]*100. << " " 
+		<< setprecision(5) << setw(5) << f0[0]*100. << "+-" << setprecision(4) << sf0[0]*100. << " "
+		<< setprecision(5) << setw(5) << f0t*100.   << "+-" << setprecision(4) << sf0t*100. << endl;
+      decayfile << endl;
+    }
+  }
+
+  cout << endl;
+  cout << "Totals : " << endl;
+  cout << "-------- " << endl;
+  f0t=0.;
+  sf0t=0.;
+  for ( int hdecay=0; hdecay<5; hdecay++ ) {
+    if ( grandtotaltt[hdecay]>0 ) {
+      f0[hdecay] = grandtotalttpass[hdecay]/grandtotaltt[hdecay];
+      sf0[hdecay] = sqrt(f0[hdecay]*(1-f0[hdecay])/grandtotaltt[hdecay]);
+    }
+    cout << Hname[hdecay] << setprecision(6) << grandtotalttpass[hdecay] << "/" 
+	 << grandtotaltt[hdecay] << " = " << "(" <<setprecision(5) << f0[hdecay]*100. 
+	 << "+-" << setprecision(5) << sf0[hdecay]*100. << ") %" << endl;
+  }
+  cout << endl;
+  cout << "Grandtotal : " << endl;
+  cout << "------------ " << endl;
+  f0t=0.;
+  sf0t=0.;
+  if ( grandgrandtotal>0 ) {
+    f0t = grandgrandtotalpass/grandgrandtotal;
+    sf0t = sqrt(f0t*(1-f0t)/grandgrandtotal);
+  }
+  cout << setprecision(6) << grandgrandtotalpass << "/" << grandgrandtotal << " = " 
+       << "(" <<setprecision(5) << f0t*100. 
+       << "+-" << setprecision(5) << sf0t*100. << ") %" << endl;
+
+  decayfile << "Totals:     " 
+	    << setprecision(6) << setw(7) << grandtotalttpass[1] << "/" 
+	    <<  setprecision(5) << grandtotaltt[1] << " " 
+	    << setprecision(6) << setw(8) << grandtotalttpass[2] << "/" 
+	    <<  setprecision(5) << grandtotaltt[2] << " " 
+	    << setprecision(6) << setw(8) << grandtotalttpass[3] << "/" 
+	    <<  setprecision(5) << grandtotaltt[3] << " " 
+	    << setprecision(6) << setw(8) << grandtotalttpass[4] << "/" 
+	    <<  setprecision(5) << grandtotaltt[4] << " " 
+	    << setprecision(6) << setw(8) << grandtotalttpass[0] << "/" 
+	    <<  setprecision(5) << grandtotaltt[0] << " " 
+	    << setprecision(6) << setw(8) << grandgrandtotalpass << "/" 
+	    <<  setprecision(5) << grandgrandtotal << endl;
+  decayfile << "            " 
+	    << setprecision(5) << setw(5) << f0[1]*100. << "+-" 
+	    << setprecision(4) << sf0[1]*100.  << " " 
+	    << setprecision(5) << setw(5) << f0[2]*100.  << "+-" 
+	    << setprecision(4) << sf0[2]*100.  << " " 
+	    << setprecision(5) << setw(5) << f0[3]*100.  << "+-" 
+	    << setprecision(4) << sf0[3]*100.  << " " 
+	    << setprecision(5) << setw(5) << f0[4]*100.  << "+-" 
+	    << setprecision(4) << sf0[4]*100.  << " " 
+	    << setprecision(5) << setw(5) << f0[0]*100.  << "+-" 
+	    << setprecision(4) << sf0[0]*100.  << " " 
+	    << setprecision(5) << setw(5) << f0t*100.    << "+-" 
+	    << setprecision(4) << sf0t*100.  << endl;
+
+  decayfile.close();
 
   // Histograms for events passing trigger
   // -------------------------------------
