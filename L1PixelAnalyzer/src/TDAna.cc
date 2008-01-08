@@ -94,8 +94,8 @@ TDAna::TDAna(const edm::ParameterSet& iConfig) :
   simpleTauLabel_( iConfig.getUntrackedParameter<edm::InputTag>( "SimpleTaus" ) ),
   summaryLabel_( iConfig.getUntrackedParameter<edm::InputTag>( "Summary" ) ),
   numTkCut_( iConfig.getUntrackedParameter<unsigned int>( "TracksMinimumNum_in_PixelJet" ) ),
-  OutputEffFileName( iConfig.getUntrackedParameter<string>( "OutputEffFileName" ) ),
-  QCD_( iConfig.getUntrackedParameter<bool> ( "QCD" ) )
+  QCD_( iConfig.getUntrackedParameter<bool> ( "QCD" ) ),
+  OutputEffFileName( iConfig.getUntrackedParameter<string>( "OutputEffFileName" ) )
 {
 
   // Now do what ever initialization is needed
@@ -163,6 +163,22 @@ TDAna::TDAna(const edm::ParameterSet& iConfig) :
 
   // Histograms
   // ----------
+  Nsltt_hjj=0.; // Counter of semileptonic tt decays with h->jj decays
+  Drmax_ = new TH2D ( "Drmax", "Drmax for choices of etmin, etamax", 7, 17.5, 52.5, 4, 1.25, 3.25 );
+  Drmedall_ = new TH2D ( "Drmedall", "Drmedall for choices of etmin, etamax", 7, 17.5, 52.5, 4, 1.25, 3.25 );
+  Drmed07_ = new TH2D ( "Drmed07", "Drmed07 for choices of etmin, etamax", 7, 17.5, 52.5, 4, 1.25, 3.25 );
+  N07_ = new TH2D ( "N07", "N07 for choices of etmin, etamax", 7, 17.5, 52.5, 4, 1.25, 3.25 );
+  N04_ = new TH2D ( "N04", "N04 for choices of etmin, etamax", 7, 17.5, 52.5, 4, 1.25, 3.25 );
+  N02_ = new TH2D ( "N02", "N02 for choices of etmin, etamax", 7, 17.5, 52.5, 4, 1.25, 3.25 );
+  Nlo_ = new TH2D ( "Nlo", "Nlo for choices of etmin, etamax", 7, 17.5, 52.5, 4, 1.25, 3.25 );
+  Detmedall_ = new TH2D ( "Detmedall", "Detmedall for choices of etmin, etamax", 7, 17.5, 52.5, 4, 1.25, 3.25 );
+  Detmed07_ = new TH2D ( "Detmed07", "Detmed07 for choices of etmin, etamax", 7, 17.5, 52.5, 4, 1.25, 3.25 );
+  Perf07_ = new TH2D ( "Perf07", "Perf07 for choices of etmin, etamax", 7, 17.5, 52.5, 4, 1.25, 3.25 );
+  Perf04_ = new TH2D ( "Perf04", "Perf04 for choices of etmin, etamax", 7, 17.5, 52.5, 4, 1.25, 3.25 );
+  Perf02_ = new TH2D ( "Perf02", "Perf02 for choices of etmin, etamax", 7, 17.5, 52.5, 4, 1.25, 3.25 );
+  Det2medall_ = new TH2D ( "Det2medall", "Detmedall for choices of etmin, etamax", 7, 17.5, 52.5, 4, 1.25, 3.25 );
+  Det2med07_ = new TH2D ( "Det2med07", "Detmed07 for choices of etmin, etamax", 7, 17.5, 52.5, 4, 1.25, 3.25 );
+
   NJets_ = new TH1D ( "NJets", "Number of selected jets", 20, 0, 20 );
   UncorrHt_ = new TH1D ( "UncorrHt", "Ht with uncorrected jets", 50, 0, 4000 );
   CorrHt_ = new TH1D ( "CorrHt", "Ht with corrected jets", 50, 0, 4000 );
@@ -1090,43 +1106,245 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   int hdecay=0;
   int tdecay=0;
   int foundw=0;
+  double Parton_pt[8]={0.};
+  double Parton_eta[8]={0.};
+  double Parton_phi[8]={0.};
+  double Parton_mass[8]={0.};
+  double Parton_dec[8]={0.};
+  int iparton=0;
   // NB we know that the block is filled with top and antitop first, then Higgs
   // So we need not worry about messing up W's from top and from H ...
   // --------------------------------------------------------------------------
-  //int ipart=0;
   for ( MCParticleCollection::const_iterator MCp = MCpartons->begin(); MCp != MCpartons->end(); ++MCp ) {
-    //ipart++;
-    //cout << ipart << " " << MCp->mPid() << " " << MCp->pid() << " " << foundw << endl;
     // See if this is a daughter of the W
     // ----------------------------------
     if ( fabs(MCp->mPid())==24 && foundw<4 ) { // first two W's in list are always from t, tbar
-      // if ( fabs(MCp->pid())<6 ) tdecay+=0;
-      if ( fabs(MCp->pid())==11 ) tdecay+=1;
-      if ( fabs(MCp->pid())==13 ) tdecay+=2;
-      if ( fabs(MCp->pid())==15 ) tdecay+=4;
+      if ( MCp->pid()<6 && MCp->pid()>0 ) tdecay+=1; // count particles, not antiparticles, to count once
+      if ( fabs(MCp->pid())==11 ) tdecay+=2;
+      if ( fabs(MCp->pid())==13 ) tdecay+=4;
+      if ( fabs(MCp->pid())==15 ) tdecay+=8;
       foundw++;
+      
+      // For hadronic W decay from top, store info on partons
+      // ----------------------------------------------------
+      if ( fabs(MCp->pid())<6 && iparton<8 ) {
+	Parton_pt[iparton]=MCp->pt();
+	Parton_eta[iparton]=MCp->eta();
+	Parton_phi[iparton]=MCp->phi();
+	Parton_mass[iparton]=MCp->mass();
+	if ( MCp->mPid()==24 )  Parton_dec[iparton] = 1; // 1 for W+ daughters, 2 for b from top
+	if ( MCp->mPid()==-24 ) Parton_dec[iparton] = 3; // 3 for W- daughters, 4 for bbar frop antitop
+	iparton++;
+      }
+    }
+    // Store information on b partons from t, tbar
+    // -------------------------------------------
+    if ( fabs(MCp->mPid())==6 && iparton<8 ) {
+      if ( MCp->pid()==5 ) {
+	Parton_pt[iparton]=MCp->pt();
+	Parton_eta[iparton]=MCp->eta();
+	Parton_phi[iparton]=MCp->phi();
+	Parton_mass[iparton]=MCp->mass();
+	Parton_dec[iparton]=2; // 2 for b from top
+	iparton++;
+      } else if ( MCp->pid()==-5 ) {
+	Parton_pt[iparton]=MCp->pt();
+	Parton_eta[iparton]=MCp->eta();
+	Parton_phi[iparton]=MCp->phi();
+	Parton_mass[iparton]=MCp->mass();
+	Parton_dec[iparton]=4; // 4 for bbar from antitop
+	iparton++;
+      }
     }
     if ( MCp->mPid()==25 ) {
       // See if this is a daughter of the Higgs
       // --------------------------------------
-      if ( hdecay==0 ) { 
-	if ( fabs(MCp->pid())== 5 ) hdecay=1;
-	if ( fabs(MCp->pid())== 4 ) hdecay=2;
-	if ( fabs(MCp->pid())== 15 ) hdecay=3;
-	if ( fabs(MCp->pid())== 24 ) hdecay=4;
-      } 
+      if ( fabs(MCp->pid())== 5 ) hdecay=1;
+      if ( fabs(MCp->pid())== 4 ) hdecay=2;
+      if ( fabs(MCp->pid())== 15 ) hdecay=3;
+      if ( fabs(MCp->pid())== 24 ) hdecay=4;
+      
+      // Store information on partons from H
+      // -----------------------------------
+      if ( fabs(MCp->pid())<6 && iparton<8 ) {
+	Parton_pt[iparton]=MCp->pt();
+	Parton_eta[iparton]=MCp->eta();
+	Parton_phi[iparton]=MCp->phi();
+	Parton_mass[iparton]=MCp->mass();
+	Parton_dec[iparton]=5; // 5 for H daughters
+	iparton++;	
+      }
     }
   }
-  total[tdecay][hdecay]++;
+  int itdecay = 0;
+  if ( tdecay==2 ) itdecay=0; // 6j
+  if ( tdecay==3 ) itdecay=1; // en4j
+  if ( tdecay==5 ) itdecay=2; // mn4j
+  if ( tdecay==9 ) itdecay=3; // tn4j
+  if ( tdecay==4 ) itdecay=4; // enen2j
+  if ( tdecay==6 ) itdecay=5; // enmn2j
+  if ( tdecay==10) itdecay=6; // entn2j
+  if ( tdecay==8 ) itdecay=7; // mnmn2j
+  if ( tdecay==12) itdecay=8; // mntn2j
+  if ( tdecay==16) itdecay=9; // tntn2j
+  if ( itdecay==-1 ) {
+    itdecay=0;
+    cout << "Wrong decay assignment" << endl;
+  }
+  total[itdecay][hdecay]++;
   grandtotaltt[hdecay]++;
-  grandtotalh[tdecay]++;
+  grandtotalh[itdecay]++;
   grandgrandtotal++;
   if ( response ) {
-    totalpass[tdecay][hdecay]++;
+    totalpass[itdecay][hdecay]++;
     grandtotalttpass[hdecay]++;
-    grandtotalhpass[tdecay]++;
+    grandtotalhpass[itdecay]++;
     grandgrandtotalpass++;
   }
+
+  // HiVariables
+  // -----------
+  edm::Handle<OfflineJetCollection> caloJets;
+  iEvent.getByLabel( offlineJetLabel_, caloJets );
+
+  // Preliminary creation of jet array ordered by Et for parton-jet matching study only
+  // ----------------------------------------------------------------------------------
+  if ( ( itdecay==1 || itdecay==2 || itdecay==3 ) && 
+       ( hdecay==1 || hdecay==2 ) && 
+       caloJets->size() != 0 && response ) { // sl decay + h->cc,bb & jets exist
+   
+    if ( iparton!=6 ) {
+      cout << "something weird with np=" << iparton << " itdec=" << itdecay << " hdec=" << hdecay << endl;      
+    }
+    double JPet[200]={0.};
+    double JPeta[200]={0.};
+    double JPphi[200]={0.};
+    int NJP=0;
+    for ( OfflineJetCollection::const_iterator cal = caloJets->begin(); 
+	  cal != caloJets->end(); ++cal ) {
+      if ( NJP<200 ) {
+	JPet[NJP]=cal->et();
+	JPeta[NJP]=cal->eta();
+	JPphi[NJP]=cal->phi();
+	NJP++;
+      }
+    }
+    // Order arrays by Et
+    // ------------------
+    for ( int times=0; times<NJP; times++ ) {
+      for ( int j=0; j<NJP-1; j++ ) {
+	int k = NJP-j-1;
+	if ( JPet[k]>JPet[k-1] ) {
+	  double a1 = JPet[k];
+	  double a2 = JPeta[k];
+	  double a3 = JPphi[k];
+	  JPet[k]=JPet[k-1];
+	  JPeta[k]=JPeta[k-1];
+	  JPphi[k]=JPphi[k-1];
+	  JPet[k-1]=a1;
+	  JPeta[k-1]=a2;
+	  JPphi[k-1]=a3;
+	}
+      }
+    }
+    // Study parton-jet matching
+    // -------------------------
+    bool ipass[8]; // whether a parton is associated to one of the leading jets
+    for ( int ietmin=0; ietmin<7; ietmin++ ) {
+      double etmin = 20.+5.*(double)ietmin;
+      for ( int ietamax=0; ietamax<4; ietamax++ ) {
+	double etamax = 1.5+0.5*(double)ietamax;
+	// Variables needed to fill histograms
+	// -----------------------------------
+	double drmax=0.;
+	double drmed07=0.;
+	double drmedall=0.;
+	double n07=0.;
+	double n04=0.;
+	double n02=0.;
+	double leftover=0.;
+	double detmed07=0.;
+	double detmedall=0.;
+	double det2med07=0.;
+	double det2medall=0.;
+	double nptotal=0.;
+	for ( int ip=0; ip<8; ip++ ) { ipass[ip]=false; }; 
+	// Loop on jets
+	// ------------
+	int considered=0; // Consider at most 8 jets for the association
+	for ( int ij=0; ij<NJP; ij++ ) {
+	  if ( JPet[ij]>etmin && fabs(JPeta[ij])<etamax && considered<iparton ) {
+	    considered++;
+	    double drmin=1.0;
+	    double det=0.;
+	    double det2=0.;
+	    int tmpind=-1;
+	    for ( int ip=0; ip<iparton; ip++ ) {
+	      if ( !ipass[ij] ) {
+		double deta = Parton_eta[ip]-JPeta[ij];
+		double dphi = 3.1415926-fabs(fabs(Parton_phi[ip]-JPphi[ip])-3.1415926);
+		double d_et = fabs(Parton_pt[ip]-JPet[ij])/Parton_pt[ip];
+		double dr2  = deta*deta+dphi*dphi; // +d_et*d_et;
+		if ( dr2<drmin ) {
+		  drmin=dr2;
+		  tmpind=ip;
+		  det=fabs(Parton_pt[ip]-JPet[ij])/Parton_pt[ip];
+		  det2=pow(Parton_pt[ip]-JPet[ij],2);
+		}
+	      }
+	    }
+	    drmin = sqrt(drmin);
+	    if ( tmpind>=0 ) { 
+	      ipass[tmpind]=true;
+	      nptotal++;
+	      // Compute estimators of association
+	      // ---------------------------------
+	      if ( drmin>drmax ) drmax=drmin;
+	      drmedall+=drmin;
+	      detmedall+=det;
+	      det2medall+=det2;
+	      if ( drmin<0.7 ) { 
+		drmed07+=drmin;
+		n07++;
+		detmed07+=det;
+		det2med07+=det2;
+	      }
+	      if ( drmin<0.4 ) n04++;
+	      if ( drmin<0.2 ) n02++;
+	    } 
+	  } // if there is a jet
+	} // ij
+	if ( nptotal>0 ) { // total number of partons matched to one of the leading 8 jets
+	  drmedall=drmedall/nptotal;
+	  detmedall=detmedall/nptotal;
+	  det2medall=det2medall/nptotal;
+	}
+	if ( n07>0 ) {
+	  drmed07=drmed07/n07;
+	  detmed07=detmed07/n07;
+	  det2med07=det2med07/n07;
+	}
+	leftover = iparton-nptotal;
+	// Fill histograms
+	// ---------------
+	Drmedall_->Fill(etmin, etamax, drmedall);
+	Drmed07_->Fill(etmin, etamax, drmed07);
+	Drmax_->Fill(etmin, etamax, drmax);
+	N07_->Fill(etmin, etamax, n07);
+	N04_->Fill(etmin, etamax, n04);
+	N02_->Fill(etmin, etamax, n02);
+	Nlo_->Fill(etmin, etamax, leftover);
+	Detmed07_->Fill(etmin, etamax, detmed07);
+	Detmedall_->Fill(etmin, etamax, detmedall);
+	Det2med07_->Fill(etmin, etamax, det2med07);
+	Det2medall_->Fill(etmin, etamax, det2medall);
+	if ( n07==iparton ) Perf07_->Fill(etmin, etamax);
+	if ( n04==iparton ) Perf04_->Fill(etmin, etamax);
+	if ( n02==iparton ) Perf02_->Fill(etmin, etamax);
+      } // ietamax
+    } // ietmin
+    Nsltt_hjj++;
+  } // if sl tt decay + h->cc,bb decay
 
   /////////////////////////////////////////////////////////////////////////////////////
 
@@ -1142,11 +1360,6 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   double met = caloMET->et();
   double metsig = caloMET->mEtSig();
   double metphi = caloMET->phi();
-
-  // HiVariables
-  // -----------
-  edm::Handle<OfflineJetCollection> caloJets;
-  iEvent.getByLabel( offlineJetLabel_, caloJets );
 
   // Count IC5 jets with Et>=30 GeV and |eta| < 3.0
   // ----------------------------------------------
@@ -1242,7 +1455,7 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
       CorrSumEt+=cal->et();
       CorrHt0+=cal->et();
 
-      if ( cal->et() >= 30. && fabs( cal->eta() ) < 2.5 ) {
+      if ( cal->et() >= 40. && fabs( cal->eta() ) < 2.0 ) {
         goodIc5Jets=goodIc5Jets+1;
 	if ( cal->discriminatorHighEff() > loose_ ) NTagsL++;
 	if ( cal->discriminatorHighEff() > medium_ ) NTagsM++;
@@ -2984,8 +3197,9 @@ void TDAna::endJob() {
   double sf0t=0.;
   TString Hname[5] = { "  H->others ", "    H->bb   ", "    H->cc   ", 
 		       " H->tau tau ", "    H->WW   " };
-  TString Tname[9] = { "tt->jjbjjb  ", "tt->evbjjb  ", "tt->mvbjjb  ", "tt->evbmvb  ", 
-		       "tt->tvbjjb  ", "tt->tvbevb  ", "tt->tvbmvb  ", "            ", "tt->tvbtvb  " };
+  TString Tname[10] = { "tt->jjbjjb  ", "tt->evbjjb  ", "tt->mvbjjb  ", "tt->tvbjjb  ", 
+			"tt->evbenb  ", "tt->evbmvb  ", "tt->evbtvb  ", "tt->mnbmnb  ", 
+			"tt->mvbtvb  ", "tt->tnbtnb  " };
   // File with HEP table
   // -------------------
   ofstream decayfile("tthdecays.asc");
@@ -2994,50 +3208,48 @@ void TDAna::endJob() {
 	    << Hname[4] << "  " << Hname[0] << "   Total   " << endl;
   decayfile << "--------------------------------------------------" 
 	    << "-------------------------------------" << endl;
-  for ( int tdecay=0; tdecay<9; tdecay++ ) {
-    if ( tdecay!=7 ) {
-      cout << endl;
-      cout << Tname[tdecay] << " : " << endl;
-      cout << "--------------" << endl;
-      if ( grandtotalh[tdecay]>0 ) {
-	f0t = grandtotalhpass[tdecay]/grandtotalh[tdecay];
-	sf0t = sqrt(f0t*(1-f0t)/grandtotalh[tdecay]);
-      }
-      cout << "Total       " << setprecision(6) << grandtotalhpass[tdecay] << "/" 
-	   << grandtotalh[tdecay] << " = " 
-	   << "(" <<setprecision(5) << f0t*100. << "+-" 
-	   << setprecision(5) << sf0t*100. << ") %" << endl;
-      for ( int hdecay=0; hdecay<5; hdecay++ ) {
-	if ( total[tdecay][hdecay]>0 ) {
-	  f0[hdecay] = totalpass[tdecay][hdecay]/total[tdecay][hdecay];
-	  sf0[hdecay] = sqrt(f0[hdecay]*(1-f0[hdecay])/total[tdecay][hdecay]);
-	}
-	cout << Hname[hdecay] << setprecision(6) << totalpass[tdecay][hdecay] << "/" 
-	 << total[tdecay][hdecay] << " = " << "(" << setprecision(5) << f0[hdecay]*100. 
-	     << "+-" << setprecision(5) << sf0[hdecay]*100. << ") %" << endl;
-      } 
-      
-      decayfile << Tname[tdecay] << setprecision(6) << setw(7) << totalpass[tdecay][1] << "/" 
-		<< setprecision(6) << total[tdecay][1] << " "  << setprecision(6) 
-		<< setw(8) << totalpass[tdecay][2] << "/" 
-		<< setprecision(6) << total[tdecay][2] << " "  << setprecision(6) 
-		<< setw(8) << totalpass[tdecay][3] << "/" 
-		<< setprecision(6) << total[tdecay][3] << " "  << setprecision(6) 
-		<< setw(8) << totalpass[tdecay][4] << "/" 
-		<< setprecision(6) << total[tdecay][4] << " "  << setprecision(6) 
-		<< setw(8) << totalpass[tdecay][0] << "/" 
-		<< setprecision(6) << total[tdecay][0] << " "  << setprecision(6) 
-		<< setw(8) << grandtotalhpass[tdecay] << "/" 
-		<< setprecision(6) << grandtotalh[tdecay] << endl;
-      decayfile << "            "  
-		<< setprecision(5) << setw(5) << f0[1]*100. << "+-" << setprecision(4) << sf0[1]*100. << " " 
-		<< setprecision(5) << setw(5) << f0[2]*100. << "+-" << setprecision(4) << sf0[2]*100. << " " 
-		<< setprecision(5) << setw(5) << f0[3]*100. << "+-" << setprecision(4) << sf0[3]*100. << " " 
-		<< setprecision(5) << setw(5) << f0[4]*100. << "+-" << setprecision(4) << sf0[4]*100. << " " 
-		<< setprecision(5) << setw(5) << f0[0]*100. << "+-" << setprecision(4) << sf0[0]*100. << " "
-		<< setprecision(5) << setw(5) << f0t*100.   << "+-" << setprecision(4) << sf0t*100. << endl;
-      decayfile << endl;
+  for ( int itdecay=0; itdecay<10; itdecay++ ) {
+    cout << endl;
+    cout << Tname[itdecay] << " : " << endl;
+    cout << "--------------" << endl;
+    if ( grandtotalh[itdecay]>0 ) {
+      f0t = grandtotalhpass[itdecay]/grandtotalh[itdecay];
+      sf0t = sqrt(f0t*(1-f0t)/grandtotalh[itdecay]);
     }
+    cout << "Total       " << setprecision(6) << grandtotalhpass[itdecay] << "/" 
+	 << grandtotalh[itdecay] << " = " 
+	 << "(" <<setprecision(5) << f0t*100. << "+-" 
+	 << setprecision(5) << sf0t*100. << ") %" << endl;
+    for ( int hdecay=0; hdecay<5; hdecay++ ) {
+      if ( total[itdecay][hdecay]>0 ) {
+	f0[hdecay] = totalpass[itdecay][hdecay]/total[itdecay][hdecay];
+	sf0[hdecay] = sqrt(f0[hdecay]*(1-f0[hdecay])/total[itdecay][hdecay]);
+      }
+      cout << Hname[hdecay] << setprecision(6) << totalpass[itdecay][hdecay] << "/" 
+	   << total[itdecay][hdecay] << " = " << "(" << setprecision(5) << f0[hdecay]*100. 
+	   << "+-" << setprecision(5) << sf0[hdecay]*100. << ") %" << endl;
+    } 
+    
+    decayfile << Tname[itdecay] << setprecision(6) << setw(7) << totalpass[itdecay][1] << "/" 
+	      << setprecision(6) << total[itdecay][1] << " "  << setprecision(6) 
+	      << setw(8) << totalpass[itdecay][2] << "/" 
+	      << setprecision(6) << total[itdecay][2] << " "  << setprecision(6) 
+	      << setw(8) << totalpass[itdecay][3] << "/" 
+	      << setprecision(6) << total[itdecay][3] << " "  << setprecision(6) 
+	      << setw(8) << totalpass[itdecay][4] << "/" 
+	      << setprecision(6) << total[itdecay][4] << " "  << setprecision(6) 
+	      << setw(8) << totalpass[itdecay][0] << "/" 
+	      << setprecision(6) << total[itdecay][0] << " "  << setprecision(6) 
+	      << setw(8) << grandtotalhpass[itdecay] << "/" 
+	      << setprecision(6) << grandtotalh[itdecay] << endl;
+    decayfile << "            "  
+	      << setprecision(5) << setw(5) << f0[1]*100. << "+-" << setprecision(4) << sf0[1]*100. << " " 
+	      << setprecision(5) << setw(5) << f0[2]*100. << "+-" << setprecision(4) << sf0[2]*100. << " " 
+	      << setprecision(5) << setw(5) << f0[3]*100. << "+-" << setprecision(4) << sf0[3]*100. << " " 
+	      << setprecision(5) << setw(5) << f0[4]*100. << "+-" << setprecision(4) << sf0[4]*100. << " " 
+	      << setprecision(5) << setw(5) << f0[0]*100. << "+-" << setprecision(4) << sf0[0]*100. << " "
+	      << setprecision(5) << setw(5) << f0t*100.   << "+-" << setprecision(4) << sf0t*100. << endl;
+    decayfile << endl;
   }
 
   cout << endl;
@@ -3095,6 +3307,37 @@ void TDAna::endJob() {
 	    << setprecision(4) << sf0t*100.  << endl;
 
   decayfile.close();
+
+  // Histograms for the study of jet/parton association
+  // --------------------------------------------------
+  Drmax_->Scale(1./Nsltt_hjj);
+  Drmedall_->Scale(1./Nsltt_hjj);
+  Drmed07_->Scale(1./Nsltt_hjj);
+  N07_->Scale(1./Nsltt_hjj);
+  N04_->Scale(1./Nsltt_hjj);
+  N02_->Scale(1./Nsltt_hjj);
+  Nlo_->Scale(1./Nsltt_hjj);
+  Detmed07_->Scale(1./Nsltt_hjj);
+  Detmedall_->Scale(1./Nsltt_hjj);
+  Perf07_->Scale(1./Nsltt_hjj);
+  Perf04_->Scale(1./Nsltt_hjj);
+  Perf02_->Scale(1./Nsltt_hjj);
+  Det2med07_->Scale(1./Nsltt_hjj);
+  Det2medall_->Scale(1./Nsltt_hjj);
+  Drmax_->Write();
+  Drmedall_->Write();
+  Drmed07_->Write();
+  N07_->Write();
+  N04_->Write();
+  N02_->Write();
+  Nlo_->Write();
+  Detmedall_->Write();
+  Detmed07_->Write();
+  Perf07_->Write();
+  Perf04_->Write();
+  Perf02_->Write();
+  Det2med07_->Write();
+  Det2medall_->Write();
 
   // Histograms for events passing trigger
   // -------------------------------------

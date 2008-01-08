@@ -196,6 +196,21 @@ class TDAna : public edm::EDAnalyzer {
   
   // My histograms
   // -------------
+  TH2D * Drmax_;
+  TH2D * Drmedall_;
+  TH2D * Drmed07_;
+  TH2D * N07_;
+  TH2D * N04_;
+  TH2D * N02_;
+  TH2D * Nlo_;
+  TH2D * Detmedall_;
+  TH2D * Detmed07_;
+  TH2D * Perf07_;
+  TH2D * Perf04_;
+  TH2D * Perf02_;
+  TH2D * Det2medall_;
+  TH2D * Det2med07_;
+
   TH1D * NJets_;
   TH1D * UncorrSumEt_;
   TH1D * UncorrHt_;
@@ -727,13 +742,15 @@ class TDAna : public edm::EDAnalyzer {
   double rel_lik;
   double njsss;
 
-  double total[9][5];
-  double totalpass[9][5];
+  double Nsltt_hjj;
+
+  double total[10][5];
+  double totalpass[10][5];
   double grandtotaltt[5];
-  double grandtotalh[9];
+  double grandtotalh[10];
   double grandgrandtotal;
   double grandtotalttpass[5];
-  double grandtotalhpass[9];
+  double grandtotalhpass[10];
   double grandgrandtotalpass;
 
   // Likelihood histograms
