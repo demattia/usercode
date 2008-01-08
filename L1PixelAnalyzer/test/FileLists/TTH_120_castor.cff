@@ -500,7 +500,6 @@ source = PoolSource {
     "castor:/castor/cern.ch/user/d/demattia/FastSim/PUHL/TTH_120/TTH_120_620.root",
     "castor:/castor/cern.ch/user/d/demattia/FastSim/PUHL/TTH_120/TTH_120_621.root",
     "castor:/castor/cern.ch/user/d/demattia/FastSim/PUHL/TTH_120/TTH_120_622.root",
-    "castor:/castor/cern.ch/user/d/demattia/FastSim/PUHL/TTH_120/TTH_120_623.root",
     "castor:/castor/cern.ch/user/d/demattia/FastSim/PUHL/TTH_120/TTH_120_624.root",
     "castor:/castor/cern.ch/user/d/demattia/FastSim/PUHL/TTH_120/TTH_120_625.root",
     "castor:/castor/cern.ch/user/d/demattia/FastSim/PUHL/TTH_120/TTH_120_626.root",
