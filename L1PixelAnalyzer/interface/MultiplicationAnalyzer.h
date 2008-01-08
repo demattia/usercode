@@ -16,7 +16,7 @@
 //
 // Original Author:  Marco De Mattia
 //         Created:  Tue May  8 13:05:37 CEST 2007
-// $Id: MultiplicationAnalyzer.h,v 1.2 2008/01/06 11:43:48 demattia Exp $
+// $Id: MultiplicationAnalyzer.h,v 1.1 2008/01/06 18:43:47 demattia Exp $
 //
 //
 
@@ -64,6 +64,9 @@
 #include "DataFormats/JetReco/interface/GenJetCollection.h"
 #include "DataFormats/JetReco/interface/GenJet.h"
 
+// Multiplier
+#include "AnalysisExamples/L1PixelAnalyzer/interface/Multiplier.h"
+
 // Class declaration
 // -----------------
 
@@ -94,6 +97,55 @@ private:
   // ------
   // The histograms must be created after the TFile is opened.
   // ---------------------------------------------------------
+  // Histograms
+  // ----------
+  TH1F * NJET;
+  TH1F * JETET;
+  TH1F * JETET_5j;
+  TH1F * JETET_5j_s3;
+  TH1F * MET;
+  TH1F * MET_5j;
+  TH1F * MET_5j_s3;
+  TH1F * METX;
+  TH1F * METX_5j;
+  TH1F * METX_5j_s3;
+  TH1F * SET;
+  TH1F * SET_5j;
+  TH1F * SET_5j_s3;
+  TH1F * SMET;
+  TH1F * SMET_5j;
+  TH1F * SMET_5j_s3;
+
+  TH1F * NJETC;
+  TH1F * JETETC;
+  TH1F * JETETC_5j;
+  TH1F * JETETC_5j_s3;
+  TH1F * METC;
+  TH1F * METC_5j;
+  TH1F * METC_5j_s3;
+  TH1F * METXC;
+  TH1F * METXC_5j;
+  TH1F * METXC_5j_s3;
+  TH1F * SETC;
+  TH1F * SETC_5j;
+  TH1F * SETC_5j_s3;
+  TH1F * SMETC;
+  TH1F * SMETC_5j;
+  TH1F * SMETC_5j_s3;
+
+  TH1F * DPtmod;
+  TH2F * DSET_DMET;
+  TH1F * DSET;
+  TH1F * DMET;
+
+  TH1F * ChangedNum;
+  TH1F * ChangedRatio;
+
+  // For Kolmogorov test
+  TH1F * KolmogorovTestMEt;
+  TH1F * KolMEt[50];
+  TH1F * KolmogorovTestSumEt;
+  TH1F * KolSumEt[50];
 
   // Collections labels
   // ------------------
@@ -110,4 +162,11 @@ private:
   edm::InputTag simpleTauLabel_;
   edm::InputTag summaryLabel_;
   edm::InputTag genJetLabel_;
+
+  // For multiplication
+  Multiplier * multiplier;
+  double minMultiplicationEt_;
+  double mEtAlpha_;
+  // Total number of events to generate (includes the original event as the first one)
+  int Ntot_;
 };
