@@ -19,7 +19,7 @@
 //
 // Original Author:  Marco De Mattia
 //         Created:  Tue May  8 13:05:37 CEST 2007
-// $Id: TDAna.h,v 1.13 2007/12/25 14:19:03 dorigo Exp $
+// $Id: TDAna.h,v 1.15 2008/01/08 16:53:20 dorigo Exp $
 //
 //
 
@@ -210,6 +210,7 @@ class TDAna : public edm::EDAnalyzer {
   TH2D * Perf02_;
   TH2D * Det2medall_;
   TH2D * Det2med07_;
+  TH2D * Hrecfrac_;
 
   TH1D * NJets_;
   TH1D * UncorrSumEt_;

@@ -101,17 +101,17 @@ TDAna::TDAna(const edm::ParameterSet& iConfig) :
   // Now do what ever initialization is needed
   // -----------------------------------------
   eventcounter_=0;
-  for ( int i=0; i<9; i++ ) {
-    grandtotaltt[i]=0;
-    grandtotalttpass[i]=0;
+  for ( int i=0; i<10; i++ ) {
+    grandtotalh[i]=0;
+    grandtotalhpass[i]=0;
     for ( int j=0; j<5; j++ ) {
       total[i][j]=0;
       totalpass[i][j]=0;
     }
   }
   for ( int j=0; j<5; j++ ) {
-    grandtotalh[j]=0;
-    grandtotalhpass[j]=0;
+    grandtotaltt[j]=0;
+    grandtotalttpass[j]=0;
   }
   grandgrandtotal=0;
   grandgrandtotalpass=0;
@@ -164,20 +164,21 @@ TDAna::TDAna(const edm::ParameterSet& iConfig) :
   // Histograms
   // ----------
   Nsltt_hjj=0.; // Counter of semileptonic tt decays with h->jj decays
-  Drmax_ = new TH2D ( "Drmax", "Drmax for choices of etmin, etamax", 7, 17.5, 52.5, 4, 1.25, 3.25 );
-  Drmedall_ = new TH2D ( "Drmedall", "Drmedall for choices of etmin, etamax", 7, 17.5, 52.5, 4, 1.25, 3.25 );
-  Drmed07_ = new TH2D ( "Drmed07", "Drmed07 for choices of etmin, etamax", 7, 17.5, 52.5, 4, 1.25, 3.25 );
-  N07_ = new TH2D ( "N07", "N07 for choices of etmin, etamax", 7, 17.5, 52.5, 4, 1.25, 3.25 );
-  N04_ = new TH2D ( "N04", "N04 for choices of etmin, etamax", 7, 17.5, 52.5, 4, 1.25, 3.25 );
-  N02_ = new TH2D ( "N02", "N02 for choices of etmin, etamax", 7, 17.5, 52.5, 4, 1.25, 3.25 );
-  Nlo_ = new TH2D ( "Nlo", "Nlo for choices of etmin, etamax", 7, 17.5, 52.5, 4, 1.25, 3.25 );
-  Detmedall_ = new TH2D ( "Detmedall", "Detmedall for choices of etmin, etamax", 7, 17.5, 52.5, 4, 1.25, 3.25 );
-  Detmed07_ = new TH2D ( "Detmed07", "Detmed07 for choices of etmin, etamax", 7, 17.5, 52.5, 4, 1.25, 3.25 );
-  Perf07_ = new TH2D ( "Perf07", "Perf07 for choices of etmin, etamax", 7, 17.5, 52.5, 4, 1.25, 3.25 );
-  Perf04_ = new TH2D ( "Perf04", "Perf04 for choices of etmin, etamax", 7, 17.5, 52.5, 4, 1.25, 3.25 );
-  Perf02_ = new TH2D ( "Perf02", "Perf02 for choices of etmin, etamax", 7, 17.5, 52.5, 4, 1.25, 3.25 );
-  Det2medall_ = new TH2D ( "Det2medall", "Detmedall for choices of etmin, etamax", 7, 17.5, 52.5, 4, 1.25, 3.25 );
-  Det2med07_ = new TH2D ( "Det2med07", "Detmed07 for choices of etmin, etamax", 7, 17.5, 52.5, 4, 1.25, 3.25 );
+  Drmax_ = new TH2D ( "Drmax", "Drmax for choices of etmin, etamax", 21, 14, 56, 11, 1.4, 3.6  );
+  Drmedall_ = new TH2D ( "Drmedall", "Drmedall for choices of etmin, etamax", 21, 14, 56, 11, 1.4, 3.6  );
+  Drmed07_ = new TH2D ( "Drmed07", "Drmed07 for choices of etmin, etamax", 21, 14, 56, 11, 1.4, 3.6  );
+  N07_ = new TH2D ( "N07", "N07 for choices of etmin, etamax", 21, 14, 56, 11, 1.4, 3.6  );
+  N04_ = new TH2D ( "N04", "N04 for choices of etmin, etamax", 21, 14, 56, 11, 1.4, 3.6  );
+  N02_ = new TH2D ( "N02", "N02 for choices of etmin, etamax", 21, 14, 56, 11, 1.4, 3.6  );
+  Nlo_ = new TH2D ( "Nlo", "Nlo for choices of etmin, etamax", 21, 14, 56, 11, 1.4, 3.6  );
+  Detmedall_ = new TH2D ( "Detmedall", "Detmedall for choices of etmin, etamax", 21, 14, 56, 11, 1.4, 3.6  );
+  Detmed07_ = new TH2D ( "Detmed07", "Detmed07 for choices of etmin, etamax", 21, 14, 56, 11, 1.4, 3.6  );
+  Perf07_ = new TH2D ( "Perf07", "Perf07 for choices of etmin, etamax", 21, 14, 56, 11, 1.4, 3.6  );
+  Perf04_ = new TH2D ( "Perf04", "Perf04 for choices of etmin, etamax", 21, 14, 56, 11, 1.4, 3.6  );
+  Perf02_ = new TH2D ( "Perf02", "Perf02 for choices of etmin, etamax", 21, 14, 56, 11, 1.4, 3.6  );
+  Det2medall_ = new TH2D ( "Det2medall", "Det2medall for choices of etmin, etamax", 21, 14, 56, 11, 1.4, 3.6  );
+  Det2med07_ = new TH2D ( "Det2med07", "Det2med07 for choices of etmin, etamax", 21, 14, 56, 11, 1.4, 3.6  );
+  Hrecfrac_ = new TH2D ( "Hrecfrac", "Hrecfrac for choices of etmin, etamax", 21, 14, 56, 11, 1.4, 3.6 );
 
   NJets_ = new TH1D ( "NJets", "Number of selected jets", 20, 0, 20 );
   UncorrHt_ = new TH1D ( "UncorrHt", "Ht with uncorrected jets", 50, 0, 4000 );
@@ -1112,6 +1113,7 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   double Parton_mass[8]={0.};
   double Parton_dec[8]={0.};
   int iparton=0;
+
   // NB we know that the block is filled with top and antitop first, then Higgs
   // So we need not worry about messing up W's from top and from H ...
   // --------------------------------------------------------------------------
@@ -1206,16 +1208,12 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   // -----------
   edm::Handle<OfflineJetCollection> caloJets;
   iEvent.getByLabel( offlineJetLabel_, caloJets );
-
+  
   // Preliminary creation of jet array ordered by Et for parton-jet matching study only
   // ----------------------------------------------------------------------------------
   if ( ( itdecay==1 || itdecay==2 || itdecay==3 ) && 
        ( hdecay==1 || hdecay==2 ) && 
-       caloJets->size() != 0 && response ) { // sl decay + h->cc,bb & jets exist
-   
-    if ( iparton!=6 ) {
-      cout << "something weird with np=" << iparton << " itdec=" << itdecay << " hdec=" << hdecay << endl;      
-    }
+       caloJets->size() != 0 && response && iparton==6 ) { // sl decay + h->cc,bb & jets exist
     double JPet[200]={0.};
     double JPeta[200]={0.};
     double JPphi[200]={0.};
@@ -1250,10 +1248,10 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
     // Study parton-jet matching
     // -------------------------
     bool ipass[8]; // whether a parton is associated to one of the leading jets
-    for ( int ietmin=0; ietmin<7; ietmin++ ) {
-      double etmin = 20.+5.*(double)ietmin;
-      for ( int ietamax=0; ietamax<4; ietamax++ ) {
-	double etamax = 1.5+0.5*(double)ietamax;
+    for ( int ietmin=0; ietmin<21; ietmin++ ) {
+      double etmin = 15.+2.*(double)ietmin;
+      for ( int ietamax=0; ietamax<11; ietamax++ ) {
+	double etamax = 1.5+0.2*(double)ietamax;
 	// Variables needed to fill histograms
 	// -----------------------------------
 	double drmax=0.;
@@ -1268,28 +1266,30 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	double det2med07=0.;
 	double det2medall=0.;
 	double nptotal=0.;
+	int ijh[2]={0};
+	int njh=0.;
 	for ( int ip=0; ip<8; ip++ ) { ipass[ip]=false; }; 
 	// Loop on jets
 	// ------------
 	int considered=0; // Consider at most 8 jets for the association
 	for ( int ij=0; ij<NJP; ij++ ) {
-	  if ( JPet[ij]>etmin && fabs(JPeta[ij])<etamax && considered<iparton ) {
+	  if ( JPet[ij]>etmin && fabs(JPeta[ij])<etamax && considered<8 ) {
 	    considered++;
 	    double drmin=1.0;
 	    double det=0.;
 	    double det2=0.;
 	    int tmpind=-1;
 	    for ( int ip=0; ip<iparton; ip++ ) {
-	      if ( !ipass[ij] ) {
+	      if ( !ipass[ip] ) { // this parton has not been used yet
 		double deta = Parton_eta[ip]-JPeta[ij];
-		double dphi = 3.1415926-fabs(fabs(Parton_phi[ip]-JPphi[ip])-3.1415926);
+		double dphi = 3.1415926-fabs(fabs(Parton_phi[ip]-JPphi[ij])-3.1415926);
 		double d_et = fabs(Parton_pt[ip]-JPet[ij])/Parton_pt[ip];
 		double dr2  = deta*deta+dphi*dphi; // +d_et*d_et;
 		if ( dr2<drmin ) {
 		  drmin=dr2;
 		  tmpind=ip;
-		  det=fabs(Parton_pt[ip]-JPet[ij])/Parton_pt[ip];
-		  det2=pow(Parton_pt[ip]-JPet[ij],2);
+		  det=(-Parton_pt[ip]+JPet[ij])/Parton_pt[ip];
+		  det2=pow((Parton_pt[ip]-JPet[ij])/Parton_pt[ip],2);
 		}
 	      }
 	    }
@@ -1311,9 +1311,21 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	      }
 	      if ( drmin<0.4 ) n04++;
 	      if ( drmin<0.2 ) n02++;
-	    } 
+	      if ( Parton_dec[tmpind]==5 ) {
+		// Special treatment for H daughters
+		// ---------------------------------
+		ijh[njh]=ij;
+		njh++;
+	      }
+	    } else { 
+	      // Count here how many jets among the first N (at most equal to the number of partons)
+	      // could not be associated reasonably to a parton
+	      // -----------------------------------------------------------------------------------
+	      if ( considered<iparton ) leftover++;
+	    }
 	  } // if there is a jet
 	} // ij
+	if ( ietmin+ietamax==0 ) cout << "Total associated partons = " << nptotal << " N07=" << n07 << endl;
 	if ( nptotal>0 ) { // total number of partons matched to one of the leading 8 jets
 	  drmedall=drmedall/nptotal;
 	  detmedall=detmedall/nptotal;
@@ -1324,7 +1336,21 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	  detmed07=detmed07/n07;
 	  det2med07=det2med07/n07;
 	}
-	leftover = iparton-nptotal;
+	// Mass of two jets from h
+	// -----------------------
+	double m45=0.;
+	if ( njh==2 ) {
+	  double px4=JPet[ijh[0]]*cos(JPphi[ijh[0]]);
+	  double px5=JPet[ijh[1]]*cos(JPphi[ijh[1]]);
+	  double py4=JPet[ijh[0]]*sin(JPphi[ijh[0]]);
+	  double py5=JPet[ijh[1]]*sin(JPphi[ijh[1]]);
+	  double pz4=JPet[ijh[0]]/tan(2*atan(exp(-JPeta[ijh[0]])));
+	  double pz5=JPet[ijh[1]]/tan(2*atan(exp(-JPeta[ijh[1]])));
+	  double e4 =sqrt(px4*px4+py4*py4+pz4*pz4);
+	  double e5 =sqrt(px5*px5+py5*py5+pz5*pz5);
+	  m45=(e4+e5)*(e4+e5)-(px4+px5)*(px4+px5)-(py4+py5)*(py4+py5)-(pz4+pz5)*(pz4+pz5);
+	  if ( m45>0 ) m45=sqrt(m45);
+	}
 	// Fill histograms
 	// ---------------
 	Drmedall_->Fill(etmin, etamax, drmedall);
@@ -1341,13 +1367,14 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	if ( n07==iparton ) Perf07_->Fill(etmin, etamax);
 	if ( n04==iparton ) Perf04_->Fill(etmin, etamax);
 	if ( n02==iparton ) Perf02_->Fill(etmin, etamax);
+	if ( fabs(m45-120)<20 ) Hrecfrac_->Fill(etmin,etamax);
       } // ietamax
     } // ietmin
     Nsltt_hjj++;
   } // if sl tt decay + h->cc,bb decay
-
-  /////////////////////////////////////////////////////////////////////////////////////
-
+  
+  ////////////////////////////////////////////////////////////////////////////////////
+  
   // Offline analysis
   // ----------------
 
@@ -3324,6 +3351,7 @@ void TDAna::endJob() {
   Perf02_->Scale(1./Nsltt_hjj);
   Det2med07_->Scale(1./Nsltt_hjj);
   Det2medall_->Scale(1./Nsltt_hjj);
+  Hrecfrac_->Scale(1./Nsltt_hjj);
   Drmax_->Write();
   Drmedall_->Write();
   Drmed07_->Write();
@@ -3338,6 +3366,7 @@ void TDAna::endJob() {
   Perf02_->Write();
   Det2med07_->Write();
   Det2medall_->Write();
+  Hrecfrac_->Write();
 
   // Histograms for events passing trigger
   // -------------------------------------
