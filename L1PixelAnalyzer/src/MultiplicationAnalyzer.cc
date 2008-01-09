@@ -247,6 +247,7 @@ void MultiplicationAnalyzer::analyze(const edm::Event& iEvent, const edm::EventS
   for ( int N=0; N<Ntot_; ++N, ++count ) {
     // Change the et of offlineJets associated to genJets
     if ( N > 0 ) {
+      multiplier->setAlpha( mEtAlpha_ );
       multiplier->generate();
       numChanged = multiplier->numChanged();
     }
@@ -357,7 +358,7 @@ void MultiplicationAnalyzer::analyze(const edm::Event& iEvent, const edm::EventS
 
   // Multiple passes to evaluate alpha factor:
   for ( int iAlpha=0; iAlpha<50; ++iAlpha ) {
-    double alpha = float(iAlpha+1)*0.1;
+    double alpha = float(iAlpha+1)*0.02;
     // Change the alpha factor and regenerate the event
     multiplier->setAlpha( alpha );
     multiplier->generate();
