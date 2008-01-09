@@ -26,7 +26,7 @@
 //      b-jets as in signal topology
 //    - revert logic of M3, M2 selection by first choosing b-pair, then finding
 //      best triplet among remaining jets, and look for W boson within those
-//    - compute minimum dijet mass in triplet which gives best top mass
+//    x compute minimum dijet mass in triplet which gives best top mass
 //    - compute angle between best triplet momentum and best b-pair momentum
 //    - compute mass of those two vectors (just mass of five included jets)
 //    - compute average |eta| of first 8 jets
@@ -48,6 +48,9 @@
 //    and if so, some smart way of taking into account correlations could be envisioned.
 //    (changes: etamax 2.5->3.0 and etmin 30->25).
 // 
+// 7) Added mwmin -> minimum dijet mass in chosen triplet.
+//
+//
 // --------------------------------------------------------------------------------
 //
 // #define DEBUG
@@ -1392,7 +1395,6 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	    }
 	  } // if there is a jet
 	} // ij
-	if ( ietmin+ietamax==0 ) cout << "Total associated partons = " << nptotal << " N07=" << n07 << endl;
 	if ( nptotal>0 ) { // total number of partons matched to one of the leading 8 jets
 	  drmedall=drmedall/nptotal;
 	  detmedall=detmedall/nptotal;
