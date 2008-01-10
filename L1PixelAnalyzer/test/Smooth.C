@@ -284,6 +284,8 @@ void Smooth (TString sel)
     Histo_TOT[ivar]->SetLineColor(kRed);
     Histo_TOT[ivar]->Draw("PE");    
     Histo_TOTS[ivar]->Draw("PESAME");
+    Histo_TOT[ivar]->Write();
+    Histo_TTH[ivar]->Write();
     Histo_TOTS[ivar]->Write();
     Histo_TTHS[ivar]->Write();
   }
