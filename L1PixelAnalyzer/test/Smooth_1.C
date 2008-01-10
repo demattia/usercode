@@ -1,12 +1,10 @@
-void Smooth (TString sel) 
+void Smooth_1 (TString v, TString sel) 
 {
 
   const int nbins = 50;
 
-  const int nvars=17;
-  TString var[nvars] = { "C8", "M8", "C6", "M6", "MEt", "MEtSig", "CorrSumEt", "GoodHt", 
-		      "M45bestall", "Chi2mass", "Chi2extall", "Mbbnoh", "DPbbnoh", 
-		      "SumHED4", "SumHED6", "DP12", "MEtDP2" };
+  const int nvars=1;
+  TString var[nvars] = v;
   TString pippo[nvars];
   TString pippotot[nvars];
   TString pippotth[nvars];
@@ -22,46 +20,46 @@ void Smooth (TString sel)
   
   const int nqcdsamples=8;
   TFile * QCD[nqcdsamples];     
-  QCD[0] = new TFile("./root/et30_eta2.5/TDAna_QCD30-50_tk3.root");
-  QCD[1] = new TFile("./root/et30_eta2.5/TDAna_QCD50-80_tk3.root");
-  QCD[2] = new TFile("./root/et30_eta2.5/TDAna_QCD80-120_tk3.root");
-  QCD[3] = new TFile("./root/et30_eta2.5/TDAna_QCD120-170_tk3.root");
-  QCD[4] = new TFile("./root/et30_eta2.5/TDAna_QCD170-230_tk3.root");
-  QCD[5] = new TFile("./root/et30_eta2.5/TDAna_QCD230-300_tk3.root");
-  QCD[6] = new TFile("./root/et30_eta2.5/TDAna_QCD300-380_tk3.root");
-  QCD[7] = new TFile("./root/et30_eta2.5/TDAna_QCD380incl_tk3.root");
+  QCD[0] = new TFile("./root/TDAna_QCD30-50_tk3.root");
+  QCD[1] = new TFile("./root/TDAna_QCD50-80_tk3.root");
+  QCD[2] = new TFile("./root/TDAna_QCD80-120_tk3.root");
+  QCD[3] = new TFile("./root/TDAna_QCD120-170_tk3.root");
+  QCD[4] = new TFile("./root/TDAna_QCD170-230_tk3.root");
+  QCD[5] = new TFile("./root/TDAna_QCD230-300_tk3.root");
+  QCD[6] = new TFile("./root/TDAna_QCD300-380_tk3.root");
+  QCD[7] = new TFile("./root/TDAna_QCD380incl_tk3.root");
   double QCDxs[nqcdsamples] = { 155929000., 20938850., 2949713., 499656., 100995.,  23855., 6391., 2821.};
   double NQCD[nqcdsamples] = { 86000., 78000., 104000., 96000., 100000., 102000., 112000., 102000.};
 
 
   const int nwsamples=11;
   TFile * W[nwsamples];
-  W[0] = new TFile ("./root/et30_eta2.5/TDAna_W0w_tk3.root");
-  W[1] = new TFile ("./root/et30_eta2.5/TDAna_W10w_tk3.root");
-  W[2] = new TFile ("./root/et30_eta2.5/TDAna_W11w_tk3.root");
-  W[3] = new TFile ("./root/et30_eta2.5/TDAna_W20w_tk3.root");
-  W[4] = new TFile ("./root/et30_eta2.5/TDAna_W21w_tk3.root");
-  W[5] = new TFile ("./root/et30_eta2.5/TDAna_W30w_tk3.root");
-  W[6] = new TFile ("./root/et30_eta2.5/TDAna_W31w_tk3.root");
-  W[7] = new TFile ("./root/et30_eta2.5/TDAna_W40w_tk3.root");
-  W[8] = new TFile ("./root/et30_eta2.5/TDAna_W41w_tk3.root");
-  W[9] = new TFile ("./root/et30_eta2.5/TDAna_W50w_tk3.root");
-  W[10] = new TFile ("./root/et30_eta2.5/TDAna_W51w_tk3.root");
+  W[0] = new TFile ("./root/TDAna_W0w_tk3.root");
+  W[1] = new TFile ("./root/TDAna_W10w_tk3.root");
+  W[2] = new TFile ("./root/TDAna_W11w_tk3.root");
+  W[3] = new TFile ("./root/TDAna_W20w_tk3.root");
+  W[4] = new TFile ("./root/TDAna_W21w_tk3.root");
+  W[5] = new TFile ("./root/TDAna_W30w_tk3.root");
+  W[6] = new TFile ("./root/TDAna_W31w_tk3.root");
+  W[7] = new TFile ("./root/TDAna_W40w_tk3.root");
+  W[8] = new TFile ("./root/TDAna_W41w_tk3.root");
+  W[9] = new TFile ("./root/TDAna_W50w_tk3.root");
+  W[10] = new TFile ("./root/TDAna_W51w_tk3.root");
   double Wxs[nwsamples] = { 45000., 9200., 250., 2500., 225., 590., 100., 125., 40., 85., 40. };
   double NW[nwsamples] = { 88000., 40000., 100530., 99523., 105255., 79000., 
 			   88258., 83038., 30796., 59022., 41865. };
 
-  TFile * TTH = new TFile("./root/et30_eta2.5/TDAna_ttH_120_tk3.root");
+  TFile * TTH = new TFile("./root/TDAna_ttH_120_tk3.root");
   double TTHxs = 0.667 ;
   double NTTH = 62000.; // 1652000.; // 62000.;
 
   const int nttsamples=5;
   TFile * TT[nttsamples];
-  TT[0] = new TFile("./root/et30_eta2.5/TDAna_TT0_tk3.root");
-  TT[1] = new TFile("./root/et30_eta2.5/TDAna_TT1_tk3.root");
-  TT[2] = new TFile("./root/et30_eta2.5/TDAna_TT2_tk3.root");
-  TT[3] = new TFile("./root/et30_eta2.5/TDAna_TT3_tk3.root");
-  TT[4] = new TFile("./root/et30_eta2.5/TDAna_TT4_tk3.root");
+  TT[0] = new TFile("./root/TDAna_TT0_tk3.root");
+  TT[1] = new TFile("./root/TDAna_TT1_tk3.root");
+  TT[2] = new TFile("./root/TDAna_TT2_tk3.root");
+  TT[3] = new TFile("./root/TDAna_TT3_tk3.root");
+  TT[4] = new TFile("./root/TDAna_TT4_tk3.root");
   // double TTxs[5] = { 619., 176., 34.,  6., 1.5 };  // from web
   double TTxs[nttsamples] = { 434., 162., 43., 10., 1.9 };     // from note
   double NTT[nttsamples] = { 57900., 66000., 98159., 14768., 5304. };
@@ -269,38 +267,24 @@ void Smooth (TString sel)
 
   } // end of ivar loop
 
-  cout << "Done, now plotting and writing histos." << endl;
-
   TString fname;
-  fname="functionfile"+sel+".root";
+  fname="./root/"+v+sel+".root";
 
   TFile * Smoothed = new TFile(fname,"RECREATE");
   Smoothed->cd();
 
   TCanvas * b1 = new TCanvas ("b1", "Kinematics comparison", 600, 600 );
-  b1->Divide(3,3);
-  for ( int ivar=0; ivar<9; ivar++ ) {
+  for ( int ivar=0; ivar<nvars; ivar++ ) {
     b1->cd(ivar+1);
     Histo_TOTS[ivar]->SetMinimum(0.);
     Histo_TOTS[ivar]->Draw();
     Histo_TTHS[ivar]->SetLineColor(kBlue);
     Histo_TTHS[ivar]->Draw("PESAME");
   }
-  b1->Print("./ps/Smooth_svsb_1.ps");
-  TCanvas * b2 = new TCanvas ("b2", "Kinematics comparison", 600, 600 );
-  b2->Divide(3,3);
-  for ( int ivar=9; ivar<nvars; ivar++ ) {
-    b2->cd(ivar-8);
-    Histo_TOTS[ivar]->SetMinimum(0.);
-    Histo_TOTS[ivar]->Draw();
-    Histo_TTHS[ivar]->SetLineColor(kBlue);
-    Histo_TTHS[ivar]->Draw("PESAME");
-  }
-  b2->Print("./ps/Smooth_svsb_2.ps");
+  b1->Print("./ps/"+v+"_smooth_svsb_1.ps");
 
   TCanvas * b3 = new TCanvas ("b3", "Kinematics comparison", 600, 600 );
-  b3->Divide(3,3);
-  for ( int ivar=0; ivar<9; ivar++ ) {
+  for ( int ivar=0; ivar<nvars; ivar++ ) {
     b3->cd(ivar+1);
     Histo_TOT[ivar]->SetMinimum(0.);
     Histo_TOT[ivar]->SetLineColor(kRed);
@@ -311,21 +295,7 @@ void Smooth (TString sel)
     Histo_TOTS[ivar]->Write();
     Histo_TTHS[ivar]->Write();
   }
-  b3->Print("./ps/Smooth_check_1.ps");
-  TCanvas * b4 = new TCanvas ("b4", "Kinematics comparison", 600, 600 );
-  b4->Divide(3,3);
-  for ( int ivar=9; ivar<nvars; ivar++ ) {
-    b4->cd(ivar-8);
-    Histo_TOT[ivar]->SetMinimum(0.);
-    Histo_TOT[ivar]->SetLineColor(kRed);
-    Histo_TOT[ivar]->Draw("PE");    
-    Histo_TOTS[ivar]->Draw("PESAME");
-    Histo_TOT[ivar]->Write();
-    Histo_TTH[ivar]->Write();
-    Histo_TOTS[ivar]->Write();
-    Histo_TTHS[ivar]->Write();
-  }
-  b4->Print("./ps/Smooth_check_2.ps");
+  b3->Print("./ps/"+v+"_smooth_check_1.ps");
 
   Smoothed->Close();
 

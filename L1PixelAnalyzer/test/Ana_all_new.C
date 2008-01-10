@@ -34,7 +34,7 @@ void Ana_all (TString var, TString sel )
 
   TFile * TTH = new TFile("./root/TDAna_ttH_120_tk3.root");
   double TTHxs = 0.667 ;
-  double NTTH = 62000.;
+  double NTTH = 1000000.; // 1652000.; // 96000.;
 
   TFile * TT[5];
   TT[0] = new TFile("./root/TDAna_TT0_tk3.root");
@@ -125,7 +125,7 @@ void Ana_all (TString var, TString sel )
       }
     }
   }
-
+  
   double totTT[nbins]={0.};
   double s2_totTT[nbins]={0.};
   for ( int i=0; i<5; i++ ) {
@@ -163,10 +163,10 @@ void Ana_all (TString var, TString sel )
     Histo_TOT->SetBinContent(ibin,grandtot);
     Histo_TOT->SetBinError(ibin,grandtote);
   }
-
+  
   TCanvas * b = new TCanvas ("b", "Kinematics comparison", 700, 700 );
   b->Divide(1,2);
-
+  
   b->cd(1);
   b->GetPad(1)->SetLogy();
   Histo_TOT->SetMarkerStyle(20);
@@ -222,5 +222,140 @@ void Ana_all (TString var, TString sel )
   //     TT[i]->Close();
   //   }
   //   TTH->Close();
+  
+  ////////////////////////////////////////////////////////
+  
+//   // Now compute max quality factor for this distribution
+//   // -----------------------------------------------------
+//   TH1F * S_ = new TH1F ( "S", "S", 50, minx, maxx );
+//   TH1F * B_ = new TH1F ( "B", "B", 50, minx, maxx );
+//   TH1F * ES_ = new TH1F ( "ES", "ES", 50, minx, maxx );
+//   TH1F * EB_ = new TH1F ( "EB", "EB", 50, minx, maxx);  
+//   TH1F * R_ = new TH1F ( "R", "R", 50, minx, maxx );
+//   TH1F * Q_ = new TH1F ( "Q", "Q", 50, minx, maxx );
+  
+//   double IS = Histo_TTH->Integral();
+//   double IB = Histo_TOT->Integral();
+//   double es[nbins];
+//   double s_es[nbins];
+//   double eb[nbins];
+//   double s_eb[nbins];
+//   double maxS=0;
+//   double maxB=0;
+//   for ( int ibin=1; ibin<=nbins; ibin++ ) {
+//     S_->SetBinContent(ibin,Histo_TTH->GetBinContent(ibin)/IS);
+//     S_->SetBinError(ibin,Histo_TTH->GetBinError(ibin)/IS);
+//     if ( maxS<Histo_TTH->GetBinContent(ibin)/IS ) maxS=Histo_TTH->GetBinContent(ibin)/IS;
+//     B_->SetBinContent(ibin,Histo_TOT->GetBinContent(ibin)/IB);
+//     B_->SetBinError(ibin,Histo_TOT->GetBinError(ibin)/IB);
+//     if ( maxB<Histo_TOT->GetBinContent(ibin)/IB ) maxB=Histo_TOT->GetBinContent(ibin)/IB;
+//     double fs=0;    // signal failing cut
+//     double s2_fs=0;
+//     double ps=0;    // signal passing cut
+//     double s2_ps=0;
+//     double fb=0;    // background failing cut
+//     double s2_fb=0;
+//     double pb=0;    // background passing cut
+//     double s2_pb=0;
+//     for ( int jbin=1; jbin<=nbins; jbin++ ) {
+//       if ( jbin<ibin ) { 
+// 	fs    += Histo_TTH->GetBinContent(jbin);
+// 	s2_fs += Histo_TTH->GetBinError(jbin);
+//       }
+//       if ( jbin>=ibin ) {
+// 	ps    += Histo_TTH->GetBinContent(jbin);
+// 	s2_ps += Histo_TTH->GetBinError(jbin);
+//       }
+//     }
+//     for ( int jbin=1; jbin<=nbins; jbin++ ) {
+//       if ( jbin<ibin ) { 
+// 	fb    += Histo_TOT->GetBinContent(jbin);
+// 	s2_fb += Histo_TOT->GetBinError(jbin);
+//       }
+//       if ( jbin>=ibin ) {
+// 	pb    += Histo_TOT->GetBinContent(jbin);
+// 	s2_pb += Histo_TOT->GetBinError(jbin);
+//       }
+//     }
+//     if ( fs+ps>0 ) {
+//       es[ibin-1]=ps/(fs+ps);
+//       s_es[ibin-1]=sqrt(ps*ps*s2_fs+fs*fs*s2_ps)/pow(fs+ps,2);
+//     } else {
+//       es[ibin-1]=0;
+//       s_es[ibin-1]=0;
+//     }
+//     ES->SetBinContent(ibin,es[ibin-1]);
+//     ES->SetBinError(ibin,s_es[ibin-1]);
+//     if ( fb+pb>0 ) {
+//       eb[ibin-1]=pb/(fb+pb);
+//       s_eb[ibin-1]=sqrt(pb*pb*s2_fb+fb*fb*s2_pb)/pow(fb+pb,2);
+//     } else {
+//       eb[ibin-1]=0;
+//       s_eb[ibin-1]=0;
+//     }
+//     EB->SetBinContent(ibin,eb[ibin-1]);
+//     EB->SetBinError(ibin,s_eb[ibin-1]);
+//   }
+  
+//   double R;
+//   double s_R;
+//   double Q;
+//   double s_Q;
+//   double maxQm1s=0;
+//   double s_maxQm1s=0;
+//   double x_maxQ=0;
+//   for ( int ibin=1; ibin<=nbins; ibin++ ) {
+//     if ( eb[ibin-1]>0 ) {
+//       R = es[ibin-1]/eb[ibin-1];
+//       s_R = sqrt(s_es[ibin-1]*s_es[ibin-1]/eb[ibin-1]/eb[ibin-1]+
+// 		 es[ibin-1]*es[ibin-1]*s_eb[ibin-1]*s_eb[ibin-1]/pow(eb[ibin-1],4));
+//       Q = es[ibin-1]*es[ibin-1]/eb[ibin-1];
+//       s_Q = sqrt(pow(2*es[ibin-1]/eb[ibin-1]*s_es[ibin-1],2)+pow(es[ibin-1]/eb[ibin-1],4)*pow(s_eb[ibin-1],2));
+//     } else {
+//       R = es[ibin-1]/0.1;
+//       s_R = sqrt(pow(s_es[ibin-1]/0.1,2)+
+// 		 pow(es[ibin-1]*s_eb[ibin-1],2)/pow(0.1,4));
+//       Q = es[ibin-1]*es[ibin-1]/0.1;
+//       s_Q = sqrt(pow(2*es[ibin-1]/0.1*s_es[ibin-1],2)+pow(es[ibin-1]/0.1,4)*pow(s_eb[ibin-1],2));
+//     }
+//     R_->SetBinContent(ibin,R);
+//     R_->SetBinError(ibin,s_R);
+//     Q_->SetBinContent(ibin,Q);
+//     Q_->SetBinError(ibin,s_Q);
+//     if ( maxQm1s<Q-s_Q ) {
+//       maxQm1s=Q;
+//       s_maxQm1s=s_Q;
+//       x_maxQ=(double)ibin*(maxx-minx)/(double)nbins;
+//     } 
+//   }
+//   double maxX=maxS;
+//   if (maxB>maxX) maxX=maxB;
+//   cout << endl;
+//   cout << "Maximum quality factor: " << maxQm1s << "+-" << s_maxQm1s << " at x > " << x_maxQ << endl; 
+//   cout << "--------------------------------------------------------------------" << endl;
+  
+//   TCanvas * b = new TCanvas ("b", "Cut optimization", 500, 500 );
+//   b->Divide(2,2);
+//   b->cd(1);
+//   S_->SetMaximum(1.2*maxX);
+//   S_->SetLineColor(kRed);
+//   S_->SetMarkerColor(kRed);
+//   S_->Draw("PE");
+//   B_->SetLineColor(kBlue);
+//   B_->SetMarkerColor(kBlue);
+//   B_->Draw("PESAME");
+//   b->cd(2);
+//   ES_->SetLineColor(kRed);
+//   ES_->SetMarkerColor(kRed);
+//   ES_->Draw("PE");
+//   EB_->SetLineColor(kBlue);
+//   EB_->SetMarkerColor(kBlue);
+//   EB_->Draw("PESAME");
+//   b->cd(3);
+//   R_->Draw("PE");
+//   b->cd(4);
+//   Q_->Draw("PE");
+//   b->Print(pippo+"_opt.ps");
+
 
 }
