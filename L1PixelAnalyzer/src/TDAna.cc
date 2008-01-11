@@ -48,8 +48,6 @@
 //    and if so, some smart way of taking into account correlations could be envisioned.
 //    (changes: etamax 2.5->3.0 and etmin 30->25).
 // 
-// 7) Added mwmin -> minimum dijet mass in chosen triplet.
-//
 //
 // --------------------------------------------------------------------------------
 //
@@ -127,6 +125,10 @@ TDAna::TDAna(const edm::ParameterSet& iConfig) :
   }
   grandgrandtotal=0;
   grandgrandtotalpass=0;
+  for ( int i=0; i<1000; i++ ) {
+    H[i]=0.;
+    Hnot[i]=0.;
+  }
 
   // Load file with smoothed histograms to use for Likelihood definition
   // -------------------------------------------------------------------
@@ -134,26 +136,26 @@ TDAna::TDAna(const edm::ParameterSet& iConfig) :
   FunctionFile->cd();
   HSS_sig[0] = dynamic_cast<TH1D*> ( FunctionFile->Get("C8SS_sigS"));
   HSS_bgr[0] = dynamic_cast<TH1D*> ( FunctionFile->Get("C8SS_bgrS"));
-  HSS_sig[1] = dynamic_cast<TH1D*> ( FunctionFile->Get("M45bestallSS_sigS"));
-  HSS_bgr[1] = dynamic_cast<TH1D*> ( FunctionFile->Get("M45bestallSS_bgrS"));
-  HSS_sig[2] = dynamic_cast<TH1D*> ( FunctionFile->Get("Chi2extallSS_sigS"));
-  HSS_bgr[2] = dynamic_cast<TH1D*> ( FunctionFile->Get("Chi2extallSS_bgrS"));
-  HSS_sig[3] = dynamic_cast<TH1D*> ( FunctionFile->Get("MEtSigSS_sigS"));
-  HSS_bgr[3] = dynamic_cast<TH1D*> ( FunctionFile->Get("MEtSigSS_bgrS"));
-  HSS_sig[4] = dynamic_cast<TH1D*> ( FunctionFile->Get("M8SS_sigS"));
-  HSS_bgr[4] = dynamic_cast<TH1D*> ( FunctionFile->Get("M8SS_bgrS"));
-  HSS_sig[5] = dynamic_cast<TH1D*> ( FunctionFile->Get("MEtSS_sigS"));
-  HSS_bgr[5] = dynamic_cast<TH1D*> ( FunctionFile->Get("MEtSS_bgrS"));
-  HSS_sig[6] = dynamic_cast<TH1D*> ( FunctionFile->Get("DP12SS_sigS"));
-  HSS_bgr[6] = dynamic_cast<TH1D*> ( FunctionFile->Get("DP12SS_bgrS"));
-  HSS_sig[7] = dynamic_cast<TH1D*> ( FunctionFile->Get("MEtDP2SS_sigS"));
-  HSS_bgr[7] = dynamic_cast<TH1D*> ( FunctionFile->Get("MEtDP2SS_bgrS"));
-  HSS_sig[8] = dynamic_cast<TH1D*> ( FunctionFile->Get("C6SS_sigS"));
-  HSS_bgr[8] = dynamic_cast<TH1D*> ( FunctionFile->Get("C6SS_bgrS"));
-  HSS_sig[9] = dynamic_cast<TH1D*> ( FunctionFile->Get("M6SS_sigS"));
-  HSS_bgr[9] = dynamic_cast<TH1D*> ( FunctionFile->Get("M6SS_bgrS"));
-  HSS_sig[10]= dynamic_cast<TH1D*> ( FunctionFile->Get("CorrSumEtSS_sigS"));
-  HSS_bgr[10]= dynamic_cast<TH1D*> ( FunctionFile->Get("CorrSumEtSS_bgrS"));
+  HSS_sig[1] = dynamic_cast<TH1D*> ( FunctionFile->Get("M8SS_sigS"));
+  HSS_bgr[1] = dynamic_cast<TH1D*> ( FunctionFile->Get("M8SS_bgrS"));
+  HSS_sig[2] = dynamic_cast<TH1D*> ( FunctionFile->Get("C6SS_sigS"));
+  HSS_bgr[2] = dynamic_cast<TH1D*> ( FunctionFile->Get("C6SS_bgrS"));
+  HSS_sig[3] = dynamic_cast<TH1D*> ( FunctionFile->Get("M6SS_sigS"));
+  HSS_bgr[3] = dynamic_cast<TH1D*> ( FunctionFile->Get("M6SS_bgrS"));
+  HSS_sig[4] = dynamic_cast<TH1D*> ( FunctionFile->Get("MEtSigSS_sigS"));
+  HSS_bgr[4] = dynamic_cast<TH1D*> ( FunctionFile->Get("MEtSigSS_bgrS"));
+  HSS_sig[5] = dynamic_cast<TH1D*> ( FunctionFile->Get("CorrSumEtSS_sigS"));
+  HSS_bgr[5] = dynamic_cast<TH1D*> ( FunctionFile->Get("CorrSumEtSS_bgrS"));
+  HSS_sig[6] = dynamic_cast<TH1D*> ( FunctionFile->Get("Chi2massSS_sigS"));
+  HSS_bgr[6] = dynamic_cast<TH1D*> ( FunctionFile->Get("Chi2massSS_bgrS"));
+  HSS_sig[7] = dynamic_cast<TH1D*> ( FunctionFile->Get("MEtDP1SS_sigS"));
+  HSS_bgr[7] = dynamic_cast<TH1D*> ( FunctionFile->Get("MEtDP1SS_bgrS"));
+  HSS_sig[8] = dynamic_cast<TH1D*> ( FunctionFile->Get("M45bestSS_sigS"));
+  HSS_bgr[8] = dynamic_cast<TH1D*> ( FunctionFile->Get("M45bestSS_bgrS"));
+  HSS_sig[9] = dynamic_cast<TH1D*> ( FunctionFile->Get("M_othersSS_sigS"));
+  HSS_bgr[9] = dynamic_cast<TH1D*> ( FunctionFile->Get("M_othersSS_bgrS"));
+  HSS_sig[10]= dynamic_cast<TH1D*> ( FunctionFile->Get("Et6SS_sigS"));
+  HSS_bgr[10]= dynamic_cast<TH1D*> ( FunctionFile->Get("Et6SS_bgrS"));
   //  FunctionFile->Close();
 
   // File with HED and HPD distributions from QCD jets
@@ -196,7 +198,15 @@ TDAna::TDAna(const edm::ParameterSet& iConfig) :
   MHbest_ = new TH1D ( "MHbest", "Best H mass from jets ass to H partons", 50, 0, 200 );
   MTbest_ = new TH1D ( "MTbest", "Best T mass from jets ass to T partons", 50, 0, 300 );
   MWbest_ = new TH1D ( "MWbest", "Best W mass from jets ass to W partons", 50, 0, 200 );
-
+  HBJ_etrank_ = new TH1D ( "HBJ_etrank", "Rank in Et of b-jets from H decay", 8, -0.5, 7.5 );
+  Hpt_ = new TH1D ( "Hpt", "Pt of best H mass", 50, 0, 500 );
+  Heta_ = new TH1D ( "Heta", "Eta of H from jets", 50, 0., 4.);
+  Hdr_ = new TH1D ( "Hdr", "Delta R of b-jets from H", 50, 0., 4. );
+  MHnot_ = new TH1D ( "MHnot", "H mass from jets NOT ass to H partons", 50, 0, 200 ); 
+  Hnotpt_ = new TH1D ( "Hnotpt", "Pt of b jets NOT from H", 50, 0, 500 );
+  Hnoteta_ = new TH1D ( "Hnoteta", "Eta of H from NOT H jets", 50, 0., 4.);
+  Hnotdr_ = new TH1D ( "Hnotdr", "Delta R of b-jets NOT from H", 50, 0., 4. );
+  
   NJets_ = new TH1D ( "NJets", "Number of selected jets", 20, 0, 20 );
   UncorrHt_ = new TH1D ( "UncorrHt", "Ht with uncorrected jets", 50, 0, 4000 );
   CorrHt_ = new TH1D ( "CorrHt", "Ht with corrected jets", 50, 0, 4000 );
@@ -240,6 +250,8 @@ TDAna::TDAna(const edm::ParameterSet& iConfig) :
   HPD_ = new TH1D ( "HPD", "High pur discriminator", 200, 0., 40. );      
   Et6_ = new TH1D ( "Et6", "Et of sixth jet", 50, 0., 150. );
   Mwmin_ = new TH1D ( "Mwmin", "Minimum dijet mass in best triplet", 50, 0., 200. );
+  Hbestcomb_ = new TH1D ( "Hbestcomb", "Best H mass combination", 50, 0., 400. );
+  Drpairbestall_ = new TH1D ( "Drpairbestall", "Dr of best bb pair", 50, 0., 4. );
 
   NJetsN_ = new TH1D ( "NJetsN", "Number of selected jets", 20, 0, 20 );
   UncorrHtN_ = new TH1D ( "UncorrHtN", "Ht with uncorrected jets", 50, 0, 4000 );
@@ -284,6 +296,8 @@ TDAna::TDAna(const edm::ParameterSet& iConfig) :
   HPDN_ = new TH1D ( "HPDN", "High pur discriminator", 200, 0., 40. );      
   Et6N_ = new TH1D ( "Et6N", "Et of sixth jet", 50, 0., 150. );
   MwminN_ = new TH1D ( "MwminN", "Minimum dijet mass in best triplet", 50, 0., 200. );
+  HbestcombN_ = new TH1D ( "HbestcombN", "Best H mass combination", 50, 0., 400. );
+  DrpairbestallN_ = new TH1D ( "DrpairbestallN", "Dr of best bb pair", 50, 0., 4. );
 
   NJetsS_ = new TH1D ( "NJetsS", "Number of selected jets", 20, 0, 20 );
   UncorrHtS_ = new TH1D ( "UncorrHtS", "Ht with uncorrected jets", 50, 0, 4000 );
@@ -328,6 +342,8 @@ TDAna::TDAna(const edm::ParameterSet& iConfig) :
   HPDS_ = new TH1D ( "HPDS", "High eff discriminator", 200, 0., 40. );       
   Et6S_ = new TH1D ( "Et6S", "Et of sixth jet", 50, 0., 150. );
   MwminS_ = new TH1D ( "MwminS", "Minimum dijet mass in best triplet", 50, 0., 200. );
+  HbestcombS_ = new TH1D ( "HbestcombS", "Best H mass combination", 50, 0., 400. );
+  DrpairbestallS_ = new TH1D ( "DrpairbestallS", "Dr of best bb pair", 50, 0., 4. );
 
   NJetsSN_ = new TH1D ( "NJetsSN", "Number of selected jets", 20, 0, 20 );
   UncorrHtSN_ = new TH1D ( "UncorrHtSN", "Ht with uncorrected jets", 50, 0, 4000 );
@@ -372,6 +388,8 @@ TDAna::TDAna(const edm::ParameterSet& iConfig) :
   HPDSN_ = new TH1D ( "HPDSN", "High pur discriminator", 200, 0., 40. );     
   Et6SN_ = new TH1D ( "Et6SN", "Et of sixth jet", 50, 0., 150. );
   MwminSN_ = new TH1D ( "MwminSN", "Minimum dijet mass in best triplet", 50, 0., 200. );
+  HbestcombSN_ = new TH1D ( "HbestcombSN", "Best H mass combination", 50, 0., 400. );
+  DrpairbestallSN_ = new TH1D ( "DrpairbestallSN", "Dr of best bb pair", 50, 0., 4. );
 
   NJetsSS_ = new TH1D ( "NJetsSS", "Number of selected jets", 20, 0, 20 );
   UncorrHtSS_ = new TH1D ( "UncorrHtSS", "Ht with uncorrected jets", 50, 0, 4000 );
@@ -416,6 +434,8 @@ TDAna::TDAna(const edm::ParameterSet& iConfig) :
   HPDSS_ = new TH1D ( "HPDSS", "High eff discriminator", 200, 0., 40. );     
   Et6SS_ = new TH1D ( "Et6SS", "Et of sixth jet", 50, 0., 150. );
   MwminSS_ = new TH1D ( "MwminSS", "Minimum dijet mass in best triplet", 50, 0., 200. );
+  HbestcombSS_ = new TH1D ( "HbestcombSS", "Best H mass combination", 50, 0., 400. );
+  DrpairbestallSS_ = new TH1D ( "DrpairbestallSS", "Dr of best bb pair", 50, 0., 4. );
 
   NJetsSSN_ = new TH1D ( "NJetsSSN", "Number of selected jets", 20, 0, 20 );
   UncorrHtSSN_ = new TH1D ( "UncorrHtSSN", "Ht with uncorrected jets", 50, 0, 4000 );
@@ -460,6 +480,8 @@ TDAna::TDAna(const edm::ParameterSet& iConfig) :
   HPDSSN_ = new TH1D ( "HPDSSN", "High pur discriminator", 200, 0., 40. );   
   Et6SSN_ = new TH1D ( "Et6SSN", "Et of sixth jet", 50, 0., 150. );
   MwminSSN_ = new TH1D ( "MwminSSN", "Minimum dijet mass in best triplet", 50, 0., 200. );
+  HbestcombSSN_ = new TH1D ( "HbestcombSSN", "Best H mass combination", 50, 0., 400. );
+  DrpairbestallSSN_ = new TH1D ( "DrpairbestallSSN", "Dr of best bb pair", 50, 0., 4. );
 
   NJetsSSS_ = new TH1D ( "NJetsSSS", "Number of selected jets", 20, 0, 20 );
   UncorrHtSSS_ = new TH1D ( "UncorrHtSSS", "Ht with uncorrected jets", 50, 0, 4000 );
@@ -504,6 +526,8 @@ TDAna::TDAna(const edm::ParameterSet& iConfig) :
   HPDSSS_ = new TH1D ( "HPDSSS_", "High eff discriminator", 200, 0., 40. );  
   Et6SSS_ = new TH1D ( "Et6SSS", "Et of sixth jet", 50, 0., 150. );
   MwminSSS_ = new TH1D ( "MwminSSS", "Minimum dijet mass in best triplet", 50, 0., 200. );
+  HbestcombSSS_ = new TH1D ( "HbestcombSSS", "Best H mass combination", 50, 0., 400. );
+  DrpairbestallSSS_ = new TH1D ( "DrpairbestallSSS", "Dr of best bb pair", 50, 0., 4. );
 
   NJetsSSSN_ = new TH1D ( "NJetsSSSN", "Number of selected jets", 20, 0, 20 );
   UncorrHtSSSN_ = new TH1D ( "UncorrHtSSSN", "Ht with uncorrected jets", 50, 0, 4000 );
@@ -548,6 +572,8 @@ TDAna::TDAna(const edm::ParameterSet& iConfig) :
   HPDSSSN_ = new TH1D ( "HPDSSSN", "High pur discriminator", 200, 0., 40. ); 
   Et6SSSN_ = new TH1D ( "Et6SSSN", "Et of sixth jet", 50, 0., 150. );
   MwminSSSN_ = new TH1D ( "MwminSSSN", "Minimum dijet mass in best triplet", 50, 0., 200. );
+  HbestcombSSSN_ = new TH1D ( "HbestcombSSSN", "Best H mass combination", 50, 0., 400. );
+  DrpairbestallSSSN_ = new TH1D ( "DrpairbestallSSSN", "Dr of best bb pair", 50, 0., 4. );
 
   N4NJSSS_ = new TH1D ( "N4NJSSS", "N of 4HEL tags vs N jets", 
 			20, 0, 20 );  // These are filled only for this
@@ -597,6 +623,8 @@ TDAna::TDAna(const edm::ParameterSet& iConfig) :
   HPDW_ = new TH1D ( "HPDW", "High pur discriminator", 200, 0., 40. );     
   Et6W_ = new TH1D ( "Et6W", "Et of sixth jet", 50, 0., 150. );
   MwminW_ = new TH1D ( "MwminW", "Minimum dijet mass in best triplet", 50, 0., 200. );
+  HbestcombW_ = new TH1D ( "HbestcombW", "Best H mass combination", 50, 0., 400. );
+  DrpairbestallW_ = new TH1D ( "DrpairbestallW", "Dr of best bb pair", 50, 0., 4. );
 
   NJetsSW_ = new TH1D ( "NJetsSW", "Number of selected jets", 20, 0, 20 );
   UncorrHtSW_ = new TH1D ( "UncorrHtSW", "Ht with uncorrected jets", 50, 0, 4000 );
@@ -641,6 +669,8 @@ TDAna::TDAna(const edm::ParameterSet& iConfig) :
   HPDSW_ = new TH1D ( "HPDSW", "High pur discriminator", 200, 0., 40. );   
   Et6SW_ = new TH1D ( "Et6SW", "Et of sixth jet", 50, 0., 150. );
   MwminSW_ = new TH1D ( "MwminSW", "Minimum dijet mass in best triplet", 50, 0., 200. );
+  HbestcombSW_ = new TH1D ( "HbestcombSW", "Best H mass combination", 50, 0., 400. );
+  DrpairbestallSW_ = new TH1D ( "DrpairbestallSW", "Dr of best bb pair", 50, 0., 4. );
 
   NJetsSSW_ = new TH1D ( "NJetsSSW", "Number of selected jets", 20, 0, 20 );
   UncorrHtSSW_ = new TH1D ( "UncorrHtSSW", "Ht with uncorrected jets", 50, 0, 4000 );
@@ -685,6 +715,8 @@ TDAna::TDAna(const edm::ParameterSet& iConfig) :
   HPDSSW_ = new TH1D ( "HPDSSW", "High pur discriminator", 200, 0., 40. ); 
   Et6SSW_ = new TH1D ( "Et6SSW", "Et of sixth jet", 50, 0., 150. );
   MwminSSW_ = new TH1D ( "MwminSSW", "Minimum dijet mass in best triplet", 50, 0., 200. );
+  HbestcombSSW_ = new TH1D ( "HbestcombSSW", "Best H mass combination", 50, 0., 400. );
+  DrpairbestallSSW_ = new TH1D ( "DrpairbestallSSW", "Dr of best bb pair", 50, 0., 4. );
 
   NJetsSSSW_ = new TH1D ( "NJetsSSSW", "Number of selected jets", 20, 0, 20 );
   UncorrHtSSSW_ = new TH1D ( "UncorrHtSSSW", "Ht with uncorrected jets", 50, 0, 4000 );
@@ -729,6 +761,8 @@ TDAna::TDAna(const edm::ParameterSet& iConfig) :
   HPDSSSW_ = new TH1D ( "HPDSSSW", "High pur discriminator", 200, 0., 40. ); 
   Et6SSSW_ = new TH1D ( "Et6SSSW", "Et of sixth jet", 50, 0., 150. );
   MwminSSSW_ = new TH1D ( "MwminSSSW", "Minimum dijet mass in best triplet", 50, 0., 200. );
+  HbestcombSSSW_ = new TH1D ( "HbestcombSSSW", "Best H mass combination", 50, 0., 400. );
+  DrpairbestallSSSW_ = new TH1D ( "DrpairbestallSSSW", "Dr of best bb pair", 50, 0., 4. );
 
   N4NJSSSW_ = new TH1D ( "N4NJSSSW", "N of 4HEL tags vs N jets", 20, 0, 20 );
   E4NJSSSW_ = new TH1D ( "E4NJSSSW", "Efficiency of 4HEL tags vs N jets", 20, 0, 20 );
@@ -743,9 +777,12 @@ TDAna::TDAna(const edm::ParameterSet& iConfig) :
   CorrMEt_SumEtJ_ = new TH2D ( "CorrMEt_SumEtJ", "MEt vs SumEt", 100, 0, 4000, 100, 0, 1000 );
   MEt_SumEtJ_ = new TH2D ( "MEt_SumEtJ", "MEt vs SumEt", 100, 0, 4000, 100, 0, 1000 );
   
-  loose_  = 2.3; // high eff -> 70.49% b / 32.33% c / 8.64% uds / 10.43% g / 9.98% udsg // P.Schilling 23/10/07
-  medium_ = 5.3; // high eff -> 50.30% b / 10.77% c / 0.92% uds /  0.98% g / 0.96% udsg // P.Schilling 23/10/07
-  tight_  = 4.8; // high pur -> 31.94% b /  2.93% c / 0.10% uds /  0.11% g / 0.10% udsg // P.Schilling 23/10/07
+  loose_  = 2.3; 
+  // high eff -> 70.49% b / 32.33% c / 8.64% uds / 10.43% g / 9.98% udsg // P.Schilling 23/10/07
+  medium_ = 5.3; 
+  // high eff -> 50.30% b / 10.77% c / 0.92% uds /  0.98% g / 0.96% udsg // P.Schilling 23/10/07
+  tight_  = 4.8; 
+  // high pur -> 31.94% b /  2.93% c / 0.10% uds /  0.11% g / 0.10% udsg // P.Schilling 23/10/07
 
   // Relative Likelihood
   // -------------------       
@@ -764,6 +801,36 @@ TDAna::TDAna(const edm::ParameterSet& iConfig) :
   LSSN_  = new TH1D ("LSSN", "Likelihood 2t passing sel", 50, -10., 10.  );
   LSSSN_ = new TH1D ("LSSSN", "Likelihood 2t passing sel", 50, -10., 10.  );
 
+  // Read H decay file
+  // -----------------
+  for ( int i=0; i<1000; i++ ) {
+    Hread[i]=0.;
+    Hnotread[i]=0.;
+  }
+  int counter=0;
+  ifstream Hreadfile ("Hread.asc");
+  string line;
+  while (Hreadfile) {
+    getline(Hreadfile,line,' ');
+    stringstream pippo1(line);
+    pippo1 >> Hread[counter];
+    getline(Hreadfile,line);
+    stringstream pippo2(line);
+    pippo1 >> Hnotread[counter];
+    counter++;
+  }
+  cout << "Read " << counter << " lines from H file." << endl;
+  double toth=0.;
+  double tothnot=0.;
+  for ( int i=0; i<1000; i++ ) {
+    toth+=Hread[i];
+    tothnot+=Hnotread[i];
+  }
+  for ( int i=0; i<1000; i++ ) {
+    Hread[i]=Hread[i]/toth;
+    Hnotread[i]=Hnotread[i]/tothnot;
+  }
+
   // Read PTag file
   // --------------
   for ( int i=0; i<1000; i++ ) {
@@ -778,7 +845,6 @@ TDAna::TDAna(const edm::ParameterSet& iConfig) :
 
   int iet, ieta, in1;
   int j;  
-  string line;
 
   while (PTagFile) {
     getline(PTagFile,line,' ');
@@ -1261,16 +1327,18 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   if ( ( itdecay==1 || itdecay==2 || itdecay==3 ) && 
        ( hdecay==1 || hdecay==2 ) && 
        caloJets->size() != 0 && response && iparton==6 ) { // sl decay + h->cc,bb & jets exist
-    double JPet[200]={0.};
-    double JPeta[200]={0.};
-    double JPphi[200]={0.};
+    double JPet[100]={0.};
+    double JPeta[100]={0.};
+    double JPphi[100]={0.};
+    bool JPtag[100]={false};
     int NJP=0;
     for ( OfflineJetCollection::const_iterator cal = caloJets->begin(); 
 	  cal != caloJets->end(); ++cal ) {
-      if ( NJP<200 ) {
+      if ( NJP<100 ) {
 	JPet[NJP]=cal->et();
 	JPeta[NJP]=cal->eta();
 	JPphi[NJP]=cal->phi();
+	if ( cal->discriminatorHighEff()>loose_ ) JPtag[NJP]=true;
 	NJP++;
       }
     }
@@ -1283,12 +1351,15 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	  double a1 = JPet[k];
 	  double a2 = JPeta[k];
 	  double a3 = JPphi[k];
+	  bool   a4 = JPtag[k];
 	  JPet[k]=JPet[k-1];
 	  JPeta[k]=JPeta[k-1];
 	  JPphi[k]=JPphi[k-1];
+	  JPtag[k]=JPtag[k-1];
 	  JPet[k-1]=a1;
 	  JPeta[k-1]=a2;
 	  JPphi[k-1]=a3;
+	  JPtag[k-1]=a4;
 	}
       }
     }
@@ -1419,12 +1490,113 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	  double e5 =sqrt(px5*px5+py5*py5+pz5*pz5);
 	  m45=(e4+e5)*(e4+e5)-(px4+px5)*(px4+px5)-(py4+py5)*(py4+py5)-(pz4+pz5)*(pz4+pz5);
 	  if ( m45>0 ) m45=sqrt(m45);
-	  if ( ietmin==5 && ietamax==7 ) MHbest_->Fill(m45);
+	  if ( ietmin==5 && ietamax==7 ) { 
+	    double ptpair = sqrt((px4+px5)*(px4+px5)+(py4+py5)*(py4+py5));
+	    double deta = JPeta[ijh[0]]-JPeta[ijh[1]];
+	    double dphi = 3.1415926-fabs(fabs(JPphi[ijh[0]]-JPphi[ijh[1]])-3.1415926);
+	    double drpair = sqrt(deta*deta+dphi*dphi);
+	    double ptotpair = sqrt((px4+px5)*(px4+px5)+(py4+py5)*(py4+py5)+(pz4+pz5)*(pz4+pz5));
+	    double etapair=0.;
+	    if ( ptotpair-pz4-pz5!=0 ) etapair = 0.5*log((ptotpair+pz4+pz5)/(ptotpair-pz4-pz5));
+	    etapair = fabs(etapair);
+	    MHbest_->Fill(m45);
+	    Hpt_->Fill(ptpair);
+	    Heta_->Fill(etapair);
+	    Hdr_->Fill(drpair);
+	    // Fill matrix with probability of pair
+	    // ------------------------------------
+	    int ipt=(int)((ptpair/500.)*10);
+	    int ieta=(int)((etapair/4.)*10);
+	    int idr=(int)((drpair/4.)*10);
+	    if ( ipt<0 ) ipt=0;
+	    if ( ipt>9 ) ipt=9;
+	    if ( ieta<0 ) ieta=0;
+	    if ( ieta>9) ieta=9;
+	    if ( idr<0 ) idr=0;
+	    if ( idr>9 ) idr=9;
+	    H[idr*100+ieta*10+ipt]++;
+	  }
 	}
+
+	// Only for et,eta cuts chosen: study which is most likely b-tag pair
+	// for events where both h products have been b-tagged
+	// ------------------------------------------------------------------
+	if ( JPtag[ijh[0]] && JPtag[ijh[1]] && ietmin==5 && ietamax==7 ) {
+	  considered=0; // Consider at most 8 jets for the association
+	  // First get b-tag indices:
+	  // ------------------------
+	  int indtag=0;
+	  int ijtag[100]={0.};
+	  for ( int ij=0; ij<NJP; ij++ ) {
+	    if ( JPet[ij]>etmin && fabs(JPeta[ij])<etamax && considered<8 ) {
+	      considered++;
+	      if ( JPtag[ij] ) {
+		ijtag[indtag]=ij;
+		indtag++;
+	      }
+	    }
+	  }
+	  // Now find rank in Et
+	  // -------------------
+	  if ( indtag>=4 ) {
+	    for ( int ind=0; ind<indtag; ind++ ) {
+	      if ( ijh[0]==ijtag[ind] || ijh[1]==ijtag[ind] ) {
+		HBJ_etrank_->Fill((double)ind);
+	      }
+	    }
+	  }
+	  // Fill pt, eta, dr distribution for wrong tagged pairs
+	  // ----------------------------------------------------
+	  for ( int ind1=0; ind1<indtag-1; ind1++ ) {
+	    for ( int ind2=ind1+1; ind2<indtag; ind2++ ) {
+	      if ( ( ijh[0]!=ind1 && ijh[0]!=ind2 ) ||  
+		   ( ijh[1]!=ind1 && ijh[1]!=ind2 ) ) {
+		double px4=JPet[ind1]*cos(JPphi[ind1]);
+		double px5=JPet[ind2]*cos(JPphi[ind2]);
+		double py4=JPet[ind1]*sin(JPphi[ind1]);
+		double py5=JPet[ind2]*sin(JPphi[ind2]);
+		double pz4=JPet[ind1]/tan(2*atan(exp(-JPeta[ind1])));
+		double pz5=JPet[ind2]/tan(2*atan(exp(-JPeta[ind2])));
+		double e4 =sqrt(px4*px4+py4*py4+pz4*pz4);
+		double e5 =sqrt(px5*px5+py5*py5+pz5*pz5);
+		double m45not=(e4+e5)*(e4+e5)-(px4+px5)*(px4+px5)-(py4+py5)*(py4+py5)-(pz4+pz5)*(pz4+pz5);
+		if ( m45not>0 ) m45not=sqrt(m45not);
+		double ptpair = sqrt((px4+px5)*(px4+px5)+(py4+py5)*(py4+py5));
+		double deta = JPeta[ind1]-JPeta[ind2];
+		double dphi = 3.1415926-fabs(fabs(JPphi[ind1]-JPphi[ind2])-3.1415926);
+		double drpair = sqrt(deta*deta+dphi*dphi);
+		double ptotpair = sqrt((px4+px5)*(px4+px5)+(py4+py5)*(py4+py5)+(pz4+pz5)*(pz4+pz5));
+		double etapair=0.;
+		if ( ptotpair-pz4-pz5!=0 ) etapair = 0.5*log((ptotpair+pz4+pz5)/(ptotpair-pz4-pz5));
+		etapair = fabs(etapair);
+		MHnot_->Fill(m45not);
+		Hnotpt_->Fill(ptpair);
+		Hnoteta_->Fill(etapair);
+		Hnotdr_->Fill(drpair);
+		// Fill matrix with probability of pair
+		// ------------------------------------
+		int ipt=(int)((ptpair/500.)*10);
+		int ieta=(int)((etapair/4.)*10);
+		int idr=(int)((drpair/4.)*10);
+		if ( ipt<0 ) ipt=0;
+		if ( ipt>9 ) ipt=9;
+		if ( ieta<0 ) ieta=0;
+		if ( ieta>9) ieta=9;
+		if ( idr<0 ) idr=0;
+		if ( idr>9 ) idr=9;
+		Hnot[idr*100+ieta*10+ipt]++;
+	      }
+	    }
+	  }
+
+	} // iet=5, ieta=7, two tags from hbb jets
+	
+
+
 	// Mass of three jets from t
 	// -------------------------
 	double m123=0.;
-	if ( njt==3 ) {
+ 	if ( njt==3 ) {
 	  double px1=JPet[ijt[0]]*cos(JPphi[ijt[0]]);
 	  double px2=JPet[ijt[1]]*cos(JPphi[ijt[1]]);
 	  double px3=JPet[ijt[2]]*cos(JPphi[ijt[2]]);
@@ -1477,6 +1649,7 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	if ( fabs(m123-mtref)<40 ) Trecfrac_->Fill(etmin,etamax);
       } // ietamax
     } // ietmin
+
     Nsltt_hjj++;
   } // if sl tt decay + h->cc,bb decay
   
@@ -1497,48 +1670,50 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 
   // Count IC5 jets with Et>=30 GeV and |eta| < 3.0
   // ----------------------------------------------
-  double goodIc5Jets = 0; // Number of selected jets
-  double NTagsL = 0;      // Number of loose b-tags
-  double NTagsM = 0;      // Number of medium b-tags 
-  double NTagsT = 0;      // Number of tight b-tags
+  double goodIc5Jets = 0.; // Number of selected jets
+  double NTagsL = 0.;      // Number of loose b-tags
+  double NTagsM = 0.;      // Number of medium b-tags 
+  double NTagsT = 0.;      // Number of tight b-tags
 
   double UncorrSumEx=0;
-  double UncorrSumEy=0;
-  double UncorrSumEt=0;  // SumEt with all jets before corrections
-  double UncorrHt=0;     // Ht with all jets before corrections
-  double UncorrHt0=0;     // Ht with all jets before corrections
+  double UncorrSumEy=0.;
+  double UncorrSumEt=0.;  // SumEt with all jets before corrections
+  double UncorrHt=0.;     // Ht with all jets before corrections
+  double UncorrHt0=0.;     // Ht with all jets before corrections
 
-  double CorrSumEx=0;
-  double CorrSumEy=0;
-  double CorrSumEt=0;    // SumEt with all jets after corrections 
-  double CorrHt=0;       // Ht with all jets after corrections
-  double CorrHt0=0;       // Ht with all jets after corrections
+  double CorrSumEx=0.;
+  double CorrSumEy=0.;
+  double CorrSumEt=0.;    // SumEt with all jets after corrections 
+  double CorrHt=0.;       // Ht with all jets after corrections
+  double CorrHt0=0.;       // Ht with all jets after corrections
 
-  double GoodSumEt=0;    // SumEt with all selected jets
-  double GoodHt=0;       // Ht with all selected jets
-  double GoodHt2=0;      // Ht with all selected jets and standard MET
-  double GoodHt0=0;       // Ht with all selected jets
-  double GoodHt20=0;      // Ht with all selected jets and standard MET
+  double GoodSumEt=0.;    // SumEt with all selected jets
+  double GoodHt=0.;       // Ht with all selected jets
+  double GoodHt2=0.;      // Ht with all selected jets and standard MET
+  double GoodHt0=0.;       // Ht with all selected jets
+  double GoodHt20=0.;      // Ht with all selected jets and standard MET
 
-  double dpmin=20;  // DP min MET / selected jets
-  double dp1st=20;  // DP MET/leading jet
-  double dp2nd=20;  // DP MET/2nd leading jet
-  double dp3rd=20;  // DP MET/3rd leading jet
+  double dpmin=20.;  // DP min MET / selected jets
+  double dp1st=20.;  // DP MET/leading jet
+  double dp2nd=20.;  // DP MET/2nd leading jet
+  double dp3rd=20.;  // DP MET/3rd leading jet
 
-  double m3best=-999; // Massa del tripletto piu' vicino a mtref (200 GeV, see above)
-  double mwbest=-999;    // Massa del doppietto piu' vicino a 80.4 GeV tra i tre nel tripletto definito sopra
-  double chi2=1000;   // Chiquadro costruito con le due masse qui sopra
-  double m45best=-999;
+  double m3best=-999.; // Massa del tripletto piu' vicino a mtref (200 GeV, see above)
+  double mwbest=-999.;    // Massa del doppietto piu' vicino a 80.4 GeV tra i tre nel tripletto definito sopra
+  double chi2=1000.;   // Chiquadro costruito con le due masse qui sopra
+  double m45best=-999.;
   double mwmin=0.;
-  double chi2ext=1000;
-  double m45bestall=-999;
-  double chi2extall=1000;
-  double dp12 = 0;        // Delta phi jet 1 jet 2
-  double dpbb = 0;    // delta phi bb
-  double dpbball = 0;    // delta phi bb
-  double m_others = -999; // mass of jets not part of best triplet and pair
-  double mbbnohmax = -999; // mass of b pair with highest mass excluding b-jets from h decay
-  double dpbbnohmax = 0; // angle of b pair with highest mass excluding b-jets from h decay
+  double chi2ext=1000.;
+  double m45bestall=-999.;
+  double drpairbestall=3.99;
+  double hbestcomb=0.;
+  double chi2extall=1000.;
+  double dp12 = 0.;        // Delta phi jet 1 jet 2
+  double dpbb = 0.;    // delta phi bb
+  double dpbball = 0.;    // delta phi bb
+  double m_others = -999.; // mass of jets not part of best triplet and pair
+  double mbbnohmax = -999.; // mass of b pair with highest mass excluding b-jets from h decay
+  double dpbbnohmax = 0.; // angle of b pair with highest mass excluding b-jets from h decay
 
   // Offline cuts
   // ------------
@@ -1714,7 +1889,9 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	              // tra i tre nel tripletto definito sopra
 	chi2=1000;    // Chiquadro costruito con le due masse qui sopra
 	m45best=-999; // mass of two b-tags closest to 120 GeV not in triplet
+        mwmin=0.;
 	chi2ext=1000; // chi2 computed by adding contribution from distance to 120 GeV
+	dp12 = 0.;
 	dpbb = 0;     // delta phi bb of pair above
 	m45bestall=-999;  // Same as above, without bothering to exclude jets in triplet
 	chi2extall=1000;  // Same as above
@@ -1726,7 +1903,9 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	m6=0.;
 	m8=0.;
 	set=0.;
+	c6=0.;
 	c8=0.;
+	Et6=0.;
 
 	// Ok now start producing probability combinations
 	// -----------------------------------------------
@@ -1806,965 +1985,1032 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	  sumhed6+=hemax[i];
 	  sumhpd6+=hpmax[i];
 	}
-
-	// if ( NHEM>=2 ) {
           
-	  // Compute best top and W masses and determine simple chi2
-	  // -------------------------------------------------------
-	  double px1,px2,px3,py1,py2,py3,pz1,pz2,pz3,e1,e2,e3;
-	  double px4,px5,py4,py5,pz4,pz5,e4,e5;
-	  double px,py,pz;
-	  double spx,spy,spz,se;
-	  double m3,m12,m13,m23;
-	  double m45;
-	  double mw=0.;
-	  double bestWhasb=0.;
-	  double bestbnob=0.;
-	  int it1=-1;
-	  int it2=-1;
-	  int it3=-1;
-	  int ih1=-1;
-	  int ih2=-1;
-	  double nb;
-	  for ( int i=0; i<iJ-2 && i<NHSJ-2; i++ ) {
-	    for ( int j=i+1; j<iJ-1 && j<NHSJ-1; j++ ) {
-	      for ( int k=j+1; k<iJ && k<NHSJ; k++ ) { // limit to 8 the number of jets in hard subprocess
+	// Compute best top and W masses and determine simple chi2
+	// -------------------------------------------------------
+	double px1,px2,px3,py1,py2,py3,pz1,pz2,pz3,e1,e2,e3;
+	double px4,px5,py4,py5,pz4,pz5,e4,e5;
+	double px,py,pz;
+	double spx,spy,spz,se;
+	double m3,m12,m13,m23;
+	double m45;
+	double mw=0.;
+	double bestWhasb=0.;
+	double bestbnob=0.;
+	int it1=-1;
+	int it2=-1;
+	int it3=-1;
+	int ih1=-1;
+	int ih2=-1;
+	for ( int i=0; i<iJ-2 && i<NHSJ-2; i++ ) {
+	  for ( int j=i+1; j<iJ-1 && j<NHSJ-1; j++ ) {
+	    for ( int k=j+1; k<iJ && k<NHSJ; k++ ) { // limit to 8 the number of jets in hard subprocess
+	      
+	      // Require that the triplet owns at least one b-tag
+	      // ------------------------------------------------
+	      double nb=0.;
+	      
+	      if ( JHEM[i] ) nb++; 
+	      if ( JHEM[j] ) nb++;
+	      if ( JHEM[k] ) nb++;
+	      if ( nb>=1 ) {
+		bestWhasb=0;
+		px1=JEt[i]*cos(Jphi[i]);
+		px2=JEt[j]*cos(Jphi[j]);
+		px3=JEt[k]*cos(Jphi[k]);
+		py1=JEt[i]*sin(Jphi[i]);
+		py2=JEt[j]*sin(Jphi[j]);
+		py3=JEt[k]*sin(Jphi[k]);
+		pz1=JEt[i]/tan(2*atan(exp(-Jeta[i])));
+		pz2=JEt[j]/tan(2*atan(exp(-Jeta[j])));
+		pz3=JEt[k]/tan(2*atan(exp(-Jeta[k])));
+		e1 =sqrt(px1*px1+py1*py1+pz1*pz1);
+		e2 =sqrt(px2*px2+py2*py2+pz2*pz2);
+		e3 =sqrt(px3*px3+py3*py3+pz3*pz3);
+		m3=(e1+e2+e3)*(e1+e2+e3)-(px1+px2+px3)*(px1+px2+px3)-
+		  (py1+py2+py3)*(py1+py2+py3)-(pz1+pz2+pz3)*(pz1+pz2+pz3);
+		if ( m3>0 ) m3=sqrt(m3);
+		m12=(e1+e2)*(e1+e2)-(px1+px2)*(px1+px2)-(py1+py2)*(py1+py2)-(pz1+pz2)*(pz1+pz2);
+		if ( m12>0 ) m12=sqrt(m12);
+		m13=(e1+e3)*(e1+e3)-(px1+px3)*(px1+px3)-(py1+py3)*(py1+py3)-(pz1+pz3)*(pz1+pz3);
+		if ( m13>0 ) m13=sqrt(m13);
+		m23=(e2+e3)*(e2+e3)-(px2+px3)*(px2+px3)-(py2+py3)*(py2+py3)-(pz2+pz3)*(pz2+pz3);
+		if ( m23>0 ) m23=sqrt(m23);
 		
-		// Require that the triplet owns at least one b-tag
-		// ------------------------------------------------
-		nb=0.;
-		
-		if ( JHEM[i] ) nb++; 
-		if ( JHEM[j] ) nb++;
-		if ( JHEM[k] ) nb++;
-		if ( nb>=1 ) {
-		  bestWhasb=0;
-		  px1=JEt[i]*cos(Jphi[i]);
-		  px2=JEt[j]*cos(Jphi[j]);
-		  px3=JEt[k]*cos(Jphi[k]);
-		  py1=JEt[i]*sin(Jphi[i]);
-		  py2=JEt[j]*sin(Jphi[j]);
-		  py3=JEt[k]*sin(Jphi[k]);
-		  pz1=JEt[i]/tan(2*atan(exp(-Jeta[i])));
-		  pz2=JEt[j]/tan(2*atan(exp(-Jeta[j])));
-		  pz3=JEt[k]/tan(2*atan(exp(-Jeta[k])));
-		  e1 =sqrt(px1*px1+py1*py1+pz1*pz1);
-		  e2 =sqrt(px2*px2+py2*py2+pz2*pz2);
-		  e3 =sqrt(px3*px3+py3*py3+pz3*pz3);
-		  m3=(e1+e2+e3)*(e1+e2+e3)-(px1+px2+px3)*(px1+px2+px3)-
-		    (py1+py2+py3)*(py1+py2+py3)-(pz1+pz2+pz3)*(pz1+pz2+pz3);
-		  if ( m3>0 ) m3=sqrt(m3);
-		  m12=(e1+e2)*(e1+e2)-(px1+px2)*(px1+px2)-(py1+py2)*(py1+py2)-(pz1+pz2)*(pz1+pz2);
-		  if ( m12>0 ) m12=sqrt(m12);
-		  m13=(e1+e3)*(e1+e3)-(px1+px3)*(px1+px3)-(py1+py3)*(py1+py3)-(pz1+pz3)*(pz1+pz3);
-		  if ( m13>0 ) m13=sqrt(m13);
-		  m23=(e2+e3)*(e2+e3)-(px2+px3)*(px2+px3)-(py2+py3)*(py2+py3)-(pz2+pz3)*(pz2+pz3);
-		  if ( m23>0 ) m23=sqrt(m23);
-		  
-		  // Simple non-selecting way to use info of b-tag in W selection
-		  // ------------------------------------------------------------
-		  if ( fabs(m12-mwref)<fabs(m13-mwref) && fabs(m12-mwref)<fabs(m23-mwref) ) {
-		    mw=m12;
-		    if ( JHEM[i] || JHEM[j] ) bestWhasb=1;
-		    if ( !JHEM[k] ) bestbnob=1;
-		  }
-		  if ( fabs(m13-mwref)<fabs(m12-mwref) && fabs(m13-mwref)<fabs(m23-mwref) ) { 
-		    mw=m13;
-		    if ( JHEM[i] || JHEM[k] ) bestWhasb=1;
-		    if ( !JHEM[j] ) bestbnob=1;
-		  }
-		  if ( fabs(m23-mwref)<fabs(m13-mwref) && fabs(m23-mwref)<fabs(m12-mwref) ) {
-		    mw=m23;
-		    if ( JHEM[j] || JHEM[k] ) bestWhasb=1;
-		    if ( !JHEM[i] ) bestbnob=1;
-		  }
-		  if ( fabs(m3-mtref)<fabs(m3best-mtref) ) {
-		    m3best=m3;
+		// Simple non-selecting way to use info of b-tag in W selection
+		// ------------------------------------------------------------
+		if ( fabs(m12-mwref)<fabs(m13-mwref) && fabs(m12-mwref)<fabs(m23-mwref) ) {
+		  mw=m12;
+		  if ( JHEM[i] || JHEM[j] ) bestWhasb=1;
+		  if ( !JHEM[k] ) bestbnob=1;
+		}
+		if ( fabs(m13-mwref)<fabs(m12-mwref) && fabs(m13-mwref)<fabs(m23-mwref) ) { 
+		  mw=m13;
+		  if ( JHEM[i] || JHEM[k] ) bestWhasb=1;
+		  if ( !JHEM[j] ) bestbnob=1;
+		}
+		if ( fabs(m23-mwref)<fabs(m13-mwref) && fabs(m23-mwref)<fabs(m12-mwref) ) {
+		  mw=m23;
+		  if ( JHEM[j] || JHEM[k] ) bestWhasb=1;
+		  if ( !JHEM[i] ) bestbnob=1;
+		}
+		if ( fabs(m3-mtref)<fabs(m3best-mtref) ) {
+		  m3best=m3;
 		    mwbest=mw;
 		    chi2=sqrt((m3best-mtref)*(m3best-mtref)/900+(mwbest-mwref)*(mwbest-mwref)/400)+
 		      3*bestWhasb+3*bestbnob;
 		    it1=i;
 		    it2=j;
 		    it3=k;
-		  }
-		  // Compute minimum W mass
-		  // ----------------------
-		  mwmin = m12;
-		  if ( mwmin>m13 ) mwmin=m13;
-		  if ( mwmin>m23 ) mwmin=m23;
-		} // nb>=1	    
-	      }
+		}
+		// Compute minimum W mass
+		// ----------------------
+		mwmin = m12;
+		if ( mwmin>m13 ) mwmin=m13;
+		if ( mwmin>m23 ) mwmin=m23;
+	      } // nb>=1	    
 	    }
 	  }
-
-	  // Search for a H signal in the remaining jets
-	  // -------------------------------------------
-	  if ( it1+it2+it3>0 ) {
-	    for ( int ii=0; ii<iJ-1 && ii<NHSJ-1; ii++ ) {
-	      if ( ii!=it1 && ii!=it2 && ii!=it3 ) {
-		for ( int jj=ii+1; jj<iJ && jj<NHSJ; jj++ ) { // limit to NHSJ the number of jets from h.s.
-		  if ( jj!=it1 && jj!=it2 && jj!=it3 ) {
-		    
-		    // Demand that both b-jets from H be tagged
-		    // ----------------------------------------
-		    if ( JHEM[ii] && JHEM[jj] ) {
-		      px4=JEt[ii]*cos(Jphi[ii]);
-		      px5=JEt[jj]*cos(Jphi[jj]);
-		      py4=JEt[ii]*sin(Jphi[ii]);
-		      py5=JEt[jj]*sin(Jphi[jj]);
-		      pz4=JEt[ii]/tan(2*atan(exp(-Jeta[ii])));
-		      pz5=JEt[jj]/tan(2*atan(exp(-Jeta[jj])));
-		      e4 =sqrt(px4*px4+py4*py4+pz4*pz4);
-		      e5 =sqrt(px5*px5+py5*py5+pz5*pz5);
-		      m45=(e4+e5)*(e4+e5)-(px4+px5)*(px4+px5)-(py4+py5)*(py4+py5)-(pz4+pz5)*(pz4+pz5);
-		      if ( m45>0 ) m45=sqrt(m45);
-		      if ( fabs(m45-123)<fabs(m45best-123) ) {
-			m45best=m45;
-			chi2ext=sqrt(chi2*chi2+(m45best-123)*(m45best-123)/729);
-			dpbb=3.145926-fabs(fabs(Jphi[ii]-Jphi[jj])-3.1415926);
-			ih1=ii;
-			ih2=jj;
-		      }
-		    }
-		  }
-		}
-	      }
-	    }
-	    // Now redo the same, on all b-jets regardless of best triplet
-	    // -----------------------------------------------------------
-	    for ( int ii=0; ii<iJ-1 && ii<NHSJ-1; ii++ ) {
+	}
+	
+	// Search for a H signal in the remaining jets
+	// -------------------------------------------
+	if ( it1+it2+it3>0 ) {
+	  for ( int ii=0; ii<iJ-1 && ii<NHSJ-1; ii++ ) {
+	    if ( ii!=it1 && ii!=it2 && ii!=it3 ) {
 	      for ( int jj=ii+1; jj<iJ && jj<NHSJ; jj++ ) { // limit to NHSJ the number of jets from h.s.
-		// Demand that both b-jets from H be tagged
-		// ----------------------------------------
-		if ( JHEM[ii] && JHEM[jj] ) {
-		  px4=JEt[ii]*cos(Jphi[ii]);
-		  px5=JEt[jj]*cos(Jphi[jj]);
-		  py4=JEt[ii]*sin(Jphi[ii]);
-		  py5=JEt[jj]*sin(Jphi[jj]);
-		  pz4=JEt[ii]/tan(2*atan(exp(-Jeta[ii])));
-		  pz5=JEt[jj]/tan(2*atan(exp(-Jeta[jj])));
-		  e4 =sqrt(px4*px4+py4*py4+pz4*pz4);
-		  e5 =sqrt(px5*px5+py5*py5+pz5*pz5);
-		  m45=(e4+e5)*(e4+e5)-(px4+px5)*(px4+px5)-(py4+py5)*(py4+py5)-(pz4+pz5)*(pz4+pz5);
-		  if ( m45>0 ) m45=sqrt(m45);
-		  if ( fabs(m45-123)<fabs(m45bestall-123) ) {
-		    m45bestall=m45;
-		    double addchi=0;
-		    if ( ii==it1 || ii==it2 || ii==it3 || jj==it1 || jj==it2 || jj==it3 ) addchi=3; 
-		    chi2extall=sqrt(chi2*chi2+(m45bestall-123)*(m45bestall-123)/729+addchi*addchi);
-		    dpbball=3.145926-fabs(fabs(Jphi[ii]-Jphi[jj])-3.1415926);
+		if ( jj!=it1 && jj!=it2 && jj!=it3 ) {
+		  
+		  // Demand that both b-jets from H be tagged
+		  // ----------------------------------------
+		  if ( JHEM[ii] && JHEM[jj] ) {
+		    px4=JEt[ii]*cos(Jphi[ii]);
+		    px5=JEt[jj]*cos(Jphi[jj]);
+		    py4=JEt[ii]*sin(Jphi[ii]);
+		    py5=JEt[jj]*sin(Jphi[jj]);
+		    pz4=JEt[ii]/tan(2*atan(exp(-Jeta[ii])));
+		    pz5=JEt[jj]/tan(2*atan(exp(-Jeta[jj])));
+		    e4 =sqrt(px4*px4+py4*py4+pz4*pz4);
+		    e5 =sqrt(px5*px5+py5*py5+pz5*pz5);
+		    m45=(e4+e5)*(e4+e5)-(px4+px5)*(px4+px5)-(py4+py5)*(py4+py5)-(pz4+pz5)*(pz4+pz5);
+		    if ( m45>0 ) m45=sqrt(m45);
+		    if ( fabs(m45-mhref)<fabs(m45best-mhref) ) {
+		      m45best=m45;
+		      chi2ext=sqrt(chi2*chi2+(m45best-mhref)*(m45best-mhref)/729);
+		      dpbb=3.145926-fabs(fabs(Jphi[ii]-Jphi[jj])-3.1415926);
+		      ih1=ii;
+		      ih2=jj;
+		    }
 		  }
 		}
 	      }
 	    }
+	  }
+	  // Now redo the same, on all b-jets regardless of best triplet
+	  // -----------------------------------------------------------
+	  double maxr=-1.;
+	  for ( int ii=0; ii<iJ-1 && ii<NHSJ-1; ii++ ) {
+	    for ( int jj=ii+1; jj<iJ && jj<NHSJ; jj++ ) { // limit to NHSJ the number of jets from h.s.
 
-	    // Compute mass of jets not selected in triplet of top and doublet of H decay
-	    // --------------------------------------------------------------------------
-	    if ( ih1+ih2>0 ) {
-	      spx=0;
-	      spy=0;
-	      spz=0;
-	      se=0;
-	      for ( int kk=0; kk<iJ && kk<NHSJ ; kk++ ) { // limit to NHSJ the number of 
-		                                          // jets from hard subprocess
-		if ( kk!= ih1 && kk!=ih2 && kk!=it1 && kk!=it2 && kk!=it3 ) { 
-		  px=JEt[kk]*cos(Jphi[kk]);
-		  py=JEt[kk]*sin(Jphi[kk]);
-		  pz=JEt[kk]/tan(2*atan(exp(-Jeta[kk])));
-		  spx+=px;
-		  spy+=py;
-		  spz+=pz;
-		  se+=sqrt(px*px+py*py+pz*pz);
+	      // Demand that both b-jets from H be tagged
+	      // ----------------------------------------
+	      if ( JHEM[ii] && JHEM[jj] ) {
+		px4=JEt[ii]*cos(Jphi[ii]);
+		px5=JEt[jj]*cos(Jphi[jj]);
+		py4=JEt[ii]*sin(Jphi[ii]);
+		py5=JEt[jj]*sin(Jphi[jj]);
+		pz4=JEt[ii]/tan(2*atan(exp(-Jeta[ii])));
+		pz5=JEt[jj]/tan(2*atan(exp(-Jeta[jj])));
+		e4 =sqrt(px4*px4+py4*py4+pz4*pz4);
+		e5 =sqrt(px5*px5+py5*py5+pz5*pz5);
+		m45=(e4+e5)*(e4+e5)-(px4+px5)*(px4+px5)-(py4+py5)*(py4+py5)-(pz4+pz5)*(pz4+pz5);
+		if ( m45>0 ) m45=sqrt(m45);
+
+		// Now define best bb combination based on H matrices
+		// --------------------------------------------------
+		double ptpair = sqrt((px4+px5)*(px4+px5)+(py4+py5)*(py4+py5));
+		double deta = Jeta[ii]-Jeta[jj];
+		double dphi = 3.1415926-fabs(fabs(Jphi[ii]-Jphi[jj])-3.1415926);
+		double drpair = sqrt(deta*deta+dphi*dphi);
+		double ptotpair = sqrt((px4+px5)*(px4+px5)+(py4+py5)*(py4+py5)+(pz4+pz5)*(pz4+pz5));
+		double etapair=0.;
+		if ( ptotpair-pz4-pz5!=0 ) etapair = 0.5*log((ptotpair+pz4+pz5)/(ptotpair-pz4-pz5));
+		etapair = fabs(etapair);
+
+		int ipt=(int)((ptpair/500.)*10);
+		int ieta=(int)((etapair/4.)*10);
+		int idr=(int)((drpair/4.)*10);
+		if ( ipt<0 ) ipt=0;
+		if ( ipt>9 ) ipt=9;
+		if ( ieta<0 ) ieta=0;
+		if ( ieta>9) ieta=9;
+		if ( idr<0 ) idr=0;
+		if ( idr>9 ) idr=9;
+		double r = Hread[100*idr+10*ieta+ipt];
+		if ( Hnotread[100*idr+10*ieta+ipt]>0 ) r=r/Hnotread[100*idr+10*ieta+ipt];
+		if ( r>maxr ) {
+		  maxr = r;
+		  hbestcomb=m45;
 		}
-		m_others=se*se-spx*spx-spy*spy-spz*spz;
-		if ( m_others>0 ) m_others=sqrt(m_others);
+		// Best combination based just on mass
+		// -----------------------------------
+		if ( fabs(m45-mhref)<fabs(m45bestall-mhref) ) {
+		  m45bestall=m45;
+		  double addchi=0;
+		  if ( ii==it1 || ii==it2 || ii==it3 || jj==it1 || jj==it2 || jj==it3 ) addchi=3; 
+		  chi2extall=sqrt(chi2*chi2+(m45bestall-mhref)*(m45bestall-mhref)/729+addchi*addchi);
+		  dpbball=3.145926-fabs(fabs(Jphi[ii]-Jphi[jj])-3.1415926);
+		  drpairbestall = drpair;
+		}
 	      }
-	      
-	      // Now compute mass and angle of two b-jets not chosen as H decay
-	      // --------------------------------------------------------------
-	      spx=0;
-	      spy=0;
-	      spz=0;
-	      se=0;
-	      double mbbnoh;
-	      for ( int k1=0; k1<iJ-1 && k1<NHSJ-1; k1++ ) {
-		if ( k1!=ih1 && k1!=ih2 && JHEM[k1] ) {
-		  for ( int k2=k1+1; k2<iJ && k2<NHSJ; k2++ ) { // limit to 8 the number of jets from h.s.
-		    if ( k2!=ih1 && k2!=ih2 && JHEM[k2] ) {
-		      px1=JEt[k1]*cos(Jphi[k1]);
-		      py1=JEt[k1]*sin(Jphi[k1]);
-		      pz1=JEt[k1]/tan(2*atan(exp(-Jeta[k1])));
-		      px2=JEt[k2]*cos(Jphi[k2]);
-		      py2=JEt[k2]*sin(Jphi[k2]);
-		      pz2=JEt[k2]/tan(2*atan(exp(-Jeta[k2])));
-		      spx=px1+px2;
-		      spy=py1+py2;
-		      spz=pz1+pz2;
-		      se=sqrt(px1*px1+py1*py1+pz1*pz1)+sqrt(px2*px2+py2*py2+pz2*pz2);
-		    }
-		    mbbnoh=se*se-spx*spx-spy*spy-spz*spz;
-		    if ( mbbnoh>0 ) mbbnoh=sqrt(mbbnoh);
-		    if ( mbbnoh>mbbnohmax ) {
-		      mbbnohmax=mbbnoh;
-		      dpbbnohmax=3.1415926-fabs(fabs(Jphi[k1]-Jphi[k2])-3.1415926);
-		    }
-		  }
-		}      
+	    }
+	  }
+	  
+	  // Compute mass of jets not selected in triplet of top and doublet of H decay
+	  // --------------------------------------------------------------------------
+	  if ( ih1+ih2>0 ) {
+	    spx=0;
+	    spy=0;
+	    spz=0;
+	    se=0;
+	    for ( int kk=0; kk<iJ && kk<NHSJ ; kk++ ) { // limit to NHSJ the number of 
+	      // jets from hard subprocess
+	      if ( kk!= ih1 && kk!=ih2 && kk!=it1 && kk!=it2 && kk!=it3 ) { 
+		px=JEt[kk]*cos(Jphi[kk]);
+		py=JEt[kk]*sin(Jphi[kk]);
+		pz=JEt[kk]/tan(2*atan(exp(-Jeta[kk])));
+		spx+=px;
+		spy+=py;
+		spz+=pz;
+		se+=sqrt(px*px+py*py+pz*pz);
 	      }
-	    }      
-	  } // end if it1+it2+it3>0      
-	  
-	  // Now compute mass of first 8 jets and their centrality
-	  // -----------------------------------------------------
-	  spx=0;
-	  spy=0;
-	  spz=0;
-	  se=0;
-	  set=0;
-	  for ( int k=0; k<iJ && k<NHSJ; k++ ) {
-	    px=JEt[k]*cos(Jphi[k]);
-	    py=JEt[k]*sin(Jphi[k]);
-	    pz=JEt[k]/tan(2*atan(exp(-Jeta[k])));
-	    spx+=px;
-	    spy+=py;
-	    spz+=pz;
-	    se+=sqrt(px*px+py*py+pz*pz);
-	    set+=JEt[k];
-	  }
-	  m8=se*se-spx*spx-spy*spy-spz*spz;
-	  if ( m8>0 ) { 
-	    m8=sqrt(m8);
-	    c8=set/m8;
-	  }
-	  // Now compute mass of first 6 jets and their centrality
-	  // -----------------------------------------------------
-	  spx=0;
-	  spy=0;
-	  spz=0;
-	  se=0;
-	  set=0;
-	  for ( int k=0; k<iJ && k<6; k++ ) {
-	    px=JEt[k]*cos(Jphi[k]);
-	    py=JEt[k]*sin(Jphi[k]);
-	    pz=JEt[k]/tan(2*atan(exp(-Jeta[k])));
-	    spx+=px;
-	    spy+=py;
-	    spz+=pz;
-	    se+=sqrt(px*px+py*py+pz*pz);
-	    set+=JEt[k];
-	  }
-	  m6=se*se-spx*spx-spy*spy-spz*spz;
-	  if ( m6>0 ) { 
-	    m6=sqrt(m6);
-	    c6=set/m6;
-	  }
-          
-	  ////////////////////////////////////////////////////////////////
-	  // Now fill histograms
-	  // -------------------
-	  // Offline cuts
-	  // ------------
-	  if ( iJ >= 5 ) NJetsCut = true;
-	  if ( metsig>3 ) MEtSigCut = true;
-	  
-	  // Fill kinematical histograms
-	  // ---------------------------
-	  double UncorrMEt =sqrt(UncorrSumEx*UncorrSumEx+UncorrSumEy*UncorrSumEy);
-	  double CorrMEt = sqrt(CorrSumEx*CorrSumEx+CorrSumEy*CorrSumEy);
-	  UncorrHt=UncorrHt0+UncorrMEt;
-	  CorrHt=CorrHt0+CorrMEt;
-	  GoodHt=GoodHt0+CorrMEt;
-	  GoodHt2=GoodHt20+met;
-
-	  if ( iJ>5 ) Et6=JEt[5];
-	  
-	  double UncorrMEtSig=0;
-	  if ( UncorrSumEt>0 ) UncorrMEtSig = UncorrMEt/sqrt(UncorrSumEt);
-	  double CorrMEtSig = 0;
-	  if ( CorrSumEt>0 ) CorrMEtSig = CorrMEt/sqrt(CorrSumEt);  
-	  
-	  // Missing Et significance computed with tuned resolution function
-	  // ---------------------------------------------------------------
-	  double metsignew=0;
-	  if ( sumet>0 ) 
-	    metsignew = met/(sqrt(2)*0.8033*pow(sumet,0.5004));
-	  
-	  if ( PTOT>0 ) {
-	    double weight_N = 1./pow (2.,iJmax);
-
-	    // Fill regular histograms
-	    // -----------------------
-	    UncorrMEt_SumEt_->Fill(sumet,UncorrMEt,PTOT);
-	    CorrMEt_SumEt_->Fill(sumet,CorrMEt,PTOT);
-	    MEt_SumEt_->Fill(sumet,met,PTOT);
-	    UncorrMEt_SumEtC_->Fill(CorrSumEt,UncorrMEt,PTOT);
-	    CorrMEt_SumEtC_->Fill(CorrSumEt,CorrMEt,PTOT);
-	    MEt_SumEtC_->Fill(CorrSumEt,met,PTOT);
-	    UncorrMEt_SumEtJ_->Fill(GoodSumEt,UncorrMEt,PTOT);
-	    CorrMEt_SumEtJ_->Fill(GoodSumEt,CorrMEt,PTOT);
-	    MEt_SumEtJ_->Fill(GoodSumEt,met,PTOT);
+	      m_others=se*se-spx*spx-spy*spy-spz*spz;
+	      if ( m_others>0 ) m_others=sqrt(m_others);
+	    }
 	    
-	    // Apply trigger requirement
-	    // -------------------------
-	    if ( response && NJetsCut ) {
-	      NJets_->Fill(goodIc5Jets,PTOT);
-	      UncorrHt_->Fill(UncorrHt,PTOT);
-	      CorrHt_->Fill(CorrHt,PTOT);
-	      GoodHt_->Fill(GoodHt,PTOT);
-	      GoodHt2_->Fill(GoodHt2,PTOT);
-	      UncorrSumEt_->Fill(UncorrSumEt,PTOT);
-	      CorrSumEt_->Fill(CorrSumEt,PTOT);
-	      GoodSumEt_->Fill(GoodSumEt,PTOT);
-	      MEt_->Fill(met,PTOT);
-	      MEtSig_->Fill(metsig,PTOT);
-	      MEtSigNew_->Fill(metsignew,PTOT);
-	      MEtDPM_->Fill(dpmin,PTOT);
-	      MEtDP1_->Fill(dp1st,PTOT);
-	      MEtDP2_->Fill(dp2nd,PTOT);
-	      MEtDP3_->Fill(dp3rd,PTOT);
-	      UncorrMEtSig_->Fill(UncorrMEtSig,PTOT);
-	      CorrMEtSig_->Fill(CorrMEtSig,PTOT);
-	      M3best_->Fill(m3best,PTOT);
-	      Mwbest_->Fill(mwbest,PTOT);
-	      Chi2mass_->Fill(chi2,PTOT);
-	      M45best_->Fill(m45best,PTOT);
-	      Chi2ext_->Fill(chi2ext,PTOT);
-	      MEx_SumEt_->Fill(sumet,met*cos(metphi),PTOT);
-	      MEx_SumEt_->Fill(sumet,met*sin(metphi),PTOT);
-	      DP12_->Fill(dp12,PTOT);
-	      DPbb_->Fill(dpbb,PTOT);
-	      M_others_->Fill(m_others,PTOT);
-	      Mbbnoh_->Fill(mbbnohmax,PTOT);
-	      DPbbnoh_->Fill(dpbbnohmax,PTOT);
-	      M6_->Fill(m6,PTOT);
-	      C6_->Fill(c6,PTOT);
-	      M8_->Fill(m8,PTOT);
-	      C8_->Fill(c8,PTOT);
-	      M45bestall_->Fill(m45bestall,PTOT);
-	      Chi2extall_->Fill(chi2extall,PTOT);
-	      DPbball_->Fill(dpbball,PTOT);
-	      SumHED4_->Fill(sumhed4,PTOT);
-	      SumHPD4_->Fill(sumhpd4,PTOT);
-	      SumHED6_->Fill(sumhed6,PTOT);
-	      SumHPD6_->Fill(sumhpd6,PTOT);
-	      for ( int i=0; i<iJ && i<NHSJ; i++ ) {
-		HED_->Fill(JHET[i],PTOT);
-		HPD_->Fill(JHPT[i],PTOT);
-	      } 
-	      Et6_->Fill(Et6,PTOT);
-	      Mwmin_->Fill(mwmin,PTOT);
-
-	      NJetsN_->Fill(goodIc5Jets,weight_N);
-	      UncorrHtN_->Fill(UncorrHt,weight_N);
-	      CorrHtN_->Fill(CorrHt,weight_N);
-	      GoodHtN_->Fill(GoodHt,weight_N);
-	      GoodHt2N_->Fill(GoodHt2,weight_N);
-	      UncorrSumEtN_->Fill(UncorrSumEt,weight_N);
-	      CorrSumEtN_->Fill(CorrSumEt,weight_N);
-	      GoodSumEtN_->Fill(GoodSumEt,weight_N);
-	      MEtN_->Fill(met,weight_N);
-	      MEtSigN_->Fill(metsig,weight_N);
-	      MEtSigNewN_->Fill(metsignew,weight_N);
-	      MEtDPMN_->Fill(dpmin,weight_N);
-	      MEtDP1N_->Fill(dp1st,weight_N);
-	      MEtDP2N_->Fill(dp2nd,weight_N);
-	      MEtDP3N_->Fill(dp3rd,weight_N);
-	      UncorrMEtSigN_->Fill(UncorrMEtSig,weight_N);
-	      CorrMEtSigN_->Fill(CorrMEtSig,weight_N);
-	      M3bestN_->Fill(m3best,weight_N);
-	      MwbestN_->Fill(mwbest,weight_N);
-	      Chi2massN_->Fill(chi2,weight_N);
-	      M45bestN_->Fill(m45best,weight_N);
-	      Chi2extN_->Fill(chi2ext,weight_N);
-	      MEx_SumEtN_->Fill(sumet,met*cos(metphi),weight_N);
-	      MEx_SumEtN_->Fill(sumet,met*sin(metphi),weight_N);
-	      DP12N_->Fill(dp12,weight_N);
-	      DPbbN_->Fill(dpbb,weight_N);
-	      M_othersN_->Fill(m_others,weight_N);
-	      MbbnohN_->Fill(mbbnohmax,weight_N);
-	      DPbbnohN_->Fill(dpbbnohmax,weight_N);
-	      M6N_->Fill(m6,weight_N);
-	      C6N_->Fill(c6,weight_N);
-	      M8N_->Fill(m8,weight_N);
-	      C8N_->Fill(c8,weight_N);
-	      M45bestallN_->Fill(m45bestall,weight_N);
-	      Chi2extallN_->Fill(chi2extall,weight_N);
-	      DPbballN_->Fill(dpbball,weight_N);
-	      SumHED4N_->Fill(sumhed4,weight_N);
-	      SumHPD4N_->Fill(sumhpd4,weight_N);
-	      SumHED6N_->Fill(sumhed6,weight_N);
-	      SumHPD6N_->Fill(sumhpd6,weight_N);
-	      for ( int i=0; i<iJ && i<NHSJ; i++ ) {
-		HEDN_->Fill(JHET[i],weight_N);
-		HPDN_->Fill(JHPT[i],weight_N);
-	      } 
-	      Et6N_->Fill(Et6,weight_N);
-	      MwminN_->Fill(mwmin,weight_N);
-	      
-	      if ( MEtSigCut && NHEM>=2 ) {
-		NJetsS_->Fill(goodIc5Jets,PTOT);
-		UncorrHtS_->Fill(UncorrHt,PTOT);
-		CorrHtS_->Fill(CorrHt,PTOT);
-		GoodHtS_->Fill(GoodHt,PTOT);
-		GoodHt2S_->Fill(GoodHt2,PTOT);
-		UncorrSumEtS_->Fill(UncorrSumEt,PTOT);
-		CorrSumEtS_->Fill(CorrSumEt,PTOT);
-		GoodSumEtS_->Fill(GoodSumEt,PTOT);
-		MEtS_->Fill(met,PTOT);
-		MEtSigS_->Fill(metsig,PTOT);
-		MEtSigNewS_->Fill(metsignew,PTOT);
-		MEtDPMS_->Fill(dpmin,PTOT);
-		MEtDP1S_->Fill(dp1st,PTOT);
-		MEtDP2S_->Fill(dp2nd,PTOT);
-		MEtDP3S_->Fill(dp3rd,PTOT);
-		UncorrMEtSigS_->Fill(UncorrMEtSig,PTOT);
-		CorrMEtSigS_->Fill(CorrMEtSig,PTOT);
-		M3bestS_->Fill(m3best,PTOT);
-		MwbestS_->Fill(mwbest,PTOT);
-		Chi2massS_->Fill(chi2,PTOT);
-		M45bestS_->Fill(m45best,PTOT);
-		Chi2extS_->Fill(chi2ext,PTOT);
-		MEx_SumEtS_->Fill(sumet,met*cos(metphi),PTOT);
-		MEx_SumEtS_->Fill(sumet,met*sin(metphi),PTOT);
-		DP12S_->Fill(dp12,PTOT);
-		DPbbS_->Fill(dpbb,PTOT);
-		M_othersS_->Fill(m_others,PTOT);
-		MbbnohS_->Fill(mbbnohmax,PTOT);
-		DPbbnohS_->Fill(dpbbnohmax,PTOT);
-		M6S_->Fill(m6,PTOT);
-		C6S_->Fill(c6,PTOT);
-		M8S_->Fill(m8,PTOT);
-		C8S_->Fill(c8,PTOT);
-		M45bestallS_->Fill(m45bestall,PTOT);
-		Chi2extallS_->Fill(chi2extall,PTOT);
-		DPbballS_->Fill(dpbball,PTOT);
-		SumHED4S_->Fill(sumhed4,PTOT);
-		SumHPD4S_->Fill(sumhpd4,PTOT);
-		SumHED6S_->Fill(sumhed6,PTOT);
-		SumHPD6S_->Fill(sumhpd6,PTOT);
-		for ( int i=0; i<iJ && i<NHSJ; i++ ) {
-		  HEDS_->Fill(JHET[i],PTOT);
-		  HPDS_->Fill(JHPT[i],PTOT);
-		} 
-		Et6S_->Fill(Et6,PTOT);
-		MwminS_->Fill(mwmin,PTOT);
-
-		NJetsSN_->Fill(goodIc5Jets,weight_N);
-		UncorrHtSN_->Fill(UncorrHt,weight_N);
-		CorrHtSN_->Fill(CorrHt,weight_N);
-		GoodHtSN_->Fill(GoodHt,weight_N);
-		GoodHt2SN_->Fill(GoodHt2,weight_N);
-		UncorrSumEtSN_->Fill(UncorrSumEt,weight_N);
-		CorrSumEtSN_->Fill(CorrSumEt,weight_N);
-		GoodSumEtSN_->Fill(GoodSumEt,weight_N);
-		MEtSN_->Fill(met,weight_N);
-		MEtSigSN_->Fill(metsig,weight_N);
-		MEtSigNewSN_->Fill(metsignew,weight_N);
-		MEtDPMSN_->Fill(dpmin,weight_N);
-		MEtDP1SN_->Fill(dp1st,weight_N);
-		MEtDP2SN_->Fill(dp2nd,weight_N);
-		MEtDP3SN_->Fill(dp3rd,weight_N);
-		UncorrMEtSigSN_->Fill(UncorrMEtSig,weight_N);
-		CorrMEtSigSN_->Fill(CorrMEtSig,weight_N);
-		M3bestSN_->Fill(m3best,weight_N);
-		MwbestSN_->Fill(mwbest,weight_N);
-		Chi2massSN_->Fill(chi2,weight_N);
-		M45bestSN_->Fill(m45best,weight_N);
-		Chi2extSN_->Fill(chi2ext,weight_N);
-		MEx_SumEtSN_->Fill(sumet,met*cos(metphi),weight_N);
-		MEx_SumEtSN_->Fill(sumet,met*sin(metphi),weight_N);
-		DP12SN_->Fill(dp12,weight_N);
-		DPbbSN_->Fill(dpbb,weight_N);
-		M_othersSN_->Fill(m_others,weight_N);
-		MbbnohSN_->Fill(mbbnohmax,weight_N);
-		DPbbnohSN_->Fill(dpbbnohmax,weight_N);
-		M6SN_->Fill(m6,weight_N);
-		C6SN_->Fill(c6,weight_N);
-		M8SN_->Fill(m8,weight_N);
-		C8SN_->Fill(c8,weight_N);
-		M45bestallSN_->Fill(m45bestall,weight_N);
-		Chi2extallSN_->Fill(chi2extall,weight_N);
-		DPbballSN_->Fill(dpbball,weight_N);
-		SumHED4SN_->Fill(sumhed4,weight_N);
-		SumHPD4SN_->Fill(sumhpd4,weight_N);
-		SumHED6SN_->Fill(sumhed6,weight_N);
-		SumHPD6SN_->Fill(sumhpd6,weight_N);
-		for ( int i=0; i<iJ && i<NHSJ; i++ ) {
-		  HEDSN_->Fill(JHET[i],weight_N);
-		  HPDSN_->Fill(JHPT[i],weight_N);
-		} 
-		Et6SN_->Fill(Et6,weight_N);
-		MwminSN_->Fill(mwmin,weight_N);
-	      
-		if ( NHEM>=3 ) {
-		  NJetsSS_->Fill(goodIc5Jets,PTOT);
-		  UncorrHtSS_->Fill(UncorrHt,PTOT);
-		  CorrHtSS_->Fill(CorrHt,PTOT);
-		  GoodHtSS_->Fill(GoodHt,PTOT);
-		  GoodHt2SS_->Fill(GoodHt2,PTOT);
-		  UncorrSumEtSS_->Fill(UncorrSumEt,PTOT);
-		  CorrSumEtSS_->Fill(CorrSumEt,PTOT);
-		  GoodSumEtSS_->Fill(GoodSumEt,PTOT);
-		  MEtSS_->Fill(met,PTOT);
-		  MEtSigSS_->Fill(metsig,PTOT);
-		  MEtSigNewSS_->Fill(metsignew,PTOT);
-		  MEtDPMSS_->Fill(dpmin,PTOT);
-		  MEtDP1SS_->Fill(dp1st,PTOT);
-		  MEtDP2SS_->Fill(dp2nd,PTOT);
-		  MEtDP3SS_->Fill(dp3rd,PTOT);
-		  UncorrMEtSigSS_->Fill(UncorrMEtSig,PTOT);
-		  CorrMEtSigSS_->Fill(CorrMEtSig,PTOT);
-		  M3bestSS_->Fill(m3best,PTOT);
-		  MwbestSS_->Fill(mwbest,PTOT);
-		  Chi2massSS_->Fill(chi2,PTOT);
-		  M45bestSS_->Fill(m45best,PTOT);
-		  Chi2extSS_->Fill(chi2ext,PTOT);
-		  MEx_SumEtSS_->Fill(sumet,met*cos(metphi),PTOT);
-		  MEx_SumEtSS_->Fill(sumet,met*sin(metphi),PTOT);
-		  DP12SS_->Fill(dp12,PTOT);
-		  DPbbSS_->Fill(dpbb,PTOT);
-		  M_othersSS_->Fill(m_others,PTOT);      
-		  MbbnohSS_->Fill(mbbnohmax,PTOT);
-		  DPbbnohSS_->Fill(dpbbnohmax,PTOT);
-		  M6SS_->Fill(m6,PTOT);
-		  C6SS_->Fill(c6,PTOT);
-		  M8SS_->Fill(m8,PTOT);
-		  C8SS_->Fill(c8,PTOT);
-		  M45bestallSS_->Fill(m45bestall,PTOT);
-		  Chi2extallSS_->Fill(chi2extall,PTOT);
-		  DPbballSS_->Fill(dpbball,PTOT);
-		  SumHED4SS_->Fill(sumhed4,PTOT);
-		  SumHPD4SS_->Fill(sumhpd4,PTOT);
-		  SumHED6SS_->Fill(sumhed6,PTOT);
-		  SumHPD6SS_->Fill(sumhpd6,PTOT);
-		  for ( int i=0; i<iJ && i<NHSJ; i++ ) {
-		    HEDSS_->Fill(JHET[i],PTOT);
-		    HPDSS_->Fill(JHPT[i],PTOT);
-		  } 
-		  Et6SS_->Fill(Et6,PTOT);
-		  MwminSS_->Fill(mwmin,PTOT);
-
-		  NJetsSSN_->Fill(goodIc5Jets,weight_N);
-		  UncorrHtSSN_->Fill(UncorrHt,weight_N);
-		  CorrHtSSN_->Fill(CorrHt,weight_N);
-		  GoodHtSSN_->Fill(GoodHt,weight_N);
-		  GoodHt2SSN_->Fill(GoodHt2,weight_N);
-		  UncorrSumEtSSN_->Fill(UncorrSumEt,weight_N);
-		  CorrSumEtSSN_->Fill(CorrSumEt,weight_N);
-		  GoodSumEtSSN_->Fill(GoodSumEt,weight_N);
-		  MEtSSN_->Fill(met,weight_N);
-		  MEtSigSSN_->Fill(metsig,weight_N);
-		  MEtSigNewSSN_->Fill(metsignew,weight_N);
-		  MEtDPMSSN_->Fill(dpmin,weight_N);
-		  MEtDP1SSN_->Fill(dp1st,weight_N);
-		  MEtDP2SSN_->Fill(dp2nd,weight_N);
-		  MEtDP3SSN_->Fill(dp3rd,weight_N);
-		  UncorrMEtSigSSN_->Fill(UncorrMEtSig,weight_N);
-		  CorrMEtSigSSN_->Fill(CorrMEtSig,weight_N);
-		  M3bestSSN_->Fill(m3best,weight_N);
-		  MwbestSSN_->Fill(mwbest,weight_N);
-		  Chi2massSSN_->Fill(chi2,weight_N);
-		  M45bestSSN_->Fill(m45best,weight_N);
-		  Chi2extSSN_->Fill(chi2ext,weight_N);
-		  MEx_SumEtSSN_->Fill(sumet,met*cos(metphi),weight_N);
-		  MEx_SumEtSSN_->Fill(sumet,met*sin(metphi),weight_N);
-		  DP12SSN_->Fill(dp12,weight_N);
-		  DPbbSSN_->Fill(dpbb,weight_N);
-		  M_othersSSN_->Fill(m_others,weight_N);      
-		  MbbnohSSN_->Fill(mbbnohmax,weight_N);
-		  DPbbnohSSN_->Fill(dpbbnohmax,weight_N);
-		  M6SSN_->Fill(m6,weight_N);
-		  C6SSN_->Fill(c6,weight_N);
-		  M8SSN_->Fill(m8,weight_N);
-		  C8SSN_->Fill(c8,weight_N);
-		  M45bestallSSN_->Fill(m45bestall,weight_N);
-		  Chi2extallSSN_->Fill(chi2extall,weight_N);
-		  DPbballSSN_->Fill(dpbball,weight_N);
-		  SumHED4SSN_->Fill(sumhed4,weight_N);
-		  SumHPD4SSN_->Fill(sumhpd4,weight_N);
-		  SumHED6SSN_->Fill(sumhed6,weight_N);
-		  SumHPD6SSN_->Fill(sumhpd6,weight_N);
-		  for ( int i=0; i<iJ && i<NHSJ; i++ ) {
-		    HEDSSN_->Fill(JHET[i],weight_N);
-		    HPDSSN_->Fill(JHPT[i],weight_N);
-		  } 
+	    // Now compute mass and angle of two b-jets not chosen as H decay
+	    // --------------------------------------------------------------
+	    spx=0;
+	    spy=0;
+	    spz=0;
+	    se=0;
+	    double mbbnoh;
+	    for ( int k1=0; k1<iJ-1 && k1<NHSJ-1; k1++ ) {
+	      if ( k1!=ih1 && k1!=ih2 && JHEM[k1] ) {
+		for ( int k2=k1+1; k2<iJ && k2<NHSJ; k2++ ) { // limit to 8 the number of jets from h.s.
+		  if ( k2!=ih1 && k2!=ih2 && JHEM[k2] ) {
+		    px1=JEt[k1]*cos(Jphi[k1]);
+		    py1=JEt[k1]*sin(Jphi[k1]);
+		    pz1=JEt[k1]/tan(2*atan(exp(-Jeta[k1])));
+		    px2=JEt[k2]*cos(Jphi[k2]);
+		    py2=JEt[k2]*sin(Jphi[k2]);
+		    pz2=JEt[k2]/tan(2*atan(exp(-Jeta[k2])));
+		    spx=px1+px2;
+		    spy=py1+py2;
+		    spz=pz1+pz2;
+		    se=sqrt(px1*px1+py1*py1+pz1*pz1)+sqrt(px2*px2+py2*py2+pz2*pz2);
+		  }
+		  mbbnoh=se*se-spx*spx-spy*spy-spz*spz;
+		  if ( mbbnoh>0 ) mbbnoh=sqrt(mbbnoh);
+		  if ( mbbnoh>mbbnohmax ) {
+		    mbbnohmax=mbbnoh;
+		    dpbbnohmax=3.1415926-fabs(fabs(Jphi[k1]-Jphi[k2])-3.1415926);
+		  }
 		}
-		Et6SSN_->Fill(Et6,weight_N);
-		MwminSSN_->Fill(mwmin,weight_N);
-		
-		if ( NHEM>=4 ) {
-		  NJetsSSS_->Fill(goodIc5Jets,PTOT);
-		  UncorrHtSSS_->Fill(UncorrHt,PTOT);
-		  CorrHtSSS_->Fill(CorrHt,PTOT);
-		  GoodHtSSS_->Fill(GoodHt,PTOT);
-		  GoodHt2SSS_->Fill(GoodHt2,PTOT);
-		  UncorrSumEtSSS_->Fill(UncorrSumEt,PTOT);
-		  CorrSumEtSSS_->Fill(CorrSumEt,PTOT);
-		  GoodSumEtSSS_->Fill(GoodSumEt,PTOT);
-		  MEtSSS_->Fill(met,PTOT);
-		  MEtSigSSS_->Fill(metsig,PTOT);
-		  MEtSigNewSSS_->Fill(metsignew,PTOT);
-		  MEtDPMSSS_->Fill(dpmin,PTOT);
-		  MEtDP1SSS_->Fill(dp1st,PTOT);
-		  MEtDP2SSS_->Fill(dp2nd,PTOT);
-		  MEtDP3SSS_->Fill(dp3rd,PTOT);
-		  UncorrMEtSigSSS_->Fill(UncorrMEtSig,PTOT);
-		  CorrMEtSigSSS_->Fill(CorrMEtSig,PTOT);
-		  M3bestSSS_->Fill(m3best,PTOT);
-		  MwbestSSS_->Fill(mwbest,PTOT);
-		  Chi2massSSS_->Fill(chi2,PTOT);
-		  M45bestSSS_->Fill(m45best,PTOT);
-		  Chi2extSSS_->Fill(chi2ext,PTOT);
-		  MEx_SumEtSSS_->Fill(sumet,met*cos(metphi),PTOT);
-		  MEx_SumEtSSS_->Fill(sumet,met*sin(metphi),PTOT);
-		  DP12SSS_->Fill(dp12,PTOT);
-		  DPbbSSS_->Fill(dpbb,PTOT);
-		  M_othersSSS_->Fill(m_others,PTOT);      
-		  MbbnohSSS_->Fill(mbbnohmax,PTOT);
-		  DPbbnohSSS_->Fill(dpbbnohmax,PTOT);
-		  M6SSS_->Fill(m6,PTOT);
-		  C6SSS_->Fill(c6,PTOT);
-		  M8SSS_->Fill(m8,PTOT);
-		  C8SSS_->Fill(c8,PTOT);
-		  M45bestallSSS_->Fill(m45bestall,PTOT);
-		  Chi2extallSSS_->Fill(chi2extall,PTOT);
-		  DPbballSSS_->Fill(dpbball,PTOT);
-		  SumHED4SSS_->Fill(sumhed4,PTOT);
-		  SumHPD4SSS_->Fill(sumhpd4,PTOT);
-		  SumHED6SSS_->Fill(sumhed6,PTOT);
-		  SumHPD6SSS_->Fill(sumhpd6,PTOT);
-		  for ( int i=0; i<iJ && i<NHSJ; i++ ) {
-		    HEDSSS_->Fill(JHET[i],PTOT);
-		    HPDSSS_->Fill(JHPT[i],PTOT);
-		  } 
-		  Et6SSS_->Fill(Et6,PTOT);
-		  MwminSSS_->Fill(mwmin,PTOT);
+	      }      
+	    }
+	  }      
+	} // end if it1+it2+it3>0      
+	
+	// Now compute mass of first 8 jets and their centrality
+        // -----------------------------------------------------
+	spx=0;
+	spy=0;
+	spz=0;
+	se=0;
+	set=0;
+	for ( int k=0; k<iJ && k<NHSJ; k++ ) {
+	  px=JEt[k]*cos(Jphi[k]);
+	  py=JEt[k]*sin(Jphi[k]);
+	  pz=JEt[k]/tan(2*atan(exp(-Jeta[k])));
+	  spx+=px;
+	  spy+=py;
+	  spz+=pz;
+	  se+=sqrt(px*px+py*py+pz*pz);
+	  set+=JEt[k];
+	}
+	m8=se*se-spx*spx-spy*spy-spz*spz;
+	if ( m8>0 ) { 
+	  m8=sqrt(m8);
+	  c8=set/m8;
+	}
+	// Now compute mass of first 6 jets and their centrality
+	// -----------------------------------------------------
+	spx=0;
+	spy=0;
+	spz=0;
+	se=0;
+	set=0;
+	for ( int k=0; k<iJ && k<6; k++ ) {
+	  px=JEt[k]*cos(Jphi[k]);
+	  py=JEt[k]*sin(Jphi[k]);
+	  pz=JEt[k]/tan(2*atan(exp(-Jeta[k])));
+	  spx+=px;
+	  spy+=py;
+	  spz+=pz;
+	  se+=sqrt(px*px+py*py+pz*pz);
+	  set+=JEt[k];
+	}
+	m6=se*se-spx*spx-spy*spy-spz*spz;
+	if ( m6>0 ) { 
+	  m6=sqrt(m6);
+	  c6=set/m6;
+	}
 
-		  NJetsSSSN_->Fill(goodIc5Jets,weight_N);
-		  UncorrHtSSSN_->Fill(UncorrHt,weight_N);
-		  CorrHtSSSN_->Fill(CorrHt,weight_N);
-		  GoodHtSSSN_->Fill(GoodHt,weight_N);
-		  GoodHt2SSSN_->Fill(GoodHt2,weight_N);
-		  UncorrSumEtSSSN_->Fill(UncorrSumEt,weight_N);
-		  CorrSumEtSSSN_->Fill(CorrSumEt,weight_N);
-		  GoodSumEtSSSN_->Fill(GoodSumEt,weight_N);
-		  MEtSSSN_->Fill(met,weight_N);
-		  MEtSigSSSN_->Fill(metsig,weight_N);
-		  MEtSigNewSSSN_->Fill(metsignew,weight_N);
-		  MEtDPMSSSN_->Fill(dpmin,weight_N);
-		  MEtDP1SSSN_->Fill(dp1st,weight_N);
-		  MEtDP2SSSN_->Fill(dp2nd,weight_N);
-		  MEtDP3SSSN_->Fill(dp3rd,weight_N);
-		  UncorrMEtSigSSSN_->Fill(UncorrMEtSig,weight_N);
-		  CorrMEtSigSSSN_->Fill(CorrMEtSig,weight_N);
-		  M3bestSSSN_->Fill(m3best,weight_N);
-		  MwbestSSSN_->Fill(mwbest,weight_N);
-		  Chi2massSSSN_->Fill(chi2,weight_N);
-		  M45bestSSSN_->Fill(m45best,weight_N);
-		  Chi2extSSSN_->Fill(chi2ext,weight_N);
-		  MEx_SumEtSSSN_->Fill(sumet,met*cos(metphi),weight_N);
-		  MEx_SumEtSSSN_->Fill(sumet,met*sin(metphi),weight_N);
-		  DP12SSSN_->Fill(dp12,weight_N);
-		  DPbbSSSN_->Fill(dpbb,weight_N);
-		  M_othersSSSN_->Fill(m_others,weight_N);      
-		  MbbnohSSSN_->Fill(mbbnohmax,weight_N);
-		  DPbbnohSSSN_->Fill(dpbbnohmax,weight_N);
-		  M6SSSN_->Fill(m6,weight_N);
-		  C6SSSN_->Fill(c6,weight_N);
-		  M8SSSN_->Fill(m8,weight_N);
-		  C8SSSN_->Fill(c8,weight_N);
-		  M45bestallSSSN_->Fill(m45bestall,weight_N);
-		  Chi2extallSSSN_->Fill(chi2extall,weight_N);
-		  DPbballSSSN_->Fill(dpbball,weight_N);
-		  SumHED4SSSN_->Fill(sumhed4,weight_N);
-		  SumHPD4SSSN_->Fill(sumhpd4,weight_N);
-		  SumHED6SSSN_->Fill(sumhed6,weight_N);
-		  SumHPD6SSSN_->Fill(sumhpd6,weight_N);
-		  for ( int i=0; i<iJ && i<NHSJ; i++ ) {
-		    HEDSSSN_->Fill(JHET[i],weight_N);
-		    HPDSSSN_->Fill(JHPT[i],weight_N);
-		  } 
-		  Et6SSSN_->Fill(Et6,weight_N);
-		  MwminSSSN_->Fill(mwmin,weight_N);
-		}
-
-	      }
+	// Compute most likely H pair from matrices
+	// ----------------------------------------
+	
+        
+	////////////////////////////////////////////////////////////////
+	// Now fill histograms
+	// -------------------
+	// Offline cuts
+	// ------------
+	if ( iJ >= 5 ) NJetsCut = true;
+	if ( metsig>3 ) MEtSigCut = true;
+	
+	// Fill kinematical histograms
+	// ---------------------------
+	double UncorrMEt =sqrt(UncorrSumEx*UncorrSumEx+UncorrSumEy*UncorrSumEy);
+	double CorrMEt = sqrt(CorrSumEx*CorrSumEx+CorrSumEy*CorrSumEy);
+	UncorrHt=UncorrHt0+UncorrMEt;
+	CorrHt=CorrHt0+CorrMEt;
+	GoodHt=GoodHt0+CorrMEt;
+	GoodHt2=GoodHt20+met;
+	
+	if ( iJ>5 ) Et6=JEt[5];
+	
+	double UncorrMEtSig=0;
+	if ( UncorrSumEt>0 ) UncorrMEtSig = UncorrMEt/sqrt(UncorrSumEt);
+	double CorrMEtSig = 0;
+	if ( CorrSumEt>0 ) CorrMEtSig = CorrMEt/sqrt(CorrSumEt);  
+	
+	// Missing Et significance computed with tuned resolution function
+	// ---------------------------------------------------------------
+	double metsignew=0;
+	if ( sumet>0 ) 
+	  metsignew = met/(sqrt(2)*0.8033*pow(sumet,0.5004));
+	
+	if ( PTOT>0 ) {
+	  double weight_N = 1./pow (2.,iJmax);
+	  
+	  // Fill regular histograms
+	  // -----------------------
+	  UncorrMEt_SumEt_->Fill(sumet,UncorrMEt,PTOT);
+	  CorrMEt_SumEt_->Fill(sumet,CorrMEt,PTOT);
+	  MEt_SumEt_->Fill(sumet,met,PTOT);
+	  UncorrMEt_SumEtC_->Fill(CorrSumEt,UncorrMEt,PTOT);
+	  CorrMEt_SumEtC_->Fill(CorrSumEt,CorrMEt,PTOT);
+	  MEt_SumEtC_->Fill(CorrSumEt,met,PTOT);
+	  UncorrMEt_SumEtJ_->Fill(GoodSumEt,UncorrMEt,PTOT);
+	  CorrMEt_SumEtJ_->Fill(GoodSumEt,CorrMEt,PTOT);
+	  MEt_SumEtJ_->Fill(GoodSumEt,met,PTOT);
+	  
+	  // Apply trigger requirement
+	  // -------------------------
+	  if ( response && NJetsCut ) {
+	    NJets_->Fill(goodIc5Jets,PTOT);
+	    UncorrHt_->Fill(UncorrHt,PTOT);
+	    CorrHt_->Fill(CorrHt,PTOT);
+	    GoodHt_->Fill(GoodHt,PTOT);
+	    GoodHt2_->Fill(GoodHt2,PTOT);
+	    UncorrSumEt_->Fill(UncorrSumEt,PTOT);
+	    CorrSumEt_->Fill(CorrSumEt,PTOT);
+	    GoodSumEt_->Fill(GoodSumEt,PTOT);
+	    MEt_->Fill(met,PTOT);
+	    MEtSig_->Fill(metsig,PTOT);
+	    MEtSigNew_->Fill(metsignew,PTOT);
+	    MEtDPM_->Fill(dpmin,PTOT);
+	    MEtDP1_->Fill(dp1st,PTOT);
+	    MEtDP2_->Fill(dp2nd,PTOT);
+	    MEtDP3_->Fill(dp3rd,PTOT);
+	    UncorrMEtSig_->Fill(UncorrMEtSig,PTOT);
+	    CorrMEtSig_->Fill(CorrMEtSig,PTOT);
+	    M3best_->Fill(m3best,PTOT);
+	    Mwbest_->Fill(mwbest,PTOT);
+	    Chi2mass_->Fill(chi2,PTOT);
+	    M45best_->Fill(m45best,PTOT);
+	    Chi2ext_->Fill(chi2ext,PTOT);
+	    MEx_SumEt_->Fill(sumet,met*cos(metphi),PTOT);
+	    MEx_SumEt_->Fill(sumet,met*sin(metphi),PTOT);
+	    DP12_->Fill(dp12,PTOT);
+	    DPbb_->Fill(dpbb,PTOT);
+	    M_others_->Fill(m_others,PTOT);
+	    Mbbnoh_->Fill(mbbnohmax,PTOT);
+	    DPbbnoh_->Fill(dpbbnohmax,PTOT);
+	    M6_->Fill(m6,PTOT);
+	    C6_->Fill(c6,PTOT);
+	    M8_->Fill(m8,PTOT);
+	    C8_->Fill(c8,PTOT);
+	    M45bestall_->Fill(m45bestall,PTOT);
+	    Chi2extall_->Fill(chi2extall,PTOT);
+	    DPbball_->Fill(dpbball,PTOT);
+	    SumHED4_->Fill(sumhed4,PTOT);
+	    SumHPD4_->Fill(sumhpd4,PTOT);
+	    SumHED6_->Fill(sumhed6,PTOT);
+	    SumHPD6_->Fill(sumhpd6,PTOT);
+	    for ( int i=0; i<iJ && i<NHSJ; i++ ) {
+	      HED_->Fill(JHET[i],PTOT);
+	      HPD_->Fill(JHPT[i],PTOT);
 	    } 
-
-	    // Fill error histograms now
-	    // -------------------------
-
-	    UncorrMEt_SumEt_->Fill(sumet,UncorrMEt,PTOTE2);
-	    CorrMEt_SumEt_->Fill(sumet,CorrMEt,PTOTE2);
-	    MEt_SumEt_->Fill(sumet,met,PTOTE2);
-	    UncorrMEt_SumEtC_->Fill(CorrSumEt,UncorrMEt,PTOTE2);
-	    CorrMEt_SumEtC_->Fill(CorrSumEt,CorrMEt,PTOTE2);
-	    MEt_SumEtC_->Fill(CorrSumEt,met,PTOTE2);
-	    UncorrMEt_SumEtJ_->Fill(GoodSumEt,UncorrMEt,PTOTE2);
-	    CorrMEt_SumEtJ_->Fill(GoodSumEt,CorrMEt,PTOTE2);
-	    MEt_SumEtJ_->Fill(GoodSumEt,met,PTOTE2);
+	    Et6_->Fill(Et6,PTOT);
+	    Mwmin_->Fill(mwmin,PTOT);
+	    Hbestcomb_->Fill(hbestcomb,PTOT);
+	    Drpairbestall_->Fill(drpairbestall,PTOT);
 	    
-	    // Apply trigger requirement
-	    // -------------------------
-	    if ( response && NJetsCut ) {
-	      NJetsW_->Fill(goodIc5Jets,PTOTE2);
-	      UncorrHtW_->Fill(UncorrHt,PTOTE2);
-	      CorrHtW_->Fill(CorrHt,PTOTE2);
-	      GoodHtW_->Fill(GoodHt,PTOTE2);
-	      GoodHt2W_->Fill(GoodHt2,PTOTE2);
-	      UncorrSumEtW_->Fill(UncorrSumEt,PTOTE2);
-	      CorrSumEtW_->Fill(CorrSumEt,PTOTE2);
-	      GoodSumEtW_->Fill(GoodSumEt,PTOTE2);
-	      MEtW_->Fill(met,PTOTE2);
-	      MEtSigW_->Fill(metsig,PTOTE2);
-	      MEtSigNewW_->Fill(metsignew,PTOTE2);
-	      MEtDPMW_->Fill(dpmin,PTOTE2);
-	      MEtDP1W_->Fill(dp1st,PTOTE2);
-	      MEtDP2W_->Fill(dp2nd,PTOTE2);
-	      MEtDP3W_->Fill(dp3rd,PTOTE2);
-	      UncorrMEtSigW_->Fill(UncorrMEtSig,PTOTE2);
-	      CorrMEtSigW_->Fill(CorrMEtSig,PTOTE2);
-	      M3bestW_->Fill(m3best,PTOTE2);
-	      MwbestW_->Fill(mwbest,PTOTE2);
-	      Chi2massW_->Fill(chi2,PTOTE2);
-	      M45bestW_->Fill(m45best,PTOTE2);
-	      Chi2extW_->Fill(chi2ext,PTOTE2);
-	      MEx_SumEtW_->Fill(sumet,met*cos(metphi),PTOTE2);
-	      MEx_SumEtW_->Fill(sumet,met*sin(metphi),PTOTE2);
-	      DP12W_->Fill(dp12,PTOTE2);
-	      DPbbW_->Fill(dpbb,PTOTE2);
-	      M_othersW_->Fill(m_others,PTOTE2);
-	      MbbnohW_->Fill(mbbnohmax,PTOTE2);
-	      DPbbnohW_->Fill(dpbbnohmax,PTOTE2);
-	      M6W_->Fill(m6,PTOTE2);
-	      C6W_->Fill(c6,PTOTE2);
-	      M8W_->Fill(m8,PTOTE2);
-	      C8W_->Fill(c8,PTOTE2);
-	      M45bestallW_->Fill(m45bestall,PTOTE2);
-	      Chi2extallW_->Fill(chi2extall,PTOTE2);
-	      DPbballW_->Fill(dpbball,PTOTE2);
-	      SumHED4W_->Fill(sumhed4,PTOTE2);
-	      SumHPD4W_->Fill(sumhpd4,PTOTE2);
-	      SumHED6W_->Fill(sumhed6,PTOTE2);
-	      SumHPD6W_->Fill(sumhpd6,PTOTE2);
+	    NJetsN_->Fill(goodIc5Jets,weight_N);
+	    UncorrHtN_->Fill(UncorrHt,weight_N);
+	    CorrHtN_->Fill(CorrHt,weight_N);
+	    GoodHtN_->Fill(GoodHt,weight_N);
+	    GoodHt2N_->Fill(GoodHt2,weight_N);
+	    UncorrSumEtN_->Fill(UncorrSumEt,weight_N);
+	    CorrSumEtN_->Fill(CorrSumEt,weight_N);
+	    GoodSumEtN_->Fill(GoodSumEt,weight_N);
+	    MEtN_->Fill(met,weight_N);
+	    MEtSigN_->Fill(metsig,weight_N);
+	    MEtSigNewN_->Fill(metsignew,weight_N);
+	    MEtDPMN_->Fill(dpmin,weight_N);
+	    MEtDP1N_->Fill(dp1st,weight_N);
+	    MEtDP2N_->Fill(dp2nd,weight_N);
+	    MEtDP3N_->Fill(dp3rd,weight_N);
+	    UncorrMEtSigN_->Fill(UncorrMEtSig,weight_N);
+	    CorrMEtSigN_->Fill(CorrMEtSig,weight_N);
+	    M3bestN_->Fill(m3best,weight_N);
+	    MwbestN_->Fill(mwbest,weight_N);
+	    Chi2massN_->Fill(chi2,weight_N);
+	    M45bestN_->Fill(m45best,weight_N);
+	    Chi2extN_->Fill(chi2ext,weight_N);
+	    MEx_SumEtN_->Fill(sumet,met*cos(metphi),weight_N);
+	    MEx_SumEtN_->Fill(sumet,met*sin(metphi),weight_N);
+	    DP12N_->Fill(dp12,weight_N);
+	    DPbbN_->Fill(dpbb,weight_N);
+	    M_othersN_->Fill(m_others,weight_N);
+	    MbbnohN_->Fill(mbbnohmax,weight_N);
+	    DPbbnohN_->Fill(dpbbnohmax,weight_N);
+	    M6N_->Fill(m6,weight_N);
+	    C6N_->Fill(c6,weight_N);
+	    M8N_->Fill(m8,weight_N);
+	    C8N_->Fill(c8,weight_N);
+	    M45bestallN_->Fill(m45bestall,weight_N);
+	    Chi2extallN_->Fill(chi2extall,weight_N);
+	    DPbballN_->Fill(dpbball,weight_N);
+	    SumHED4N_->Fill(sumhed4,weight_N);
+	    SumHPD4N_->Fill(sumhpd4,weight_N);
+	    SumHED6N_->Fill(sumhed6,weight_N);
+	    SumHPD6N_->Fill(sumhpd6,weight_N);
+	    for ( int i=0; i<iJ && i<NHSJ; i++ ) {
+	      HEDN_->Fill(JHET[i],weight_N);
+	      HPDN_->Fill(JHPT[i],weight_N);
+	    } 
+	    Et6N_->Fill(Et6,weight_N);
+	    MwminN_->Fill(mwmin,weight_N);
+	    HbestcombN_->Fill(hbestcomb,weight_N);
+	    DrpairbestallN_->Fill(drpairbestall,weight_N);
+	    
+	    if ( MEtSigCut && NHEM>=2 ) {
+	      NJetsS_->Fill(goodIc5Jets,PTOT);
+	      UncorrHtS_->Fill(UncorrHt,PTOT);
+	      CorrHtS_->Fill(CorrHt,PTOT);
+	      GoodHtS_->Fill(GoodHt,PTOT);
+	      GoodHt2S_->Fill(GoodHt2,PTOT);
+	      UncorrSumEtS_->Fill(UncorrSumEt,PTOT);
+	      CorrSumEtS_->Fill(CorrSumEt,PTOT);
+	      GoodSumEtS_->Fill(GoodSumEt,PTOT);
+	      MEtS_->Fill(met,PTOT);
+	      MEtSigS_->Fill(metsig,PTOT);
+	      MEtSigNewS_->Fill(metsignew,PTOT);
+	      MEtDPMS_->Fill(dpmin,PTOT);
+	      MEtDP1S_->Fill(dp1st,PTOT);
+	      MEtDP2S_->Fill(dp2nd,PTOT);
+	      MEtDP3S_->Fill(dp3rd,PTOT);
+	      UncorrMEtSigS_->Fill(UncorrMEtSig,PTOT);
+	      CorrMEtSigS_->Fill(CorrMEtSig,PTOT);
+	      M3bestS_->Fill(m3best,PTOT);
+	      MwbestS_->Fill(mwbest,PTOT);
+	      Chi2massS_->Fill(chi2,PTOT);
+	      M45bestS_->Fill(m45best,PTOT);
+	      Chi2extS_->Fill(chi2ext,PTOT);
+	      MEx_SumEtS_->Fill(sumet,met*cos(metphi),PTOT);
+	      MEx_SumEtS_->Fill(sumet,met*sin(metphi),PTOT);
+	      DP12S_->Fill(dp12,PTOT);
+	      DPbbS_->Fill(dpbb,PTOT);
+	      M_othersS_->Fill(m_others,PTOT);
+	      MbbnohS_->Fill(mbbnohmax,PTOT);
+	      DPbbnohS_->Fill(dpbbnohmax,PTOT);
+	      M6S_->Fill(m6,PTOT);
+	      C6S_->Fill(c6,PTOT);
+	      M8S_->Fill(m8,PTOT);
+	      C8S_->Fill(c8,PTOT);
+	      M45bestallS_->Fill(m45bestall,PTOT);
+	      Chi2extallS_->Fill(chi2extall,PTOT);
+	      DPbballS_->Fill(dpbball,PTOT);
+	      SumHED4S_->Fill(sumhed4,PTOT);
+	      SumHPD4S_->Fill(sumhpd4,PTOT);
+	      SumHED6S_->Fill(sumhed6,PTOT);
+	      SumHPD6S_->Fill(sumhpd6,PTOT);
 	      for ( int i=0; i<iJ && i<NHSJ; i++ ) {
-		HEDW_->Fill(JHET[i],PTOTE2);
-		HPDW_->Fill(JHPT[i],PTOTE2);
+		HEDS_->Fill(JHET[i],PTOT);
+		HPDS_->Fill(JHPT[i],PTOT);
 	      } 
-	      Et6W_->Fill(Et6,PTOTE2);
-	      MwminW_->Fill(mwmin,PTOTE2);
+	      Et6S_->Fill(Et6,PTOT);
+	      MwminS_->Fill(mwmin,PTOT);
+	      HbestcombS_->Fill(hbestcomb,PTOT);
+	      DrpairbestallS_->Fill(drpairbestall,PTOT);
 	      
-	      if ( MEtSigCut && NHEM>=2 ) {
-		NJetsSW_->Fill(goodIc5Jets,PTOTE2);
-		UncorrHtSW_->Fill(UncorrHt,PTOTE2);
-		CorrHtSW_->Fill(CorrHt,PTOTE2);
-		GoodHtSW_->Fill(GoodHt,PTOTE2);
-		GoodHt2SW_->Fill(GoodHt2,PTOTE2);
-		UncorrSumEtSW_->Fill(UncorrSumEt,PTOTE2);
-		CorrSumEtSW_->Fill(CorrSumEt,PTOTE2);
-		GoodSumEtSW_->Fill(GoodSumEt,PTOTE2);
-		MEtSW_->Fill(met,PTOTE2);
-		MEtSigSW_->Fill(metsig,PTOTE2);
-		MEtSigNewSW_->Fill(metsignew,PTOTE2);
-		MEtDPMSW_->Fill(dpmin,PTOTE2);
-		MEtDP1SW_->Fill(dp1st,PTOTE2);
-		MEtDP2SW_->Fill(dp2nd,PTOTE2);
-		MEtDP3SW_->Fill(dp3rd,PTOTE2);
-		UncorrMEtSigSW_->Fill(UncorrMEtSig,PTOTE2);
-		CorrMEtSigSW_->Fill(CorrMEtSig,PTOTE2);
-		M3bestSW_->Fill(m3best,PTOTE2);
-		MwbestSW_->Fill(mwbest,PTOTE2);
-		Chi2massSW_->Fill(chi2,PTOTE2);
-		M45bestSW_->Fill(m45best,PTOTE2);
-		Chi2extSW_->Fill(chi2ext,PTOTE2);
-		MEx_SumEtSW_->Fill(sumet,met*cos(metphi),PTOTE2);
-		MEx_SumEtSW_->Fill(sumet,met*sin(metphi),PTOTE2);
-		DP12SW_->Fill(dp12,PTOTE2);
-		DPbbSW_->Fill(dpbb,PTOTE2);
-		M_othersSW_->Fill(m_others,PTOTE2);
-		MbbnohSW_->Fill(mbbnohmax,PTOTE2);
-		DPbbnohSW_->Fill(dpbbnohmax,PTOTE2);
-		M6SW_->Fill(m6,PTOTE2);
-		C6SW_->Fill(c6,PTOTE2);
-		M8SW_->Fill(m8,PTOTE2);
-		C8SW_->Fill(c8,PTOTE2);
-		M45bestallSW_->Fill(m45bestall,PTOTE2);
-		Chi2extallSW_->Fill(chi2extall,PTOTE2);
-		DPbballSW_->Fill(dpbball,PTOTE2);
-		SumHED4SW_->Fill(sumhed4,PTOTE2);
-		SumHPD4SW_->Fill(sumhpd4,PTOTE2);
-		SumHED6SW_->Fill(sumhed6,PTOTE2);
-		SumHPD6SW_->Fill(sumhpd6,PTOTE2);
+	      NJetsSN_->Fill(goodIc5Jets,weight_N);
+	      UncorrHtSN_->Fill(UncorrHt,weight_N);
+	      CorrHtSN_->Fill(CorrHt,weight_N);
+	      GoodHtSN_->Fill(GoodHt,weight_N);
+	      GoodHt2SN_->Fill(GoodHt2,weight_N);
+	      UncorrSumEtSN_->Fill(UncorrSumEt,weight_N);
+	      CorrSumEtSN_->Fill(CorrSumEt,weight_N);
+	      GoodSumEtSN_->Fill(GoodSumEt,weight_N);
+	      MEtSN_->Fill(met,weight_N);
+	      MEtSigSN_->Fill(metsig,weight_N);
+	      MEtSigNewSN_->Fill(metsignew,weight_N);
+	      MEtDPMSN_->Fill(dpmin,weight_N);
+	      MEtDP1SN_->Fill(dp1st,weight_N);
+	      MEtDP2SN_->Fill(dp2nd,weight_N);
+	      MEtDP3SN_->Fill(dp3rd,weight_N);
+	      UncorrMEtSigSN_->Fill(UncorrMEtSig,weight_N);
+	      CorrMEtSigSN_->Fill(CorrMEtSig,weight_N);
+	      M3bestSN_->Fill(m3best,weight_N);
+	      MwbestSN_->Fill(mwbest,weight_N);
+	      Chi2massSN_->Fill(chi2,weight_N);
+	      M45bestSN_->Fill(m45best,weight_N);
+	      Chi2extSN_->Fill(chi2ext,weight_N);
+	      MEx_SumEtSN_->Fill(sumet,met*cos(metphi),weight_N);
+	      MEx_SumEtSN_->Fill(sumet,met*sin(metphi),weight_N);
+	      DP12SN_->Fill(dp12,weight_N);
+	      DPbbSN_->Fill(dpbb,weight_N);
+	      M_othersSN_->Fill(m_others,weight_N);
+	      MbbnohSN_->Fill(mbbnohmax,weight_N);
+	      DPbbnohSN_->Fill(dpbbnohmax,weight_N);
+	      M6SN_->Fill(m6,weight_N);
+	      C6SN_->Fill(c6,weight_N);
+	      M8SN_->Fill(m8,weight_N);
+	      C8SN_->Fill(c8,weight_N);
+	      M45bestallSN_->Fill(m45bestall,weight_N);
+	      Chi2extallSN_->Fill(chi2extall,weight_N);
+	      DPbballSN_->Fill(dpbball,weight_N);
+	      SumHED4SN_->Fill(sumhed4,weight_N);
+	      SumHPD4SN_->Fill(sumhpd4,weight_N);
+	      SumHED6SN_->Fill(sumhed6,weight_N);
+	      SumHPD6SN_->Fill(sumhpd6,weight_N);
+	      for ( int i=0; i<iJ && i<NHSJ; i++ ) {
+		HEDSN_->Fill(JHET[i],weight_N);
+		HPDSN_->Fill(JHPT[i],weight_N);
+	      } 
+	      Et6SN_->Fill(Et6,weight_N);
+	      MwminSN_->Fill(mwmin,weight_N);
+	      HbestcombSN_->Fill(hbestcomb,weight_N);
+	      DrpairbestallSN_->Fill(drpairbestall,weight_N);
+	      
+	      if ( NHEM>=3 ) {
+		NJetsSS_->Fill(goodIc5Jets,PTOT);
+		UncorrHtSS_->Fill(UncorrHt,PTOT);
+		CorrHtSS_->Fill(CorrHt,PTOT);
+		GoodHtSS_->Fill(GoodHt,PTOT);
+		GoodHt2SS_->Fill(GoodHt2,PTOT);
+		UncorrSumEtSS_->Fill(UncorrSumEt,PTOT);
+		CorrSumEtSS_->Fill(CorrSumEt,PTOT);
+		GoodSumEtSS_->Fill(GoodSumEt,PTOT);
+		MEtSS_->Fill(met,PTOT);
+		MEtSigSS_->Fill(metsig,PTOT);
+		MEtSigNewSS_->Fill(metsignew,PTOT);
+		MEtDPMSS_->Fill(dpmin,PTOT);
+		MEtDP1SS_->Fill(dp1st,PTOT);
+		MEtDP2SS_->Fill(dp2nd,PTOT);
+		MEtDP3SS_->Fill(dp3rd,PTOT);
+		UncorrMEtSigSS_->Fill(UncorrMEtSig,PTOT);
+		CorrMEtSigSS_->Fill(CorrMEtSig,PTOT);
+		M3bestSS_->Fill(m3best,PTOT);
+		MwbestSS_->Fill(mwbest,PTOT);
+		Chi2massSS_->Fill(chi2,PTOT);
+		M45bestSS_->Fill(m45best,PTOT);
+		Chi2extSS_->Fill(chi2ext,PTOT);
+		MEx_SumEtSS_->Fill(sumet,met*cos(metphi),PTOT);
+		MEx_SumEtSS_->Fill(sumet,met*sin(metphi),PTOT);
+		DP12SS_->Fill(dp12,PTOT);
+		DPbbSS_->Fill(dpbb,PTOT);
+		M_othersSS_->Fill(m_others,PTOT);      
+		MbbnohSS_->Fill(mbbnohmax,PTOT);
+		DPbbnohSS_->Fill(dpbbnohmax,PTOT);
+		M6SS_->Fill(m6,PTOT);
+		C6SS_->Fill(c6,PTOT);
+		M8SS_->Fill(m8,PTOT);
+		C8SS_->Fill(c8,PTOT);
+		M45bestallSS_->Fill(m45bestall,PTOT);
+		Chi2extallSS_->Fill(chi2extall,PTOT);
+		DPbballSS_->Fill(dpbball,PTOT);
+		SumHED4SS_->Fill(sumhed4,PTOT);
+		SumHPD4SS_->Fill(sumhpd4,PTOT);
+		SumHED6SS_->Fill(sumhed6,PTOT);
+		SumHPD6SS_->Fill(sumhpd6,PTOT);
 		for ( int i=0; i<iJ && i<NHSJ; i++ ) {
-		  HEDSW_->Fill(JHET[i],PTOTE2);
-		  HPDSW_->Fill(JHPT[i],PTOTE2);
+		  HEDSS_->Fill(JHET[i],PTOT);
+		  HPDSS_->Fill(JHPT[i],PTOT);
 		} 
-		Et6SW_->Fill(Et6,PTOTE2);
-		MwminSW_->Fill(mwmin,PTOTE2);
-	      
-		if ( NHEM>=3 ) {
-		  NJetsSSW_->Fill(goodIc5Jets,PTOTE2);
-		  UncorrHtSSW_->Fill(UncorrHt,PTOTE2);
-		  CorrHtSSW_->Fill(CorrHt,PTOTE2);
-		  GoodHtSSW_->Fill(GoodHt,PTOTE2);
-		  GoodHt2SSW_->Fill(GoodHt2,PTOTE2);
-		  UncorrSumEtSSW_->Fill(UncorrSumEt,PTOTE2);
-		  CorrSumEtSSW_->Fill(CorrSumEt,PTOTE2);
-		  GoodSumEtSSW_->Fill(GoodSumEt,PTOTE2);
-		  MEtSSW_->Fill(met,PTOTE2);
-		  MEtSigSSW_->Fill(metsig,PTOTE2);
-		  MEtSigNewSSW_->Fill(metsignew,PTOTE2);
-		  MEtDPMSSW_->Fill(dpmin,PTOTE2);
-		  MEtDP1SSW_->Fill(dp1st,PTOTE2);
-		  MEtDP2SSW_->Fill(dp2nd,PTOTE2);
-		  MEtDP3SSW_->Fill(dp3rd,PTOTE2);
-		  UncorrMEtSigSSW_->Fill(UncorrMEtSig,PTOTE2);
-		  CorrMEtSigSSW_->Fill(CorrMEtSig,PTOTE2);
-		  M3bestSSW_->Fill(m3best,PTOTE2);
-		  MwbestSSW_->Fill(mwbest,PTOTE2);
-		  Chi2massSSW_->Fill(chi2,PTOTE2);
-		  M45bestSSW_->Fill(m45best,PTOTE2);
-		  Chi2extSSW_->Fill(chi2ext,PTOTE2);
-		  MEx_SumEtSSW_->Fill(sumet,met*cos(metphi),PTOTE2);
-		  MEx_SumEtSSW_->Fill(sumet,met*sin(metphi),PTOTE2);
-		  DP12SSW_->Fill(dp12,PTOTE2);
-		  DPbbSSW_->Fill(dpbb,PTOTE2);
-		  M_othersSSW_->Fill(m_others,PTOTE2);      
-		  MbbnohSSW_->Fill(mbbnohmax,PTOTE2);
-		  DPbbnohSSW_->Fill(dpbbnohmax,PTOTE2);
-		  M6SSW_->Fill(m6,PTOTE2);
-		  C6SSW_->Fill(c6,PTOTE2);
-		  M8SSW_->Fill(m8,PTOTE2);
-		  C8SSW_->Fill(c8,PTOTE2);
-		  M45bestallSSW_->Fill(m45bestall,PTOTE2);
-		  Chi2extallSSW_->Fill(chi2extall,PTOTE2);
-		  DPbballSSW_->Fill(dpbball,PTOTE2);
-		  SumHED4SSW_->Fill(sumhed4,PTOTE2);
-		  SumHPD4SSW_->Fill(sumhpd4,PTOTE2);
-		  SumHED6SSW_->Fill(sumhed6,PTOTE2);
-		  SumHPD6SSW_->Fill(sumhpd6,PTOTE2);
-		  for ( int i=0; i<iJ && i<NHSJ; i++ ) {
-		    HEDSSW_->Fill(JHET[i],PTOTE2);
-		    HPDSSW_->Fill(JHPT[i],PTOTE2);
-		  } 
-		  Et6SSW_->Fill(Et6,PTOTE2);
-		  MwminSSW_->Fill(mwmin,PTOTE2);
-		}
+		Et6SS_->Fill(Et6,PTOT);
+		MwminSS_->Fill(mwmin,PTOT);
+		HbestcombSS_->Fill(hbestcomb,PTOT);
+		DrpairbestallSS_->Fill(drpairbestall,PTOT);
 		
-		if ( NHEM>=4 ) {
-		  NJetsSSSW_->Fill(goodIc5Jets,PTOTE2);
-		  UncorrHtSSSW_->Fill(UncorrHt,PTOTE2);
-		  CorrHtSSSW_->Fill(CorrHt,PTOTE2);
-		  GoodHtSSSW_->Fill(GoodHt,PTOTE2);
-		  GoodHt2SSSW_->Fill(GoodHt2,PTOTE2);
-		  UncorrSumEtSSSW_->Fill(UncorrSumEt,PTOTE2);
-		  CorrSumEtSSSW_->Fill(CorrSumEt,PTOTE2);
-		  GoodSumEtSSSW_->Fill(GoodSumEt,PTOTE2);
-		  MEtSSSW_->Fill(met,PTOTE2);
-		  MEtSigSSSW_->Fill(metsig,PTOTE2);
-		  MEtSigNewSSSW_->Fill(metsignew,PTOTE2);
-		  MEtDPMSSSW_->Fill(dpmin,PTOTE2);
-		  MEtDP1SSSW_->Fill(dp1st,PTOTE2);
-		  MEtDP2SSSW_->Fill(dp2nd,PTOTE2);
-		  MEtDP3SSSW_->Fill(dp3rd,PTOTE2);
-		  UncorrMEtSigSSSW_->Fill(UncorrMEtSig,PTOTE2);
-		  CorrMEtSigSSSW_->Fill(CorrMEtSig,PTOTE2);
-		  M3bestSSSW_->Fill(m3best,PTOTE2);
-		  MwbestSSSW_->Fill(mwbest,PTOTE2);
-		  Chi2massSSSW_->Fill(chi2,PTOTE2);
-		  M45bestSSSW_->Fill(m45best,PTOTE2);
-		  Chi2extSSSW_->Fill(chi2ext,PTOTE2);
-		  MEx_SumEtSSSW_->Fill(sumet,met*cos(metphi),PTOTE2);
-		  MEx_SumEtSSSW_->Fill(sumet,met*sin(metphi),PTOTE2);
-		  DP12SSSW_->Fill(dp12,PTOTE2);
-		  DPbbSSSW_->Fill(dpbb,PTOTE2);
-		  M_othersSSSW_->Fill(m_others,PTOTE2);      
-		  MbbnohSSSW_->Fill(mbbnohmax,PTOTE2);
-		  DPbbnohSSSW_->Fill(dpbbnohmax,PTOTE2);
-		  M6SSSW_->Fill(m6,PTOTE2);
-		  C6SSSW_->Fill(c6,PTOTE2);
-		  M8SSSW_->Fill(m8,PTOTE2);
-		  C8SSSW_->Fill(c8,PTOTE2);
-		  M45bestallSSSW_->Fill(m45bestall,PTOTE2);
-		  Chi2extallSSSW_->Fill(chi2extall,PTOTE2);
-		  DPbballSSSW_->Fill(dpbball,PTOTE2);
-		  SumHED4SSSW_->Fill(sumhed4,PTOTE2);
-		  SumHPD4SSSW_->Fill(sumhpd4,PTOTE2);
-		  SumHED6SSSW_->Fill(sumhed6,PTOTE2);
-		  SumHPD6SSSW_->Fill(sumhpd6,PTOTE2);
-		  for ( int i=0; i<iJ && i<NHSJ; i++ ) {
-		    HEDSSSW_->Fill(JHET[i],PTOTE2);
-		    HPDSSSW_->Fill(JHPT[i],PTOTE2);
-		  } 
-		  Et6SSSW_->Fill(Et6,PTOTE2);
-		  MwminSSSW_->Fill(mwmin,PTOTE2);
-		}
+		NJetsSSN_->Fill(goodIc5Jets,weight_N);
+		UncorrHtSSN_->Fill(UncorrHt,weight_N);
+		CorrHtSSN_->Fill(CorrHt,weight_N);
+		GoodHtSSN_->Fill(GoodHt,weight_N);
+		GoodHt2SSN_->Fill(GoodHt2,weight_N);
+		UncorrSumEtSSN_->Fill(UncorrSumEt,weight_N);
+		CorrSumEtSSN_->Fill(CorrSumEt,weight_N);
+		GoodSumEtSSN_->Fill(GoodSumEt,weight_N);
+		MEtSSN_->Fill(met,weight_N);
+		MEtSigSSN_->Fill(metsig,weight_N);
+		MEtSigNewSSN_->Fill(metsignew,weight_N);
+		MEtDPMSSN_->Fill(dpmin,weight_N);
+		MEtDP1SSN_->Fill(dp1st,weight_N);
+		MEtDP2SSN_->Fill(dp2nd,weight_N);
+		MEtDP3SSN_->Fill(dp3rd,weight_N);
+		UncorrMEtSigSSN_->Fill(UncorrMEtSig,weight_N);
+		CorrMEtSigSSN_->Fill(CorrMEtSig,weight_N);
+		M3bestSSN_->Fill(m3best,weight_N);
+		MwbestSSN_->Fill(mwbest,weight_N);
+		Chi2massSSN_->Fill(chi2,weight_N);
+		M45bestSSN_->Fill(m45best,weight_N);
+		Chi2extSSN_->Fill(chi2ext,weight_N);
+		MEx_SumEtSSN_->Fill(sumet,met*cos(metphi),weight_N);
+		MEx_SumEtSSN_->Fill(sumet,met*sin(metphi),weight_N);
+		DP12SSN_->Fill(dp12,weight_N);
+		DPbbSSN_->Fill(dpbb,weight_N);
+		M_othersSSN_->Fill(m_others,weight_N);      
+		MbbnohSSN_->Fill(mbbnohmax,weight_N);
+		DPbbnohSSN_->Fill(dpbbnohmax,weight_N);
+		M6SSN_->Fill(m6,weight_N);
+		C6SSN_->Fill(c6,weight_N);
+		M8SSN_->Fill(m8,weight_N);
+		C8SSN_->Fill(c8,weight_N);
+		M45bestallSSN_->Fill(m45bestall,weight_N);
+		Chi2extallSSN_->Fill(chi2extall,weight_N);
+		DPbballSSN_->Fill(dpbball,weight_N);
+		SumHED4SSN_->Fill(sumhed4,weight_N);
+		SumHPD4SSN_->Fill(sumhpd4,weight_N);
+		SumHED6SSN_->Fill(sumhed6,weight_N);
+		SumHPD6SSN_->Fill(sumhpd6,weight_N);
+		for ( int i=0; i<iJ && i<NHSJ; i++ ) {
+		  HEDSSN_->Fill(JHET[i],weight_N);
+		  HPDSSN_->Fill(JHPT[i],weight_N);
+		} 
 	      }
+	      Et6SSN_->Fill(Et6,weight_N);
+	      MwminSSN_->Fill(mwmin,weight_N);
+	      HbestcombSSN_->Fill(hbestcomb,weight_N);
+	      DrpairbestallSSN_->Fill(drpairbestall,weight_N);
+	      
+	      if ( NHEM>=4 ) {
+		NJetsSSS_->Fill(goodIc5Jets,PTOT);
+		UncorrHtSSS_->Fill(UncorrHt,PTOT);
+		CorrHtSSS_->Fill(CorrHt,PTOT);
+		GoodHtSSS_->Fill(GoodHt,PTOT);
+		GoodHt2SSS_->Fill(GoodHt2,PTOT);
+		UncorrSumEtSSS_->Fill(UncorrSumEt,PTOT);
+		CorrSumEtSSS_->Fill(CorrSumEt,PTOT);
+		GoodSumEtSSS_->Fill(GoodSumEt,PTOT);
+		MEtSSS_->Fill(met,PTOT);
+		MEtSigSSS_->Fill(metsig,PTOT);
+		MEtSigNewSSS_->Fill(metsignew,PTOT);
+		MEtDPMSSS_->Fill(dpmin,PTOT);
+		MEtDP1SSS_->Fill(dp1st,PTOT);
+		MEtDP2SSS_->Fill(dp2nd,PTOT);
+		MEtDP3SSS_->Fill(dp3rd,PTOT);
+		UncorrMEtSigSSS_->Fill(UncorrMEtSig,PTOT);
+		CorrMEtSigSSS_->Fill(CorrMEtSig,PTOT);
+		M3bestSSS_->Fill(m3best,PTOT);
+		MwbestSSS_->Fill(mwbest,PTOT);
+		Chi2massSSS_->Fill(chi2,PTOT);
+		M45bestSSS_->Fill(m45best,PTOT);
+		Chi2extSSS_->Fill(chi2ext,PTOT);
+		MEx_SumEtSSS_->Fill(sumet,met*cos(metphi),PTOT);
+		MEx_SumEtSSS_->Fill(sumet,met*sin(metphi),PTOT);
+		DP12SSS_->Fill(dp12,PTOT);
+		DPbbSSS_->Fill(dpbb,PTOT);
+		M_othersSSS_->Fill(m_others,PTOT);      
+		MbbnohSSS_->Fill(mbbnohmax,PTOT);
+		DPbbnohSSS_->Fill(dpbbnohmax,PTOT);
+		M6SSS_->Fill(m6,PTOT);
+		C6SSS_->Fill(c6,PTOT);
+		M8SSS_->Fill(m8,PTOT);
+		C8SSS_->Fill(c8,PTOT);
+		M45bestallSSS_->Fill(m45bestall,PTOT);
+		Chi2extallSSS_->Fill(chi2extall,PTOT);
+		DPbballSSS_->Fill(dpbball,PTOT);
+		SumHED4SSS_->Fill(sumhed4,PTOT);
+		SumHPD4SSS_->Fill(sumhpd4,PTOT);
+		SumHED6SSS_->Fill(sumhed6,PTOT);
+		SumHPD6SSS_->Fill(sumhpd6,PTOT);
+		for ( int i=0; i<iJ && i<NHSJ; i++ ) {
+		  HEDSSS_->Fill(JHET[i],PTOT);
+		  HPDSSS_->Fill(JHPT[i],PTOT);
+		} 
+		Et6SSS_->Fill(Et6,PTOT);
+		MwminSSS_->Fill(mwmin,PTOT);
+		HbestcombSSS_->Fill(hbestcomb,PTOT);
+		DrpairbestallSSS_->Fill(drpairbestall,PTOT);
+		
+		NJetsSSSN_->Fill(goodIc5Jets,weight_N);
+		UncorrHtSSSN_->Fill(UncorrHt,weight_N);
+		CorrHtSSSN_->Fill(CorrHt,weight_N);
+		GoodHtSSSN_->Fill(GoodHt,weight_N);
+		GoodHt2SSSN_->Fill(GoodHt2,weight_N);
+		UncorrSumEtSSSN_->Fill(UncorrSumEt,weight_N);
+		CorrSumEtSSSN_->Fill(CorrSumEt,weight_N);
+		GoodSumEtSSSN_->Fill(GoodSumEt,weight_N);
+		MEtSSSN_->Fill(met,weight_N);
+		MEtSigSSSN_->Fill(metsig,weight_N);
+		MEtSigNewSSSN_->Fill(metsignew,weight_N);
+		MEtDPMSSSN_->Fill(dpmin,weight_N);
+		MEtDP1SSSN_->Fill(dp1st,weight_N);
+		MEtDP2SSSN_->Fill(dp2nd,weight_N);
+		MEtDP3SSSN_->Fill(dp3rd,weight_N);
+		UncorrMEtSigSSSN_->Fill(UncorrMEtSig,weight_N);
+		CorrMEtSigSSSN_->Fill(CorrMEtSig,weight_N);
+		M3bestSSSN_->Fill(m3best,weight_N);
+		MwbestSSSN_->Fill(mwbest,weight_N);
+		Chi2massSSSN_->Fill(chi2,weight_N);
+		M45bestSSSN_->Fill(m45best,weight_N);
+		Chi2extSSSN_->Fill(chi2ext,weight_N);
+		MEx_SumEtSSSN_->Fill(sumet,met*cos(metphi),weight_N);
+		MEx_SumEtSSSN_->Fill(sumet,met*sin(metphi),weight_N);
+		DP12SSSN_->Fill(dp12,weight_N);
+		DPbbSSSN_->Fill(dpbb,weight_N);
+		M_othersSSSN_->Fill(m_others,weight_N);      
+		MbbnohSSSN_->Fill(mbbnohmax,weight_N);
+		DPbbnohSSSN_->Fill(dpbbnohmax,weight_N);
+		M6SSSN_->Fill(m6,weight_N);
+		C6SSSN_->Fill(c6,weight_N);
+		M8SSSN_->Fill(m8,weight_N);
+		C8SSSN_->Fill(c8,weight_N);
+		M45bestallSSSN_->Fill(m45bestall,weight_N);
+		Chi2extallSSSN_->Fill(chi2extall,weight_N);
+		DPbballSSSN_->Fill(dpbball,weight_N);
+		SumHED4SSSN_->Fill(sumhed4,weight_N);
+		SumHPD4SSSN_->Fill(sumhpd4,weight_N);
+		SumHED6SSSN_->Fill(sumhed6,weight_N);
+		SumHPD6SSSN_->Fill(sumhpd6,weight_N);
+		for ( int i=0; i<iJ && i<NHSJ; i++ ) {
+		  HEDSSSN_->Fill(JHET[i],weight_N);
+		  HPDSSSN_->Fill(JHPT[i],weight_N);
+		} 
+		Et6SSSN_->Fill(Et6,weight_N);
+		MwminSSSN_->Fill(mwmin,weight_N);
+		HbestcombSSSN_->Fill(hbestcomb,weight_N);
+		DrpairbestallSSSN_->Fill(drpairbestall,weight_N);
+	      }
+	      
 	    }
+	  } 
 
-	    // Compute Likelihood
-	    // NB need to work on templates to make sure
-	    // they are well-defined and not null over the
-	    // support segment -> check Smooth.C
-	    // --------------------------------------------
-	    double r=1.0;
-	    double fs=0.;
-	    double fb=0.;
-	    rel_lik = 0.;
-	    int bx[11];
-	    bx[0]= (int)((c8/1.2)*50)+1;
-	    bx[1]= (int)((m45bestall/300.)*50)+1;
-	    bx[2]= (int)(chi2extall)+1;
-	    bx[3]= (int)((metsig/20.)*50)+1;
-	    bx[4]= (int)((m8/2500.)*50.)+1;
-	    bx[5]= (int)((met/500.)*50)+1;
-	    bx[6]= (int)((dp12/3.2)*50.)+1;
-	    bx[7]= (int)((dp2nd/3.2)*50)+1;
-	    bx[8]= (int)((c6/1.2)*50)+1;
-	    bx[9]= (int)((m6/2500.)*50.)+1;
-	    bx[10]= (int)((sumet/4000.)*50)+1;
-	    for ( int ivar=0; ivar<11; ivar++ ) {
-	      if ( bx[ivar]>=1 && bx[ivar]<=50 ) {
-		fs = HSS_sig[ivar]->GetBinContent(bx[ivar]);
-		fb = HSS_bgr[ivar]->GetBinContent(bx[ivar]);
-		if (fb>0 && fs>0 ) {
-		  r *= fs/fb;
-		} else {
-		  if ( fb==0 ) r *= 10.;  // Need to improve this kludge
-		  if ( fs==0 ) r *= 0.1; 
-		}
+	  // Fill error histograms now
+	  // -------------------------
+	  
+	  UncorrMEt_SumEt_->Fill(sumet,UncorrMEt,PTOTE2);
+	  CorrMEt_SumEt_->Fill(sumet,CorrMEt,PTOTE2);
+	  MEt_SumEt_->Fill(sumet,met,PTOTE2);
+	  UncorrMEt_SumEtC_->Fill(CorrSumEt,UncorrMEt,PTOTE2);
+	  CorrMEt_SumEtC_->Fill(CorrSumEt,CorrMEt,PTOTE2);
+	  MEt_SumEtC_->Fill(CorrSumEt,met,PTOTE2);
+	  UncorrMEt_SumEtJ_->Fill(GoodSumEt,UncorrMEt,PTOTE2);
+	  CorrMEt_SumEtJ_->Fill(GoodSumEt,CorrMEt,PTOTE2);
+	  MEt_SumEtJ_->Fill(GoodSumEt,met,PTOTE2);
+	  
+	  // Apply trigger requirement
+	  // -------------------------
+	  if ( response && NJetsCut ) {
+	    NJetsW_->Fill(goodIc5Jets,PTOTE2);
+	    UncorrHtW_->Fill(UncorrHt,PTOTE2);
+	    CorrHtW_->Fill(CorrHt,PTOTE2);
+	    GoodHtW_->Fill(GoodHt,PTOTE2);
+	    GoodHt2W_->Fill(GoodHt2,PTOTE2);
+	    UncorrSumEtW_->Fill(UncorrSumEt,PTOTE2);
+	    CorrSumEtW_->Fill(CorrSumEt,PTOTE2);
+	    GoodSumEtW_->Fill(GoodSumEt,PTOTE2);
+	    MEtW_->Fill(met,PTOTE2);
+	    MEtSigW_->Fill(metsig,PTOTE2);
+	    MEtSigNewW_->Fill(metsignew,PTOTE2);
+	    MEtDPMW_->Fill(dpmin,PTOTE2);
+	    MEtDP1W_->Fill(dp1st,PTOTE2);
+	    MEtDP2W_->Fill(dp2nd,PTOTE2);
+	    MEtDP3W_->Fill(dp3rd,PTOTE2);
+	    UncorrMEtSigW_->Fill(UncorrMEtSig,PTOTE2);
+	    CorrMEtSigW_->Fill(CorrMEtSig,PTOTE2);
+	    M3bestW_->Fill(m3best,PTOTE2);
+	    MwbestW_->Fill(mwbest,PTOTE2);
+	    Chi2massW_->Fill(chi2,PTOTE2);
+	    M45bestW_->Fill(m45best,PTOTE2);
+	    Chi2extW_->Fill(chi2ext,PTOTE2);
+	    MEx_SumEtW_->Fill(sumet,met*cos(metphi),PTOTE2);
+	    MEx_SumEtW_->Fill(sumet,met*sin(metphi),PTOTE2);
+	    DP12W_->Fill(dp12,PTOTE2);
+	    DPbbW_->Fill(dpbb,PTOTE2);
+	    M_othersW_->Fill(m_others,PTOTE2);
+	    MbbnohW_->Fill(mbbnohmax,PTOTE2);
+	    DPbbnohW_->Fill(dpbbnohmax,PTOTE2);
+	    M6W_->Fill(m6,PTOTE2);
+	    C6W_->Fill(c6,PTOTE2);
+	    M8W_->Fill(m8,PTOTE2);
+	    C8W_->Fill(c8,PTOTE2);
+	    M45bestallW_->Fill(m45bestall,PTOTE2);
+	    Chi2extallW_->Fill(chi2extall,PTOTE2);
+	    DPbballW_->Fill(dpbball,PTOTE2);
+	    SumHED4W_->Fill(sumhed4,PTOTE2);
+	    SumHPD4W_->Fill(sumhpd4,PTOTE2);
+	    SumHED6W_->Fill(sumhed6,PTOTE2);
+	    SumHPD6W_->Fill(sumhpd6,PTOTE2);
+	    for ( int i=0; i<iJ && i<NHSJ; i++ ) {
+	      HEDW_->Fill(JHET[i],PTOTE2);
+	      HPDW_->Fill(JHPT[i],PTOTE2);
+	    } 
+	    Et6W_->Fill(Et6,PTOTE2);
+	    MwminW_->Fill(mwmin,PTOTE2);
+	    HbestcombW_->Fill(hbestcomb,PTOTE2);
+	    DrpairbestallW_->Fill(drpairbestall,PTOTE2);
+	    
+	    if ( MEtSigCut && NHEM>=2 ) {
+	      NJetsSW_->Fill(goodIc5Jets,PTOTE2);
+	      UncorrHtSW_->Fill(UncorrHt,PTOTE2);
+	      CorrHtSW_->Fill(CorrHt,PTOTE2);
+	      GoodHtSW_->Fill(GoodHt,PTOTE2);
+	      GoodHt2SW_->Fill(GoodHt2,PTOTE2);
+	      UncorrSumEtSW_->Fill(UncorrSumEt,PTOTE2);
+	      CorrSumEtSW_->Fill(CorrSumEt,PTOTE2);
+	      GoodSumEtSW_->Fill(GoodSumEt,PTOTE2);
+	      MEtSW_->Fill(met,PTOTE2);
+	      MEtSigSW_->Fill(metsig,PTOTE2);
+	      MEtSigNewSW_->Fill(metsignew,PTOTE2);
+	      MEtDPMSW_->Fill(dpmin,PTOTE2);
+	      MEtDP1SW_->Fill(dp1st,PTOTE2);
+	      MEtDP2SW_->Fill(dp2nd,PTOTE2);
+	      MEtDP3SW_->Fill(dp3rd,PTOTE2);
+	      UncorrMEtSigSW_->Fill(UncorrMEtSig,PTOTE2);
+	      CorrMEtSigSW_->Fill(CorrMEtSig,PTOTE2);
+	      M3bestSW_->Fill(m3best,PTOTE2);
+	      MwbestSW_->Fill(mwbest,PTOTE2);
+	      Chi2massSW_->Fill(chi2,PTOTE2);
+	      M45bestSW_->Fill(m45best,PTOTE2);
+	      Chi2extSW_->Fill(chi2ext,PTOTE2);
+	      MEx_SumEtSW_->Fill(sumet,met*cos(metphi),PTOTE2);
+	      MEx_SumEtSW_->Fill(sumet,met*sin(metphi),PTOTE2);
+	      DP12SW_->Fill(dp12,PTOTE2);
+	      DPbbSW_->Fill(dpbb,PTOTE2);
+	      M_othersSW_->Fill(m_others,PTOTE2);
+	      MbbnohSW_->Fill(mbbnohmax,PTOTE2);
+	      DPbbnohSW_->Fill(dpbbnohmax,PTOTE2);
+	      M6SW_->Fill(m6,PTOTE2);
+	      C6SW_->Fill(c6,PTOTE2);
+	      M8SW_->Fill(m8,PTOTE2);
+	      C8SW_->Fill(c8,PTOTE2);
+	      M45bestallSW_->Fill(m45bestall,PTOTE2);
+	      Chi2extallSW_->Fill(chi2extall,PTOTE2);
+	      DPbballSW_->Fill(dpbball,PTOTE2);
+	      SumHED4SW_->Fill(sumhed4,PTOTE2);
+	      SumHPD4SW_->Fill(sumhpd4,PTOTE2);
+	      SumHED6SW_->Fill(sumhed6,PTOTE2);
+	      SumHPD6SW_->Fill(sumhpd6,PTOTE2);
+	      for ( int i=0; i<iJ && i<NHSJ; i++ ) {
+		HEDSW_->Fill(JHET[i],PTOTE2);
+		HPDSW_->Fill(JHPT[i],PTOTE2);
+	      } 
+	      Et6SW_->Fill(Et6,PTOTE2);
+	      MwminSW_->Fill(mwmin,PTOTE2);
+	      HbestcombSW_->Fill(hbestcomb,PTOTE2);
+	      DrpairbestallSW_->Fill(drpairbestall,PTOTE2);
+	      
+	      if ( NHEM>=3 ) {
+		NJetsSSW_->Fill(goodIc5Jets,PTOTE2);
+		UncorrHtSSW_->Fill(UncorrHt,PTOTE2);
+		CorrHtSSW_->Fill(CorrHt,PTOTE2);
+		GoodHtSSW_->Fill(GoodHt,PTOTE2);
+		GoodHt2SSW_->Fill(GoodHt2,PTOTE2);
+		UncorrSumEtSSW_->Fill(UncorrSumEt,PTOTE2);
+		CorrSumEtSSW_->Fill(CorrSumEt,PTOTE2);
+		GoodSumEtSSW_->Fill(GoodSumEt,PTOTE2);
+		MEtSSW_->Fill(met,PTOTE2);
+		MEtSigSSW_->Fill(metsig,PTOTE2);
+		MEtSigNewSSW_->Fill(metsignew,PTOTE2);
+		MEtDPMSSW_->Fill(dpmin,PTOTE2);
+		MEtDP1SSW_->Fill(dp1st,PTOTE2);
+		MEtDP2SSW_->Fill(dp2nd,PTOTE2);
+		MEtDP3SSW_->Fill(dp3rd,PTOTE2);
+		UncorrMEtSigSSW_->Fill(UncorrMEtSig,PTOTE2);
+		CorrMEtSigSSW_->Fill(CorrMEtSig,PTOTE2);
+		M3bestSSW_->Fill(m3best,PTOTE2);
+		MwbestSSW_->Fill(mwbest,PTOTE2);
+		Chi2massSSW_->Fill(chi2,PTOTE2);
+		M45bestSSW_->Fill(m45best,PTOTE2);
+		Chi2extSSW_->Fill(chi2ext,PTOTE2);
+		MEx_SumEtSSW_->Fill(sumet,met*cos(metphi),PTOTE2);
+		MEx_SumEtSSW_->Fill(sumet,met*sin(metphi),PTOTE2);
+		DP12SSW_->Fill(dp12,PTOTE2);
+		DPbbSSW_->Fill(dpbb,PTOTE2);
+		M_othersSSW_->Fill(m_others,PTOTE2);      
+		MbbnohSSW_->Fill(mbbnohmax,PTOTE2);
+		DPbbnohSSW_->Fill(dpbbnohmax,PTOTE2);
+		M6SSW_->Fill(m6,PTOTE2);
+		C6SSW_->Fill(c6,PTOTE2);
+		M8SSW_->Fill(m8,PTOTE2);
+		C8SSW_->Fill(c8,PTOTE2);
+		M45bestallSSW_->Fill(m45bestall,PTOTE2);
+		Chi2extallSSW_->Fill(chi2extall,PTOTE2);
+		DPbballSSW_->Fill(dpbball,PTOTE2);
+		SumHED4SSW_->Fill(sumhed4,PTOTE2);
+		SumHPD4SSW_->Fill(sumhpd4,PTOTE2);
+		SumHED6SSW_->Fill(sumhed6,PTOTE2);
+		SumHPD6SSW_->Fill(sumhpd6,PTOTE2);
+		for ( int i=0; i<iJ && i<NHSJ; i++ ) {
+		  HEDSSW_->Fill(JHET[i],PTOTE2);
+		  HPDSSW_->Fill(JHPT[i],PTOTE2);
+		} 
+		Et6SSW_->Fill(Et6,PTOTE2);
+		MwminSSW_->Fill(mwmin,PTOTE2);
+		HbestcombSSW_->Fill(hbestcomb,PTOTE2);
+		DrpairbestallSSW_->Fill(drpairbestall,PTOTE2);
+	      }
+	      
+	      if ( NHEM>=4 ) {
+		NJetsSSSW_->Fill(goodIc5Jets,PTOTE2);
+		UncorrHtSSSW_->Fill(UncorrHt,PTOTE2);
+		CorrHtSSSW_->Fill(CorrHt,PTOTE2);
+		GoodHtSSSW_->Fill(GoodHt,PTOTE2);
+		GoodHt2SSSW_->Fill(GoodHt2,PTOTE2);
+		UncorrSumEtSSSW_->Fill(UncorrSumEt,PTOTE2);
+		CorrSumEtSSSW_->Fill(CorrSumEt,PTOTE2);
+		GoodSumEtSSSW_->Fill(GoodSumEt,PTOTE2);
+		MEtSSSW_->Fill(met,PTOTE2);
+		MEtSigSSSW_->Fill(metsig,PTOTE2);
+		MEtSigNewSSSW_->Fill(metsignew,PTOTE2);
+		MEtDPMSSSW_->Fill(dpmin,PTOTE2);
+		MEtDP1SSSW_->Fill(dp1st,PTOTE2);
+		MEtDP2SSSW_->Fill(dp2nd,PTOTE2);
+		MEtDP3SSSW_->Fill(dp3rd,PTOTE2);
+		UncorrMEtSigSSSW_->Fill(UncorrMEtSig,PTOTE2);
+		CorrMEtSigSSSW_->Fill(CorrMEtSig,PTOTE2);
+		M3bestSSSW_->Fill(m3best,PTOTE2);
+		MwbestSSSW_->Fill(mwbest,PTOTE2);
+		Chi2massSSSW_->Fill(chi2,PTOTE2);
+		M45bestSSSW_->Fill(m45best,PTOTE2);
+		Chi2extSSSW_->Fill(chi2ext,PTOTE2);
+		MEx_SumEtSSSW_->Fill(sumet,met*cos(metphi),PTOTE2);
+		MEx_SumEtSSSW_->Fill(sumet,met*sin(metphi),PTOTE2);
+		DP12SSSW_->Fill(dp12,PTOTE2);
+		DPbbSSSW_->Fill(dpbb,PTOTE2);
+		M_othersSSSW_->Fill(m_others,PTOTE2);      
+		MbbnohSSSW_->Fill(mbbnohmax,PTOTE2);
+		DPbbnohSSSW_->Fill(dpbbnohmax,PTOTE2);
+		M6SSSW_->Fill(m6,PTOTE2);
+		C6SSSW_->Fill(c6,PTOTE2);
+		M8SSSW_->Fill(m8,PTOTE2);
+		C8SSSW_->Fill(c8,PTOTE2);
+		M45bestallSSSW_->Fill(m45bestall,PTOTE2);
+		Chi2extallSSSW_->Fill(chi2extall,PTOTE2);
+		DPbballSSSW_->Fill(dpbball,PTOTE2);
+		SumHED4SSSW_->Fill(sumhed4,PTOTE2);
+		SumHPD4SSSW_->Fill(sumhpd4,PTOTE2);
+		SumHED6SSSW_->Fill(sumhed6,PTOTE2);
+		SumHPD6SSSW_->Fill(sumhpd6,PTOTE2);
+		for ( int i=0; i<iJ && i<NHSJ; i++ ) {
+		  HEDSSSW_->Fill(JHET[i],PTOTE2);
+		  HPDSSSW_->Fill(JHPT[i],PTOTE2);
+		} 
+		Et6SSSW_->Fill(Et6,PTOTE2);
+		MwminSSSW_->Fill(mwmin,PTOTE2);
+		HbestcombSSSW_->Fill(hbestcomb,PTOTE2);
+		DrpairbestallSSSW_->Fill(drpairbestall,PTOTE2);
 	      }
 	    }
-	    if ( r>=0 ) {
-	      rel_lik += log(r);
-	    } else {
-              rel_lik=-9.99;	    
-	    }
-	    if ( rel_lik<-10. ) rel_lik = -9.99;
-	    if ( rel_lik>=10. ) rel_lik = 9.99;
-	    if ( response && NJetsCut ) {
-	      L_->Fill(rel_lik,PTOT);
-	      LW_->Fill(rel_lik,PTOTE2);
-	      LN_->Fill(rel_lik,weight_N);
-	      if ( MEtSigCut && NHEM>=2 ) {
-		LS_->Fill(rel_lik,PTOT);
-		LSW_->Fill(rel_lik,PTOTE2);
-		LSN_->Fill(rel_lik,weight_N);
-		if ( NHEM>=3 ) {
-		  LSS_->Fill(rel_lik,PTOT);
-		  LSSW_->Fill(rel_lik,PTOTE2);
-		  LSSN_->Fill(rel_lik,weight_N);
-		}
-		if ( NHEM>=4 ) {
-		  LSSS_->Fill(rel_lik,PTOT);
-		  LSSSW_->Fill(rel_lik,PTOTE2);
-		  LSSSN_->Fill(rel_lik,weight_N);
-		}
+	  }
+	  
+	  // Compute Likelihood
+	  // NB need to work on templates to make sure
+	  // they are well-defined and not null over the
+	  // support segment -> check Smooth.C
+	  // --------------------------------------------
+	  double r=1.0;
+	  double fs=0.;
+	  double fb=0.;
+	  rel_lik = 0.;
+	  int bx[11];
+// 	  bx[0]= (int)((c8/1.2)*50)+1;
+// 	  bx[1]= (int)((m45bestall/300.)*50)+1;
+// 	  bx[2]= (int)(chi2extall)+1;
+// 	  bx[3]= (int)((metsig/20.)*50)+1;
+// 	  bx[4]= (int)((m8/2500.)*50.)+1;
+// 	  bx[5]= (int)((met/500.)*50)+1;
+// 	  bx[6]= (int)((dp12/3.2)*50.)+1;
+// 	  bx[7]= (int)((dp2nd/3.2)*50)+1;
+// 	  bx[8]= (int)((c6/1.2)*50)+1;
+// 	  bx[9]= (int)((m6/2500.)*50.)+1;
+// 	  bx[10]= (int)((sumet/4000.)*50)+1;
+	  bx[0]= (int)((c8/1.2)*50)+1;
+	  bx[1]= (int)((m8/2500.)*50)+1;
+	  bx[2]= (int)(c6/1.2)+1;
+	  bx[3]= (int)((m6/2500.)*50)+1;
+	  bx[4]= (int)((metsig/20.)*50.)+1;
+	  bx[5]= (int)((CorrSumEt/4000.)*50)+1;
+	  bx[6]= (int)((chi2/50.)*50.)+1;
+	  bx[7]= (int)((dp1st/3.2)*50)+1;
+	  bx[8]= (int)((m45best/300.)*50)+1;
+	  bx[9]= (int)((m_others/1500.)*50.)+1;
+	  bx[10]= (int)((Et6/150.)*50)+1;
+	  for ( int ivar=0; ivar<11; ivar++ ) {
+	    if ( bx[ivar]>=1 && bx[ivar]<=50 ) {
+	      fs = HSS_sig[ivar]->GetBinContent(bx[ivar]);
+	      fb = HSS_bgr[ivar]->GetBinContent(bx[ivar]);
+	      if (fb>0 && fs>0 ) {
+		r *= fs/fb;
+	      } else {
+		if ( fb==0 ) r *= 10.;  // Need to improve this kludge
+		if ( fs==0 ) r *= 0.1; 
 	      }
 	    }
-
-	  } // end if PTOT>0
-	  //	}  // end if ntags>=2
+	  }
+	  if ( r>=0 ) {
+	    rel_lik += log(r);
+	  } else {
+	    rel_lik=-9.99;	    
+	  }
+	  if ( rel_lik<-10. ) rel_lik = -9.99;
+	  if ( rel_lik>=10. ) rel_lik = 9.99;
+	  if ( response && NJetsCut ) {
+	    L_->Fill(rel_lik,PTOT);
+	    LW_->Fill(rel_lik,PTOTE2);
+	    LN_->Fill(rel_lik,weight_N);
+	    if ( MEtSigCut && NHEM>=2 ) {
+	      LS_->Fill(rel_lik,PTOT);
+	      LSW_->Fill(rel_lik,PTOTE2);
+	      LSN_->Fill(rel_lik,weight_N);
+	      if ( NHEM>=3 ) {
+		LSS_->Fill(rel_lik,PTOT);
+		LSSW_->Fill(rel_lik,PTOTE2);
+		LSSN_->Fill(rel_lik,weight_N);
+	      }
+	      if ( NHEM>=4 ) {
+		LSSS_->Fill(rel_lik,PTOT);
+		LSSSW_->Fill(rel_lik,PTOTE2);
+		LSSSN_->Fill(rel_lik,weight_N);
+	      }
+	    }
+	  }
+	  
+	} // end if PTOT>0
 
       } // end for tag combinatorial
       
@@ -2811,9 +3057,9 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
       double spx,spy,spz,se;
       double m3,m12,m13,m23;
       double m45;
-      double mw=0;
-      double bestWhasb=0;
-      double bestbnob=0;
+      double mw=0.;
+      double bestWhasb=0.;
+      double bestbnob=0.;
       int it1=-1;
       int it2=-1;
       int it3=-1;
@@ -2911,9 +3157,9 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 		  e5 =sqrt(px5*px5+py5*py5+pz5*pz5);
 		  m45=(e4+e5)*(e4+e5)-(px4+px5)*(px4+px5)-(py4+py5)*(py4+py5)-(pz4+pz5)*(pz4+pz5);
 		  if ( m45>0 ) m45=sqrt(m45);
-		  if ( fabs(m45-123)<fabs(m45best-123) ) {
+		  if ( fabs(m45-mhref)<fabs(m45best-mhref) ) {
 		    m45best=m45;
-		    chi2ext=sqrt(chi2*chi2+(m45best-123)*(m45best-123)/729);
+		    chi2ext=sqrt(chi2*chi2+(m45best-mhref)*(m45best-mhref)/729);
 		    dpbb=3.145926-fabs(fabs(Jphi[ii]-Jphi[jj])-3.1415926);
 		    ih1=ii;
 		    ih2=jj;
@@ -2925,6 +3171,7 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	}
 	// Now redo the same, on all b-jets regardless of best triplet
 	// -----------------------------------------------------------
+	double maxr=-1.;
 	for ( int ii=0; ii<iJ-1 && ii<NHSJ-1; ii++ ) {
 	  for ( int jj=ii+1; jj<iJ && jj<NHSJ; jj++ ) { // limit to NHSJ the number of jets from h.s.
 
@@ -2941,12 +3188,42 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	      e5 =sqrt(px5*px5+py5*py5+pz5*pz5);
 	      m45=(e4+e5)*(e4+e5)-(px4+px5)*(px4+px5)-(py4+py5)*(py4+py5)-(pz4+pz5)*(pz4+pz5);
 	      if ( m45>0 ) m45=sqrt(m45);
-	      if ( fabs(m45-123)<fabs(m45bestall-123) ) {
+
+	      // Now define best bb combination based on H matrices
+	      // --------------------------------------------------
+	      double ptpair = sqrt((px4+px5)*(px4+px5)+(py4+py5)*(py4+py5));
+	      double deta = Jeta[ii]-Jeta[jj];
+	      double dphi = 3.1415926-fabs(fabs(Jphi[ii]-Jphi[jj])-3.1415926);
+	      double drpair = sqrt(deta*deta+dphi*dphi);
+	      double ptotpair = sqrt((px4+px5)*(px4+px5)+(py4+py5)*(py4+py5)+(pz4+pz5)*(pz4+pz5));
+	      double etapair=0.;
+	      if ( ptotpair-pz4-pz5!=0 ) etapair = 0.5*log((ptotpair+pz4+pz5)/(ptotpair-pz4-pz5));
+	      etapair = fabs(etapair);
+	      
+	      int ipt=(int)((ptpair/500.)*10);
+	      int ieta=(int)((etapair/4.)*10);
+	      int idr=(int)((drpair/4.)*10);
+	      if ( ipt<0 ) ipt=0;
+	      if ( ipt>9 ) ipt=9;
+	      if ( ieta<0 ) ieta=0;
+	      if ( ieta>9) ieta=9;
+	      if ( idr<0 ) idr=0;
+	      if ( idr>9 ) idr=9;
+	      double r = Hread[100*idr+10*ieta+ipt];
+	      if ( Hnotread[100*idr+10*ieta+ipt]>0 ) r=r/Hnotread[100*idr+10*ieta+ipt];
+	      if ( r>maxr ) {
+		maxr = r;
+		hbestcomb=m45;
+	      }
+	      // Select pair closest to 123 GeV
+	      // ------------------------------
+	      if ( fabs(m45-mhref)<fabs(m45bestall-mhref) ) {
 		m45bestall=m45;
 		double addchi=0;
 		if ( ii==it1 || ii==it2 || ii==it3 || jj==it1 || jj==it2 || jj==it3 ) addchi=3; 
-		chi2extall=sqrt(chi2*chi2+(m45bestall-123)*(m45bestall-123)/729+addchi*addchi);
+		chi2extall=sqrt(chi2*chi2+(m45bestall-mhref)*(m45bestall-mhref)/729+addchi*addchi);
 		dpbball=3.145926-fabs(fabs(Jphi[ii]-Jphi[jj])-3.1415926);
+		drpairbestall = drpair;
 	      }
 	    }
 	  }
@@ -2959,7 +3236,8 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	  spy=0;
 	  spz=0;
 	  se=0;
-	  for ( int kk=0; kk<iJ && kk<NHSJ ; kk++ ) { // limit to NHSJ the number of jets from hard subprocess
+	  for ( int kk=0; kk<iJ && kk<NHSJ ; kk++ ) { // limit to NHSJ the number of 
+	                                              // jets from hard subprocess
 	    if ( kk!= ih1 && kk!=ih2 && kk!=it1 && kk!=it2 && kk!=it3 ) { 
 	      px=JEt[kk]*cos(Jphi[kk]);
 	      py=JEt[kk]*sin(Jphi[kk]);
@@ -3005,7 +3283,7 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	    }      
 	  }
 	}      
-      }      
+      } // end if it1+it2+it3>0     
 
       // Now compute mass of first 8 jets and their centrality
       // -----------------------------------------------------
@@ -3079,7 +3357,8 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
       // Missing Et significance computed with tuned resolution function
       // ---------------------------------------------------------------
       double metsignew=0;
-      if ( sumet>0 ) metsignew = met/(sqrt(2)*0.8033*pow(sumet,0.5004));
+      if ( sumet>0 ) 
+	metsignew = met/(sqrt(2)*0.8033*pow(sumet,0.5004));
       
       UncorrMEt_SumEt_->Fill(sumet,UncorrMEt);
       CorrMEt_SumEt_->Fill(sumet,CorrMEt);
@@ -3140,6 +3419,8 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	} 
 	Et6_->Fill(Et6);
 	Mwmin_->Fill(mwmin);
+	Hbestcomb_->Fill(hbestcomb);
+	Drpairbestall_->Fill(drpairbestall);
 	
 	if ( MEtSigCut && NHEM>=2 ) {
 	  NJetsS_->Fill(goodIc5Jets);
@@ -3188,6 +3469,8 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	  } 
 	  Et6S_->Fill(Et6);
 	  MwminS_->Fill(mwmin);
+	  HbestcombS_->Fill(hbestcomb);
+	  DrpairbestallS_->Fill(drpairbestall);
 	  
 	  if ( NHEM>=3 ) {
 	    NJetsSS_->Fill(goodIc5Jets);
@@ -3236,7 +3519,9 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	    } 
 	    Et6SS_->Fill(Et6);
 	    MwminSS_->Fill(mwmin);
+	    HbestcombSS_->Fill(hbestcomb);
 	  }
+	  DrpairbestallSS_->Fill(drpairbestall);
 	  
 	  if ( NHEM>=4 ) {
 	    NJetsSSS_->Fill(goodIc5Jets);
@@ -3285,6 +3570,8 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	    } 
 	    Et6SSS_->Fill(Et6);
 	    MwminSSS_->Fill(mwmin);
+	    HbestcombSSS_->Fill(hbestcomb);
+	    DrpairbestallSSS_->Fill(drpairbestall);
 
 	    // Study number of events with 4HEM tags vs N jets on which to look for them
 	    // -------------------------------------------------------------------------
@@ -3309,17 +3596,28 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
       double fb=0.;
       rel_lik = 0.;
       int bx[11];
+//       bx[0]= (int)((c8/1.2)*50)+1;
+//       bx[1]= (int)((m45bestall/300.)*50)+1;
+//       bx[2]= (int)(chi2extall)+1;
+//       bx[3]= (int)((metsig/20.)*50)+1;
+//       bx[4]= (int)((m8/2000)*50.)+1;
+//       bx[5]= (int)((met/500.)*50)+1;
+//       bx[6]= (int)((dp12/3.2)*50.)+1;
+//       bx[7]= (int)((dp2nd/3.2)*50)+1;
+//       bx[8]= (int)((c6/1.2)*50)+1;
+//       bx[9]= (int)((m6/2500.)*50.)+1;
+//       bx[10]= (int)((sumet/4000.)*50)+1;
       bx[0]= (int)((c8/1.2)*50)+1;
-      bx[1]= (int)((m45bestall/300.)*50)+1;
-      bx[2]= (int)(chi2extall)+1;
-      bx[3]= (int)((metsig/20.)*50)+1;
-      bx[4]= (int)((m8/2000)*50.)+1;
-      bx[5]= (int)((met/500.)*50)+1;
-      bx[6]= (int)((dp12/3.2)*50.)+1;
-      bx[7]= (int)((dp2nd/3.2)*50)+1;
-      bx[8]= (int)((c6/1.2)*50)+1;
-      bx[9]= (int)((m6/2500.)*50.)+1;
-      bx[10]= (int)((sumet/4000.)*50)+1;
+      bx[1]= (int)((m8/2500.)*50)+1;
+      bx[2]= (int)(c6/1.2)+1;
+      bx[3]= (int)((m6/2500.)*50)+1;
+      bx[4]= (int)((metsig/20.)*50.)+1;
+      bx[5]= (int)((CorrSumEt/4000.)*50)+1;
+      bx[6]= (int)((chi2/50.)*50.)+1;
+      bx[7]= (int)((dp1st/3.2)*50)+1;
+      bx[8]= (int)((m45best/300.)*50)+1;
+      bx[9]= (int)((m_others/1500.)*50.)+1;
+      bx[10]= (int)((Et6/150.)*50)+1;
       for ( int ivar=0; ivar<11; ivar++ ) {
 	if ( bx[ivar]>=1 && bx[ivar]<=50 ) {
 	  fs = HSS_sig[ivar]->GetBinContent(bx[ivar]);
@@ -3352,7 +3650,8 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	}
       }
 
-    }
+    } // if QCD or not QCD
+
   } // end if caloJETS.size()
   else {
     std::cout << "ATTENTION: Jet collection empty" << std::endl;
@@ -3370,6 +3669,14 @@ void TDAna::beginJob(const edm::EventSetup&) {
 //       method called once each job just after ending the event loop 
 // -------------------------------------------------------------------------
 void TDAna::endJob() {
+
+  // Write H matrix containing kinematics of b-pair
+  // ----------------------------------------------
+  ofstream Hfile("H.asc");
+  for ( int i=0; i<1000; i++ ) {
+    Hfile << H[i] << " " << Hnot[i] << endl;
+  }
+  Hfile.close();
 
   // Write stats on decays
   // ---------------------
@@ -3444,7 +3751,7 @@ void TDAna::endJob() {
       f0[hdecay] = grandtotalttpass[hdecay]/grandtotaltt[hdecay];
       sf0[hdecay] = sqrt(f0[hdecay]*(1-f0[hdecay])/grandtotaltt[hdecay]);
     }
-    cout << Hname[hdecay] << setprecision(6) << grandtotalttpass[hdecay] << "/" 
+    cout << Hname[hdecay] << setprecision(7) << grandtotalttpass[hdecay] << "/" 
 	 << grandtotaltt[hdecay] << " = " << "(" <<setprecision(5) << f0[hdecay]*100. 
 	 << "+-" << setprecision(5) << sf0[hdecay]*100. << ") %" << endl;
   }
@@ -3457,23 +3764,23 @@ void TDAna::endJob() {
     f0t = grandgrandtotalpass/grandgrandtotal;
     sf0t = sqrt(f0t*(1-f0t)/grandgrandtotal);
   }
-  cout << setprecision(6) << grandgrandtotalpass << "/" << grandgrandtotal << " = " 
+  cout << setprecision(7) << grandgrandtotalpass << "/" << grandgrandtotal << " = " 
        << "(" <<setprecision(5) << f0t*100. 
        << "+-" << setprecision(5) << sf0t*100. << ") %" << endl;
 
   decayfile << "Totals:     " 
 	    << setprecision(6) << setw(7) << grandtotalttpass[1] << "/" 
-	    <<  setprecision(5) << grandtotaltt[1] << " " 
+	    <<  setprecision(7) << grandtotaltt[1] << " " 
 	    << setprecision(6) << setw(8) << grandtotalttpass[2] << "/" 
-	    <<  setprecision(5) << grandtotaltt[2] << " " 
+	    <<  setprecision(7) << grandtotaltt[2] << " " 
 	    << setprecision(6) << setw(8) << grandtotalttpass[3] << "/" 
-	    <<  setprecision(5) << grandtotaltt[3] << " " 
+	    <<  setprecision(7) << grandtotaltt[3] << " " 
 	    << setprecision(6) << setw(8) << grandtotalttpass[4] << "/" 
-	    <<  setprecision(5) << grandtotaltt[4] << " " 
+	    <<  setprecision(7) << grandtotaltt[4] << " " 
 	    << setprecision(6) << setw(8) << grandtotalttpass[0] << "/" 
-	    <<  setprecision(5) << grandtotaltt[0] << " " 
+	    <<  setprecision(7) << grandtotaltt[0] << " " 
 	    << setprecision(6) << setw(8) << grandgrandtotalpass << "/" 
-	    <<  setprecision(5) << grandgrandtotal << endl;
+	    <<  setprecision(7) << grandgrandtotal << endl;
   decayfile << "            " 
 	    << setprecision(5) << setw(5) << f0[1]*100. << "+-" 
 	    << setprecision(4) << sf0[1]*100.  << " " 
@@ -3528,6 +3835,14 @@ void TDAna::endJob() {
   MHbest_->Write();
   MTbest_->Write();
   MWbest_->Write();
+  HBJ_etrank_->Write();
+  Hpt_->Write();
+  Heta_->Write();
+  Hdr_->Write();
+  MHnot_->Write();
+  Hnotpt_->Write();
+  Hnoteta_->Write();
+  Hnotdr_->Write();
 
   // Histograms for events passing trigger
   // -------------------------------------
@@ -3574,6 +3889,8 @@ void TDAna::endJob() {
   HPD_->Write();
   Et6_->Write(); 
   Mwmin_->Write();
+  Hbestcomb_->Write();
+  Drpairbestall_->Write();
 
   NJetsN_->Write();
   UncorrHtN_->Write();
@@ -3618,6 +3935,8 @@ void TDAna::endJob() {
   HPDN_->Write();
   Et6N_->Write(); 
   MwminN_->Write();
+  HbestcombN_->Write();
+  DrpairbestallN_->Write();
 
   // Histograms for events passing trigger and NJet cut
   // --------------------------------------------------
@@ -3664,6 +3983,8 @@ void TDAna::endJob() {
   HPDS_->Write();
   Et6S_->Write(); 
   MwminS_->Write();
+  HbestcombS_->Write();
+  DrpairbestallS_->Write();
 
   NJetsSN_->Write();
   UncorrHtSN_->Write();
@@ -3708,6 +4029,8 @@ void TDAna::endJob() {
   HPDSN_->Write();
   Et6SN_->Write(); 
   MwminSN_->Write();
+  HbestcombSN_->Write();
+  DrpairbestallSN_->Write();
 
   // Histograms for events passing trigger, NJet, and METS cut
   // ---------------------------------------------------------
@@ -3754,6 +4077,8 @@ void TDAna::endJob() {
   HPDSS_->Write();
   Et6SS_->Write(); 
   MwminSS_->Write();
+  HbestcombSS_->Write();
+  DrpairbestallSS_->Write();
 
   NJetsSSN_->Write();
   UncorrHtSSN_->Write();
@@ -3798,6 +4123,8 @@ void TDAna::endJob() {
   HPDSSN_->Write();
   Et6SSN_->Write(); 
   MwminSSN_->Write();
+  HbestcombSSN_->Write();
+  DrpairbestallSSN_->Write();
 
   // Histograms for events passing trigger, NJet, and METS cut
   // ---------------------------------------------------------
@@ -3844,6 +4171,8 @@ void TDAna::endJob() {
   HPDSSS_->Write();
   Et6SSS_->Write(); 
   MwminSSS_->Write();
+  HbestcombSSS_->Write();
+  DrpairbestallSSS_->Write();
 
   NJetsSSSN_->Write();
   UncorrHtSSSN_->Write();
@@ -3888,6 +4217,8 @@ void TDAna::endJob() {
   HPDSSSN_->Write();
   Et6SSSN_->Write(); 
   MwminSSSN_->Write();
+  HbestcombSSSN_->Write();
+  DrpairbestallSSSN_->Write();
 
   N4NJSSS_->Write();
   E4NJSSS_->Write();
@@ -3937,6 +4268,8 @@ void TDAna::endJob() {
   HPDW_->Write();
   Et6W_->Write(); 
   MwminW_->Write();
+  HbestcombW_->Write();
+  DrpairbestallW_->Write();
 
   // Histograms for events passing trigger and NJet cut
   // --------------------------------------------------
@@ -3983,6 +4316,8 @@ void TDAna::endJob() {
   HPDSW_->Write();
   Et6SW_->Write(); 
   MwminSW_->Write();
+  HbestcombSW_->Write();
+  DrpairbestallSW_->Write();
 
   // Histograms for events passing trigger, NJet, and METS cut
   // ---------------------------------------------------------
@@ -4029,6 +4364,8 @@ void TDAna::endJob() {
   HPDSSW_->Write();
   Et6SSW_->Write(); 
   MwminSSW_->Write();
+  HbestcombSSW_->Write();
+  DrpairbestallSSW_->Write();
 
   // Histograms for events passing trigger, NJet, and METS cut
   // ---------------------------------------------------------
@@ -4075,6 +4412,8 @@ void TDAna::endJob() {
   HPDSSSW_->Write();
   Et6SSSW_->Write(); 
   MwminSSSW_->Write();
+  HbestcombSSSW_->Write();
+  DrpairbestallSSSW_->Write();
 
   N4NJSSSW_->Write();
   E4NJSSSW_->Write();

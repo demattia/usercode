@@ -19,7 +19,7 @@
 //
 // Original Author:  Marco De Mattia
 //         Created:  Tue May  8 13:05:37 CEST 2007
-// $Id: TDAna.h,v 1.16 2008/01/09 10:52:19 dorigo Exp $
+// $Id: TDAna.h,v 1.18 2008/01/09 13:16:48 dorigo Exp $
 //
 //
 
@@ -216,6 +216,14 @@ class TDAna : public edm::EDAnalyzer {
   TH1D * MHbest_;
   TH1D * MTbest_;
   TH1D * MWbest_;
+  TH1D * HBJ_etrank_;
+  TH1D * Hpt_;
+  TH1D * Heta_;
+  TH1D * Hdr_;
+  TH1D * MHnot_;
+  TH1D * Hnotpt_;
+  TH1D * Hnoteta_;
+  TH1D * Hnotdr_;
 
   TH1D * NJets_;
   TH1D * UncorrSumEt_;
@@ -260,6 +268,8 @@ class TDAna : public edm::EDAnalyzer {
   TH1D * HPD_;
   TH1D * Et6_;
   TH1D * Mwmin_;
+  TH1D * Hbestcomb_;
+  TH1D * Drpairbestall_;
 
   TH1D * NJetsS_;
   TH1D * UncorrSumEtS_;
@@ -304,6 +314,8 @@ class TDAna : public edm::EDAnalyzer {
   TH1D * HPDS_;
   TH1D * Et6S_;
   TH1D * MwminS_;
+  TH1D * HbestcombS_;
+  TH1D * DrpairbestallS_;
 
   TH1D * NJetsSS_;
   TH1D * UncorrSumEtSS_;
@@ -348,6 +360,8 @@ class TDAna : public edm::EDAnalyzer {
   TH1D * HPDSS_;
   TH1D * Et6SS_;
   TH1D * MwminSS_;
+  TH1D * HbestcombSS_;
+  TH1D * DrpairbestallSS_;
 
   TH1D * NJetsSSS_;
   TH1D * UncorrSumEtSSS_;
@@ -392,6 +406,8 @@ class TDAna : public edm::EDAnalyzer {
   TH1D * HPDSSS_;
   TH1D * Et6SSS_;
   TH1D * MwminSSS_;
+  TH1D * HbestcombSSS_;
+  TH1D * DrpairbestallSSS_;
 
   TH1D * N4NJSSS_;
   TH1D * E4NJSSS_;
@@ -441,6 +457,8 @@ class TDAna : public edm::EDAnalyzer {
   TH1D * HPDN_;
   TH1D * Et6N_;
   TH1D * MwminN_;
+  TH1D * HbestcombN_;
+  TH1D * DrpairbestallN_;
 
   TH1D * NJetsSN_;
   TH1D * UncorrSumEtSN_;
@@ -485,6 +503,8 @@ class TDAna : public edm::EDAnalyzer {
   TH1D * HPDSN_;
   TH1D * Et6SN_;
   TH1D * MwminSN_;
+  TH1D * HbestcombSN_;
+  TH1D * DrpairbestallSN_;
 
   TH1D * NJetsSSN_;
   TH1D * UncorrSumEtSSN_;
@@ -529,6 +549,8 @@ class TDAna : public edm::EDAnalyzer {
   TH1D * HPDSSN_;
   TH1D * Et6SSN_;
   TH1D * MwminSSN_;
+  TH1D * HbestcombSSN_;
+  TH1D * DrpairbestallSSN_;
 
   TH1D * NJetsSSSN_;
   TH1D * UncorrSumEtSSSN_;
@@ -573,6 +595,8 @@ class TDAna : public edm::EDAnalyzer {
   TH1D * HPDSSSN_;
   TH1D * Et6SSSN_;
   TH1D * MwminSSSN_;
+  TH1D * HbestcombSSSN_;
+  TH1D * DrpairbestallSSSN_;
 
   // Error histograms
   // ----------------
@@ -619,6 +643,8 @@ class TDAna : public edm::EDAnalyzer {
   TH1D * HPDW_;
   TH1D * Et6W_;
   TH1D * MwminW_;
+  TH1D * HbestcombW_;
+  TH1D * DrpairbestallW_;
 
   TH1D * NJetsSW_;
   TH1D * UncorrSumEtSW_;
@@ -663,6 +689,8 @@ class TDAna : public edm::EDAnalyzer {
   TH1D * HPDSW_;
   TH1D * Et6SW_;
   TH1D * MwminSW_;
+  TH1D * HbestcombSW_;
+  TH1D * DrpairbestallSW_;
 
   TH1D * NJetsSSW_;
   TH1D * UncorrSumEtSSW_;
@@ -707,6 +735,8 @@ class TDAna : public edm::EDAnalyzer {
   TH1D * HPDSSW_;
   TH1D * Et6SSW_;
   TH1D * MwminSSW_;
+  TH1D * HbestcombSSW_;
+  TH1D * DrpairbestallSSW_;
 
   TH1D * NJetsSSSW_;
   TH1D * UncorrSumEtSSSW_;
@@ -751,6 +781,8 @@ class TDAna : public edm::EDAnalyzer {
   TH1D * HPDSSSW_;
   TH1D * Et6SSSW_;
   TH1D * MwminSSSW_;
+  TH1D * HbestcombSSSW_;
+  TH1D * DrpairbestallSSSW_;
 
   TH1D * N4NJSSSW_;
   TH1D * E4NJSSSW_;
@@ -782,6 +814,13 @@ class TDAna : public edm::EDAnalyzer {
   double grandtotalttpass[5];
   double grandtotalhpass[10];
   double grandgrandtotalpass;
+
+  // Matrix with H kinematics
+  // ------------------------
+  double H[1000];
+  double Hnot[1000];
+  double Hread[1000];
+  double Hnotread[1000];
 
   // Likelihood histograms
   // ---------------------
