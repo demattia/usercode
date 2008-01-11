@@ -270,6 +270,8 @@ class TDAna : public edm::EDAnalyzer {
   TH1D * Mwmin_;
   TH1D * Hbestcomb_;
   TH1D * Drpairbestall_;
+  TH1D * M3a_;
+  TH1D * Mwa_;
 
   TH1D * NJetsS_;
   TH1D * UncorrSumEtS_;
@@ -316,6 +318,8 @@ class TDAna : public edm::EDAnalyzer {
   TH1D * MwminS_;
   TH1D * HbestcombS_;
   TH1D * DrpairbestallS_;
+  TH1D * M3aS_;
+  TH1D * MwaS_;
 
   TH1D * NJetsSS_;
   TH1D * UncorrSumEtSS_;
@@ -362,6 +366,8 @@ class TDAna : public edm::EDAnalyzer {
   TH1D * MwminSS_;
   TH1D * HbestcombSS_;
   TH1D * DrpairbestallSS_;
+  TH1D * M3aSS_;
+  TH1D * MwaSS_;
 
   TH1D * NJetsSSS_;
   TH1D * UncorrSumEtSSS_;
@@ -408,6 +414,8 @@ class TDAna : public edm::EDAnalyzer {
   TH1D * MwminSSS_;
   TH1D * HbestcombSSS_;
   TH1D * DrpairbestallSSS_;
+  TH1D * M3aSSS_;
+  TH1D * MwaSSS_;
 
   TH1D * N4NJSSS_;
   TH1D * E4NJSSS_;
@@ -459,6 +467,8 @@ class TDAna : public edm::EDAnalyzer {
   TH1D * MwminN_;
   TH1D * HbestcombN_;
   TH1D * DrpairbestallN_;
+  TH1D * M3aN_;
+  TH1D * MwaN_;
 
   TH1D * NJetsSN_;
   TH1D * UncorrSumEtSN_;
@@ -505,6 +515,8 @@ class TDAna : public edm::EDAnalyzer {
   TH1D * MwminSN_;
   TH1D * HbestcombSN_;
   TH1D * DrpairbestallSN_;
+  TH1D * M3aSN_;
+  TH1D * MwaSN_;
 
   TH1D * NJetsSSN_;
   TH1D * UncorrSumEtSSN_;
@@ -551,6 +563,8 @@ class TDAna : public edm::EDAnalyzer {
   TH1D * MwminSSN_;
   TH1D * HbestcombSSN_;
   TH1D * DrpairbestallSSN_;
+  TH1D * M3aSSN_;
+  TH1D * MwaSSN_;
 
   TH1D * NJetsSSSN_;
   TH1D * UncorrSumEtSSSN_;
@@ -597,6 +611,8 @@ class TDAna : public edm::EDAnalyzer {
   TH1D * MwminSSSN_;
   TH1D * HbestcombSSSN_;
   TH1D * DrpairbestallSSSN_;
+  TH1D * M3aSSSN_;
+  TH1D * MwaSSSN_;
 
   // Error histograms
   // ----------------
@@ -645,6 +661,8 @@ class TDAna : public edm::EDAnalyzer {
   TH1D * MwminW_;
   TH1D * HbestcombW_;
   TH1D * DrpairbestallW_;
+  TH1D * M3aW_;
+  TH1D * MwaW_;
 
   TH1D * NJetsSW_;
   TH1D * UncorrSumEtSW_;
@@ -691,6 +709,8 @@ class TDAna : public edm::EDAnalyzer {
   TH1D * MwminSW_;
   TH1D * HbestcombSW_;
   TH1D * DrpairbestallSW_;
+  TH1D * M3aSW_;
+  TH1D * MwaSW_;
 
   TH1D * NJetsSSW_;
   TH1D * UncorrSumEtSSW_;
@@ -737,6 +757,8 @@ class TDAna : public edm::EDAnalyzer {
   TH1D * MwminSSW_;
   TH1D * HbestcombSSW_;
   TH1D * DrpairbestallSSW_;
+  TH1D * M3aSSW_;
+  TH1D * MwaSSW_;
 
   TH1D * NJetsSSSW_;
   TH1D * UncorrSumEtSSSW_;
@@ -783,6 +805,8 @@ class TDAna : public edm::EDAnalyzer {
   TH1D * MwminSSSW_;
   TH1D * HbestcombSSSW_;
   TH1D * DrpairbestallSSSW_;
+  TH1D * M3aSSSW_;
+  TH1D * MwaSSSW_;
 
   TH1D * N4NJSSSW_;
   TH1D * E4NJSSSW_;
