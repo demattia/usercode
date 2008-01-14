@@ -4,27 +4,28 @@
 // Class:      L1PixelOptimizer
 // 
 /**\class L1PixelOptimizer L1PixelOptimizer.cc AnalysisExamples/L1PixelOptimizer/src/L1PixelOptimizer.cc
-
- Description: <one line class summary>
-
- Implementation:
- This class shows how to access:
- - level 1 calorimetric quantities
- - offline corrected jets (calibration performed here)
- - offline corrected MET, depending on jets corrections
- - MC informations         <---------------------------------- to do
- - B tagging               <---------------------------------- to do
-
- Evaluates:
- - DPhimin between MET and closest (in phi) offline jet
- - association of MC partons to offline jets            <----- to do
- - association of btags to offline jets                 <----- to do
-
-*/
+ *
+ * Description: Evaluates efficiencies varying the cut values. <br>
+ *
+ * Evaluates the efficiencies of the level 1 trigger cuts and the pixel trigger
+ * cuts varying the cut values. Fills histograms with the efficiencies. <br>
+ * Also evaluates and saves the same values after the offline cuts: <br>
+ * >= 5 offlineJets with Et > 25 GeV and eta < 3. && MEt significance > 3. <br>
+ *
+ * The output histograms can be processed by the EvalLessCuts.cc root macro
+ * in order to obtain the best eff value with the constraint of the level 1
+ * QCD rate, and draw the histogram of the best efficiencies varying the
+ * PtCut and NumPV cut.
+ *
+ * Implementation:
+ *
+ * Evaluates:
+ *
+ */
 //
 // Original Author:  Marco De Mattia
 //         Created:  Tue May  8 13:05:37 CEST 2007
-// $Id: L1PixelOptimizer.h,v 1.1 2008/01/12 11:26:12 demattia Exp $
+// $Id: L1PixelOptimizer.h,v 1.2 2008/01/14 13:26:55 demattia Exp $
 //
 //
 
