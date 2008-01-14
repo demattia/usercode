@@ -24,7 +24,7 @@
 //
 // Original Author:  Marco De Mattia
 //         Created:  Tue May  8 13:05:37 CEST 2007
-// $Id: OfflinePixelAnalyzer.h,v 1.4 2007/12/20 12:28:47 demattia Exp $
+// $Id: OfflinePixelAnalyzer.h,v 1.1 2008/01/10 10:19:36 demattia Exp $
 //
 //
 
@@ -114,6 +114,12 @@
 // // Calo MEt
 // #include "DataFormats/METReco/interface/CaloMET.h"
 
+#include "DataFormats/Candidate/interface/Candidate.h"
+#include "DataFormats/Candidate/interface/CandidateFwd.h"
+
+// For the SimVertex
+#include "SimDataFormats/Vertex/interface/SimVertex.h"
+#include "SimDataFormats/Vertex/interface/SimVertexContainer.h"
 
 // Associator for the jets
 #include "AnalysisExamples/AnalysisClasses/interface/Associator.h"
@@ -150,16 +156,6 @@ class OfflinePixelAnalyzer : public edm::EDAnalyzer {
   edm::ParameterSet conf_;
   TFile* OutputFile;
 
-  // Declare here, since it does not have a default constructor
-  // it will be initialized with an initialization list ( in
-  // the OfflinePixelAnalyzer constructor ).
-  //  HiVariables HiVar;
-
-  // Use a dynamic construction, or the TFile problem will crash the job
-  // when moving from one input file to another.
-  // The histograms must be created after the TFile is opened.
-  HiVariables * HiVar;
-
   edm::InputTag cenJetLabel_;
   edm::InputTag forJetLabel_;
   edm::InputTag tauJetLabel_;
@@ -172,6 +168,7 @@ class OfflinePixelAnalyzer : public edm::EDAnalyzer {
   edm::InputTag simpleElectronLabel_;
   edm::InputTag simpleTauLabel_;
   edm::InputTag summaryLabel_;
+  edm::InputTag simVtxLabel_;
 
   unsigned int numTkCut_;
   double minDz_;
@@ -179,15 +176,6 @@ class OfflinePixelAnalyzer : public edm::EDAnalyzer {
   bool doTrigger_;
   bool extendedInfo_;
   std::string OutputEffFileName;
-
-  TH1F * uncorr_JetPt_IC5_;
-  TH1F * corr_JetPt_IC5_;
-  TH1F * JetNumber_IC5_;
-
-  TH1F * MEt_CorrIC5_Pt_;
-  TH1F * MEt_CorrIC5_Phi_;
-  TH1F * MEt_CorrIC5_SumEt_;
-  TH1F * MEt_CorrIC5_mEtSig_;
 
   TH1F * PixelJet_dz_;
   TH1F * PixelJet_Num_;
@@ -212,6 +200,9 @@ class OfflinePixelAnalyzer : public edm::EDAnalyzer {
   MultiTH1F * Multi_AllSecVPt_;
   MultiTH1F * Multi_AllSecVEta_;
   MultiTH1F * Multi_AllSecVPhi_;
+
+  MultiTH1F * MultiVertexDeltaZ_;
+  MultiTH1F * MultiVertexDeltaZres_;
 
   TH1F * DPhimin_;
 

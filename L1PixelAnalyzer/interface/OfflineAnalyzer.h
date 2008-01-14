@@ -24,7 +24,7 @@
 //
 // Original Author:  Marco De Mattia
 //         Created:  Tue May  8 13:05:37 CEST 2007
-// $Id: OfflineAnalyzer.h,v 1.3 2007/12/04 11:15:09 demattia Exp $
+// $Id: OfflineAnalyzer.h,v 1.4 2007/12/20 12:28:47 demattia Exp $
 //
 //
 
@@ -258,10 +258,16 @@ class OfflineAnalyzer : public edm::EDAnalyzer {
   int Eff_tautrig_single_;
   int Eff_tautrig_ditau_;
 
+  // MultiJet Or MEtJet
+  int Eff_Multi_Or_MEtJet_;
+  int Eff_Multi_Or_MEtJet_nofor_;
+
   // Offline
   int offlineEffMultijet_;
   int offlineEffMEtJet_;
   int offlineEffTauTrig_;
+  int offlineEff_Multi_Or_MEtJet_;
+  int offlineEff_Multi_Or_MEtJet_nofor_;
 
   double dz_;
   double dzmax_;

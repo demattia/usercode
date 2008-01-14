@@ -49,11 +49,11 @@ vector<ModOfflineJet> * Multiplier::initialize( const OfflineJetCollection & OFF
 
 void Multiplier::fillGen( const GenJetCollection & GENJETS ) {
   // Create vectors of pointers to use in the association
-  // Use only offlineJets with Et > etMin_ GeV and eta < 2.5
+  // Use only offlineJets with Et > etMin_ GeV and eta < 3.
   vector<const ModOfflineJet*> modOfflineJetPtrs;
   vector<ModOfflineJet>::const_iterator off_it = modOfflineJets_.begin();
   for( ; off_it != modOfflineJets_.end(); ++off_it ) {
-    if ( off_it->et() > etMin_ && fabs(off_it->eta()) < 2.5 ) {
+    if ( off_it->et() > etMin_ && fabs(off_it->eta()) < 3. ) {
       modOfflineJetPtrs.push_back( &(*off_it) );
     }
   }

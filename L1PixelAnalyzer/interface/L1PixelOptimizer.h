@@ -24,7 +24,7 @@
 //
 // Original Author:  Marco De Mattia
 //         Created:  Tue May  8 13:05:37 CEST 2007
-// $Id: L1PixelOptimizer.h,v 1.4 2007/12/20 12:28:47 demattia Exp $
+// $Id: L1PixelOptimizer.h,v 1.1 2008/01/12 11:26:12 demattia Exp $
 //
 //
 
@@ -328,6 +328,7 @@ class L1PixelOptimizer : public edm::EDAnalyzer {
   int dzIndexSize_;
   int ptIndexSize_; 
   int numPVindexSize_;
+  unsigned int tkNumIndexSize_;
 
   // ----------member data ---------------------------
 };

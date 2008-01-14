@@ -242,10 +242,16 @@ OfflineAnalyzer::OfflineAnalyzer(const edm::ParameterSet& iConfig) :
   Eff_tautrig_single_ = 0;
   Eff_tautrig_ditau_ = 0;
 
+  // MultiJet || MEtJet
+  Eff_Multi_Or_MEtJet_ = 0;
+  Eff_Multi_Or_MEtJet_nofor_ = 0;
+
   // Offline
   offlineEffMultijet_ = 0;
   offlineEffMEtJet_ = 0;
   offlineEffTauTrig_ = 0;
+  offlineEff_Multi_Or_MEtJet_ = 0;
+  offlineEff_Multi_Or_MEtJet_nofor_ = 0;
 
   eventcounter_ = 0;
   //  PI_ = 3.141593;
@@ -420,15 +426,14 @@ OfflineAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
       //       if ( cal->et() >= 40. && fabs( cal->eta() ) < 3.0 ) {
       //         vec_DPhi.push_back( DeltaPhi( MET_phi, cal->phi() ) );
       //       }
-      if ( cal->et() >= 30. && fabs( cal->eta() ) < 3.0 ) {
+      if ( cal->et() >= 25. && fabs( cal->eta() ) < 3.0 ) {
         ++goodIc5Jets;
       }
     }
 
     // Offline cut
     // -----------
-    if ( goodIc5Jets >= 5 ) offline = true;
-
+    if ( goodIc5Jets >= 5 && caloMET->mEtSig() > 3. ) offline = true;
 
     JetNumber_IC5_->Fill( vec_calojet.size() );
 
@@ -767,10 +772,16 @@ OfflineAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
   if ( response_tautrig_single ) ++Eff_tautrig_single_;
   if ( response_tautrig_ditau ) ++Eff_tautrig_ditau_;
 
+  // multijet || MEt+jet
+  if ( response || response_MEtJet ) ++Eff_Multi_Or_MEtJet_;
+  if ( response_nofor || response_MEtJet_nofor ) ++Eff_Multi_Or_MEtJet_nofor_;
+
   // Offline
   if ( response && offline ) ++offlineEffMultijet_;
   if ( response_MEtJet && offline ) ++offlineEffMEtJet_;
   if ( response_tautrig && offline ) ++offlineEffTauTrig_;
+  if ( (response || response_MEtJet) && offline ) ++offlineEff_Multi_Or_MEtJet_;
+  if ( (response_nofor || response_MEtJet_nofor) && offline ) ++offlineEff_Multi_Or_MEtJet_nofor_;
 
   // PixelTrigger
   // ------------
@@ -1202,11 +1213,18 @@ void OfflineAnalyzer::endJob() {
   Effoutputfile << "Eff ditau trigger = " << float(Eff_tautrig_ditau_)/float(eventcounter_) << endl;
   Effoutputfile << endl;
 
+  Effoutputfile << "MultiJet || MEtJet" << endl;
+  Effoutputfile << "------------------" << endl;
+  Effoutputfile << "Eff MultiJet || MEtJet = " << float(Eff_Multi_Or_MEtJet_)/float(eventcounter_) << endl;
+  Effoutputfile << "Eff MultiJet || MEtJet no-forward = " << float(Eff_Multi_Or_MEtJet_nofor_)/float(eventcounter_) << endl;
+
   Effoutputfile << "Offline efficiency" << endl;
   Effoutputfile << "------------------" << endl;
   Effoutputfile << "offline efficiency after multijet trigger = " << float(offlineEffMultijet_)/float(eventcounter_) << endl;
   Effoutputfile << "offline efficiency after MEt + Jet trigger = " << float(offlineEffMEtJet_)/float(eventcounter_) << endl;
   Effoutputfile << "offline efficiency after Tau trigger = " << float(offlineEffTauTrig_)/float(eventcounter_) << endl;
+  Effoutputfile << "offline efficiency after (MultiJet || MEtJet) trigger = " << float(offlineEff_Multi_Or_MEtJet_)/float(eventcounter_) << endl;
+  Effoutputfile << "offline efficiency after (MultiJet || MEtJet) no-forward trigger = " << float(offlineEff_Multi_Or_MEtJet_nofor_)/float(eventcounter_) << endl;
   Effoutputfile << endl;
 
   Effoutputfile << "PixelTrigger alone efficiency" << endl;
