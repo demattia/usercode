@@ -19,7 +19,7 @@
 //
 // Original Author:  Marco De Mattia
 //         Created:  Tue May  8 13:05:37 CEST 2007
-// $Id: TDAna.h,v 1.20 2008/01/11 16:28:18 dorigo Exp $
+// $Id: TDAna.h,v 1.21 2008/01/15 10:21:11 dorigo Exp $
 //
 //
 
@@ -283,6 +283,9 @@ class TDAna : public edm::EDAnalyzer {
   TH1D * Drpairbestall_;
   TH1D * M3a_;
   TH1D * Mwa_;
+  TH1D * Scprod_;
+  TH1D * Thdeta_;
+  TH1D * M5_;
 
   TH1D * NJetsS_;
   TH1D * UncorrSumEtS_;
@@ -331,6 +334,9 @@ class TDAna : public edm::EDAnalyzer {
   TH1D * DrpairbestallS_;
   TH1D * M3aS_;
   TH1D * MwaS_;
+  TH1D * ScprodS_;
+  TH1D * ThdetaS_;
+  TH1D * M5S_;
 
   TH1D * NJetsSS_;
   TH1D * UncorrSumEtSS_;
@@ -379,6 +385,9 @@ class TDAna : public edm::EDAnalyzer {
   TH1D * DrpairbestallSS_;
   TH1D * M3aSS_;
   TH1D * MwaSS_;
+  TH1D * ScprodSS_;
+  TH1D * ThdetaSS_;
+  TH1D * M5SS_;
 
   TH1D * NJetsSSS_;
   TH1D * UncorrSumEtSSS_;
@@ -427,6 +436,9 @@ class TDAna : public edm::EDAnalyzer {
   TH1D * DrpairbestallSSS_;
   TH1D * M3aSSS_;
   TH1D * MwaSSS_;
+  TH1D * ScprodSSS_;
+  TH1D * ThdetaSSS_;
+  TH1D * M5SSS_;
 
   TH1D * N4NJSSS_;
   TH1D * E4NJSSS_;
@@ -480,6 +492,9 @@ class TDAna : public edm::EDAnalyzer {
   TH1D * DrpairbestallN_;
   TH1D * M3aN_;
   TH1D * MwaN_;
+  TH1D * ScprodN_;
+  TH1D * ThdetaN_;
+  TH1D * M5N_;
 
   TH1D * NJetsSN_;
   TH1D * UncorrSumEtSN_;
@@ -528,6 +543,9 @@ class TDAna : public edm::EDAnalyzer {
   TH1D * DrpairbestallSN_;
   TH1D * M3aSN_;
   TH1D * MwaSN_;
+  TH1D * ScprodSN_;
+  TH1D * ThdetaSN_;
+  TH1D * M5SN_;
 
   TH1D * NJetsSSN_;
   TH1D * UncorrSumEtSSN_;
@@ -576,6 +594,9 @@ class TDAna : public edm::EDAnalyzer {
   TH1D * DrpairbestallSSN_;
   TH1D * M3aSSN_;
   TH1D * MwaSSN_;
+  TH1D * ScprodSSN_;
+  TH1D * ThdetaSSN_;
+  TH1D * M5SSN_;
 
   TH1D * NJetsSSSN_;
   TH1D * UncorrSumEtSSSN_;
@@ -624,6 +645,9 @@ class TDAna : public edm::EDAnalyzer {
   TH1D * DrpairbestallSSSN_;
   TH1D * M3aSSSN_;
   TH1D * MwaSSSN_;
+  TH1D * ScprodSSSN_;
+  TH1D * ThdetaSSSN_;
+  TH1D * M5SSSN_;
 
   // Error histograms
   // ----------------
@@ -674,6 +698,9 @@ class TDAna : public edm::EDAnalyzer {
   TH1D * DrpairbestallW_;
   TH1D * M3aW_;
   TH1D * MwaW_;
+  TH1D * ScprodW_;
+  TH1D * ThdetaW_;
+  TH1D * M5W_;
 
   TH1D * NJetsSW_;
   TH1D * UncorrSumEtSW_;
@@ -722,6 +749,9 @@ class TDAna : public edm::EDAnalyzer {
   TH1D * DrpairbestallSW_;
   TH1D * M3aSW_;
   TH1D * MwaSW_;
+  TH1D * ScprodSW_;
+  TH1D * ThdetaSW_;
+  TH1D * M5SW_;
 
   TH1D * NJetsSSW_;
   TH1D * UncorrSumEtSSW_;
@@ -770,6 +800,9 @@ class TDAna : public edm::EDAnalyzer {
   TH1D * DrpairbestallSSW_;
   TH1D * M3aSSW_;
   TH1D * MwaSSW_;
+  TH1D * ScprodSSW_;
+  TH1D * ThdetaSSW_;
+  TH1D * M5SSW_;
 
   TH1D * NJetsSSSW_;
   TH1D * UncorrSumEtSSSW_;
@@ -818,6 +851,9 @@ class TDAna : public edm::EDAnalyzer {
   TH1D * DrpairbestallSSSW_;
   TH1D * M3aSSSW_;
   TH1D * MwaSSSW_;
+  TH1D * ScprodSSSW_;
+  TH1D * ThdetaSSSW_;
+  TH1D * M5SSSW_;
 
   TH1D * N4NJSSSW_;
   TH1D * E4NJSSSW_;

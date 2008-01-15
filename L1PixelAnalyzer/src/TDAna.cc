@@ -269,6 +269,9 @@ TDAna::TDAna(const edm::ParameterSet& iConfig) :
   Drpairbestall_ = new TH1D ( "Drpairbestall", "Dr of best bb pair", 50, 0., 4. );
   M3a_ = new TH1D ( "M3a", "Highest Et triplet besides best H combo", 50, 0., 500. );
   Mwa_ = new TH1D ( "Mwa", "Doublet not tagged in highest Et triplet", 50, 0., 300. );
+  Scprod_ = new TH1D ( "Scprod", "Scalar product of top vector and H versor", 50, -1200., 1200. );
+  Thdeta_ = new TH1D ( "Thdeta", "Delta eta top-higgs", 50, -5., 5. );
+  M5_ = new TH1D ( "M5", "Mass of five jets from t and h", 50, 0., 2000. );
 
   NJetsN_ = new TH1D ( "NJetsN", "Number of selected jets", 20, 0, 20 );
   UncorrHtN_ = new TH1D ( "UncorrHtN", "Ht with uncorrected jets", 50, 0, 4000 );
@@ -317,6 +320,9 @@ TDAna::TDAna(const edm::ParameterSet& iConfig) :
   DrpairbestallN_ = new TH1D ( "DrpairbestallN", "Dr of best bb pair", 50, 0., 4. );
   M3aN_ = new TH1D ( "M3aN", "Highest Et triplet besides best H combo", 50, 0., 500. );
   MwaN_ = new TH1D ( "MwaN", "Doublet not tagged in highest Et triplet", 50, 0., 300. );
+  ScprodN_ = new TH1D ( "ScprodN", "Scalar product of top vector and H versor", 50, -1200., 1200. );
+  ThdetaN_ = new TH1D ( "ThdetaN", "Delta eta top-higgs", 50, -5., 5. );
+  M5N_ = new TH1D ( "M5N", "Mass of five jets from t and h", 50, 0., 2000. );
 
   NJetsS_ = new TH1D ( "NJetsS", "Number of selected jets", 20, 0, 20 );
   UncorrHtS_ = new TH1D ( "UncorrHtS", "Ht with uncorrected jets", 50, 0, 4000 );
@@ -365,6 +371,9 @@ TDAna::TDAna(const edm::ParameterSet& iConfig) :
   DrpairbestallS_ = new TH1D ( "DrpairbestallS", "Dr of best bb pair", 50, 0., 4. );
   M3aS_ = new TH1D ( "M3aS", "Highest Et triplet besides best H combo", 50, 0., 500. );
   MwaS_ = new TH1D ( "MwaS", "Doublet not tagged in highest Et triplet", 50, 0., 300. );
+  ScprodS_ = new TH1D ( "ScprodS", "Scalar product of top vector and H versor", 50, -1200., 1200. );
+  ThdetaS_ = new TH1D ( "ThdetaS", "Delta eta top-higgs", 50, -5., 5. );
+  M5S_ = new TH1D ( "M5S", "Mass of five jets from t and h", 50, 0., 2000. );
 
   NJetsSN_ = new TH1D ( "NJetsSN", "Number of selected jets", 20, 0, 20 );
   UncorrHtSN_ = new TH1D ( "UncorrHtSN", "Ht with uncorrected jets", 50, 0, 4000 );
@@ -413,6 +422,9 @@ TDAna::TDAna(const edm::ParameterSet& iConfig) :
   DrpairbestallSN_ = new TH1D ( "DrpairbestallSN", "Dr of best bb pair", 50, 0., 4. );
   M3aSN_ = new TH1D ( "M3aSN", "Highest Et triplet besides best H combo", 50, 0., 500. );
   MwaSN_ = new TH1D ( "MwaSN", "Doublet not tagged in highest Et triplet", 50, 0., 300. );
+  ScprodSN_ = new TH1D ( "ScprodSN", "Scalar product of top vector and H versor", 50, -1200., 1200. );
+  ThdetaSN_ = new TH1D ( "ThdetaSN", "Delta eta top-higgs", 50, -5., 5. );
+  M5SN_ = new TH1D ( "M5SN", "Mass of five jets from t and h", 50, 0., 2000. );
 
   NJetsSS_ = new TH1D ( "NJetsSS", "Number of selected jets", 20, 0, 20 );
   UncorrHtSS_ = new TH1D ( "UncorrHtSS", "Ht with uncorrected jets", 50, 0, 4000 );
@@ -461,6 +473,9 @@ TDAna::TDAna(const edm::ParameterSet& iConfig) :
   DrpairbestallSS_ = new TH1D ( "DrpairbestallSS", "Dr of best bb pair", 50, 0., 4. );
   M3aSS_ = new TH1D ( "M3aSS", "Highest Et triplet besides best H combo", 50, 0., 500. );
   MwaSS_ = new TH1D ( "MwaSS", "Doublet not tagged in highest Et triplet", 50, 0., 300. );
+  ScprodSS_ = new TH1D ( "ScprodSS", "Scalar product of top vector and H versor", 50, -1200., 1200. );
+  ThdetaSS_ = new TH1D ( "ThdetaSS", "Delta eta top-higgs", 50, -5., 5. );
+  M5SS_ = new TH1D ( "M5SS", "Mass of five jets from t and h", 50, 0., 2000. );
 
   NJetsSSN_ = new TH1D ( "NJetsSSN", "Number of selected jets", 20, 0, 20 );
   UncorrHtSSN_ = new TH1D ( "UncorrHtSSN", "Ht with uncorrected jets", 50, 0, 4000 );
@@ -509,6 +524,9 @@ TDAna::TDAna(const edm::ParameterSet& iConfig) :
   DrpairbestallSSN_ = new TH1D ( "DrpairbestallSSN", "Dr of best bb pair", 50, 0., 4. );
   M3aSSN_ = new TH1D ( "M3aSSN", "Highest Et triplet besides best H combo", 50, 0., 500. );
   MwaSSN_ = new TH1D ( "MwaSSN", "Doublet not tagged in highest Et triplet", 50, 0., 300. );
+  ScprodSSN_ = new TH1D ( "ScprodSSN", "Scalar product of top vector and H versor", 50, -1200., 1200. );
+  ThdetaSSN_ = new TH1D ( "ThdetaSSN", "Delta eta top-higgs", 50, -5., 5. );
+  M5SSN_ = new TH1D ( "M5SSN", "Mass of five jets from t and h", 50, 0., 2000. );
 
   NJetsSSS_ = new TH1D ( "NJetsSSS", "Number of selected jets", 20, 0, 20 );
   UncorrHtSSS_ = new TH1D ( "UncorrHtSSS", "Ht with uncorrected jets", 50, 0, 4000 );
@@ -557,6 +575,9 @@ TDAna::TDAna(const edm::ParameterSet& iConfig) :
   DrpairbestallSSS_ = new TH1D ( "DrpairbestallSSS", "Dr of best bb pair", 50, 0., 4. );
   M3aSSS_ = new TH1D ( "M3aSSS", "Highest Et triplet besides best H combo", 50, 0., 500. );
   MwaSSS_ = new TH1D ( "MwaSSS", "Doublet not tagged in highest Et triplet", 50, 0., 300. );
+  ScprodSSS_ = new TH1D ( "ScprodSSS", "Scalar product of top vector and H versor", 50, -1200., 1200. );
+  ThdetaSSS_ = new TH1D ( "ThdetaSSS", "Delta eta top-higgs", 50, -5., 5. );
+  M5SSS_ = new TH1D ( "M5SSS", "Mass of five jets from t and h", 50, 0., 2000. );
 
   NJetsSSSN_ = new TH1D ( "NJetsSSSN", "Number of selected jets", 20, 0, 20 );
   UncorrHtSSSN_ = new TH1D ( "UncorrHtSSSN", "Ht with uncorrected jets", 50, 0, 4000 );
@@ -605,6 +626,9 @@ TDAna::TDAna(const edm::ParameterSet& iConfig) :
   DrpairbestallSSSN_ = new TH1D ( "DrpairbestallSSSN", "Dr of best bb pair", 50, 0., 4. );
   M3aSSSN_ = new TH1D ( "M3aSSSN", "Highest Et triplet besides best H combo", 50, 0., 500. );
   MwaSSSN_ = new TH1D ( "MwaSSSN", "Doublet not tagged in highest Et triplet", 50, 0., 300. );
+  ScprodSSSN_ = new TH1D ( "ScprodSSSN", "Scalar product of top vector and H versor", 50, -1200., 1200. );
+  ThdetaSSSN_ = new TH1D ( "ThdetaSSSN", "Delta eta top-higgs", 50, -5., 5. );
+  M5SSSN_ = new TH1D ( "M5SSSN", "Mass of five jets from t and h", 50, 0., 2000. );
 
   N4NJSSS_ = new TH1D ( "N4NJSSS", "N of 4HEL tags vs N jets", 
 			20, 0, 20 );  // These are filled only for this
@@ -658,6 +682,9 @@ TDAna::TDAna(const edm::ParameterSet& iConfig) :
   DrpairbestallW_ = new TH1D ( "DrpairbestallW", "Dr of best bb pair", 50, 0., 4. );
   M3aW_ = new TH1D ( "M3aW", "Highest Et triplet besides best H combo", 50, 0., 500. );
   MwaW_ = new TH1D ( "MwaW", "Doublet not tagged in highest Et triplet", 50, 0., 300. );
+  ScprodW_ = new TH1D ( "ScprodW", "Scalar product of top vector and H versor", 50, -1200., 1200. );
+  ThdetaW_ = new TH1D ( "ThdetaW", "Delta eta top-higgs", 50, -5., 5. );
+  M5W_ = new TH1D ( "M5W", "Mass of five jets from t and h", 50, 0., 2000. );
 
   NJetsSW_ = new TH1D ( "NJetsSW", "Number of selected jets", 20, 0, 20 );
   UncorrHtSW_ = new TH1D ( "UncorrHtSW", "Ht with uncorrected jets", 50, 0, 4000 );
@@ -706,6 +733,9 @@ TDAna::TDAna(const edm::ParameterSet& iConfig) :
   DrpairbestallSW_ = new TH1D ( "DrpairbestallSW", "Dr of best bb pair", 50, 0., 4. );
   M3aSW_ = new TH1D ( "M3aSW", "Highest Et triplet besides best H combo", 50, 0., 500. );
   MwaSW_ = new TH1D ( "MwaSW", "Doublet not tagged in highest Et triplet", 50, 0., 300. );
+  ScprodSW_ = new TH1D ( "ScprodSW", "Scalar product of top vector and H versor", 50, -1200., 1200. );
+  ThdetaSW_ = new TH1D ( "ThdetaSW", "Delta eta top-higgs", 50, -5., 5. );
+  M5SW_ = new TH1D ( "M5SW", "Mass of five jets from t and h", 50, 0., 2000. );
 
   NJetsSSW_ = new TH1D ( "NJetsSSW", "Number of selected jets", 20, 0, 20 );
   UncorrHtSSW_ = new TH1D ( "UncorrHtSSW", "Ht with uncorrected jets", 50, 0, 4000 );
@@ -754,6 +784,9 @@ TDAna::TDAna(const edm::ParameterSet& iConfig) :
   DrpairbestallSSW_ = new TH1D ( "DrpairbestallSSW", "Dr of best bb pair", 50, 0., 4. );
   M3aSSW_ = new TH1D ( "M3aSSW", "Highest Et triplet besides best H combo", 50, 0., 500. );
   MwaSSW_ = new TH1D ( "MwaSSW", "Doublet not tagged in highest Et triplet", 50, 0., 300. );
+  ScprodSSW_ = new TH1D ( "ScprodSSW", "Scalar product of top vector and H versor", 50, -1200., 1200. );
+  ThdetaSSW_ = new TH1D ( "ThdetaSSW", "Delta eta top-higgs", 50, -5., 5. );
+  M5SSW_ = new TH1D ( "M5SSW", "Mass of five jets from t and h", 50, 0., 2000. );
 
   NJetsSSSW_ = new TH1D ( "NJetsSSSW", "Number of selected jets", 20, 0, 20 );
   UncorrHtSSSW_ = new TH1D ( "UncorrHtSSSW", "Ht with uncorrected jets", 50, 0, 4000 );
@@ -802,6 +835,9 @@ TDAna::TDAna(const edm::ParameterSet& iConfig) :
   DrpairbestallSSSW_ = new TH1D ( "DrpairbestallSSSW", "Dr of best bb pair", 50, 0., 4. );
   M3aSSSW_ = new TH1D ( "M3aSSSW", "Highest Et triplet besides best H combo", 50, 0., 500. );
   MwaSSSW_ = new TH1D ( "MwaSSSW", "Doublet not tagged in highest Et triplet", 50, 0., 300. );
+  ScprodSSSW_ = new TH1D ( "ScprodSSSW", "Scalar product of top vector and H versor", 50, -1200., 1200. );
+  ThdetaSSSW_ = new TH1D ( "ThdetaSSSW", "Delta eta top-higgs", 50, -5., 5. );
+  M5SSSW_ = new TH1D ( "M5SSSW", "Mass of five jets from t and h", 50, 0., 2000. );
 
   N4NJSSSW_ = new TH1D ( "N4NJSSSW", "N of 4HEL tags vs N jets", 20, 0, 20 );
   E4NJSSSW_ = new TH1D ( "E4NJSSSW", "Efficiency of 4HEL tags vs N jets", 20, 0, 20 );
@@ -1584,7 +1620,7 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	    // Fill matrix with probability of pair
 	    // ------------------------------------
 	    int ipt=(int)((ptpair/500.)*10);
-	    int ieta=(int)((etapair/4.)*10);
+	    int ieta=(int)((fabs(etapair)/4.)*10);
 	    int idr=(int)((drpair/4.)*10);
 	    if ( ipt<0 ) ipt=0;
 	    if ( ipt>9 ) ipt=9;
@@ -1713,14 +1749,14 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	    // ------------------------------------
  	    int ipt=(int)((pt3/600.)*10);
  	    int idp=(int)((thdphi/3.15)*10);
- 	    int ipr=(int)(((scprodth+800)/1600.)*10);
+ 	    int iet=(int)((fabs(eta3)/4.)*10);
  	    if ( ipt<0 ) ipt=0;
  	    if ( ipt>9 ) ipt=9;
  	    if ( idp<0 ) idp=0;
  	    if ( idp>9 ) idp=9;
- 	    if ( ipr<0 ) ipr=0;
- 	    if ( ipr>9 ) ipr=9;
- 	    T[ipr*100+idp*10+ipt]++;
+ 	    if ( iet<0 ) iet=0;
+ 	    if ( iet>9 ) iet=9;
+ 	    T[iet*100+idp*10+ipt]++;
 	  }
 	  // Mass of two jets from W
 	  // -----------------------
@@ -1794,14 +1830,14 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 			  // ------------------------------------
 			  int ipt=(int)((pt3/600.)*10);
 			  int idp=(int)((thdphi/3.15)*10);
-			  int ipr=(int)(((scprodth+800)/1600.)*10);
+			  int iet=(int)((fabs(eta3)/4.)*10);
 			  if ( ipt<0 ) ipt=0;
 			  if ( ipt>9 ) ipt=9;
 			  if ( idp<0 ) idp=0;
 			  if ( idp>9 ) idp=9;
-			  if ( ipr<0 ) ipr=0;
-			  if ( ipr>9 ) ipr=9;
-			  Tnot[ipr*100+idp*10+ipt]++;
+			  if ( iet<0 ) iet=0;
+			  if ( iet>9 ) iet=9;
+			  Tnot[iet*100+idp*10+ipt]++;
 			}
 		      }
 		    }
@@ -1897,6 +1933,9 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   double m_others = -999.; // mass of jets not part of best triplet and pair
   double mbbnohmax = -999.; // mass of b pair with highest mass excluding b-jets from h decay
   double dpbbnohmax = 0.; // angle of b pair with highest mass excluding b-jets from h decay
+  double scprodthbest=0.; // scalar product between top and higgs
+  double thdetabest=0.; // delta eta between top and higgs
+  double m5=0.;         // mass of five jets assigned to top and higgs
 
   // Offline cuts
   // ------------
@@ -2230,18 +2269,12 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 		hbestcomb=m45;
 		ih1a=ii;
 		ih2a=jj;
-		ph2=ptotpair;
+		ph2=ptotpair*ptotpair;
 		phih=phipair;
 		etah=etapair;
 		pxh=px4+px5;
 		pyh=py4+py5;
 		pzh=pz4+pz5;
-	      }
-	      // Best combination based just on mass
-	      // -----------------------------------
-	      if ( fabs(m45-mhref)<fabs(m45bestall-mhref) ) {
-		m45bestall=m45;
-		chi2extall=sqrt((m45bestall-mhref)*(m45bestall-mhref)/729);
 		dpbball=3.145926-fabs(fabs(Jphi[ii]-Jphi[jj])-3.1415926);
 		drpairbestall = drpair;
 	      }
@@ -2261,9 +2294,9 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	maxr=-1.;
 	// First triplet with one b-jet
 	// ----------------------------
-	for ( int i=0; i<iJ-2 && i<NHSJ-2 && m3a==0; i++ ) {
-	  for ( int j=i+1; j<iJ-1 && j<NHSJ-1 && m3a==0; j++ ) {
-	    for ( int k=j+1; k<iJ && k<NHSJ && m3a==0; k++ ) { // limit to 8 the number of jets 
+	for ( int i=0; i<iJ-2 && i<NHSJ-2; i++ ) {
+	  for ( int j=i+1; j<iJ-1 && j<NHSJ-1; j++ ) {
+	    for ( int k=j+1; k<iJ && k<NHSJ; k++ ) { // limit to 8 the number of jets 
 	                                                       // in hard subprocess
 	      // Require that the triplet owns at least one b-tag
 	      // ------------------------------------------------
@@ -2271,7 +2304,7 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	      if ( JHEM[i] ) ib=i;
 	      if ( JHEM[j] ) ib=j;
 	      if ( JHEM[k] ) ib=k;
-	      if ( JHEM[i]+JHEM[j]+JHEM[k]==1 && i!=ih1a && i!=ih2a && j!=ih1a && j!=ih2a 
+	      if ( (JHEM[i]||JHEM[j]||JHEM[k]) && i!=ih1a && i!=ih2a && j!=ih1a && j!=ih2a 
 		   && k!=ih1a && k!=ih2a ) {
 		px1=JEt[i]*cos(Jphi[i]);
 		px2=JEt[j]*cos(Jphi[j]);
@@ -2285,18 +2318,21 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 		e1 =sqrt(px1*px1+py1*py1+pz1*pz1);
 		e2 =sqrt(px2*px2+py2*py2+pz2*pz2);
 		e3 =sqrt(px3*px3+py3*py3+pz3*pz3);
-		m3a=(e1+e2+e3)*(e1+e2+e3)-(px1+px2+px3)*(px1+px2+px3)-
-		  (py1+py2+py3)*(py1+py2+py3)-(pz1+pz2+pz3)*(pz1+pz2+pz3);
-		if ( m3a>0 ) m3a=sqrt(m3a);
-		if ( ib==k ) {
-		  mwa=(e1+e2)*(e1+e2)-(px1+px2)*(px1+px2)-(py1+py2)*(py1+py2)-(pz1+pz2)*(pz1+pz2);
-		} else if ( ib==j ) {
-		  mwa=(e1+e3)*(e1+e3)-(px1+px3)*(px1+px3)-(py1+py3)*(py1+py3)-(pz1+pz3)*(pz1+pz3);
-		} else if ( ib==i ) {
-		  mwa=(e3+e2)*(e3+e2)-(px3+px2)*(px3+px2)-(py3+py2)*(py3+py2)-(pz3+pz2)*(pz3+pz2);
+		if ( m3a==0 ) {
+		  m3a=(e1+e2+e3)*(e1+e2+e3)-(px1+px2+px3)*(px1+px2+px3)-
+		    (py1+py2+py3)*(py1+py2+py3)-(pz1+pz2+pz3)*(pz1+pz2+pz3);
+		  if ( m3a>0 ) m3a=sqrt(m3a);
 		}
-		if ( mwa>0 ) mwa=sqrt(mwa);
-		
+		double mw=0.;
+		if ( ib==k ) {
+		  mw=(e1+e2)*(e1+e2)-(px1+px2)*(px1+px2)-(py1+py2)*(py1+py2)-(pz1+pz2)*(pz1+pz2);
+		} else if ( ib==j ) {
+		  mw=(e1+e3)*(e1+e3)-(px1+px3)*(px1+px3)-(py1+py3)*(py1+py3)-(pz1+pz3)*(pz1+pz3);
+		} else if ( ib==i ) {
+		  mw=(e3+e2)*(e3+e2)-(px3+px2)*(px3+px2)-(py3+py2)*(py3+py2)-(pz3+pz2)*(pz3+pz2);
+		}
+		if ( mw>0 ) mw=sqrt(mw);
+		if ( mwa==0 ) mwa==mw;
 		double spx=px1+px2+px3;
 		double spy=py1+py2+py3;
 		double spz=pz1+pz2+pz3;
@@ -2313,19 +2349,21 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 		double thdeta = eta3-etah; // angle between momenta of t and h		
 		int ipt=(int)((pt3/600.)*10);
 		int idp=(int)((thdphi/3.15)*10);
-		int ipr=(int)(((scprodth+800)/1600.)*10);
+		int iet=(int)((fabs(eta3)/4.)*10);
 		if ( ipt<0 ) ipt=0;
 		if ( ipt>9 ) ipt=9;
 		if ( idp<0 ) idp=0;
 		if ( idp>9 ) idp=9;
-		if ( ipr<0 ) ipr=0;
-		if ( ipr>9 ) ipr=9;
-		double r = Tread[100*ipr+10*idp+ipt];
-		if ( Tnotread[100*ipr+10*idp+ipt]>0 ) r=r/Tnotread[100*ipr+10*idp+ipt];
+		if ( iet<0 ) iet=0;
+		if ( iet>9 ) iet=9;
+		double r = Tread[100*iet+10*idp+ipt];
+		if ( Tnotread[100*iet+10*idp+ipt]>0 ) r=r/Tnotread[100*iet+10*idp+ipt];
 		if ( r>maxr ) {
 		  maxr = r;
 		  tbestcomb=m123;
-		  wbestcomb=mwa;
+		  wbestcomb=mw;
+		  scprodthbest=scprodth;
+		  thdetabest=thdeta;
 		  it1a=i;
 		  it2a=j;
 		  it3a=k;
@@ -2337,26 +2375,41 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	}
 	  
 	// Compute mass of jets not selected in triplet of top and doublet of H decay
+	// and mass of 5 jets chosen to be H and T decay products
 	// --------------------------------------------------------------------------
 	if ( ih1a+ih2a>0 && it1a+it2a+it3a>0 ) {
-	  spx=0;
-	  spy=0;
-	  spz=0;
-	  se=0;
+	  double spxo=0.;
+	  double spyo=0.;
+	  double spzo=0.;
+	  double seo=0.;
+	  double spx5=0.;
+	  double spy5=0.;
+	  double spz5=0.;
+	  double se5=0.;
 	  for ( int kk=0; kk<iJ && kk<NHSJ ; kk++ ) { // limit to NHSJ the number of 
 	    // jets from hard subprocess
 	    if ( kk!= ih1a && kk!=ih2a && kk!=it1a && kk!=it2a && kk!=it3a ) { 
 	      px=JEt[kk]*cos(Jphi[kk]);
 	      py=JEt[kk]*sin(Jphi[kk]);
 	      pz=JEt[kk]/tan(2*atan(exp(-Jeta[kk])));
-	      spx+=px;
-	      spy+=py;
-	      spz+=pz;
-	      se+=sqrt(px*px+py*py+pz*pz);
+	      spxo+=px;
+	      spyo+=py;
+	      spzo+=pz;
+	      seo+=sqrt(px*px+py*py+pz*pz);
+	    } else {
+	      px=JEt[kk]*cos(Jphi[kk]);
+	      py=JEt[kk]*sin(Jphi[kk]);
+	      pz=JEt[kk]/tan(2*atan(exp(-Jeta[kk])));
+	      spx5+=px;
+	      spy5+=py;
+	      spz5+=pz;
+	      se5+=sqrt(px*px+py*py+pz*pz);
 	    }
-	    m_others=se*se-spx*spx-spy*spy-spz*spz;
-	    if ( m_others>0 ) m_others=sqrt(m_others);
 	  }
+	  m_others=seo*seo-spxo*spxo-spyo*spyo-spzo*spzo;
+	  if ( m_others>0 ) m_others=sqrt(m_others);
+	  m5=se5*se5-spx5*spx5-spy5*spy5-spz5*spz5;
+	  if ( m5>0 ) m5=sqrt(m5);
 	  
 	  // Now compute mass and angle of two b-jets not chosen as H decay
 	  // --------------------------------------------------------------
@@ -2389,6 +2442,12 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	      }
 	    }      
 	  }
+
+	  // Now compute global mass chisquared
+	  // ----------------------------------
+	  chi2 = pow((tbestcomb-mtref)/40.,2)+pow((wbestcomb-mwref)/20.,2)+pow((hbestcomb-mhref)/25.,2);
+
+
 	}      // all 5 jets from h and t defined
 	
 	// Now compute mass of first 8 jets and their centrality
@@ -2534,7 +2593,10 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	    Drpairbestall_->Fill(drpairbestall,PTOT);
 	    M3a_->Fill(m3a,PTOT);
 	    Mwa_->Fill(mwa,PTOT);
-	    
+	    Scprod_->Fill(scprodthbest,PTOT);
+	    Thdeta_->Fill(thdetabest,PTOT);
+	    M5_->Fill(m5,PTOT);
+    
 	    NJetsN_->Fill(goodIc5Jets,weight_N);
 	    UncorrHtN_->Fill(UncorrHt,weight_N);
 	    CorrHtN_->Fill(CorrHt,weight_N);
@@ -2585,6 +2647,9 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	    DrpairbestallN_->Fill(drpairbestall,weight_N);
 	    M3aN_->Fill(m3a,weight_N);
 	    MwaN_->Fill(mwa,weight_N);
+	    ScprodN_->Fill(scprodthbest,weight_N);
+	    ThdetaN_->Fill(thdetabest,weight_N);
+	    M5N_->Fill(m5,weight_N);
 	    
 	    if ( MEtSigCut && NHEM>=2 ) {
 	      NJetsS_->Fill(goodIc5Jets,PTOT);
@@ -2637,6 +2702,9 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	      DrpairbestallS_->Fill(drpairbestall,PTOT);
 	      M3aS_->Fill(m3a,PTOT);
 	      MwaS_->Fill(mwa,PTOT);
+	      ScprodS_->Fill(scprodthbest,PTOT);
+	      ThdetaS_->Fill(thdetabest,PTOT);
+	      M5S_->Fill(m5,PTOT);
 	      
 	      NJetsSN_->Fill(goodIc5Jets,weight_N);
 	      UncorrHtSN_->Fill(UncorrHt,weight_N);
@@ -2688,6 +2756,9 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	      DrpairbestallSN_->Fill(drpairbestall,weight_N);
 	      M3aSN_->Fill(m3a,weight_N);
 	      MwaSN_->Fill(mwa,weight_N);
+	      ScprodSN_->Fill(scprodthbest,weight_N);
+	      ThdetaSN_->Fill(thdetabest,weight_N);
+	      M5SN_->Fill(m5,weight_N);
 	      
 	      if ( NHEM>=3 ) {
 		NJetsSS_->Fill(goodIc5Jets,PTOT);
@@ -2740,6 +2811,9 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 		DrpairbestallSS_->Fill(drpairbestall,PTOT);
 		M3aSS_->Fill(m3a,PTOT);
 		MwaSS_->Fill(mwa,PTOT);
+		ScprodSS_->Fill(scprodthbest,PTOT);
+		ThdetaSS_->Fill(thdetabest,PTOT);
+		M5SS_->Fill(m5,PTOT);
 		
 		NJetsSSN_->Fill(goodIc5Jets,weight_N);
 		UncorrHtSSN_->Fill(UncorrHt,weight_N);
@@ -2792,6 +2866,9 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	      DrpairbestallSSN_->Fill(drpairbestall,weight_N);
 	      M3aSSN_->Fill(m3a,weight_N);
 	      MwaSSN_->Fill(mwa,weight_N);
+	      ScprodSSN_->Fill(scprodthbest,weight_N);
+	      ThdetaSSN_->Fill(thdetabest,weight_N);
+	      M5SSN_->Fill(m5,weight_N);
 	      
 	      if ( NHEM>=4 ) {
 		NJetsSSS_->Fill(goodIc5Jets,PTOT);
@@ -2844,6 +2921,9 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 		DrpairbestallSSS_->Fill(drpairbestall,PTOT);
 		M3aSSS_->Fill(m3a,PTOT);
 		MwaSSS_->Fill(mwa,PTOT);
+		ScprodSSS_->Fill(scprodthbest,PTOT);
+		ThdetaSSS_->Fill(thdetabest,PTOT);
+		M5SSS_->Fill(m5,PTOT);
 		
 		NJetsSSSN_->Fill(goodIc5Jets,weight_N);
 		UncorrHtSSSN_->Fill(UncorrHt,weight_N);
@@ -2895,6 +2975,9 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 		DrpairbestallSSSN_->Fill(drpairbestall,weight_N);
 		M3aSSSN_->Fill(m3a,weight_N);
 		MwaSSSN_->Fill(mwa,weight_N);
+		ScprodSSSN_->Fill(scprodthbest,weight_N);
+		ThdetaSSSN_->Fill(thdetabest,weight_N);
+		M5SSSN_->Fill(m5,weight_N);
 	      }
 	      
 	    }
@@ -2966,6 +3049,9 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	    DrpairbestallW_->Fill(drpairbestall,PTOTE2);
 	    M3aW_->Fill(m3a,PTOTE2);
 	    MwaW_->Fill(mwa,PTOTE2);
+	    ScprodW_->Fill(scprodthbest,PTOTE2);
+	    ThdetaW_->Fill(thdetabest,PTOTE2);
+	    M5W_->Fill(m5,PTOTE2);
 	    
 	    if ( MEtSigCut && NHEM>=2 ) {
 	      NJetsSW_->Fill(goodIc5Jets,PTOTE2);
@@ -3018,6 +3104,9 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	      DrpairbestallSW_->Fill(drpairbestall,PTOTE2);
 	      M3aSW_->Fill(m3a,PTOTE2);
 	      MwaSW_->Fill(mwa,PTOTE2);
+	      ScprodSW_->Fill(scprodthbest,PTOTE2);
+	      ThdetaSW_->Fill(thdetabest,PTOTE2);
+	      M5SW_->Fill(m5,PTOTE2);
 	      
 	      if ( NHEM>=3 ) {
 		NJetsSSW_->Fill(goodIc5Jets,PTOTE2);
@@ -3070,6 +3159,9 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 		DrpairbestallSSW_->Fill(drpairbestall,PTOTE2);
 		M3aSSW_->Fill(m3a,PTOTE2);
 		MwaSSW_->Fill(mwa,PTOTE2);
+		ScprodSSW_->Fill(scprodthbest,PTOTE2);
+		ThdetaSSW_->Fill(thdetabest,PTOTE2);
+		M5SSW_->Fill(m5,PTOTE2);
 	      }
 	      
 	      if ( NHEM>=4 ) {
@@ -3123,6 +3215,9 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 		DrpairbestallSSSW_->Fill(drpairbestall,PTOTE2);
 		M3aSSSW_->Fill(m3a,PTOTE2);
 		MwaSSSW_->Fill(mwa,PTOTE2);
+		ScprodSSSW_->Fill(scprodthbest,PTOTE2);
+		ThdetaSSSW_->Fill(thdetabest,PTOTE2);
+		M5SSSW_->Fill(m5,PTOTE2);
 	      }
 	    }
 	  }
@@ -3297,18 +3392,12 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	      hbestcomb=m45;
 	      ih1a=ii;
 	      ih2a=jj;
-	      ph2=ptotpair;
+	      ph2=ptotpair*ptotpair;
 	      phih=phipair;
 	      etah=etapair;
 	      pxh=px4+px5;
 	      pyh=py4+py5;
 	      pzh=pz4+pz5;
-	    }
-	    // Best combination based just on mass
-	    // -----------------------------------
-	    if ( fabs(m45-mhref)<fabs(m45bestall-mhref) ) {
-	      m45bestall=m45;
-	      chi2extall=sqrt((m45bestall-mhref)*(m45bestall-mhref)/729);
 	      dpbball=3.145926-fabs(fabs(Jphi[ii]-Jphi[jj])-3.1415926);
 	      drpairbestall = drpair;
 	    }
@@ -3328,9 +3417,9 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
       maxr=-1.;
       // First triplet with one b-jet
       // ----------------------------
-      for ( int i=0; i<iJ-2 && i<NHSJ-2 && m3a==0; i++ ) {
-	for ( int j=i+1; j<iJ-1 && j<NHSJ-1 && m3a==0; j++ ) {
-	  for ( int k=j+1; k<iJ && k<NHSJ && m3a==0; k++ ) { // limit to 8 the number of jets 
+      for ( int i=0; i<iJ-2 && i<NHSJ-2; i++ ) {
+	for ( int j=i+1; j<iJ-1 && j<NHSJ-1; j++ ) {
+	  for ( int k=j+1; k<iJ && k<NHSJ; k++ ) { // limit to 8 the number of jets 
 	    // in hard subprocess
 	    // Require that the triplet owns at least one b-tag
 	    // ------------------------------------------------
@@ -3338,7 +3427,7 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	    if ( JHEM[i] ) ib=i;
 	    if ( JHEM[j] ) ib=j;
 	    if ( JHEM[k] ) ib=k;
-	    if ( JHEM[i]+JHEM[j]+JHEM[k]==1 && i!=ih1a && i!=ih2a && j!=ih1a && j!=ih2a 
+	    if ( (JHEM[i]||JHEM[j]||JHEM[k]) && i!=ih1a && i!=ih2a && j!=ih1a && j!=ih2a 
 		 && k!=ih1a && k!=ih2a ) {
 	      px1=JEt[i]*cos(Jphi[i]);
 	      px2=JEt[j]*cos(Jphi[j]);
@@ -3352,18 +3441,21 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	      e1 =sqrt(px1*px1+py1*py1+pz1*pz1);
 	      e2 =sqrt(px2*px2+py2*py2+pz2*pz2);
 	      e3 =sqrt(px3*px3+py3*py3+pz3*pz3);
-	      m3a=(e1+e2+e3)*(e1+e2+e3)-(px1+px2+px3)*(px1+px2+px3)-
-		(py1+py2+py3)*(py1+py2+py3)-(pz1+pz2+pz3)*(pz1+pz2+pz3);
-	      if ( m3a>0 ) m3a=sqrt(m3a);
-	      if ( ib==k ) {
-		mwa=(e1+e2)*(e1+e2)-(px1+px2)*(px1+px2)-(py1+py2)*(py1+py2)-(pz1+pz2)*(pz1+pz2);
-	      } else if ( ib==j ) {
-		mwa=(e1+e3)*(e1+e3)-(px1+px3)*(px1+px3)-(py1+py3)*(py1+py3)-(pz1+pz3)*(pz1+pz3);
-	      } else if ( ib==i ) {
-		mwa=(e3+e2)*(e3+e2)-(px3+px2)*(px3+px2)-(py3+py2)*(py3+py2)-(pz3+pz2)*(pz3+pz2);
+	      if ( m3a==0 ) {
+		m3a=(e1+e2+e3)*(e1+e2+e3)-(px1+px2+px3)*(px1+px2+px3)-
+		  (py1+py2+py3)*(py1+py2+py3)-(pz1+pz2+pz3)*(pz1+pz2+pz3);
+		if ( m3a>0 ) m3a=sqrt(m3a);
 	      }
-	      if ( mwa>0 ) mwa=sqrt(mwa);
-		
+	      double mw=0.;
+	      if ( ib==k ) {
+		mw=(e1+e2)*(e1+e2)-(px1+px2)*(px1+px2)-(py1+py2)*(py1+py2)-(pz1+pz2)*(pz1+pz2);
+	      } else if ( ib==j ) {
+		mw=(e1+e3)*(e1+e3)-(px1+px3)*(px1+px3)-(py1+py3)*(py1+py3)-(pz1+pz3)*(pz1+pz3);
+	      } else if ( ib==i ) {
+		mw=(e3+e2)*(e3+e2)-(px3+px2)*(px3+px2)-(py3+py2)*(py3+py2)-(pz3+pz2)*(pz3+pz2);
+	      }
+	      if ( mw>0 ) mw=sqrt(mw);
+	      if ( mwa==0 ) mwa==mw;
 	      double spx=px1+px2+px3;
 	      double spy=py1+py2+py3;
 	      double spz=pz1+pz2+pz3;
@@ -3380,19 +3472,21 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	      double thdeta = eta3-etah; // angle between momenta of t and h		
 	      int ipt=(int)((pt3/600.)*10);
 	      int idp=(int)((thdphi/3.15)*10);
-	      int ipr=(int)(((scprodth+800)/1600.)*10);
+	      int iet=(int)((fabs(eta3)/4.)*10);
 	      if ( ipt<0 ) ipt=0;
 	      if ( ipt>9 ) ipt=9;
 	      if ( idp<0 ) idp=0;
 	      if ( idp>9 ) idp=9;
-	      if ( ipr<0 ) ipr=0;
-	      if ( ipr>9 ) ipr=9;
-	      double r = Tread[100*ipr+10*idp+ipt];
-	      if ( Tnotread[100*ipr+10*idp+ipt]>0 ) r=r/Tnotread[100*ipr+10*idp+ipt];
+	      if ( iet<0 ) iet=0;
+	      if ( iet>9 ) iet=9;
+	      double r = Tread[100*iet+10*idp+ipt];
+	      if ( Tnotread[100*iet+10*idp+ipt]>0 ) r=r/Tnotread[100*iet+10*idp+ipt];
 	      if ( r>maxr ) {
 		maxr = r;
 		tbestcomb=m123;
-		wbestcomb=mwa;
+		wbestcomb=mw;
+		scprodthbest=scprodth;
+		thdetabest=thdeta;
 		it1a=i;
 		it2a=j;
 		it3a=k;
@@ -3404,26 +3498,41 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
       }
 	  
       // Compute mass of jets not selected in triplet of top and doublet of H decay
+      // and mass of 5 jets chosen to be H and T decay products
       // --------------------------------------------------------------------------
       if ( ih1a+ih2a>0 && it1a+it2a+it3a>0 ) {
-	spx=0;
-	spy=0;
-	spz=0;
-	se=0;
+	double spxo=0.;
+	double spyo=0.;
+	double spzo=0.;
+	double seo=0.;
+	double spx5=0.;
+	double spy5=0.;
+	double spz5=0.;
+	double se5=0.;
 	for ( int kk=0; kk<iJ && kk<NHSJ ; kk++ ) { // limit to NHSJ the number of 
 	  // jets from hard subprocess
 	  if ( kk!= ih1a && kk!=ih2a && kk!=it1a && kk!=it2a && kk!=it3a ) { 
 	    px=JEt[kk]*cos(Jphi[kk]);
 	    py=JEt[kk]*sin(Jphi[kk]);
 	    pz=JEt[kk]/tan(2*atan(exp(-Jeta[kk])));
-	    spx+=px;
-	    spy+=py;
-	    spz+=pz;
-	    se+=sqrt(px*px+py*py+pz*pz);
+	    spxo+=px;
+	    spyo+=py;
+	    spzo+=pz;
+	    seo+=sqrt(px*px+py*py+pz*pz);
+	  } else {
+	    px=JEt[kk]*cos(Jphi[kk]);
+	    py=JEt[kk]*sin(Jphi[kk]);
+	    pz=JEt[kk]/tan(2*atan(exp(-Jeta[kk])));
+	    spx5+=px;
+	    spy5+=py;
+	    spz5+=pz;
+	    se5+=sqrt(px*px+py*py+pz*pz);
 	  }
-	  m_others=se*se-spx*spx-spy*spy-spz*spz;
-	  if ( m_others>0 ) m_others=sqrt(m_others);
 	}
+	m_others=seo*seo-spxo*spxo-spyo*spyo-spzo*spzo;
+	if ( m_others>0 ) m_others=sqrt(m_others);
+	m5=se5*se5-spx5*spx5-spy5*spy5-spz5*spz5;
+	if ( m5>0 ) m5=sqrt(m5);
 	  
 	// Now compute mass and angle of two b-jets not chosen as H decay
 	// --------------------------------------------------------------
@@ -3456,6 +3565,11 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	    }
 	  }      
 	}
+
+	// Now compute global mass chisquared
+	// ----------------------------------
+	chi2 = pow((tbestcomb-mtref)/40.,2)+pow((wbestcomb-mwref)/20.,2)+pow((hbestcomb-mhref)/25.,2);
+
       }      // all 5 jets from h and t defined
 	
       // Now compute mass of first 8 jets and their centrality
@@ -3596,6 +3710,9 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	Drpairbestall_->Fill(drpairbestall);
 	M3a_->Fill(m3a);
 	Mwa_->Fill(mwa);
+	Scprod_->Fill(scprodthbest);
+	Thdeta_->Fill(thdetabest);
+	M5_->Fill(m5);
 	
 	if ( MEtSigCut && NHEM>=2 ) {
 	  NJetsS_->Fill(goodIc5Jets);
@@ -3648,6 +3765,9 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	  DrpairbestallS_->Fill(drpairbestall);
 	  M3aS_->Fill(m3a);
 	  MwaS_->Fill(mwa);
+	  ScprodS_->Fill(scprodthbest);
+	  ThdetaS_->Fill(thdetabest);
+	  M5S_->Fill(m5);
 	  
 	  if ( NHEM>=3 ) {
 	    NJetsSS_->Fill(goodIc5Jets);
@@ -3697,10 +3817,13 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	    Et6SS_->Fill(Et6);
 	    MwminSS_->Fill(mwmin);
 	    HbestcombSS_->Fill(hbestcomb);
+	    DrpairbestallSS_->Fill(drpairbestall);
+	    M3aSS_->Fill(m3a);
+	    MwaSS_->Fill(mwa);
+	    ScprodSS_->Fill(scprodthbest);
+	    ThdetaSS_->Fill(thdetabest);
+	    M5SS_->Fill(m5);
 	  }
-	  DrpairbestallSS_->Fill(drpairbestall);
-	  M3aSS_->Fill(m3a);
-	  MwaSS_->Fill(mwa);
 	  
 	  if ( NHEM>=4 ) {
 	    NJetsSSS_->Fill(goodIc5Jets);
@@ -3753,6 +3876,9 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	    DrpairbestallSSS_->Fill(drpairbestall);
 	    M3aSSS_->Fill(m3a);
 	    MwaSSS_->Fill(mwa);
+	    ScprodSSS_->Fill(scprodthbest);
+	    ThdetaSSS_->Fill(thdetabest);
+	    M5SSS_->Fill(m5);
 
 	    // Study number of events with 4HEM tags vs N jets on which to look for them
 	    // -------------------------------------------------------------------------
@@ -3988,22 +4114,26 @@ void TDAna::endJob() {
 
   // Histograms for the study of jet/parton association
   // --------------------------------------------------
-  Drmax_->Scale(1./Nsltt_hjj);
-  Drmedall_->Scale(1./Nsltt_hjj);
-  Drmed07_->Scale(1./Nsltt_hjj);
-  N07_->Scale(1./Nsltt_hjj);
-  N04_->Scale(1./Nsltt_hjj);
-  N02_->Scale(1./Nsltt_hjj);
-  Nlo_->Scale(1./Nsltt_hjj);
-  Detmed07_->Scale(1./Nsltt_hjj);
-  Detmedall_->Scale(1./Nsltt_hjj);
-  Perf07_->Scale(1./Nsltt_hjj);
-  Perf04_->Scale(1./Nsltt_hjj);
-  Perf02_->Scale(1./Nsltt_hjj);
-  Det2med07_->Scale(1./Nsltt_hjj);
-  Det2medall_->Scale(1./Nsltt_hjj);
-  Hrecfrac_->Scale(1./Nsltt_hjj);
-  Trecfrac_->Scale(1./Nsltt_hjj);
+  cout << "Writing histograms..." << endl;
+  if ( Nsltt_hjj>0 ) {
+    Drmax_->Scale(1./Nsltt_hjj);
+    Drmedall_->Scale(1./Nsltt_hjj);
+    Drmed07_->Scale(1./Nsltt_hjj);
+    N07_->Scale(1./Nsltt_hjj);
+    N04_->Scale(1./Nsltt_hjj);
+    N02_->Scale(1./Nsltt_hjj);
+    Nlo_->Scale(1./Nsltt_hjj);
+    Detmed07_->Scale(1./Nsltt_hjj);
+    Detmedall_->Scale(1./Nsltt_hjj);
+    Perf07_->Scale(1./Nsltt_hjj);
+    Perf04_->Scale(1./Nsltt_hjj);
+    Perf02_->Scale(1./Nsltt_hjj);
+    Det2med07_->Scale(1./Nsltt_hjj);
+    Det2medall_->Scale(1./Nsltt_hjj);
+    Hrecfrac_->Scale(1./Nsltt_hjj);
+    Trecfrac_->Scale(1./Nsltt_hjj);
+  } else cout << "N sl tt decays=0" << endl;
+
   Drmax_->Write();
   Drmedall_->Write();
   Drmed07_->Write();
@@ -4093,6 +4223,9 @@ void TDAna::endJob() {
   Drpairbestall_->Write();
   M3a_->Write();
   Mwa_->Write();
+  Scprod_->Write();
+  Thdeta_->Write();
+  M5_->Write();
 
   NJetsN_->Write();
   UncorrHtN_->Write();
@@ -4141,6 +4274,9 @@ void TDAna::endJob() {
   DrpairbestallN_->Write();
   M3aN_->Write();
   MwaN_->Write();
+  ScprodN_->Write();
+  ThdetaN_->Write();
+  M5N_->Write();
 
   // Histograms for events passing trigger and NJet cut
   // --------------------------------------------------
@@ -4191,6 +4327,9 @@ void TDAna::endJob() {
   DrpairbestallS_->Write();
   M3aS_->Write();
   MwaS_->Write();
+  ScprodS_->Write();
+  ThdetaS_->Write();
+  M5S_->Write();
 
   NJetsSN_->Write();
   UncorrHtSN_->Write();
@@ -4239,6 +4378,9 @@ void TDAna::endJob() {
   DrpairbestallSN_->Write();
   M3aSN_->Write();
   MwaSN_->Write();
+  ScprodSN_->Write();
+  ThdetaSN_->Write();
+  M5SN_->Write();
 
   // Histograms for events passing trigger, NJet, and METS cut
   // ---------------------------------------------------------
@@ -4289,6 +4431,9 @@ void TDAna::endJob() {
   DrpairbestallSS_->Write();
   M3aSS_->Write();
   MwaSS_->Write();
+  ScprodSS_->Write();
+  ThdetaSS_->Write();
+  M5SS_->Write();
 
   NJetsSSN_->Write();
   UncorrHtSSN_->Write();
@@ -4337,6 +4482,9 @@ void TDAna::endJob() {
   DrpairbestallSSN_->Write();
   M3aSSN_->Write();
   MwaSSN_->Write();
+  ScprodSSN_->Write();
+  ThdetaSSN_->Write();
+  M5SSN_->Write();
 
   // Histograms for events passing trigger, NJet, and METS cut
   // ---------------------------------------------------------
@@ -4387,6 +4535,9 @@ void TDAna::endJob() {
   DrpairbestallSSS_->Write();
   M3aSSS_->Write();
   MwaSSS_->Write();
+  ScprodSSS_->Write();
+  ThdetaSSS_->Write();
+  M5SSS_->Write();
 
   NJetsSSSN_->Write();
   UncorrHtSSSN_->Write();
@@ -4435,6 +4586,9 @@ void TDAna::endJob() {
   DrpairbestallSSSN_->Write();
   M3aSSSN_->Write();
   MwaSSSN_->Write();
+  ScprodSSSN_->Write();
+  ThdetaSSSN_->Write();
+  M5SSSN_->Write();
 
   N4NJSSS_->Write();
   E4NJSSS_->Write();
@@ -4488,6 +4642,9 @@ void TDAna::endJob() {
   DrpairbestallW_->Write();
   M3aW_->Write();
   MwaW_->Write();
+  ScprodW_->Write();
+  ThdetaW_->Write();
+  M5W_->Write();
 
   // Histograms for events passing trigger and NJet cut
   // --------------------------------------------------
@@ -4538,6 +4695,9 @@ void TDAna::endJob() {
   DrpairbestallSW_->Write();
   M3aSW_->Write();
   MwaSW_->Write();
+  ScprodSW_->Write();
+  ThdetaSW_->Write();
+  M5SW_->Write();
 
   // Histograms for events passing trigger, NJet, and METS cut
   // ---------------------------------------------------------
@@ -4588,6 +4748,9 @@ void TDAna::endJob() {
   DrpairbestallSSW_->Write();
   M3aSSW_->Write();
   MwaSSW_->Write();
+  ScprodSSW_->Write();
+  ThdetaSSW_->Write();
+  M5SSW_->Write();
 
   // Histograms for events passing trigger, NJet, and METS cut
   // ---------------------------------------------------------
@@ -4638,6 +4801,9 @@ void TDAna::endJob() {
   DrpairbestallSSSW_->Write();
   M3aSSSW_->Write();
   MwaSSSW_->Write();
+  ScprodSSSW_->Write();
+  ThdetaSSSW_->Write();
+  M5SSSW_->Write();
 
   N4NJSSSW_->Write();
   E4NJSSSW_->Write();
