@@ -1,0 +1,15 @@
+source = PoolSource {
+  untracked vstring fileNames = {
+    "castor:/castor/cern.ch/user/d/demattia/FastSim/PUHL/TT_3JETS/TT_3JETS_1.root",
+    "castor:/castor/cern.ch/user/d/demattia/FastSim/PUHL/TT_3JETS/TT_3JETS_10.root",
+    "castor:/castor/cern.ch/user/d/demattia/FastSim/PUHL/TT_3JETS/TT_3JETS_11.root",
+    "castor:/castor/cern.ch/user/d/demattia/FastSim/PUHL/TT_3JETS/TT_3JETS_2.root",
+    "castor:/castor/cern.ch/user/d/demattia/FastSim/PUHL/TT_3JETS/TT_3JETS_3.root",
+    "castor:/castor/cern.ch/user/d/demattia/FastSim/PUHL/TT_3JETS/TT_3JETS_4.root",
+    "castor:/castor/cern.ch/user/d/demattia/FastSim/PUHL/TT_3JETS/TT_3JETS_5.root",
+    "castor:/castor/cern.ch/user/d/demattia/FastSim/PUHL/TT_3JETS/TT_3JETS_6.root",
+    "castor:/castor/cern.ch/user/d/demattia/FastSim/PUHL/TT_3JETS/TT_3JETS_7.root",
+    "castor:/castor/cern.ch/user/d/demattia/FastSim/PUHL/TT_3JETS/TT_3JETS_8.root",
+    "castor:/castor/cern.ch/user/d/demattia/FastSim/PUHL/TT_3JETS/TT_3JETS_9.root"
+  }
+}
