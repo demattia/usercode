@@ -129,6 +129,10 @@ TDAna::TDAna(const edm::ParameterSet& iConfig) :
     H[i]=0.;
     Hnot[i]=0.;
   }
+  for ( int i=0; i<1000; i++ ) {
+    T[i]=0.;
+    Tnot[i]=0.;
+  }
 
   // Load file with smoothed histograms to use for Likelihood definition
   // -------------------------------------------------------------------
@@ -195,18 +199,29 @@ TDAna::TDAna(const edm::ParameterSet& iConfig) :
   Hrecfrac_ = new TH2D ( "Hrecfrac", "Hrecfrac for choices of etmin, etamax", 21, 14, 56, 11, 1.5, 3.7 );
   Trecfrac_ = new TH2D ( "Trecfrac", "Trecfrac for choices of etmin, etamax", 21, 14, 56, 11, 1.5, 3.7 );
 
-  MHbest_ = new TH1D ( "MHbest", "Best H mass from jets ass to H partons", 50, 0, 200 );
-  MTbest_ = new TH1D ( "MTbest", "Best T mass from jets ass to T partons", 50, 0, 300 );
+  MHbest_ = new TH1D ( "MHbest", "Best H mass from jets ass to H partons", 50, 0, 500 );
+  MTbest_ = new TH1D ( "MTbest", "Best T mass from jets ass to T partons", 50, 0, 800 );
   MWbest_ = new TH1D ( "MWbest", "Best W mass from jets ass to W partons", 50, 0, 200 );
   HBJ_etrank_ = new TH1D ( "HBJ_etrank", "Rank in Et of b-jets from H decay", 8, -0.5, 7.5 );
   Hpt_ = new TH1D ( "Hpt", "Pt of best H mass", 50, 0, 500 );
   Heta_ = new TH1D ( "Heta", "Eta of H from jets", 50, 0., 4.);
-  Hdr_ = new TH1D ( "Hdr", "Delta R of b-jets from H", 50, 0., 4. );
-  MHnot_ = new TH1D ( "MHnot", "H mass from jets NOT ass to H partons", 50, 0, 200 ); 
+  Hdr_ = new TH1D ( "Hdr", "Delta R of b-jets from H", 50, 0., 5. );
+  MHnot_ = new TH1D ( "MHnot", "H mass from jets NOT ass to H partons", 50, 0, 500 ); 
   Hnotpt_ = new TH1D ( "Hnotpt", "Pt of b jets NOT from H", 50, 0, 500 );
   Hnoteta_ = new TH1D ( "Hnoteta", "Eta of H from NOT H jets", 50, 0., 4.);
-  Hnotdr_ = new TH1D ( "Hnotdr", "Delta R of b-jets NOT from H", 50, 0., 4. );
-  
+  Hnotdr_ = new TH1D ( "Hnotdr", "Delta R of b-jets NOT from H", 50, 0., 5. );
+  MTnotbest_ = new TH1D ( "MTnotbest", "Best T mass from jets NOT ass to T partons", 50, 0, 800 );
+  Tpt_ = new TH1D ( "Tpt", "Pt of jet triplet ass to T partons", 50, 0, 600 );
+  Teta_ = new TH1D ( "Teta", "Eta of jet triplet ass to T partons", 50, 0., 4. );
+  THdeta_ = new TH1D ( "THdeta", "Eta difference of T and H", 50, -5., 5. );
+  THdphi_ = new TH1D ( "THdphi", "Phi difference of T and H", 50, 0., 3.15 );
+  THproj_ = new TH1D ( "THproj", "Momentum of T projected on H direction", 50, -1000., 1000. );
+  Tnotpt_ = new TH1D ( "Tnotpt", "Pt of jet triplet NOT ass to T partons", 50, 0, 600 );
+  Tnoteta_ = new TH1D ( "Tnoteta", "Eta of jet triplet NOT ass to T partons", 50, 0., 4. );
+  THnotdeta_ = new TH1D ( "THnotdeta", "Eta difference of NOT T and H", 50, -5., 5. );
+  THnotdphi_ = new TH1D ( "THnotdphi", "Phi difference of NOT T and H", 50, 0., 3.15 );
+  THnotproj_ = new TH1D ( "THnotproj", "Momentum of NOT T projected on H direction", 50, -1000., 1000. );
+
   NJets_ = new TH1D ( "NJets", "Number of selected jets", 20, 0, 20 );
   UncorrHt_ = new TH1D ( "UncorrHt", "Ht with uncorrected jets", 50, 0, 4000 );
   CorrHt_ = new TH1D ( "CorrHt", "Ht with corrected jets", 50, 0, 4000 );
@@ -224,8 +239,8 @@ TDAna::TDAna(const edm::ParameterSet& iConfig) :
   MEtDP3_ = new TH1D ( "MEtDP3", "MEtDP3", 50, 0, 3.2 );
   UncorrMEtSig_ = new TH1D ( "UncorrMEtSig", "MEtSig", 50, 0, 20 );
   CorrMEtSig_ = new TH1D ( "CorrMEtSig", "MEtSig", 50, 0, 20 );
-  M3best_ = new TH1D ( "M3best", "M3best", 50, 0, 300 );
-  Mwbest_ = new TH1D ( "Mwbest", "Mwbest", 50, 0, 200 );
+  M3best_ = new TH1D ( "M3best", "M3best", 50, 0., 800. );
+  Mwbest_ = new TH1D ( "Mwbest", "Mwbest", 50, 0., 500. );
   Chi2mass_ = new TH1D ( "Chi2mass", "Chi2mass", 50, 0, 50 );
   M45best_ = new TH1D ( "M45best", "M45best", 50, 0, 300 );
   Chi2ext_ = new TH1D ( "Chi2ext", "Chi2ext", 50, 0, 50 );
@@ -272,8 +287,8 @@ TDAna::TDAna(const edm::ParameterSet& iConfig) :
   MEtDP3N_ = new TH1D ( "MEtDP3N", "MEtDP3", 50, 0, 3.2 );
   UncorrMEtSigN_ = new TH1D ( "UncorrMEtSigN", "MEtSig", 50, 0, 20 );
   CorrMEtSigN_ = new TH1D ( "CorrMEtSigN", "MEtSig", 50, 0, 20 );
-  M3bestN_ = new TH1D ( "M3bestN", "M3best", 50, 0, 300 );
-  MwbestN_ = new TH1D ( "MwbestN", "Mwbest", 50, 0, 200 );
+  M3bestN_ = new TH1D ( "M3bestN", "M3best", 50, 0., 800. );
+  MwbestN_ = new TH1D ( "MwbestN", "Mwbest", 50, 0., 500. );
   Chi2massN_ = new TH1D ( "Chi2massN", "Chi2mass", 50, 0, 50 );
   M45bestN_ = new TH1D ( "M45bestN", "M45best", 50, 0, 300 );
   Chi2extN_ = new TH1D ( "Chi2extN", "Chi2ext", 50, 0, 50 );
@@ -320,8 +335,8 @@ TDAna::TDAna(const edm::ParameterSet& iConfig) :
   MEtDP3S_ = new TH1D ( "MEtDP3S", "MEtDP3S", 50, 0, 3.2 );
   UncorrMEtSigS_ = new TH1D ( "UncorrMEtSigS", "MEtSig", 50, 0, 20 );
   CorrMEtSigS_ = new TH1D ( "CorrMEtSigS", "MEtSig", 50, 0, 20 );
-  M3bestS_ = new TH1D ( "M3bestS", "M3bestS", 50, 0, 300 );
-  MwbestS_ = new TH1D ( "MwbestS", "MwbestS", 50, 0, 200 );
+  M3bestS_ = new TH1D ( "M3bestS", "M3bestS", 50, 0., 800. );
+  MwbestS_ = new TH1D ( "MwbestS", "MwbestS", 50, 0., 500. );
   Chi2massS_ = new TH1D ( "Chi2massS", "Chi2massS", 50, 0, 50 );
   M45bestS_ = new TH1D ( "M45bestS", "M45best", 50, 0, 300 );
   Chi2extS_ = new TH1D ( "Chi2extS", "Chi2ext", 50, 0, 50 );
@@ -368,8 +383,8 @@ TDAna::TDAna(const edm::ParameterSet& iConfig) :
   MEtDP3SN_ = new TH1D ( "MEtDP3SN", "MEtDP3S", 50, 0, 3.2 );
   UncorrMEtSigSN_ = new TH1D ( "UncorrMEtSigSN", "MEtSig", 50, 0, 20 );
   CorrMEtSigSN_ = new TH1D ( "CorrMEtSigSN", "MEtSig", 50, 0, 20 );
-  M3bestSN_ = new TH1D ( "M3bestSN", "M3bestS", 50, 0, 300 );
-  MwbestSN_ = new TH1D ( "MwbestSN", "MwbestS", 50, 0, 200 );
+  M3bestSN_ = new TH1D ( "M3bestSN", "M3bestS", 50, 0., 800. );
+  MwbestSN_ = new TH1D ( "MwbestSN", "MwbestS", 50, 0., 500. );
   Chi2massSN_ = new TH1D ( "Chi2massSN", "Chi2massS", 50, 0, 50 );
   M45bestSN_ = new TH1D ( "M45bestSN", "M45best", 50, 0, 300 );
   Chi2extSN_ = new TH1D ( "Chi2extSN", "Chi2ext", 50, 0, 50 );
@@ -416,8 +431,8 @@ TDAna::TDAna(const edm::ParameterSet& iConfig) :
   MEtDP3SS_ = new TH1D ( "MEtDP3SS", "MEtDP3SS", 50, 0, 3.2 );
   UncorrMEtSigSS_ = new TH1D ( "UncorrMEtSigSS", "UncorrMEtSigSS", 50, 0, 20 );
   CorrMEtSigSS_ = new TH1D ( "CorrMEtSigSS", "CorrMEtSigSS", 50, 0, 20 );
-  M3bestSS_ = new TH1D ( "M3bestSS", "M3bestSS", 50, 0, 300 );
-  MwbestSS_ = new TH1D ( "MwbestSS", "MwbestSS", 50, 0, 200 );
+  M3bestSS_ = new TH1D ( "M3bestSS", "M3bestSS", 50, 0., 800. );
+  MwbestSS_ = new TH1D ( "MwbestSS", "MwbestSS", 50, 0., 500. );
   Chi2massSS_ = new TH1D ( "Chi2massSS", "Chi2massSS", 50, 0, 50 );
   M45bestSS_ = new TH1D ( "M45bestSS", "M45best", 50, 0, 300 );
   Chi2extSS_ = new TH1D ( "Chi2extSS", "Chi2ext", 50, 0, 50 );
@@ -464,8 +479,8 @@ TDAna::TDAna(const edm::ParameterSet& iConfig) :
   MEtDP3SSN_ = new TH1D ( "MEtDP3SSN", "MEtDP3SSN", 50, 0, 3.2 );
   UncorrMEtSigSSN_ = new TH1D ( "UncorrMEtSigSSN", "UncorrMEtSigSSN", 50, 0, 20 );
   CorrMEtSigSSN_ = new TH1D ( "CorrMEtSigSSN", "CorrMEtSigSSN", 50, 0, 20 );
-  M3bestSSN_ = new TH1D ( "M3bestSSN", "M3bestSSN", 50, 0, 300 );
-  MwbestSSN_ = new TH1D ( "MwbestSSN", "MwbestSSN", 50, 0, 200 );
+  M3bestSSN_ = new TH1D ( "M3bestSSN", "M3bestSSN", 50, 0., 800. );
+  MwbestSSN_ = new TH1D ( "MwbestSSN", "MwbestSSN", 50, 0., 500. );
   Chi2massSSN_ = new TH1D ( "Chi2massSSN", "Chi2massSSN", 50, 0, 50 );
   M45bestSSN_ = new TH1D ( "M45bestSSN", "M45best", 50, 0, 300 );
   Chi2extSSN_ = new TH1D ( "Chi2extSSN", "Chi2ext", 50, 0, 50 );
@@ -512,8 +527,8 @@ TDAna::TDAna(const edm::ParameterSet& iConfig) :
   MEtDP3SSS_ = new TH1D ( "MEtDP3SSS", "MEtDP3SSS", 50, 0, 3.2 );
   UncorrMEtSigSSS_ = new TH1D ( "UncorrMEtSigSSS", "UncorrMEtSigSSS", 50, 0, 20 );
   CorrMEtSigSSS_ = new TH1D ( "CorrMEtSigSSS", "CorrMEtSigSSS", 50, 0, 20 );
-  M3bestSSS_ = new TH1D ( "M3bestSSS", "M3bestSSS", 50, 0, 300 );
-  MwbestSSS_ = new TH1D ( "MwbestSSS", "MwbestSSS", 50, 0, 200 );
+  M3bestSSS_ = new TH1D ( "M3bestSSS", "M3bestSSS", 50, 0., 800. );
+  MwbestSSS_ = new TH1D ( "MwbestSSS", "MwbestSSS", 50, 0., 500. );
   Chi2massSSS_ = new TH1D ( "Chi2massSSS", "Chi2massSSS", 50, 0, 50 );
   M45bestSSS_ = new TH1D ( "M45bestSSS", "M45best", 50, 0, 300 );
   Chi2extSSS_ = new TH1D ( "Chi2extSSS", "Chi2ext", 50, 0, 50 );
@@ -560,8 +575,8 @@ TDAna::TDAna(const edm::ParameterSet& iConfig) :
   MEtDP3SSSN_ = new TH1D ( "MEtDP3SSSN", "MEtDP3SSSN", 50, 0, 3.2 );
   UncorrMEtSigSSSN_ = new TH1D ( "UncorrMEtSigSSSN", "UncorrMEtSigSSSN", 50, 0, 20 );
   CorrMEtSigSSSN_ = new TH1D ( "CorrMEtSigSSSN", "CorrMEtSigSSSN", 50, 0, 20 );
-  M3bestSSSN_ = new TH1D ( "M3bestSSSN", "M3bestSSSN", 50, 0, 300 );
-  MwbestSSSN_ = new TH1D ( "MwbestSSSN", "MwbestSSSN", 50, 0, 200 );
+  M3bestSSSN_ = new TH1D ( "M3bestSSSN", "M3bestSSSN", 50, 0., 800. );
+  MwbestSSSN_ = new TH1D ( "MwbestSSSN", "MwbestSSSN", 50, 0., 500. );
   Chi2massSSSN_ = new TH1D ( "Chi2massSSSN", "Chi2massSSSN", 50, 0, 50 );
   M45bestSSSN_ = new TH1D ( "M45bestSSSN", "M45best", 50, 0, 300 );
   Chi2extSSSN_ = new TH1D ( "Chi2extSSSN", "Chi2ext", 50, 0, 50 );
@@ -613,8 +628,8 @@ TDAna::TDAna(const edm::ParameterSet& iConfig) :
   MEtDP3W_ = new TH1D ( "MEtDP3W", "MEtDP3", 50, 0, 3.2 );
   UncorrMEtSigW_ = new TH1D ( "UncorrMEtSigW", "MEtSig", 50, 0, 20 );
   CorrMEtSigW_ = new TH1D ( "CorrMEtSigW", "MEtSig", 50, 0, 20 );
-  M3bestW_ = new TH1D ( "M3bestW", "M3best", 50, 0, 300 );
-  MwbestW_ = new TH1D ( "MwbestW", "Mwbest", 50, 0, 200 );
+  M3bestW_ = new TH1D ( "M3bestW", "M3best", 50, 0., 800. );
+  MwbestW_ = new TH1D ( "MwbestW", "Mwbest", 50, 0., 500. );
   Chi2massW_ = new TH1D ( "Chi2massW", "Chi2mass", 50, 0, 50 );
   M45bestW_ = new TH1D ( "M45bestW", "M45best", 50, 0, 300 );
   Chi2extW_ = new TH1D ( "Chi2extW", "Chi2ext", 50, 0, 50 );
@@ -661,8 +676,8 @@ TDAna::TDAna(const edm::ParameterSet& iConfig) :
   MEtDP3SW_ = new TH1D ( "MEtDP3SW", "MEtDP3S", 50, 0, 3.2 );
   UncorrMEtSigSW_ = new TH1D ( "UncorrMEtSigSW", "MEtSig", 50, 0, 20 );
   CorrMEtSigSW_ = new TH1D ( "CorrMEtSigSW", "MEtSig", 50, 0, 20 );
-  M3bestSW_ = new TH1D ( "M3bestSW", "M3bestS", 50, 0, 300 );
-  MwbestSW_ = new TH1D ( "MwbestSW", "MwbestS", 50, 0, 200 );
+  M3bestSW_ = new TH1D ( "M3bestSW", "M3bestS", 50, 0., 800. );
+  MwbestSW_ = new TH1D ( "MwbestSW", "MwbestS", 50, 0., 500. );
   Chi2massSW_ = new TH1D ( "Chi2massSW", "Chi2massS", 50, 0, 50 );
   M45bestSW_ = new TH1D ( "M45bestSW", "M45best", 50, 0, 300 );
   Chi2extSW_ = new TH1D ( "Chi2extSW", "Chi2ext", 50, 0, 50 );
@@ -709,8 +724,8 @@ TDAna::TDAna(const edm::ParameterSet& iConfig) :
   MEtDP3SSW_ = new TH1D ( "MEtDP3SSW", "MEtDP3SS", 50, 0, 3.2 );
   UncorrMEtSigSSW_ = new TH1D ( "UncorrMEtSigSSW", "UncorrMEtSigSS", 50, 0, 20 );
   CorrMEtSigSSW_ = new TH1D ( "CorrMEtSigSSW", "CorrMEtSigSS", 50, 0, 20 );
-  M3bestSSW_ = new TH1D ( "M3bestSSW", "M3bestSS", 50, 0, 300 );
-  MwbestSSW_ = new TH1D ( "MwbestSSW", "MwbestSS", 50, 0, 200 );
+  M3bestSSW_ = new TH1D ( "M3bestSSW", "M3bestSS", 50, 0., 800. );
+  MwbestSSW_ = new TH1D ( "MwbestSSW", "MwbestSS", 50, 0., 500. );
   Chi2massSSW_ = new TH1D ( "Chi2massSSW", "Chi2massSS", 50, 0, 50 );
   M45bestSSW_ = new TH1D ( "M45bestSSW", "M45best", 50, 0, 300 );
   Chi2extSSW_ = new TH1D ( "Chi2extSSW", "Chi2ext", 50, 0, 50 );
@@ -757,8 +772,8 @@ TDAna::TDAna(const edm::ParameterSet& iConfig) :
   MEtDP3SSSW_ = new TH1D ( "MEtDP3SSSW", "MEtDP3SSS", 50, 0, 3.2 );
   UncorrMEtSigSSSW_ = new TH1D ( "UncorrMEtSigSSSW", "UncorrMEtSigSSS", 50, 0, 20 );
   CorrMEtSigSSSW_ = new TH1D ( "CorrMEtSigSSSW", "CorrMEtSigSSS", 50, 0, 20 );
-  M3bestSSSW_ = new TH1D ( "M3bestSSSW", "M3bestSSS", 50, 0, 300 );
-  MwbestSSSW_ = new TH1D ( "MwbestSSSW", "MwbestSSS", 50, 0, 200 );
+  M3bestSSSW_ = new TH1D ( "M3bestSSSW", "M3bestSSS", 50, 0., 800. );
+  MwbestSSSW_ = new TH1D ( "MwbestSSSW", "MwbestSSS", 50, 0., 500. );
   Chi2massSSSW_ = new TH1D ( "Chi2massSSSW", "Chi2massSSS", 50, 0, 50 );
   M45bestSSSW_ = new TH1D ( "M45bestSSSW", "M45best", 50, 0, 300 );
   Chi2extSSSW_ = new TH1D ( "Chi2extSSSW", "Chi2ext", 50, 0, 50 );
@@ -853,6 +868,35 @@ TDAna::TDAna(const edm::ParameterSet& iConfig) :
   for ( int i=0; i<1000; i++ ) {
     Hread[i]=Hread[i]/toth;
     Hnotread[i]=Hnotread[i]/tothnot;
+  }
+
+  // Read T decay file
+  // -----------------
+  for ( int i=0; i<1000; i++ ) {
+    Tread[i]=0.;
+    Tnotread[i]=0.;
+  }
+  counter=0;
+  ifstream Treadfile ("Tread.asc");
+  while (Treadfile) {
+    getline(Treadfile,line,' ');
+    stringstream pippo1(line);
+    pippo1 >> Tread[counter];
+    getline(Treadfile,line);
+    stringstream pippo2(line);
+    pippo1 >> Tnotread[counter];
+    counter++;
+  }
+  cout << "Read " << counter << " lines from T file." << endl;
+  double tott=0.;
+  double tottnot=0.;
+  for ( int i=0; i<1000; i++ ) {
+    tott+=Tread[i];
+    tottnot+=Tnotread[i];
+  }
+  for ( int i=0; i<1000; i++ ) {
+    Tread[i]=Tread[i]/tott;
+    Tnotread[i]=Tnotread[i]/tottnot;
   }
 
   // Read PTag file
@@ -1500,10 +1544,16 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	  detmed07=detmed07/n07;
 	  det2med07=det2med07/n07;
 	}
-	// Mass of two jets from h
-	// -----------------------
+	// Mass of two jets from h when tagged
+	// -----------------------------------
 	double m45=0.;
-	if ( njh==2 ) {
+	double etapair=0.;
+	double phipair=0.;
+	double pxh=0.;
+	double pyh=0.;
+	double pzh=0.;
+	double ph2=0.;
+	if ( njh==2 && njt==3 && JPtag[ijh[0]] && JPtag[ijh[1]] ) {
 	  double px4=JPet[ijh[0]]*cos(JPphi[ijh[0]]);
 	  double px5=JPet[ijh[1]]*cos(JPphi[ijh[1]]);
 	  double py4=JPet[ijh[0]]*sin(JPphi[ijh[0]]);
@@ -1512,20 +1562,24 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	  double pz5=JPet[ijh[1]]/tan(2*atan(exp(-JPeta[ijh[1]])));
 	  double e4 =sqrt(px4*px4+py4*py4+pz4*pz4);
 	  double e5 =sqrt(px5*px5+py5*py5+pz5*pz5);
-	  m45=(e4+e5)*(e4+e5)-(px4+px5)*(px4+px5)-(py4+py5)*(py4+py5)-(pz4+pz5)*(pz4+pz5);
+	  pxh=px4+px5;
+	  pyh=py4+py5;
+	  pzh=pz4+pz5;
+	  ph2=pxh*pxh+pyh*pyh+pzh*pzh; 
+	  m45=(e4+e5)*(e4+e5)-ph2;
 	  if ( m45>0 ) m45=sqrt(m45);
 	  if ( ietmin==5 && ietamax==7 ) { 
-	    double ptpair = sqrt((px4+px5)*(px4+px5)+(py4+py5)*(py4+py5));
+	    double ptpair = sqrt(pxh*pxh+pyh*pyh);
 	    double deta = JPeta[ijh[0]]-JPeta[ijh[1]];
 	    double dphi = 3.1415926-fabs(fabs(JPphi[ijh[0]]-JPphi[ijh[1]])-3.1415926);
 	    double drpair = sqrt(deta*deta+dphi*dphi);
-	    double ptotpair = sqrt((px4+px5)*(px4+px5)+(py4+py5)*(py4+py5)+(pz4+pz5)*(pz4+pz5));
+	    double ptotpair = sqrt(pxh*pxh+pyh*pyh+pzh*pzh);
 	    double etapair=0.;
-	    if ( ptotpair-pz4-pz5!=0 ) etapair = 0.5*log((ptotpair+pz4+pz5)/(ptotpair-pz4-pz5));
-	    etapair = fabs(etapair);
+	    if ( ptotpair-pzh!=0 ) etapair = 0.5*log((ptotpair+pzh)/(ptotpair-pzh));
+	    phipair = atan2(pyh,pxh);
 	    MHbest_->Fill(m45);
 	    Hpt_->Fill(ptpair);
-	    Heta_->Fill(etapair);
+	    Heta_->Fill(fabs(etapair));
 	    Hdr_->Fill(drpair);
 	    // Fill matrix with probability of pair
 	    // ------------------------------------
@@ -1545,7 +1599,7 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	// Only for et,eta cuts chosen: study which is most likely b-tag pair
 	// for events where both h products have been b-tagged
 	// ------------------------------------------------------------------
-	if ( JPtag[ijh[0]] && JPtag[ijh[1]] && ietmin==5 && ietamax==7 ) {
+	if ( njh==2 && njt==3 && JPtag[ijh[0]] && JPtag[ijh[1]] && ietmin==5 && ietamax==7 ) {
 	  considered=0; // Consider at most 8 jets for the association
 	  // First get b-tag indices:
 	  // ------------------------
@@ -1590,17 +1644,17 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 		double dphi = 3.1415926-fabs(fabs(JPphi[ind1]-JPphi[ind2])-3.1415926);
 		double drpair = sqrt(deta*deta+dphi*dphi);
 		double ptotpair = sqrt((px4+px5)*(px4+px5)+(py4+py5)*(py4+py5)+(pz4+pz5)*(pz4+pz5));
-		double etapair=0.;
-		if ( ptotpair-pz4-pz5!=0 ) etapair = 0.5*log((ptotpair+pz4+pz5)/(ptotpair-pz4-pz5));
-		etapair = fabs(etapair);
+		double etanotpair=0.;
+		if ( ptotpair-pz4-pz5!=0 ) etanotpair = 0.5*log((ptotpair+pz4+pz5)/(ptotpair-pz4-pz5));
+		double phinotpair=atan2(py4+py5,px4+px5);
 		MHnot_->Fill(m45not);
 		Hnotpt_->Fill(ptpair);
-		Hnoteta_->Fill(etapair);
+		Hnoteta_->Fill(fabs(etanotpair));
 		Hnotdr_->Fill(drpair);
 		// Fill matrix with probability of pair
 		// ------------------------------------
 		int ipt=(int)((ptpair/500.)*10);
-		int ieta=(int)((etapair/4.)*10);
+		int ieta=(int)((fabs(etanotpair)/4.)*10);
 		int idr=(int)((drpair/4.)*10);
 		if ( ipt<0 ) ipt=0;
 		if ( ipt>9 ) ipt=9;
@@ -1613,46 +1667,151 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	    }
 	  }
 
-	} // iet=5, ieta=7, two tags from hbb jets
+	} // ietmin=5, ietamax=7, two tags from hbb jets
 	
-
-
 	// Mass of three jets from t
 	// -------------------------
 	double m123=0.;
- 	if ( njt==3 ) {
-	  double px1=JPet[ijt[0]]*cos(JPphi[ijt[0]]);
-	  double px2=JPet[ijt[1]]*cos(JPphi[ijt[1]]);
-	  double px3=JPet[ijt[2]]*cos(JPphi[ijt[2]]);
-	  double py1=JPet[ijt[0]]*sin(JPphi[ijt[0]]);
-	  double py2=JPet[ijt[1]]*sin(JPphi[ijt[1]]);
-	  double py3=JPet[ijt[2]]*sin(JPphi[ijt[2]]);
-	  double pz1=JPet[ijt[0]]/tan(2*atan(exp(-JPeta[ijt[0]])));
-	  double pz2=JPet[ijt[1]]/tan(2*atan(exp(-JPeta[ijt[1]])));
-	  double pz3=JPet[ijt[2]]/tan(2*atan(exp(-JPeta[ijt[2]])));
-	  double e1 =sqrt(px1*px1+py1*py1+pz1*pz1);
-	  double e2 =sqrt(px2*px2+py2*py2+pz2*pz2);
-	  double e3 =sqrt(px3*px3+py3*py3+pz3*pz3);
-	  m123=pow(e1+e2+e3,2)-pow(px1+px2+px3,2)-pow(py1+py2+py3,2)-pow(pz1+pz2+pz3,2);
-	  if ( m123>0 ) m123=sqrt(m123);
-	  if ( ietmin==5 && ietamax==7 ) MTbest_->Fill(m123);
+ 	if ( ietmin==5 && ietamax==7 && njt==3 && njh==2 ) {
+	  if (  JPet[ijt[0]]>etmin && fabs(JPeta[ijt[0]])<etamax  &&
+		JPet[ijt[1]]>etmin && fabs(JPeta[ijt[1]])<etamax  && 
+		JPet[ijt[2]]>etmin && fabs(JPeta[ijt[2]])<etamax ) {
+	    double px1=JPet[ijt[0]]*cos(JPphi[ijt[0]]);
+	    double px2=JPet[ijt[1]]*cos(JPphi[ijt[1]]);
+	    double px3=JPet[ijt[2]]*cos(JPphi[ijt[2]]);
+	    double py1=JPet[ijt[0]]*sin(JPphi[ijt[0]]);
+	    double py2=JPet[ijt[1]]*sin(JPphi[ijt[1]]);
+	    double py3=JPet[ijt[2]]*sin(JPphi[ijt[2]]);
+	    double pz1=JPet[ijt[0]]/tan(2*atan(exp(-JPeta[ijt[0]])));
+	    double pz2=JPet[ijt[1]]/tan(2*atan(exp(-JPeta[ijt[1]])));
+	    double pz3=JPet[ijt[2]]/tan(2*atan(exp(-JPeta[ijt[2]])));
+	    double e1 =sqrt(px1*px1+py1*py1+pz1*pz1);
+	    double e2 =sqrt(px2*px2+py2*py2+pz2*pz2);
+	    double e3 =sqrt(px3*px3+py3*py3+pz3*pz3);
+	    double spx=px1+px2+px3;
+	    double spy=py1+py2+py3;
+	    double spz=pz1+pz2+pz3;
+	    m123=pow(e1+e2+e3,2)-pow(spx,2)-pow(spy,2)-pow(spz,2);
+	    if ( m123>0 ) m123=sqrt(m123);
+	    
+	    double pt3 = sqrt(spx*spx+spy*spy);
+	    double scprodth=0.;          // projection of top momentum in h direction
+	    if ( ph2>0 ) scprodth = (spx*pxh+spy*pyh+spz*pzh)/sqrt(ph2);
+	    double ptot3 = sqrt(spx*spx+spy*spy+spz*spz);
+	    double eta3=0.;
+	    if ( ptot3-spz!=0 ) eta3 = 0.5*log((ptot3+spz)/(ptot3-spz));
+	    double phi3 = atan2(spy,spx);
+	    double thdphi = 3.141592-fabs(fabs(phi3-phipair)-3.141592);
+	    double thdeta = eta3-etapair; // angle between momenta of t and h
+	    MTbest_->Fill(m123);
+	    Tpt_->Fill(pt3);
+	    Teta_->Fill(fabs(eta3));
+	    THdeta_->Fill(thdeta);
+	    if ( ph2>0 ) THproj_->Fill(scprodth);
+	    THdphi_->Fill(thdphi);
+	    // Fill matrix with probability of pair
+	    // ------------------------------------
+ 	    int ipt=(int)((pt3/600.)*10);
+ 	    int idp=(int)((thdphi/3.15)*10);
+ 	    int ipr=(int)(((scprodth+800)/1600.)*10);
+ 	    if ( ipt<0 ) ipt=0;
+ 	    if ( ipt>9 ) ipt=9;
+ 	    if ( idp<0 ) idp=0;
+ 	    if ( idp>9 ) idp=9;
+ 	    if ( ipr<0 ) ipr=0;
+ 	    if ( ipr>9 ) ipr=9;
+ 	    T[ipr*100+idp*10+ipt]++;
+	  }
+	  // Mass of two jets from W
+	  // -----------------------
+	  double m12=0.;
+	  if ( njw==2 ) {
+	    double px1=JPet[ijw[0]]*cos(JPphi[ijw[0]]);
+	    double px2=JPet[ijw[1]]*cos(JPphi[ijw[1]]);
+	    double py1=JPet[ijw[0]]*sin(JPphi[ijw[0]]);
+	    double py2=JPet[ijw[1]]*sin(JPphi[ijw[1]]);
+	    double pz1=JPet[ijw[0]]/tan(2*atan(exp(-JPeta[ijw[0]])));
+	    double pz2=JPet[ijw[1]]/tan(2*atan(exp(-JPeta[ijw[1]])));
+	    double e1 =sqrt(px1*px1+py1*py1+pz1*pz1);
+	    double e2 =sqrt(px2*px2+py2*py2+pz2*pz2);
+	    m12=(e1+e2)*(e1+e2)-(px1+px2)*(px1+px2)-(py1+py2)*(py1+py2)-(pz1+pz2)*(pz1+pz2);
+	    if ( m12>0 ) m12=sqrt(m12);
+	    if ( ietmin==5 && ietamax==7 ) MWbest_->Fill(m12);
+	  }
+	  
+	  // Mass and kinematics of three jets NOT from t
+	  // --------------------------------------------
+	  if (  ietmin==5 && ietamax==7 && njt==3 && njh==2 ) {
+	    int considered1=0; // Consider at most 8 jets for the association
+	    for ( int i1=0; i1<NJP-2; i1++ ) {
+	      if ( JPet[i1]>etmin && fabs(JPeta[i1])<etamax && considered1<8 ) {
+		considered1++;
+		int considered2=0;
+		for ( int i2=0; i2<NJP-1; i2++ ) {
+		  if ( JPet[i2]>etmin && fabs(JPeta[i2])<etamax && considered2<8 ) {
+		    considered2++;
+		    int considered3=0;
+		    for ( int i3=0; i3<NJP; i3++ ) {
+		      if ( JPet[i3]>etmin && fabs(JPeta[i3])<etamax && considered3<8 ) {
+			considered3++;
+			if ( ( ijt[0]!=i1 && ijt[0]!=i2 && ijt[0]!=i3 ) ||  
+			     ( ijt[1]!=i1 && ijt[1]!=i2 && ijt[1]!=i3 ) ||
+			     ( ijt[2]!=i1 && ijt[2]!=i2 && ijt[2]!=i3 ) ) {
+			  double px1=JPet[i1]*cos(JPphi[i1]);
+			  double px2=JPet[i2]*cos(JPphi[i2]);
+			  double px3=JPet[i3]*cos(JPphi[i3]);
+			  double py1=JPet[i1]*sin(JPphi[i1]);
+			  double py2=JPet[i2]*sin(JPphi[i2]);
+			  double py3=JPet[i3]*sin(JPphi[i3]);
+			  double pz1=JPet[i1]/tan(2*atan(exp(-JPeta[i1])));
+			  double pz2=JPet[i2]/tan(2*atan(exp(-JPeta[i2])));
+			  double pz3=JPet[i3]/tan(2*atan(exp(-JPeta[i3])));
+			  double e1 =sqrt(px1*px1+py1*py1+pz1*pz1);
+			  double e2 =sqrt(px2*px2+py2*py2+pz2*pz2);
+			  double e3 =sqrt(px3*px3+py3*py3+pz3*pz3);
+			  double spx=px1+px2+px3;
+			  double spy=py1+py2+py3;
+			  double spz=pz1+pz2+pz3;
+			  double m123not=pow(e1+e2+e3,2)-pow(spx,2)-pow(spy,2)-pow(spz,2);
+			  if ( m123not>0 ) m123not=sqrt(m123not);
+			  
+			  double pt3 = sqrt(spx*spx+spy*spy);
+			  double scprodth=0.;          // projection of top momentum in h direction
+			  if ( ph2>0 ) scprodth = (spx*pxh+spy*pyh+spz*pzh)/sqrt(ph2);
+			  double ptot3 = sqrt(spx*spx+spy*spy+spz*spz);
+			  double eta3=0.;
+			  if ( ptot3-spz!=0 ) eta3 = 0.5*log((ptot3+spz)/(ptot3-spz));
+			  double phi3 = atan2(spy,spx);
+			  double thdphi = 3.141592-fabs(fabs(phi3-phipair)-3.141592);
+			  double thdeta = eta3-etapair; // angle between momenta of t and h
+			  MTnotbest_->Fill(m123not);
+			  Tnotpt_->Fill(pt3);
+			  Tnoteta_->Fill(fabs(eta3));
+			  THnotdeta_->Fill(thdeta);
+			  if ( ph2>0 ) THnotproj_->Fill(scprodth);
+			  THnotdphi_->Fill(thdphi);
+			  // Fill matrix with probability of pair
+			  // ------------------------------------
+			  int ipt=(int)((pt3/600.)*10);
+			  int idp=(int)((thdphi/3.15)*10);
+			  int ipr=(int)(((scprodth+800)/1600.)*10);
+			  if ( ipt<0 ) ipt=0;
+			  if ( ipt>9 ) ipt=9;
+			  if ( idp<0 ) idp=0;
+			  if ( idp>9 ) idp=9;
+			  if ( ipr<0 ) ipr=0;
+			  if ( ipr>9 ) ipr=9;
+			  Tnot[ipr*100+idp*10+ipt]++;
+			}
+		      }
+		    }
+		  }
+		}
+	      }
+	    }
+	  }
 	}
-	// Mass of two jets from W
-	// -----------------------
-	double m12=0.;
-	if ( njw==2 ) {
-	  double px1=JPet[ijw[0]]*cos(JPphi[ijw[0]]);
-	  double px2=JPet[ijw[1]]*cos(JPphi[ijw[1]]);
-	  double py1=JPet[ijw[0]]*sin(JPphi[ijw[0]]);
-	  double py2=JPet[ijw[1]]*sin(JPphi[ijw[1]]);
-	  double pz1=JPet[ijw[0]]/tan(2*atan(exp(-JPeta[ijw[0]])));
-	  double pz2=JPet[ijw[1]]/tan(2*atan(exp(-JPeta[ijw[1]])));
-	  double e1 =sqrt(px1*px1+py1*py1+pz1*pz1);
-	  double e2 =sqrt(px2*px2+py2*py2+pz2*pz2);
-	  m12=(e1+e2)*(e1+e2)-(px1+px2)*(px1+px2)-(py1+py2)*(py1+py2)-(pz1+pz2)*(pz1+pz2);
-	  if ( m12>0 ) m12=sqrt(m12);
-	  if ( ietmin==5 && ietamax==7 ) MWbest_->Fill(m12);
-	}
+
 	// Fill histograms
 	// ---------------
 	Drmedall_->Fill(etmin, etamax, drmedall);
@@ -1981,6 +2140,7 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	sumhpd4=0.;
 	sumhed6=0.;
 	sumhpd6=0.;
+
 	// Compute sum of discriminants
 	// ----------------------------
 	for ( int i=0; i<NHSJ; i++ ) {
@@ -2010,6 +2170,11 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	  sumhpd6+=hpmax[i];
 	}
           
+
+	// ////////////////////////////////////////////////////////////////////////
+	// Top and H kinematics
+	// --------------------
+
 	// Find best b-jet doublet
 	// -----------------------
 	double px4,px5,py4,py5,pz4,pz5,e4,e5;
@@ -2017,6 +2182,12 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	double maxr=-1.;
 	int ih1a=-1;
 	int ih2a=-1;
+	double ph2=0.;
+	double phih=0.;
+	double etah=0.;
+	double pxh=0.;
+	double pyh=0.;
+	double pzh=0.;
 	for ( int ii=0; ii<iJ-1 && ii<NHSJ-1; ii++ ) {
 	  for ( int jj=ii+1; jj<iJ && jj<NHSJ; jj++ ) { // limit to NHSJ the number of jets from h.s.
 	    
@@ -2033,7 +2204,6 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	      e5 =sqrt(px5*px5+py5*py5+pz5*pz5);
 	      m45=(e4+e5)*(e4+e5)-(px4+px5)*(px4+px5)-(py4+py5)*(py4+py5)-(pz4+pz5)*(pz4+pz5);
 	      if ( m45>0 ) m45=sqrt(m45);
-	      
 	      // Now define best bb combination based on H matrices
 	      // --------------------------------------------------
 	      double ptpair = sqrt((px4+px5)*(px4+px5)+(py4+py5)*(py4+py5));
@@ -2043,10 +2213,9 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	      double ptotpair = sqrt((px4+px5)*(px4+px5)+(py4+py5)*(py4+py5)+(pz4+pz5)*(pz4+pz5));
 	      double etapair=0.;
 	      if ( ptotpair-pz4-pz5!=0 ) etapair = 0.5*log((ptotpair+pz4+pz5)/(ptotpair-pz4-pz5));
-	      etapair = fabs(etapair);
-	      
+	      double phipair = atan2(py4+py5,px4+px5);
 	      int ipt=(int)((ptpair/500.)*10);
-	      int ieta=(int)((etapair/4.)*10);
+	      int ieta=(int)((fabs(etapair)/4.)*10);
 	      int idr=(int)((drpair/4.)*10);
 	      if ( ipt<0 ) ipt=0;
 	      if ( ipt>9 ) ipt=9;
@@ -2061,6 +2230,12 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 		hbestcomb=m45;
 		ih1a=ii;
 		ih2a=jj;
+		ph2=ptotpair;
+		phih=phipair;
+		etah=etapair;
+		pxh=px4+px5;
+		pyh=py4+py5;
+		pzh=pz4+pz5;
 	      }
 	      // Best combination based just on mass
 	      // -----------------------------------
@@ -2078,6 +2253,12 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	double spx,spy,spz,se;
 	double m3a=0.;
 	double mwa=0.;
+	int it1a=-1;
+	int it2a=-1;
+	int it3a=-1;
+	double tbestcomb=0.;
+	double wbestcomb=0.;
+	maxr=-1.;
 	// First triplet with one b-jet
 	// ----------------------------
 	for ( int i=0; i<iJ-2 && i<NHSJ-2 && m3a==0; i++ ) {
@@ -2116,182 +2297,99 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 		}
 		if ( mwa>0 ) mwa=sqrt(mwa);
 		
+		double spx=px1+px2+px3;
+		double spy=py1+py2+py3;
+		double spz=pz1+pz2+pz3;
+		double m123=pow(e1+e2+e3,2)-pow(spx,2)-pow(spy,2)-pow(spz,2);
+		if ( m123>0 ) m123=sqrt(m123);		
+		double pt3 = sqrt(spx*spx+spy*spy);
+		double scprodth=0.;          // projection of top momentum in h direction
+		if ( ph2>0 ) scprodth = (spx*pxh+spy*pyh+spz*pzh)/sqrt(ph2);
+		double ptot3 = sqrt(spx*spx+spy*spy+spz*spz);
+		double eta3=0.;
+		if ( ptot3-spz!=0 ) eta3 = 0.5*log((ptot3+spz)/(ptot3-spz));
+		double phi3 = atan2(spy,spx);
+		double thdphi = 3.141592-fabs(fabs(phi3-phih)-3.141592);
+		double thdeta = eta3-etah; // angle between momenta of t and h		
+		int ipt=(int)((pt3/600.)*10);
+		int idp=(int)((thdphi/3.15)*10);
+		int ipr=(int)(((scprodth+800)/1600.)*10);
+		if ( ipt<0 ) ipt=0;
+		if ( ipt>9 ) ipt=9;
+		if ( idp<0 ) idp=0;
+		if ( idp>9 ) idp=9;
+		if ( ipr<0 ) ipr=0;
+		if ( ipr>9 ) ipr=9;
+		double r = Tread[100*ipr+10*idp+ipt];
+		if ( Tnotread[100*ipr+10*idp+ipt]>0 ) r=r/Tnotread[100*ipr+10*idp+ipt];
+		if ( r>maxr ) {
+		  maxr = r;
+		  tbestcomb=m123;
+		  wbestcomb=mwa;
+		  it1a=i;
+		  it2a=j;
+		  it3a=k;
+		}
+
 	      }
 	    }
 	  }
 	}
-	double m3=0.;
-	double m12,m13,m23;
-	double mw=0.;
-	double bestWhasb=0.;
-	double bestbnob=0.;
-	int it1=-1;
-	int it2=-1;
-	int it3=-1;
-	int ih1=-1;
-	int ih2=-1;
-	// Compute best top and W masses and determine simple chi2
-	// -------------------------------------------------------
-	for ( int i=0; i<iJ-2 && i<NHSJ-2; i++ ) {
-	  for ( int j=i+1; j<iJ-1 && j<NHSJ-1; j++ ) {
-	    for ( int k=j+1; k<iJ && k<NHSJ; k++ ) { // limit to 8 the number of jets in hard subprocess
-	      
-	      // Require that the triplet owns at least one b-tag
-	      // ------------------------------------------------
-	      double nb=0.;
-	      
-	      if ( JHEM[i] ) nb++; 
-	      if ( JHEM[j] ) nb++;
-	      if ( JHEM[k] ) nb++;
-	      if ( nb>=1 ) {
-		bestWhasb=0;
-		px1=JEt[i]*cos(Jphi[i]);
-		px2=JEt[j]*cos(Jphi[j]);
-		px3=JEt[k]*cos(Jphi[k]);
-		py1=JEt[i]*sin(Jphi[i]);
-		py2=JEt[j]*sin(Jphi[j]);
-		py3=JEt[k]*sin(Jphi[k]);
-		pz1=JEt[i]/tan(2*atan(exp(-Jeta[i])));
-		pz2=JEt[j]/tan(2*atan(exp(-Jeta[j])));
-		pz3=JEt[k]/tan(2*atan(exp(-Jeta[k])));
-		e1 =sqrt(px1*px1+py1*py1+pz1*pz1);
-		e2 =sqrt(px2*px2+py2*py2+pz2*pz2);
-		e3 =sqrt(px3*px3+py3*py3+pz3*pz3);
-		m3=(e1+e2+e3)*(e1+e2+e3)-(px1+px2+px3)*(px1+px2+px3)-
-		  (py1+py2+py3)*(py1+py2+py3)-(pz1+pz2+pz3)*(pz1+pz2+pz3);
-		if ( m3>0 ) m3=sqrt(m3);
-		m12=(e1+e2)*(e1+e2)-(px1+px2)*(px1+px2)-(py1+py2)*(py1+py2)-(pz1+pz2)*(pz1+pz2);
-		if ( m12>0 ) m12=sqrt(m12);
-		m13=(e1+e3)*(e1+e3)-(px1+px3)*(px1+px3)-(py1+py3)*(py1+py3)-(pz1+pz3)*(pz1+pz3);
-		if ( m13>0 ) m13=sqrt(m13);
-		m23=(e2+e3)*(e2+e3)-(px2+px3)*(px2+px3)-(py2+py3)*(py2+py3)-(pz2+pz3)*(pz2+pz3);
-		if ( m23>0 ) m23=sqrt(m23);
-		
-		// Simple non-selecting way to use info of b-tag in W selection
-		// ------------------------------------------------------------
-		if ( fabs(m12-mwref)<fabs(m13-mwref) && fabs(m12-mwref)<fabs(m23-mwref) ) {
-		  mw=m12;
-		  if ( JHEM[i] || JHEM[j] ) bestWhasb=1;
-		  if ( !JHEM[k] ) bestbnob=1;
-		}
-		if ( fabs(m13-mwref)<fabs(m12-mwref) && fabs(m13-mwref)<fabs(m23-mwref) ) { 
-		  mw=m13;
-		  if ( JHEM[i] || JHEM[k] ) bestWhasb=1;
-		  if ( !JHEM[j] ) bestbnob=1;
-		}
-		if ( fabs(m23-mwref)<fabs(m13-mwref) && fabs(m23-mwref)<fabs(m12-mwref) ) {
-		  mw=m23;
-		  if ( JHEM[j] || JHEM[k] ) bestWhasb=1;
-		  if ( !JHEM[i] ) bestbnob=1;
-		}
-		if ( fabs(m3-mtref)<fabs(m3best-mtref) ) {
-		  m3best=m3;
-		    mwbest=mw;
-		    chi2=sqrt((m3best-mtref)*(m3best-mtref)/900+(mwbest-mwref)*(mwbest-mwref)/400)+
-		      3*bestWhasb+3*bestbnob;
-		    it1=i;
-		    it2=j;
-		    it3=k;
-		}
-		// Compute minimum W mass
-		// ----------------------
-		mwmin = m12;
-		if ( mwmin>m13 ) mwmin=m13;
-		if ( mwmin>m23 ) mwmin=m23;
-	      } // nb>=1	    
+	  
+	// Compute mass of jets not selected in triplet of top and doublet of H decay
+	// --------------------------------------------------------------------------
+	if ( ih1a+ih2a>0 && it1a+it2a+it3a>0 ) {
+	  spx=0;
+	  spy=0;
+	  spz=0;
+	  se=0;
+	  for ( int kk=0; kk<iJ && kk<NHSJ ; kk++ ) { // limit to NHSJ the number of 
+	    // jets from hard subprocess
+	    if ( kk!= ih1a && kk!=ih2a && kk!=it1a && kk!=it2a && kk!=it3a ) { 
+	      px=JEt[kk]*cos(Jphi[kk]);
+	      py=JEt[kk]*sin(Jphi[kk]);
+	      pz=JEt[kk]/tan(2*atan(exp(-Jeta[kk])));
+	      spx+=px;
+	      spy+=py;
+	      spz+=pz;
+	      se+=sqrt(px*px+py*py+pz*pz);
 	    }
-	  }
-	}
-	
-	// Search for a H signal in the remaining jets
-	// -------------------------------------------
-	if ( it1+it2+it3>0 ) {
-	  for ( int ii=0; ii<iJ-1 && ii<NHSJ-1; ii++ ) {
-	    if ( ii!=it1 && ii!=it2 && ii!=it3 ) {
-	      for ( int jj=ii+1; jj<iJ && jj<NHSJ; jj++ ) { // limit to NHSJ the number of jets from h.s.
-		if ( jj!=it1 && jj!=it2 && jj!=it3 ) {
-		  
-		  // Demand that both b-jets from H be tagged
-		  // ----------------------------------------
-		  if ( JHEM[ii] && JHEM[jj] ) {
-		    px4=JEt[ii]*cos(Jphi[ii]);
-		    px5=JEt[jj]*cos(Jphi[jj]);
-		    py4=JEt[ii]*sin(Jphi[ii]);
-		    py5=JEt[jj]*sin(Jphi[jj]);
-		    pz4=JEt[ii]/tan(2*atan(exp(-Jeta[ii])));
-		    pz5=JEt[jj]/tan(2*atan(exp(-Jeta[jj])));
-		    e4 =sqrt(px4*px4+py4*py4+pz4*pz4);
-		    e5 =sqrt(px5*px5+py5*py5+pz5*pz5);
-		    m45=(e4+e5)*(e4+e5)-(px4+px5)*(px4+px5)-(py4+py5)*(py4+py5)-(pz4+pz5)*(pz4+pz5);
-		    if ( m45>0 ) m45=sqrt(m45);
-		    if ( fabs(m45-mhref)<fabs(m45best-mhref) ) {
-		      m45best=m45;
-		      chi2ext=sqrt(chi2*chi2+(m45best-mhref)*(m45best-mhref)/729);
-		      dpbb=3.145926-fabs(fabs(Jphi[ii]-Jphi[jj])-3.1415926);
-		      ih1=ii;
-		      ih2=jj;
-		    }
-		  }
-		}
-	      }
-	    }
+	    m_others=se*se-spx*spx-spy*spy-spz*spz;
+	    if ( m_others>0 ) m_others=sqrt(m_others);
 	  }
 	  
-	  // Compute mass of jets not selected in triplet of top and doublet of H decay
-	  // --------------------------------------------------------------------------
-	  if ( ih1+ih2>0 ) {
-	    spx=0;
-	    spy=0;
-	    spz=0;
-	    se=0;
-	    for ( int kk=0; kk<iJ && kk<NHSJ ; kk++ ) { // limit to NHSJ the number of 
-	      // jets from hard subprocess
-	      if ( kk!= ih1 && kk!=ih2 && kk!=it1 && kk!=it2 && kk!=it3 ) { 
-		px=JEt[kk]*cos(Jphi[kk]);
-		py=JEt[kk]*sin(Jphi[kk]);
-		pz=JEt[kk]/tan(2*atan(exp(-Jeta[kk])));
-		spx+=px;
-		spy+=py;
-		spz+=pz;
-		se+=sqrt(px*px+py*py+pz*pz);
-	      }
-	      m_others=se*se-spx*spx-spy*spy-spz*spz;
-	      if ( m_others>0 ) m_others=sqrt(m_others);
-	    }
-	    
-	    // Now compute mass and angle of two b-jets not chosen as H decay
-	    // --------------------------------------------------------------
-	    spx=0;
-	    spy=0;
-	    spz=0;
-	    se=0;
-	    double mbbnoh;
-	    for ( int k1=0; k1<iJ-1 && k1<NHSJ-1; k1++ ) {
-	      if ( k1!=ih1 && k1!=ih2 && JHEM[k1] ) {
-		for ( int k2=k1+1; k2<iJ && k2<NHSJ; k2++ ) { // limit to 8 the number of jets from h.s.
-		  if ( k2!=ih1 && k2!=ih2 && JHEM[k2] ) {
-		    px1=JEt[k1]*cos(Jphi[k1]);
-		    py1=JEt[k1]*sin(Jphi[k1]);
-		    pz1=JEt[k1]/tan(2*atan(exp(-Jeta[k1])));
-		    px2=JEt[k2]*cos(Jphi[k2]);
-		    py2=JEt[k2]*sin(Jphi[k2]);
-		    pz2=JEt[k2]/tan(2*atan(exp(-Jeta[k2])));
-		    spx=px1+px2;
-		    spy=py1+py2;
-		    spz=pz1+pz2;
-		    se=sqrt(px1*px1+py1*py1+pz1*pz1)+sqrt(px2*px2+py2*py2+pz2*pz2);
-		  }
-		  mbbnoh=se*se-spx*spx-spy*spy-spz*spz;
-		  if ( mbbnoh>0 ) mbbnoh=sqrt(mbbnoh);
-		  if ( mbbnoh>mbbnohmax ) {
-		    mbbnohmax=mbbnoh;
-		    dpbbnohmax=3.1415926-fabs(fabs(Jphi[k1]-Jphi[k2])-3.1415926);
-		  }
+	  // Now compute mass and angle of two b-jets not chosen as H decay
+	  // --------------------------------------------------------------
+	  spx=0;
+	  spy=0;
+	  spz=0;
+	  se=0;
+	  double mbbnoh;
+	  for ( int k1=0; k1<iJ-1 && k1<NHSJ-1; k1++ ) {
+	    if ( k1!=ih1a && k1!=ih2a && JHEM[k1] ) {
+	      for ( int k2=k1+1; k2<iJ && k2<NHSJ; k2++ ) { // limit to 8 the number of jets from h.s.
+		if ( k2!=ih1a && k2!=ih2a && JHEM[k2] ) {
+		  px1=JEt[k1]*cos(Jphi[k1]);
+		  py1=JEt[k1]*sin(Jphi[k1]);
+		  pz1=JEt[k1]/tan(2*atan(exp(-Jeta[k1])));
+		  px2=JEt[k2]*cos(Jphi[k2]);
+		  py2=JEt[k2]*sin(Jphi[k2]);
+		  pz2=JEt[k2]/tan(2*atan(exp(-Jeta[k2])));
+		  spx=px1+px2;
+		  spy=py1+py2;
+		  spz=pz1+pz2;
+		  se=sqrt(px1*px1+py1*py1+pz1*pz1)+sqrt(px2*px2+py2*py2+pz2*pz2);
 		}
-	      }      
-	    }
-	  }      
-	} // end if it1+it2+it3>0      
+		mbbnoh=se*se-spx*spx-spy*spy-spz*spz;
+		if ( mbbnoh>0 ) mbbnoh=sqrt(mbbnoh);
+		if ( mbbnoh>mbbnohmax ) {
+		  mbbnohmax=mbbnoh;
+		  dpbbnohmax=3.1415926-fabs(fabs(Jphi[k1]-Jphi[k2])-3.1415926);
+		}
+	      }
+	    }      
+	  }
+	}      // all 5 jets from h and t defined
 	
 	// Now compute mass of first 8 jets and their centrality
         // -----------------------------------------------------
@@ -2338,10 +2436,6 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	  c6=set/m6;
 	}
 
-	// Compute most likely H pair from matrices
-	// ----------------------------------------
-	
-        
 	////////////////////////////////////////////////////////////////
 	// Now fill histograms
 	// -------------------
@@ -2407,8 +2501,8 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	    MEtDP3_->Fill(dp3rd,PTOT);
 	    UncorrMEtSig_->Fill(UncorrMEtSig,PTOT);
 	    CorrMEtSig_->Fill(CorrMEtSig,PTOT);
-	    M3best_->Fill(m3best,PTOT);
-	    Mwbest_->Fill(mwbest,PTOT);
+	    M3best_->Fill(tbestcomb,PTOT);
+	    Mwbest_->Fill(wbestcomb,PTOT);
 	    Chi2mass_->Fill(chi2,PTOT);
 	    M45best_->Fill(m45best,PTOT);
 	    Chi2ext_->Fill(chi2ext,PTOT);
@@ -2458,8 +2552,8 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	    MEtDP3N_->Fill(dp3rd,weight_N);
 	    UncorrMEtSigN_->Fill(UncorrMEtSig,weight_N);
 	    CorrMEtSigN_->Fill(CorrMEtSig,weight_N);
-	    M3bestN_->Fill(m3best,weight_N);
-	    MwbestN_->Fill(mwbest,weight_N);
+	    M3bestN_->Fill(tbestcomb,weight_N);
+	    MwbestN_->Fill(wbestcomb,weight_N);
 	    Chi2massN_->Fill(chi2,weight_N);
 	    M45bestN_->Fill(m45best,weight_N);
 	    Chi2extN_->Fill(chi2ext,weight_N);
@@ -2510,8 +2604,8 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	      MEtDP3S_->Fill(dp3rd,PTOT);
 	      UncorrMEtSigS_->Fill(UncorrMEtSig,PTOT);
 	      CorrMEtSigS_->Fill(CorrMEtSig,PTOT);
-	      M3bestS_->Fill(m3best,PTOT);
-	      MwbestS_->Fill(mwbest,PTOT);
+	      M3bestS_->Fill(tbestcomb,PTOT);
+	      MwbestS_->Fill(wbestcomb,PTOT);
 	      Chi2massS_->Fill(chi2,PTOT);
 	      M45bestS_->Fill(m45best,PTOT);
 	      Chi2extS_->Fill(chi2ext,PTOT);
@@ -2561,8 +2655,8 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	      MEtDP3SN_->Fill(dp3rd,weight_N);
 	      UncorrMEtSigSN_->Fill(UncorrMEtSig,weight_N);
 	      CorrMEtSigSN_->Fill(CorrMEtSig,weight_N);
-	      M3bestSN_->Fill(m3best,weight_N);
-	      MwbestSN_->Fill(mwbest,weight_N);
+	      M3bestSN_->Fill(tbestcomb,weight_N);
+	      MwbestSN_->Fill(wbestcomb,weight_N);
 	      Chi2massSN_->Fill(chi2,weight_N);
 	      M45bestSN_->Fill(m45best,weight_N);
 	      Chi2extSN_->Fill(chi2ext,weight_N);
@@ -2613,8 +2707,8 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 		MEtDP3SS_->Fill(dp3rd,PTOT);
 		UncorrMEtSigSS_->Fill(UncorrMEtSig,PTOT);
 		CorrMEtSigSS_->Fill(CorrMEtSig,PTOT);
-		M3bestSS_->Fill(m3best,PTOT);
-		MwbestSS_->Fill(mwbest,PTOT);
+		M3bestSS_->Fill(tbestcomb,PTOT);
+		MwbestSS_->Fill(wbestcomb,PTOT);
 		Chi2massSS_->Fill(chi2,PTOT);
 		M45bestSS_->Fill(m45best,PTOT);
 		Chi2extSS_->Fill(chi2ext,PTOT);
@@ -2664,8 +2758,8 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 		MEtDP3SSN_->Fill(dp3rd,weight_N);
 		UncorrMEtSigSSN_->Fill(UncorrMEtSig,weight_N);
 		CorrMEtSigSSN_->Fill(CorrMEtSig,weight_N);
-		M3bestSSN_->Fill(m3best,weight_N);
-		MwbestSSN_->Fill(mwbest,weight_N);
+		M3bestSSN_->Fill(tbestcomb,weight_N);
+		MwbestSSN_->Fill(wbestcomb,weight_N);
 		Chi2massSSN_->Fill(chi2,weight_N);
 		M45bestSSN_->Fill(m45best,weight_N);
 		Chi2extSSN_->Fill(chi2ext,weight_N);
@@ -2717,8 +2811,8 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 		MEtDP3SSS_->Fill(dp3rd,PTOT);
 		UncorrMEtSigSSS_->Fill(UncorrMEtSig,PTOT);
 		CorrMEtSigSSS_->Fill(CorrMEtSig,PTOT);
-		M3bestSSS_->Fill(m3best,PTOT);
-		MwbestSSS_->Fill(mwbest,PTOT);
+		M3bestSSS_->Fill(tbestcomb,PTOT);
+		MwbestSSS_->Fill(wbestcomb,PTOT);
 		Chi2massSSS_->Fill(chi2,PTOT);
 		M45bestSSS_->Fill(m45best,PTOT);
 		Chi2extSSS_->Fill(chi2ext,PTOT);
@@ -2768,8 +2862,8 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 		MEtDP3SSSN_->Fill(dp3rd,weight_N);
 		UncorrMEtSigSSSN_->Fill(UncorrMEtSig,weight_N);
 		CorrMEtSigSSSN_->Fill(CorrMEtSig,weight_N);
-		M3bestSSSN_->Fill(m3best,weight_N);
-		MwbestSSSN_->Fill(mwbest,weight_N);
+		M3bestSSSN_->Fill(tbestcomb,weight_N);
+		MwbestSSSN_->Fill(wbestcomb,weight_N);
 		Chi2massSSSN_->Fill(chi2,weight_N);
 		M45bestSSSN_->Fill(m45best,weight_N);
 		Chi2extSSSN_->Fill(chi2ext,weight_N);
@@ -2839,8 +2933,8 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	    MEtDP3W_->Fill(dp3rd,PTOTE2);
 	    UncorrMEtSigW_->Fill(UncorrMEtSig,PTOTE2);
 	    CorrMEtSigW_->Fill(CorrMEtSig,PTOTE2);
-	    M3bestW_->Fill(m3best,PTOTE2);
-	    MwbestW_->Fill(mwbest,PTOTE2);
+	    M3bestW_->Fill(tbestcomb,PTOTE2);
+	    MwbestW_->Fill(wbestcomb,PTOTE2);
 	    Chi2massW_->Fill(chi2,PTOTE2);
 	    M45bestW_->Fill(m45best,PTOTE2);
 	    Chi2extW_->Fill(chi2ext,PTOTE2);
@@ -2891,8 +2985,8 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	      MEtDP3SW_->Fill(dp3rd,PTOTE2);
 	      UncorrMEtSigSW_->Fill(UncorrMEtSig,PTOTE2);
 	      CorrMEtSigSW_->Fill(CorrMEtSig,PTOTE2);
-	      M3bestSW_->Fill(m3best,PTOTE2);
-	      MwbestSW_->Fill(mwbest,PTOTE2);
+	      M3bestSW_->Fill(tbestcomb,PTOTE2);
+	      MwbestSW_->Fill(wbestcomb,PTOTE2);
 	      Chi2massSW_->Fill(chi2,PTOTE2);
 	      M45bestSW_->Fill(m45best,PTOTE2);
 	      Chi2extSW_->Fill(chi2ext,PTOTE2);
@@ -2943,8 +3037,8 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 		MEtDP3SSW_->Fill(dp3rd,PTOTE2);
 		UncorrMEtSigSSW_->Fill(UncorrMEtSig,PTOTE2);
 		CorrMEtSigSSW_->Fill(CorrMEtSig,PTOTE2);
-		M3bestSSW_->Fill(m3best,PTOTE2);
-		MwbestSSW_->Fill(mwbest,PTOTE2);
+		M3bestSSW_->Fill(tbestcomb,PTOTE2);
+		MwbestSSW_->Fill(wbestcomb,PTOTE2);
 		Chi2massSSW_->Fill(chi2,PTOTE2);
 		M45bestSSW_->Fill(m45best,PTOTE2);
 		Chi2extSSW_->Fill(chi2ext,PTOTE2);
@@ -2996,8 +3090,8 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 		MEtDP3SSSW_->Fill(dp3rd,PTOTE2);
 		UncorrMEtSigSSSW_->Fill(UncorrMEtSig,PTOTE2);
 		CorrMEtSigSSSW_->Fill(CorrMEtSig,PTOTE2);
-		M3bestSSSW_->Fill(m3best,PTOTE2);
-		MwbestSSSW_->Fill(mwbest,PTOTE2);
+		M3bestSSSW_->Fill(tbestcomb,PTOTE2);
+		MwbestSSSW_->Fill(wbestcomb,PTOTE2);
 		Chi2massSSSW_->Fill(chi2,PTOTE2);
 		M45bestSSSW_->Fill(m45best,PTOTE2);
 		Chi2extSSSW_->Fill(chi2ext,PTOTE2);
@@ -3144,6 +3238,10 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	sumhpd6+=hpmax[i];
       }
 
+      // ////////////////////////////////////////////////////////////////////////
+      // Top and H kinematics
+      // --------------------
+
       // Find best b-jet doublet
       // -----------------------
       double px4,px5,py4,py5,pz4,pz5,e4,e5;
@@ -3151,6 +3249,12 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
       double maxr=-1.;
       int ih1a=-1;
       int ih2a=-1;
+      double ph2=0.;
+      double phih=0.;
+      double etah=0.;
+      double pxh=0.;
+      double pyh=0.;
+      double pzh=0.;
       for ( int ii=0; ii<iJ-1 && ii<NHSJ-1; ii++ ) {
 	for ( int jj=ii+1; jj<iJ && jj<NHSJ; jj++ ) { // limit to NHSJ the number of jets from h.s.
 	    
@@ -3167,7 +3271,6 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	    e5 =sqrt(px5*px5+py5*py5+pz5*pz5);
 	    m45=(e4+e5)*(e4+e5)-(px4+px5)*(px4+px5)-(py4+py5)*(py4+py5)-(pz4+pz5)*(pz4+pz5);
 	    if ( m45>0 ) m45=sqrt(m45);
-	      
 	    // Now define best bb combination based on H matrices
 	    // --------------------------------------------------
 	    double ptpair = sqrt((px4+px5)*(px4+px5)+(py4+py5)*(py4+py5));
@@ -3177,10 +3280,9 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	    double ptotpair = sqrt((px4+px5)*(px4+px5)+(py4+py5)*(py4+py5)+(pz4+pz5)*(pz4+pz5));
 	    double etapair=0.;
 	    if ( ptotpair-pz4-pz5!=0 ) etapair = 0.5*log((ptotpair+pz4+pz5)/(ptotpair-pz4-pz5));
-	    etapair = fabs(etapair);
-	      
+	    double phipair = atan2(py4+py5,px4+px5);
 	    int ipt=(int)((ptpair/500.)*10);
-	    int ieta=(int)((etapair/4.)*10);
+	    int ieta=(int)((fabs(etapair)/4.)*10);
 	    int idr=(int)((drpair/4.)*10);
 	    if ( ipt<0 ) ipt=0;
 	    if ( ipt>9 ) ipt=9;
@@ -3195,6 +3297,12 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	      hbestcomb=m45;
 	      ih1a=ii;
 	      ih2a=jj;
+	      ph2=ptotpair;
+	      phih=phipair;
+	      etah=etapair;
+	      pxh=px4+px5;
+	      pyh=py4+py5;
+	      pzh=pz4+pz5;
 	    }
 	    // Best combination based just on mass
 	    // -----------------------------------
@@ -3212,6 +3320,12 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
       double spx,spy,spz,se;
       double m3a=0.;
       double mwa=0.;
+      int it1a=-1;
+      int it2a=-1;
+      int it3a=-1;
+      double tbestcomb=0.;
+      double wbestcomb=0.;
+      maxr=-1.;
       // First triplet with one b-jet
       // ----------------------------
       for ( int i=0; i<iJ-2 && i<NHSJ-2 && m3a==0; i++ ) {
@@ -3250,183 +3364,100 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	      }
 	      if ( mwa>0 ) mwa=sqrt(mwa);
 		
+	      double spx=px1+px2+px3;
+	      double spy=py1+py2+py3;
+	      double spz=pz1+pz2+pz3;
+	      double m123=pow(e1+e2+e3,2)-pow(spx,2)-pow(spy,2)-pow(spz,2);
+	      if ( m123>0 ) m123=sqrt(m123);		
+	      double pt3 = sqrt(spx*spx+spy*spy);
+	      double scprodth=0.;          // projection of top momentum in h direction
+	      if ( ph2>0 ) scprodth = (spx*pxh+spy*pyh+spz*pzh)/sqrt(ph2);
+	      double ptot3 = sqrt(spx*spx+spy*spy+spz*spz);
+	      double eta3=0.;
+	      if ( ptot3-spz!=0 ) eta3 = 0.5*log((ptot3+spz)/(ptot3-spz));
+	      double phi3 = atan2(spy,spx);
+	      double thdphi = 3.141592-fabs(fabs(phi3-phih)-3.141592);
+	      double thdeta = eta3-etah; // angle between momenta of t and h		
+	      int ipt=(int)((pt3/600.)*10);
+	      int idp=(int)((thdphi/3.15)*10);
+	      int ipr=(int)(((scprodth+800)/1600.)*10);
+	      if ( ipt<0 ) ipt=0;
+	      if ( ipt>9 ) ipt=9;
+	      if ( idp<0 ) idp=0;
+	      if ( idp>9 ) idp=9;
+	      if ( ipr<0 ) ipr=0;
+	      if ( ipr>9 ) ipr=9;
+	      double r = Tread[100*ipr+10*idp+ipt];
+	      if ( Tnotread[100*ipr+10*idp+ipt]>0 ) r=r/Tnotread[100*ipr+10*idp+ipt];
+	      if ( r>maxr ) {
+		maxr = r;
+		tbestcomb=m123;
+		wbestcomb=mwa;
+		it1a=i;
+		it2a=j;
+		it3a=k;
+	      }
+
 	    }
 	  }
 	}
       }
-      double m3=0.;
-      double m12,m13,m23;
-      double mw=0.;
-      double bestWhasb=0.;
-      double bestbnob=0.;
-      int it1=-1;
-      int it2=-1;
-      int it3=-1;
-      int ih1=-1;
-      int ih2=-1;
-      // Compute best top and W masses and determine simple chi2
-      // -------------------------------------------------------
-      for ( int i=0; i<iJ-2 && i<NHSJ-2; i++ ) {
-	for ( int j=i+1; j<iJ-1 && j<NHSJ-1; j++ ) {
-	  for ( int k=j+1; k<iJ && k<NHSJ; k++ ) { // limit to 8 the number of jets in hard subprocess
-	      
-	    // Require that the triplet owns at least one b-tag
-	    // ------------------------------------------------
-	    double nb=0.;
-	      
-	    if ( JHEM[i] ) nb++; 
-	    if ( JHEM[j] ) nb++;
-	    if ( JHEM[k] ) nb++;
-	    if ( nb>=1 ) {
-	      bestWhasb=0;
-	      px1=JEt[i]*cos(Jphi[i]);
-	      px2=JEt[j]*cos(Jphi[j]);
-	      px3=JEt[k]*cos(Jphi[k]);
-	      py1=JEt[i]*sin(Jphi[i]);
-	      py2=JEt[j]*sin(Jphi[j]);
-	      py3=JEt[k]*sin(Jphi[k]);
-	      pz1=JEt[i]/tan(2*atan(exp(-Jeta[i])));
-	      pz2=JEt[j]/tan(2*atan(exp(-Jeta[j])));
-	      pz3=JEt[k]/tan(2*atan(exp(-Jeta[k])));
-	      e1 =sqrt(px1*px1+py1*py1+pz1*pz1);
-	      e2 =sqrt(px2*px2+py2*py2+pz2*pz2);
-	      e3 =sqrt(px3*px3+py3*py3+pz3*pz3);
-	      m3=(e1+e2+e3)*(e1+e2+e3)-(px1+px2+px3)*(px1+px2+px3)-
-		(py1+py2+py3)*(py1+py2+py3)-(pz1+pz2+pz3)*(pz1+pz2+pz3);
-	      if ( m3>0 ) m3=sqrt(m3);
-	      m12=(e1+e2)*(e1+e2)-(px1+px2)*(px1+px2)-(py1+py2)*(py1+py2)-(pz1+pz2)*(pz1+pz2);
-	      if ( m12>0 ) m12=sqrt(m12);
-	      m13=(e1+e3)*(e1+e3)-(px1+px3)*(px1+px3)-(py1+py3)*(py1+py3)-(pz1+pz3)*(pz1+pz3);
-	      if ( m13>0 ) m13=sqrt(m13);
-	      m23=(e2+e3)*(e2+e3)-(px2+px3)*(px2+px3)-(py2+py3)*(py2+py3)-(pz2+pz3)*(pz2+pz3);
-	      if ( m23>0 ) m23=sqrt(m23);
-		
-	      // Simple non-selecting way to use info of b-tag in W selection
-	      // ------------------------------------------------------------
-	      if ( fabs(m12-mwref)<fabs(m13-mwref) && fabs(m12-mwref)<fabs(m23-mwref) ) {
-		mw=m12;
-		if ( JHEM[i] || JHEM[j] ) bestWhasb=1;
-		if ( !JHEM[k] ) bestbnob=1;
-	      }
-	      if ( fabs(m13-mwref)<fabs(m12-mwref) && fabs(m13-mwref)<fabs(m23-mwref) ) { 
-		mw=m13;
-		if ( JHEM[i] || JHEM[k] ) bestWhasb=1;
-		if ( !JHEM[j] ) bestbnob=1;
-	      }
-	      if ( fabs(m23-mwref)<fabs(m13-mwref) && fabs(m23-mwref)<fabs(m12-mwref) ) {
-		mw=m23;
-		if ( JHEM[j] || JHEM[k] ) bestWhasb=1;
-		if ( !JHEM[i] ) bestbnob=1;
-	      }
-	      if ( fabs(m3-mtref)<fabs(m3best-mtref) ) {
-		m3best=m3;
-		mwbest=mw;
-		chi2=sqrt((m3best-mtref)*(m3best-mtref)/900+(mwbest-mwref)*(mwbest-mwref)/400)+
-		  3*bestWhasb+3*bestbnob;
-		it1=i;
-		it2=j;
-		it3=k;
-	      }
-	      // Compute minimum W mass
-	      // ----------------------
-	      mwmin = m12;
-	      if ( mwmin>m13 ) mwmin=m13;
-	      if ( mwmin>m23 ) mwmin=m23;
-	    } // nb>=1	    
+	  
+      // Compute mass of jets not selected in triplet of top and doublet of H decay
+      // --------------------------------------------------------------------------
+      if ( ih1a+ih2a>0 && it1a+it2a+it3a>0 ) {
+	spx=0;
+	spy=0;
+	spz=0;
+	se=0;
+	for ( int kk=0; kk<iJ && kk<NHSJ ; kk++ ) { // limit to NHSJ the number of 
+	  // jets from hard subprocess
+	  if ( kk!= ih1a && kk!=ih2a && kk!=it1a && kk!=it2a && kk!=it3a ) { 
+	    px=JEt[kk]*cos(Jphi[kk]);
+	    py=JEt[kk]*sin(Jphi[kk]);
+	    pz=JEt[kk]/tan(2*atan(exp(-Jeta[kk])));
+	    spx+=px;
+	    spy+=py;
+	    spz+=pz;
+	    se+=sqrt(px*px+py*py+pz*pz);
 	  }
-	}
-      }
-	
-      // Search for a H signal in the remaining jets
-      // -------------------------------------------
-      if ( it1+it2+it3>0 ) {
-	for ( int ii=0; ii<iJ-1 && ii<NHSJ-1; ii++ ) {
-	  if ( ii!=it1 && ii!=it2 && ii!=it3 ) {
-	    for ( int jj=ii+1; jj<iJ && jj<NHSJ; jj++ ) { // limit to NHSJ the number of jets from h.s.
-	      if ( jj!=it1 && jj!=it2 && jj!=it3 ) {
-		  
-		// Demand that both b-jets from H be tagged
-		// ----------------------------------------
-		if ( JHEM[ii] && JHEM[jj] ) {
-		  px4=JEt[ii]*cos(Jphi[ii]);
-		  px5=JEt[jj]*cos(Jphi[jj]);
-		  py4=JEt[ii]*sin(Jphi[ii]);
-		  py5=JEt[jj]*sin(Jphi[jj]);
-		  pz4=JEt[ii]/tan(2*atan(exp(-Jeta[ii])));
-		  pz5=JEt[jj]/tan(2*atan(exp(-Jeta[jj])));
-		  e4 =sqrt(px4*px4+py4*py4+pz4*pz4);
-		  e5 =sqrt(px5*px5+py5*py5+pz5*pz5);
-		  m45=(e4+e5)*(e4+e5)-(px4+px5)*(px4+px5)-(py4+py5)*(py4+py5)-(pz4+pz5)*(pz4+pz5);
-		  if ( m45>0 ) m45=sqrt(m45);
-		  if ( fabs(m45-mhref)<fabs(m45best-mhref) ) {
-		    m45best=m45;
-		    chi2ext=sqrt(chi2*chi2+(m45best-mhref)*(m45best-mhref)/729);
-		    dpbb=3.145926-fabs(fabs(Jphi[ii]-Jphi[jj])-3.1415926);
-		    ih1=ii;
-		    ih2=jj;
-		  }
-		}
-	      }
-	    }
-	  }
+	  m_others=se*se-spx*spx-spy*spy-spz*spz;
+	  if ( m_others>0 ) m_others=sqrt(m_others);
 	}
 	  
-	// Compute mass of jets not selected in triplet of top and doublet of H decay
-	// --------------------------------------------------------------------------
-	if ( ih1+ih2>0 ) {
-	  spx=0;
-	  spy=0;
-	  spz=0;
-	  se=0;
-	  for ( int kk=0; kk<iJ && kk<NHSJ ; kk++ ) { // limit to NHSJ the number of 
-	    // jets from hard subprocess
-	    if ( kk!= ih1 && kk!=ih2 && kk!=it1 && kk!=it2 && kk!=it3 ) { 
-	      px=JEt[kk]*cos(Jphi[kk]);
-	      py=JEt[kk]*sin(Jphi[kk]);
-	      pz=JEt[kk]/tan(2*atan(exp(-Jeta[kk])));
-	      spx+=px;
-	      spy+=py;
-	      spz+=pz;
-	      se+=sqrt(px*px+py*py+pz*pz);
-	    }
-	    m_others=se*se-spx*spx-spy*spy-spz*spz;
-	    if ( m_others>0 ) m_others=sqrt(m_others);
-	  }
-	    
-	  // Now compute mass and angle of two b-jets not chosen as H decay
-	  // --------------------------------------------------------------
-	  spx=0;
-	  spy=0;
-	  spz=0;
-	  se=0;
-	  double mbbnoh;
-	  for ( int k1=0; k1<iJ-1 && k1<NHSJ-1; k1++ ) {
-	    if ( k1!=ih1 && k1!=ih2 && JHEM[k1] ) {
-	      for ( int k2=k1+1; k2<iJ && k2<NHSJ; k2++ ) { // limit to 8 the number of jets from h.s.
-		if ( k2!=ih1 && k2!=ih2 && JHEM[k2] ) {
-		  px1=JEt[k1]*cos(Jphi[k1]);
-		  py1=JEt[k1]*sin(Jphi[k1]);
-		  pz1=JEt[k1]/tan(2*atan(exp(-Jeta[k1])));
-		  px2=JEt[k2]*cos(Jphi[k2]);
-		  py2=JEt[k2]*sin(Jphi[k2]);
-		  pz2=JEt[k2]/tan(2*atan(exp(-Jeta[k2])));
-		  spx=px1+px2;
-		  spy=py1+py2;
-		  spz=pz1+pz2;
-		  se=sqrt(px1*px1+py1*py1+pz1*pz1)+sqrt(px2*px2+py2*py2+pz2*pz2);
-		}
-		mbbnoh=se*se-spx*spx-spy*spy-spz*spz;
-		if ( mbbnoh>0 ) mbbnoh=sqrt(mbbnoh);
-		if ( mbbnoh>mbbnohmax ) {
-		  mbbnohmax=mbbnoh;
-		  dpbbnohmax=3.1415926-fabs(fabs(Jphi[k1]-Jphi[k2])-3.1415926);
-		}
+	// Now compute mass and angle of two b-jets not chosen as H decay
+	// --------------------------------------------------------------
+	spx=0;
+	spy=0;
+	spz=0;
+	se=0;
+	double mbbnoh;
+	for ( int k1=0; k1<iJ-1 && k1<NHSJ-1; k1++ ) {
+	  if ( k1!=ih1a && k1!=ih2a && JHEM[k1] ) {
+	    for ( int k2=k1+1; k2<iJ && k2<NHSJ; k2++ ) { // limit to 8 the number of jets from h.s.
+	      if ( k2!=ih1a && k2!=ih2a && JHEM[k2] ) {
+		px1=JEt[k1]*cos(Jphi[k1]);
+		py1=JEt[k1]*sin(Jphi[k1]);
+		pz1=JEt[k1]/tan(2*atan(exp(-Jeta[k1])));
+		px2=JEt[k2]*cos(Jphi[k2]);
+		py2=JEt[k2]*sin(Jphi[k2]);
+		pz2=JEt[k2]/tan(2*atan(exp(-Jeta[k2])));
+		spx=px1+px2;
+		spy=py1+py2;
+		spz=pz1+pz2;
+		se=sqrt(px1*px1+py1*py1+pz1*pz1)+sqrt(px2*px2+py2*py2+pz2*pz2);
 	      }
-	    }      
-	  }
-	}      
-      } // end if it1+it2+it3>0      
-
+	      mbbnoh=se*se-spx*spx-spy*spy-spz*spz;
+	      if ( mbbnoh>0 ) mbbnoh=sqrt(mbbnoh);
+	      if ( mbbnoh>mbbnohmax ) {
+		mbbnohmax=mbbnoh;
+		dpbbnohmax=3.1415926-fabs(fabs(Jphi[k1]-Jphi[k2])-3.1415926);
+	      }
+	    }
+	  }      
+	}
+      }      // all 5 jets from h and t defined
+	
       // Now compute mass of first 8 jets and their centrality
       // -----------------------------------------------------
       spx=0;
@@ -3532,8 +3563,8 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	MEtDP3_->Fill(dp3rd);
 	UncorrMEtSig_->Fill(UncorrMEtSig);
 	CorrMEtSig_->Fill(CorrMEtSig);
-	M3best_->Fill(m3best);
-	Mwbest_->Fill(mwbest);
+	M3best_->Fill(tbestcomb);
+	Mwbest_->Fill(wbestcomb);
 	Chi2mass_->Fill(chi2);
 	M45best_->Fill(m45best);
 	Chi2ext_->Fill(chi2ext);
@@ -3584,8 +3615,8 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	  MEtDP3S_->Fill(dp3rd);
 	  UncorrMEtSigS_->Fill(UncorrMEtSig);
 	  CorrMEtSigS_->Fill(CorrMEtSig);
-	  M3bestS_->Fill(m3best);
-	  MwbestS_->Fill(mwbest);
+	  M3bestS_->Fill(tbestcomb);
+	  MwbestS_->Fill(wbestcomb);
 	  Chi2massS_->Fill(chi2);
 	  M45bestS_->Fill(m45best);
 	  Chi2extS_->Fill(chi2ext);
@@ -3636,8 +3667,8 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	    MEtDP3SS_->Fill(dp3rd);
 	    UncorrMEtSigSS_->Fill(UncorrMEtSig);
 	    CorrMEtSigSS_->Fill(CorrMEtSig);
-	    M3bestSS_->Fill(m3best);
-	    MwbestSS_->Fill(mwbest);
+	    M3bestSS_->Fill(tbestcomb);
+	    MwbestSS_->Fill(wbestcomb);
 	    Chi2massSS_->Fill(chi2);
 	    M45bestSS_->Fill(m45best);
 	    Chi2extSS_->Fill(chi2ext);
@@ -3689,8 +3720,8 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	    MEtDP3SSS_->Fill(dp3rd);
 	    UncorrMEtSigSSS_->Fill(UncorrMEtSig);
 	    CorrMEtSigSSS_->Fill(CorrMEtSig);
-	    M3bestSSS_->Fill(m3best);
-	    MwbestSSS_->Fill(mwbest);
+	    M3bestSSS_->Fill(tbestcomb);
+	    MwbestSSS_->Fill(wbestcomb);
 	    Chi2massSSS_->Fill(chi2);
 	    M45bestSSS_->Fill(m45best);
 	    Chi2extSSS_->Fill(chi2ext);
@@ -3827,6 +3858,14 @@ void TDAna::endJob() {
     Hfile << H[i] << " " << Hnot[i] << endl;
   }
   Hfile.close();
+
+  // Write T matrix containing kinematics of triplet
+  // -----------------------------------------------
+  ofstream Tfile("T.asc");
+  for ( int i=0; i<1000; i++ ) {
+    Tfile << T[i] << " " << Tnot[i] << endl;
+  }
+  Tfile.close();
 
   // Write stats on decays
   // ---------------------
@@ -3993,6 +4032,17 @@ void TDAna::endJob() {
   Hnotpt_->Write();
   Hnoteta_->Write();
   Hnotdr_->Write();
+  MTnotbest_->Write();
+  Tpt_->Write();
+  Teta_->Write();
+  THdeta_->Write();
+  THdphi_->Write();
+  THproj_->Write();
+  Tnotpt_->Write();
+  Tnoteta_->Write();
+  THnotdphi_->Write();
+  THnotdeta_->Write();
+  THnotproj_->Write();
 
   // Histograms for events passing trigger
   // -------------------------------------

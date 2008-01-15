@@ -19,7 +19,7 @@
 //
 // Original Author:  Marco De Mattia
 //         Created:  Tue May  8 13:05:37 CEST 2007
-// $Id: TDAna.h,v 1.18 2008/01/09 13:16:48 dorigo Exp $
+// $Id: TDAna.h,v 1.20 2008/01/11 16:28:18 dorigo Exp $
 //
 //
 
@@ -224,6 +224,17 @@ class TDAna : public edm::EDAnalyzer {
   TH1D * Hnotpt_;
   TH1D * Hnoteta_;
   TH1D * Hnotdr_;
+  TH1D * MTnotbest_;
+  TH1D * Tpt_;
+  TH1D * Teta_;
+  TH1D * THdeta_;
+  TH1D * THdphi_;
+  TH1D * THproj_;
+  TH1D * Tnotpt_;
+  TH1D * Tnoteta_;
+  TH1D * THnotdeta_;
+  TH1D * THnotdphi_;
+  TH1D * THnotproj_;
 
   TH1D * NJets_;
   TH1D * UncorrSumEt_;
@@ -845,6 +856,13 @@ class TDAna : public edm::EDAnalyzer {
   double Hnot[1000];
   double Hread[1000];
   double Hnotread[1000];
+
+  // Matrix with T kinematics
+  // ------------------------
+  double T[1000];
+  double Tnot[1000];
+  double Tread[1000];
+  double Tnotread[1000];
 
   // Likelihood histograms
   // ---------------------
