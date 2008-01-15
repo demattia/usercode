@@ -104,7 +104,7 @@ source = PoolSource {
     "castor:/castor/cern.ch/user/d/demattia/FastSim/PUHL/EXTRA_QCD_80-120/QCD_80-120_5124_1.root",
     "castor:/castor/cern.ch/user/d/demattia/FastSim/PUHL/EXTRA_QCD_80-120/QCD_80-120_5125_1.root",
     "castor:/castor/cern.ch/user/d/demattia/FastSim/PUHL/EXTRA_QCD_80-120/QCD_80-120_5128_1.root",
-    "castor:/castor/cern.ch/user/d/demattia/FastSim/PUHL/EXTRA_QCD_80-120/QCD_80-120_5129_1.root"
+    "castor:/castor/cern.ch/user/d/demattia/FastSim/PUHL/EXTRA_QCD_80-120/QCD_80-120_5129_1.root",
     "castor:/castor/cern.ch/user/d/demattia/FastSim/PUHL/EXTRA_QCD_80-120/QCD_80-120_5130_1.root",
     "castor:/castor/cern.ch/user/d/demattia/FastSim/PUHL/EXTRA_QCD_80-120/QCD_80-120_5132_1.root",
     "castor:/castor/cern.ch/user/d/demattia/FastSim/PUHL/EXTRA_QCD_80-120/QCD_80-120_5135_1.root",
