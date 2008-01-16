@@ -1,26 +1,26 @@
 --------- MULTI_EXTRA_QCD_30-50 ---------
 Total starting events = 12388000
 Generated events = 11229443
-Written events = 61292 -> fraction = 0.0049
-Discarded events = 430862 -> fraction 0.034781
+Written events = 61292 -> fraction = 0.0055
+Discarded events = 430862 -> fraction 0.038369
 -------------------
 --------- MULTI_EXTRA_QCD_50-80 ---------
 Total starting events = 26938000
 Generated events = 26347818
-Written events = 194451 -> fraction = 0.0072
-Discarded events = 208121 -> fraction 0.007726
+Written events = 194451 -> fraction = 0.0074
+Discarded events = 208121 -> fraction 0.007899
 -------------------
 --------- MULTI_EXTRA_QCD_80-120 ---------
 Total starting events = 25128000
 Generated events = 24971508
 Written events = 240496 -> fraction = 0.0096
-Discarded events = 56008 -> fraction 0.002229
+Discarded events = 56008 -> fraction 0.002243
 -------------------
 --------- MULTI_EXTRA_QCD_120-170 ---------
 Total starting events = 29562000
 Generated events = 29514603
 Written events = 452564 -> fraction = 0.0153
-Discarded events = 17344 -> fraction 0.000587
+Discarded events = 17344 -> fraction 0.000588
 -------------------
 --------- MULTI_EXTRA_QCD_170-230 ---------
 Total starting events = 40618000
