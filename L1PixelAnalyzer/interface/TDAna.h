@@ -191,9 +191,16 @@ class TDAna : public edm::EDAnalyzer {
   // -------------------
   TH1D * HSS_sig[11];
   TH1D * HSS_bgr[11];
-  TH1D * HEDpdf;
-  TH1D * HPDpdf;
-  
+  TH1D * HEDpdf[8];
+  TH1D * HPDpdf[8];
+  TH1D * MTS1pdf[8];
+  TH1D * MNS1pdf[8];
+  TH1D * MTS2pdf[8];
+  TH1D * MNS2pdf[8];
+  TH1D * MTS3pdf[8];
+  TH1D * MNS3pdf[8];
+
+
   // My histograms
   // -------------
   TH2D * Drmax_;
@@ -253,6 +260,9 @@ class TDAna : public edm::EDAnalyzer {
   TH1D * HED8_;
   TH1D * HPD8_;
 
+  TProfile * DEtb_prof_;
+  TProfile * DEtq_prof_;
+
   TH1D * NJets_;
   TH1D * UncorrSumEt_;
   TH1D * UncorrHt_;
@@ -303,6 +313,9 @@ class TDAna : public edm::EDAnalyzer {
   TH1D * Scprod_;
   TH1D * Thdeta_;
   TH1D * M5_;
+  TH1D * TTMS1_;
+  TH1D * TTMS2_;
+  TH1D * TTMS3_;
 
   TH1D * NJetsS_;
   TH1D * UncorrSumEtS_;
@@ -354,6 +367,9 @@ class TDAna : public edm::EDAnalyzer {
   TH1D * ScprodS_;
   TH1D * ThdetaS_;
   TH1D * M5S_;
+  TH1D * TTMS1S_;
+  TH1D * TTMS2S_;
+  TH1D * TTMS3S_;
 
   TH1D * NJetsSS_;
   TH1D * UncorrSumEtSS_;
@@ -405,6 +421,9 @@ class TDAna : public edm::EDAnalyzer {
   TH1D * ScprodSS_;
   TH1D * ThdetaSS_;
   TH1D * M5SS_;
+  TH1D * TTMS1SS_;
+  TH1D * TTMS2SS_;
+  TH1D * TTMS3SS_;
 
   TH1D * NJetsSSS_;
   TH1D * UncorrSumEtSSS_;
@@ -456,6 +475,9 @@ class TDAna : public edm::EDAnalyzer {
   TH1D * ScprodSSS_;
   TH1D * ThdetaSSS_;
   TH1D * M5SSS_;
+  TH1D * TTMS1SSS_;
+  TH1D * TTMS2SSS_;
+  TH1D * TTMS3SSS_;
 
   TH1D * N4NJSSS_;
   TH1D * E4NJSSS_;
@@ -512,6 +534,9 @@ class TDAna : public edm::EDAnalyzer {
   TH1D * ScprodN_;
   TH1D * ThdetaN_;
   TH1D * M5N_;
+  TH1D * TTMS1N_;
+  TH1D * TTMS2N_;
+  TH1D * TTMS3N_;
 
   TH1D * NJetsSN_;
   TH1D * UncorrSumEtSN_;
@@ -563,6 +588,9 @@ class TDAna : public edm::EDAnalyzer {
   TH1D * ScprodSN_;
   TH1D * ThdetaSN_;
   TH1D * M5SN_;
+  TH1D * TTMS1SN_;
+  TH1D * TTMS2SN_;
+  TH1D * TTMS3SN_;
 
   TH1D * NJetsSSN_;
   TH1D * UncorrSumEtSSN_;
@@ -614,6 +642,9 @@ class TDAna : public edm::EDAnalyzer {
   TH1D * ScprodSSN_;
   TH1D * ThdetaSSN_;
   TH1D * M5SSN_;
+  TH1D * TTMS1SSN_;
+  TH1D * TTMS2SSN_;
+  TH1D * TTMS3SSN_;
 
   TH1D * NJetsSSSN_;
   TH1D * UncorrSumEtSSSN_;
@@ -665,6 +696,9 @@ class TDAna : public edm::EDAnalyzer {
   TH1D * ScprodSSSN_;
   TH1D * ThdetaSSSN_;
   TH1D * M5SSSN_;
+  TH1D * TTMS1SSSN_;
+  TH1D * TTMS2SSSN_;
+  TH1D * TTMS3SSSN_;
 
   // Error histograms
   // ----------------
@@ -718,6 +752,9 @@ class TDAna : public edm::EDAnalyzer {
   TH1D * ScprodW_;
   TH1D * ThdetaW_;
   TH1D * M5W_;
+  TH1D * TTMS1W_;
+  TH1D * TTMS2W_;
+  TH1D * TTMS3W_;
 
   TH1D * NJetsSW_;
   TH1D * UncorrSumEtSW_;
@@ -769,6 +806,9 @@ class TDAna : public edm::EDAnalyzer {
   TH1D * ScprodSW_;
   TH1D * ThdetaSW_;
   TH1D * M5SW_;
+  TH1D * TTMS1SW_;
+  TH1D * TTMS2SW_;
+  TH1D * TTMS3SW_;
 
   TH1D * NJetsSSW_;
   TH1D * UncorrSumEtSSW_;
@@ -820,6 +860,9 @@ class TDAna : public edm::EDAnalyzer {
   TH1D * ScprodSSW_;
   TH1D * ThdetaSSW_;
   TH1D * M5SSW_;
+  TH1D * TTMS1SSW_;
+  TH1D * TTMS2SSW_;
+  TH1D * TTMS3SSW_;
 
   TH1D * NJetsSSSW_;
   TH1D * UncorrSumEtSSSW_;
@@ -871,6 +914,9 @@ class TDAna : public edm::EDAnalyzer {
   TH1D * ScprodSSSW_;
   TH1D * ThdetaSSSW_;
   TH1D * M5SSSW_;
+  TH1D * TTMS1SSSW_;
+  TH1D * TTMS2SSSW_;
+  TH1D * TTMS3SSSW_;
 
   TH1D * N4NJSSSW_;
   TH1D * E4NJSSSW_;
@@ -888,6 +934,10 @@ class TDAna : public edm::EDAnalyzer {
   float loose_;
   float medium_;
   float tight_;
+
+  // Parameters of Et correction functions
+  double tpar[3];
+  double upar[3];
 
   double rel_lik;
   double njsss;
