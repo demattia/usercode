@@ -19,7 +19,7 @@
 //
 // Original Author:  Marco De Mattia
 //         Created:  Tue May  8 13:05:37 CEST 2007
-// $Id: TDAna.h,v 1.21 2008/01/15 10:21:11 dorigo Exp $
+// $Id: TDAna.h,v 1.22 2008/01/15 15:06:44 dorigo Exp $
 //
 //
 
@@ -235,6 +235,23 @@ class TDAna : public edm::EDAnalyzer {
   TH1D * THnotdeta_;
   TH1D * THnotdphi_;
   TH1D * THnotproj_;
+
+  TH1D * HED1_;
+  TH1D * HPD1_;
+  TH1D * HED2_;
+  TH1D * HPD2_;
+  TH1D * HED3_;
+  TH1D * HPD3_;
+  TH1D * HED4_;
+  TH1D * HPD4_;
+  TH1D * HED5_;
+  TH1D * HPD5_;
+  TH1D * HED6_;
+  TH1D * HPD6_;
+  TH1D * HED7_;
+  TH1D * HPD7_;
+  TH1D * HED8_;
+  TH1D * HPD8_;
 
   TH1D * NJets_;
   TH1D * UncorrSumEt_;

@@ -144,18 +144,18 @@ TDAna::TDAna(const edm::ParameterSet& iConfig) :
   HSS_bgr[1] = dynamic_cast<TH1D*> ( FunctionFile->Get("M8SS_bgrS"));
   HSS_sig[2] = dynamic_cast<TH1D*> ( FunctionFile->Get("C6SS_sigS"));
   HSS_bgr[2] = dynamic_cast<TH1D*> ( FunctionFile->Get("C6SS_bgrS"));
-  HSS_sig[3] = dynamic_cast<TH1D*> ( FunctionFile->Get("M6SS_sigS"));
-  HSS_bgr[3] = dynamic_cast<TH1D*> ( FunctionFile->Get("M6SS_bgrS"));
+  HSS_sig[3] = dynamic_cast<TH1D*> ( FunctionFile->Get("GoodHtSS_sigS"));
+  HSS_bgr[3] = dynamic_cast<TH1D*> ( FunctionFile->Get("GoodHtSS_bgrS"));
   HSS_sig[4] = dynamic_cast<TH1D*> ( FunctionFile->Get("MEtSigSS_sigS"));
   HSS_bgr[4] = dynamic_cast<TH1D*> ( FunctionFile->Get("MEtSigSS_bgrS"));
-  HSS_sig[5] = dynamic_cast<TH1D*> ( FunctionFile->Get("CorrSumEtSS_sigS"));
-  HSS_bgr[5] = dynamic_cast<TH1D*> ( FunctionFile->Get("CorrSumEtSS_bgrS"));
-  HSS_sig[6] = dynamic_cast<TH1D*> ( FunctionFile->Get("Chi2massSS_sigS"));
-  HSS_bgr[6] = dynamic_cast<TH1D*> ( FunctionFile->Get("Chi2massSS_bgrS"));
-  HSS_sig[7] = dynamic_cast<TH1D*> ( FunctionFile->Get("MEtDP1SS_sigS"));
-  HSS_bgr[7] = dynamic_cast<TH1D*> ( FunctionFile->Get("MEtDP1SS_bgrS"));
-  HSS_sig[8] = dynamic_cast<TH1D*> ( FunctionFile->Get("M45bestSS_sigS"));
-  HSS_bgr[8] = dynamic_cast<TH1D*> ( FunctionFile->Get("M45bestSS_bgrS"));
+  HSS_sig[5] = dynamic_cast<TH1D*> ( FunctionFile->Get("ThdetaSS_sigS"));
+  HSS_bgr[5] = dynamic_cast<TH1D*> ( FunctionFile->Get("ThdetaSS_bgrS"));
+  HSS_sig[6] = dynamic_cast<TH1D*> ( FunctionFile->Get("HbestcombSS_sigS"));
+  HSS_bgr[6] = dynamic_cast<TH1D*> ( FunctionFile->Get("HbestcombSS_bgrS"));
+  HSS_sig[7] = dynamic_cast<TH1D*> ( FunctionFile->Get("MEtDP2SS_sigS"));
+  HSS_bgr[7] = dynamic_cast<TH1D*> ( FunctionFile->Get("MEtDP2SS_bgrS"));
+  HSS_sig[8] = dynamic_cast<TH1D*> ( FunctionFile->Get("M5SS_sigS"));
+  HSS_bgr[8] = dynamic_cast<TH1D*> ( FunctionFile->Get("M5SS_bgrS"));
   HSS_sig[9] = dynamic_cast<TH1D*> ( FunctionFile->Get("M_othersSS_sigS"));
   HSS_bgr[9] = dynamic_cast<TH1D*> ( FunctionFile->Get("M_othersSS_bgrS"));
   HSS_sig[10]= dynamic_cast<TH1D*> ( FunctionFile->Get("Et6SS_sigS"));
@@ -222,7 +222,26 @@ TDAna::TDAna(const edm::ParameterSet& iConfig) :
   THnotdphi_ = new TH1D ( "THnotdphi", "Phi difference of NOT T and H", 50, 0., 3.15 );
   THnotproj_ = new TH1D ( "THnotproj", "Momentum of NOT T projected on H direction", 50, -1000., 1000. );
 
-  NJets_ = new TH1D ( "NJets", "Number of selected jets", 20, 0, 20 );
+  HED1_ = new TH1D ( "HED1", "HED 1", 200, 0., 40. );
+  HPD1_ = new TH1D ( "HPD1", "HPD 1", 200, 0., 40. );
+  HED2_ = new TH1D ( "HED2", "HED 2", 200, 0., 40. );
+  HPD2_ = new TH1D ( "HPD2", "HPD 2", 200, 0., 40. );
+  HED3_ = new TH1D ( "HED3", "HED 3", 200, 0., 40. );
+  HPD3_ = new TH1D ( "HPD3", "HPD 3", 200, 0., 40. );
+  HED4_ = new TH1D ( "HED4", "HED 4", 200, 0., 40. );
+  HPD4_ = new TH1D ( "HPD4", "HPD 4", 200, 0., 40. );
+  HED5_ = new TH1D ( "HED5", "HED 5", 200, 0., 40. );
+  HPD5_ = new TH1D ( "HPD5", "HPD 5", 200, 0., 40. );
+  HED6_ = new TH1D ( "HED6", "HED 6", 200, 0., 40. );
+  HPD6_ = new TH1D ( "HPD6", "HPD 6", 200, 0., 40. );
+  HED7_ = new TH1D ( "HED7", "HED 7", 200, 0., 40. );
+  HPD7_ = new TH1D ( "HPD7", "HPD 7", 200, 0., 40. );
+  HED8_ = new TH1D ( "HED8", "HED 8", 200, 0., 40. );
+  HPD8_ = new TH1D ( "HPD8", "HPD 8", 200, 0., 40. );
+
+  // Histograms for different levels of selection
+  // --------------------------------------------
+  NJets_ = new TH1D ( "NJets", "Number of selected jets", 50, 0, 50 );
   UncorrHt_ = new TH1D ( "UncorrHt", "Ht with uncorrected jets", 50, 0, 4000 );
   CorrHt_ = new TH1D ( "CorrHt", "Ht with corrected jets", 50, 0, 4000 );
   GoodHt_ = new TH1D ( "GoodHt", "Ht with corrected good jets", 50, 0, 4000 );
@@ -273,7 +292,7 @@ TDAna::TDAna(const edm::ParameterSet& iConfig) :
   Thdeta_ = new TH1D ( "Thdeta", "Delta eta top-higgs", 50, -5., 5. );
   M5_ = new TH1D ( "M5", "Mass of five jets from t and h", 50, 0., 2000. );
 
-  NJetsN_ = new TH1D ( "NJetsN", "Number of selected jets", 20, 0, 20 );
+  NJetsN_ = new TH1D ( "NJetsN", "Number of selected jets", 50, 0, 50 );
   UncorrHtN_ = new TH1D ( "UncorrHtN", "Ht with uncorrected jets", 50, 0, 4000 );
   CorrHtN_ = new TH1D ( "CorrHtN", "Ht with corrected jets", 50, 0, 4000 );
   GoodHtN_ = new TH1D ( "GoodHtN", "Ht with corrected good jets", 50, 0, 4000 );
@@ -324,7 +343,7 @@ TDAna::TDAna(const edm::ParameterSet& iConfig) :
   ThdetaN_ = new TH1D ( "ThdetaN", "Delta eta top-higgs", 50, -5., 5. );
   M5N_ = new TH1D ( "M5N", "Mass of five jets from t and h", 50, 0., 2000. );
 
-  NJetsS_ = new TH1D ( "NJetsS", "Number of selected jets", 20, 0, 20 );
+  NJetsS_ = new TH1D ( "NJetsS", "Number of selected jets", 50, 0, 50 );
   UncorrHtS_ = new TH1D ( "UncorrHtS", "Ht with uncorrected jets", 50, 0, 4000 );
   CorrHtS_ = new TH1D ( "CorrHtS", "Ht with corrected jets", 50, 0, 4000 );
   GoodHtS_ = new TH1D ( "GoodHtS", "Ht with corrected good jets", 50, 0, 4000 );
@@ -375,7 +394,7 @@ TDAna::TDAna(const edm::ParameterSet& iConfig) :
   ThdetaS_ = new TH1D ( "ThdetaS", "Delta eta top-higgs", 50, -5., 5. );
   M5S_ = new TH1D ( "M5S", "Mass of five jets from t and h", 50, 0., 2000. );
 
-  NJetsSN_ = new TH1D ( "NJetsSN", "Number of selected jets", 20, 0, 20 );
+  NJetsSN_ = new TH1D ( "NJetsSN", "Number of selected jets", 50, 0, 50 );
   UncorrHtSN_ = new TH1D ( "UncorrHtSN", "Ht with uncorrected jets", 50, 0, 4000 );
   CorrHtSN_ = new TH1D ( "CorrHtSN", "Ht with corrected jets", 50, 0, 4000 );
   GoodHtSN_ = new TH1D ( "GoodHtSN", "Ht with corrected good jets", 50, 0, 4000 );
@@ -426,7 +445,7 @@ TDAna::TDAna(const edm::ParameterSet& iConfig) :
   ThdetaSN_ = new TH1D ( "ThdetaSN", "Delta eta top-higgs", 50, -5., 5. );
   M5SN_ = new TH1D ( "M5SN", "Mass of five jets from t and h", 50, 0., 2000. );
 
-  NJetsSS_ = new TH1D ( "NJetsSS", "Number of selected jets", 20, 0, 20 );
+  NJetsSS_ = new TH1D ( "NJetsSS", "Number of selected jets", 50, 0, 50 );
   UncorrHtSS_ = new TH1D ( "UncorrHtSS", "Ht with uncorrected jets", 50, 0, 4000 );
   CorrHtSS_ = new TH1D ( "CorrHtSS", "Ht with corrected jets", 50, 0, 4000 );
   GoodHtSS_ = new TH1D ( "GoodHtSS", "Ht with corrected good jets", 50, 0, 4000 );
@@ -477,7 +496,7 @@ TDAna::TDAna(const edm::ParameterSet& iConfig) :
   ThdetaSS_ = new TH1D ( "ThdetaSS", "Delta eta top-higgs", 50, -5., 5. );
   M5SS_ = new TH1D ( "M5SS", "Mass of five jets from t and h", 50, 0., 2000. );
 
-  NJetsSSN_ = new TH1D ( "NJetsSSN", "Number of selected jets", 20, 0, 20 );
+  NJetsSSN_ = new TH1D ( "NJetsSSN", "Number of selected jets", 50, 0, 50 );
   UncorrHtSSN_ = new TH1D ( "UncorrHtSSN", "Ht with uncorrected jets", 50, 0, 4000 );
   CorrHtSSN_ = new TH1D ( "CorrHtSSN", "Ht with corrected jets", 50, 0, 4000 );
   GoodHtSSN_ = new TH1D ( "GoodHtSSN", "Ht with corrected good jets", 50, 0, 4000 );
@@ -528,7 +547,7 @@ TDAna::TDAna(const edm::ParameterSet& iConfig) :
   ThdetaSSN_ = new TH1D ( "ThdetaSSN", "Delta eta top-higgs", 50, -5., 5. );
   M5SSN_ = new TH1D ( "M5SSN", "Mass of five jets from t and h", 50, 0., 2000. );
 
-  NJetsSSS_ = new TH1D ( "NJetsSSS", "Number of selected jets", 20, 0, 20 );
+  NJetsSSS_ = new TH1D ( "NJetsSSS", "Number of selected jets", 50, 0, 50 );
   UncorrHtSSS_ = new TH1D ( "UncorrHtSSS", "Ht with uncorrected jets", 50, 0, 4000 );
   CorrHtSSS_ = new TH1D ( "CorrHtSSS", "Ht with corrected jets", 50, 0, 4000 );
   GoodHtSSS_ = new TH1D ( "GoodHtSSS", "Ht with corrected good jets", 50, 0, 4000 );
@@ -579,7 +598,7 @@ TDAna::TDAna(const edm::ParameterSet& iConfig) :
   ThdetaSSS_ = new TH1D ( "ThdetaSSS", "Delta eta top-higgs", 50, -5., 5. );
   M5SSS_ = new TH1D ( "M5SSS", "Mass of five jets from t and h", 50, 0., 2000. );
 
-  NJetsSSSN_ = new TH1D ( "NJetsSSSN", "Number of selected jets", 20, 0, 20 );
+  NJetsSSSN_ = new TH1D ( "NJetsSSSN", "Number of selected jets", 50, 0, 50 );
   UncorrHtSSSN_ = new TH1D ( "UncorrHtSSSN", "Ht with uncorrected jets", 50, 0, 4000 );
   CorrHtSSSN_ = new TH1D ( "CorrHtSSSN", "Ht with corrected jets", 50, 0, 4000 );
   GoodHtSSSN_ = new TH1D ( "GoodHtSSSN", "Ht with corrected good jets", 50, 0, 4000 );
@@ -635,7 +654,7 @@ TDAna::TDAna(const edm::ParameterSet& iConfig) :
   E4NJSSS_ = new TH1D ( "E4NJSSS", "Efficiency of 4HEL tags vs N jets", 
 			20, 0, 20 );  // selection and do not require W, N
 
-  NJetsW_ = new TH1D ( "NJetsW", "Number of selected jets", 20, 0, 20 );
+  NJetsW_ = new TH1D ( "NJetsW", "Number of selected jets", 50, 0, 50 );
   UncorrHtW_ = new TH1D ( "UncorrHtW", "Ht with uncorrected jets", 50, 0, 4000 );
   CorrHtW_ = new TH1D ( "CorrHtW", "Ht with corrected jets", 50, 0, 4000 );
   GoodHtW_ = new TH1D ( "GoodHtW", "Ht with corrected good jets", 50, 0, 4000 );
@@ -686,7 +705,7 @@ TDAna::TDAna(const edm::ParameterSet& iConfig) :
   ThdetaW_ = new TH1D ( "ThdetaW", "Delta eta top-higgs", 50, -5., 5. );
   M5W_ = new TH1D ( "M5W", "Mass of five jets from t and h", 50, 0., 2000. );
 
-  NJetsSW_ = new TH1D ( "NJetsSW", "Number of selected jets", 20, 0, 20 );
+  NJetsSW_ = new TH1D ( "NJetsSW", "Number of selected jets", 50, 0, 50 );
   UncorrHtSW_ = new TH1D ( "UncorrHtSW", "Ht with uncorrected jets", 50, 0, 4000 );
   CorrHtSW_ = new TH1D ( "CorrHtSW", "Ht with corrected jets", 50, 0, 4000 );
   GoodHtSW_ = new TH1D ( "GoodHtSW", "Ht with corrected good jets", 50, 0, 4000 );
@@ -737,7 +756,7 @@ TDAna::TDAna(const edm::ParameterSet& iConfig) :
   ThdetaSW_ = new TH1D ( "ThdetaSW", "Delta eta top-higgs", 50, -5., 5. );
   M5SW_ = new TH1D ( "M5SW", "Mass of five jets from t and h", 50, 0., 2000. );
 
-  NJetsSSW_ = new TH1D ( "NJetsSSW", "Number of selected jets", 20, 0, 20 );
+  NJetsSSW_ = new TH1D ( "NJetsSSW", "Number of selected jets", 50, 0, 50 );
   UncorrHtSSW_ = new TH1D ( "UncorrHtSSW", "Ht with uncorrected jets", 50, 0, 4000 );
   CorrHtSSW_ = new TH1D ( "CorrHtSSW", "Ht with corrected jets", 50, 0, 4000 );
   GoodHtSSW_ = new TH1D ( "GoodHtSSW", "Ht with corrected good jets", 50, 0, 4000 );
@@ -788,7 +807,7 @@ TDAna::TDAna(const edm::ParameterSet& iConfig) :
   ThdetaSSW_ = new TH1D ( "ThdetaSSW", "Delta eta top-higgs", 50, -5., 5. );
   M5SSW_ = new TH1D ( "M5SSW", "Mass of five jets from t and h", 50, 0., 2000. );
 
-  NJetsSSSW_ = new TH1D ( "NJetsSSSW", "Number of selected jets", 20, 0, 20 );
+  NJetsSSSW_ = new TH1D ( "NJetsSSSW", "Number of selected jets", 50, 0, 50 );
   UncorrHtSSSW_ = new TH1D ( "UncorrHtSSSW", "Ht with uncorrected jets", 50, 0, 4000 );
   CorrHtSSSW_ = new TH1D ( "CorrHtSSSW", "Ht with corrected jets", 50, 0, 4000 );
   GoodHtSSSW_ = new TH1D ( "GoodHtSSSW", "Ht with corrected good jets", 50, 0, 4000 );
@@ -1882,6 +1901,10 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   edm::Handle<OfflineMEt> caloMET;
   iEvent.getByLabel( offlineMEtLabel_, caloMET );
 
+  double etbins[9]={25.,50.,70.,90.,110.,150.,200.,300.,10000.};
+  double etabins[5]={0.,1.,1.5,2.0,3.0};
+  double ns1bins[9]={2.,3.,4.,5.,6.,7.,8.,9.,100.};
+
   double sumet = caloMET->sumEt();
   double met = caloMET->et();
   double metsig = caloMET->mEtSig();
@@ -1952,13 +1975,13 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   // good jets array
   // ---------------
   int iJ=0;
-  double JEt[100];
-  double Jeta[100];
-  double Jphi[100];
-  double JHET[100];
-  double JHPT[100];
-  int    JN1[100];
-  int    JBin[100];
+  double JEt[100]={0.};
+  double Jeta[100]={0.};
+  double Jphi[100]={0.};
+  double JHET[100]={0.};
+  double JHPT[100]={0.};
+  int    JN1[100]={0};
+  int    JBin[100]={0};
   bool   JHEM[100];
   double NHSJ = 8; // number of jets from hard subprocess  <---- VERY IMPORTANT PARAMETER
   double NHEM = 0; // number of medium tags
@@ -2012,7 +2035,6 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	  JHEM[iJ]=false;
 	  if ( JHET[iJ]>medium_ ) {
 	    JHEM[iJ]=true;
-	    if ( iJ<NHSJ ) NHEM++;   // NNNBBB Tags are counted only if in first 8 jets!
 	  }
 	  iJ++;
 	}
@@ -2049,6 +2071,9 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	}
       }
     }
+    for ( int ij=0; ij<iJ && ij<NHSJ; ij++ ) { 
+      if ( JHEM[ij] ) NHEM++;   // NNNBBB Tags are counted only if in first 8 jets!
+    }
     // Compute delta phi angles
     // ------------------------
     if ( iJ>1 ) dp12 = 3.1415926-fabs(fabs(Jphi[0]-Jphi[1])-3.1415926);
@@ -2064,9 +2089,6 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
       // Assign tag probability to each jet
       // by finding which bin it belongs to
       // ----------------------------------
-      double etbins[9]={25.,50.,70.,90.,110.,150.,200.,300.,10000.};
-      double etabins[5]={0.,1.,1.5,2.0,3.0};
-      double ns1bins[9]={2.,3.,4.,5.,6.,7.,8.,9.,100.};
       int etbin=-1;
       int etabin=-1;
       int ns1bin=-1;
@@ -2100,8 +2122,8 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
       // Assign tags to jets in QCD events according to their probability
       // ----------------------------------------------------------------
       int iJmax=NHSJ;  // Search for tags in the first NHSJ jets only!
-
       if ( iJ<iJmax ) iJmax=iJ;
+
       for ( int icomb=0; icomb<(int)pow (2.,iJmax); icomb++ ) { // Combinatorial loop ///////////////
 	
 	// Reset all variables
@@ -2182,12 +2204,12 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 
 	// Compute sum of discriminants
 	// ----------------------------
-	for ( int i=0; i<NHSJ; i++ ) {
+	for ( int i=0; i<iJmax; i++ ) {
 	  hemax[i]=JHET[i];
 	  hpmax[i]=JHPT[i];
 	}
-	for ( int times=0; times<NHSJ; times++ ) {
-	  for ( int j=NHSJ-1; j>=1; j-- ) {
+	for ( int times=0; times<iJmax; times++ ) {
+	  for ( int j=iJmax-1; j>=1; j-- ) {
 	    if ( hemax[j]>hemax[j-1] ) {
 	      double a1=hemax[j];
 	      hemax[j]=hemax[j-1];
@@ -2200,11 +2222,11 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	    }
 	  }
 	}
-	for ( int i=0; i<4 && i<NHSJ; i++ ) {
+	for ( int i=0; i<4 && i<iJmax; i++ ) {
 	  sumhed4+=hemax[i];
 	  sumhpd4+=hpmax[i];
 	}
-	for ( int i=0; i<6 && i<NHSJ; i++ ) {
+	for ( int i=0; i<6 && i<iJmax; i++ ) {
 	  sumhed6+=hemax[i];
 	  sumhpd6+=hpmax[i];
 	}
@@ -3245,13 +3267,13 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 // 	  bx[10]= (int)((sumet/4000.)*50)+1;
 	  bx[0]= (int)((c8/1.2)*50)+1;
 	  bx[1]= (int)((m8/2500.)*50)+1;
-	  bx[2]= (int)(c6/1.2)+1;
-	  bx[3]= (int)((m6/2500.)*50)+1;
+	  bx[2]= (int)((c6/1.2)*50)+1;
+	  bx[3]= (int)((GoodHt/4000.)*50)+1;
 	  bx[4]= (int)((metsig/20.)*50.)+1;
-	  bx[5]= (int)((CorrSumEt/4000.)*50)+1;
-	  bx[6]= (int)((chi2/50.)*50.)+1;
-	  bx[7]= (int)((dp1st/3.2)*50)+1;
-	  bx[8]= (int)((m45best/300.)*50)+1;
+	  bx[5]= (int)(((thdetabest-5.)/5.)*50)+1;
+	  bx[6]= (int)((hbestcomb/400.)*50.)+1;
+	  bx[7]= (int)((dp2nd/3.2)*50)+1;
+	  bx[8]= (int)((m5/2000.)*50)+1;
 	  bx[9]= (int)((m_others/1500.)*50.)+1;
 	  bx[10]= (int)((Et6/150.)*50)+1;
 	  for ( int ivar=0; ivar<11; ivar++ ) {
@@ -3300,18 +3322,21 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
       
     } else { // if not QCD /////////////////////////////////////////////
 
+      int iJmax=NHSJ;  // Search for tags in the first NHSJ jets only!
+      if ( iJ<iJmax ) iJmax=iJ;
+
       sumhed4=0.;
       sumhpd4=0.;
       sumhed6=0.;
       sumhpd6=0.;
       // Compute sum of discriminants
       // ----------------------------
-      for ( int i=0; i<NHSJ; i++ ) {
+      for ( int i=0; i<iJmax; i++ ) {
 	hemax[i]=JHET[i];
 	hpmax[i]=JHPT[i];
       }
-      for ( int times=0; times<NHSJ; times++ ) {
-	for ( int j=NHSJ-1; j>=1; j-- ) {
+      for ( int times=0; times<iJmax; times++ ) {
+	for ( int j=iJmax-1; j>=1; j-- ) {
 	  if ( hemax[j]>hemax[j-1] ) {
 	    double a1=hemax[j];
 	    hemax[j]=hemax[j-1];
@@ -3324,13 +3349,40 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	  }
 	}
       }
-      for ( int i=0; i<4 && i<NHSJ; i++ ) {
+      for ( int i=0; i<4 && i<iJmax; i++ ) {
 	sumhed4+=hemax[i];
 	sumhpd4+=hpmax[i];
       }
-      for ( int i=0; i<6 && i<NHSJ; i++ ) {
+      for ( int i=0; i<6 && i<iJmax; i++ ) {
 	sumhed6+=hemax[i];
 	sumhpd6+=hpmax[i];
+      }
+
+      // Fill HED and HPD histograms
+      // ---------------------------
+      for ( int i=0; i<iJmax; i++ ) {
+	int ns1bin=-1;
+	for ( int int1=0; int1<8; int1++ ) {
+	  if ( JN1[i]>=ns1bins[int1] && JN1[i]<ns1bins[int1+1] ) {
+	    ns1bin=int1;
+	  }
+	}
+	if ( ns1bin==0 ) HED1_->Fill(JHET[i]);
+	if ( ns1bin==0 ) HPD1_->Fill(JHPT[i]);
+	if ( ns1bin==1 ) HED2_->Fill(JHET[i]);
+	if ( ns1bin==1 ) HPD2_->Fill(JHPT[i]);
+	if ( ns1bin==2 ) HED3_->Fill(JHET[i]);
+	if ( ns1bin==2 ) HPD3_->Fill(JHPT[i]);
+	if ( ns1bin==3 ) HED4_->Fill(JHET[i]);
+	if ( ns1bin==3 ) HPD4_->Fill(JHPT[i]);
+	if ( ns1bin==4 ) HED5_->Fill(JHET[i]);
+	if ( ns1bin==4 ) HPD5_->Fill(JHPT[i]);
+	if ( ns1bin==5 ) HED6_->Fill(JHET[i]);
+	if ( ns1bin==5 ) HPD6_->Fill(JHPT[i]);
+	if ( ns1bin==6 ) HED7_->Fill(JHET[i]);
+	if ( ns1bin==6 ) HPD7_->Fill(JHPT[i]);
+	if ( ns1bin==7 ) HED8_->Fill(JHET[i]);
+	if ( ns1bin==7 ) HPD8_->Fill(JHPT[i]);
       }
 
       // ////////////////////////////////////////////////////////////////////////
@@ -3916,13 +3968,13 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 //       bx[10]= (int)((sumet/4000.)*50)+1;
       bx[0]= (int)((c8/1.2)*50)+1;
       bx[1]= (int)((m8/2500.)*50)+1;
-      bx[2]= (int)(c6/1.2)+1;
-      bx[3]= (int)((m6/2500.)*50)+1;
+      bx[2]= (int)((c6/1.2)*50)+1;
+      bx[3]= (int)((GoodHt/4000.)*50)+1;
       bx[4]= (int)((metsig/20.)*50.)+1;
-      bx[5]= (int)((CorrSumEt/4000.)*50)+1;
-      bx[6]= (int)((chi2/50.)*50.)+1;
-      bx[7]= (int)((dp1st/3.2)*50)+1;
-      bx[8]= (int)((m45best/300.)*50)+1;
+      bx[5]= (int)(((thdetabest-5.)/5.)*50)+1;
+      bx[6]= (int)((hbestcomb/400.)*50.)+1;
+      bx[7]= (int)((dp2nd/3.2)*50)+1;
+      bx[8]= (int)((m5/2000.)*50)+1;
       bx[9]= (int)((m_others/1500.)*50.)+1;
       bx[10]= (int)((Et6/150.)*50)+1;
       for ( int ivar=0; ivar<11; ivar++ ) {
@@ -4173,6 +4225,23 @@ void TDAna::endJob() {
   THnotdphi_->Write();
   THnotdeta_->Write();
   THnotproj_->Write();
+
+  HED1_->Write();
+  HPD1_->Write();
+  HED2_->Write();
+  HPD2_->Write();
+  HED3_->Write();
+  HPD3_->Write();
+  HED4_->Write();
+  HPD4_->Write();
+  HED5_->Write();
+  HPD5_->Write();
+  HED6_->Write();
+  HPD6_->Write();
+  HED7_->Write();
+  HPD7_->Write();
+  HED8_->Write();
+  HPD8_->Write();
 
   // Histograms for events passing trigger
   // -------------------------------------
