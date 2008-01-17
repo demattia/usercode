@@ -1327,7 +1327,6 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   }
 
   eventcounter_++;
-  cout << "Event number = " << eventcounter_ << endl;
   if ( eventcounter_/100 == float(eventcounter_)/100. ) {
     std::cout << "Event number " << eventcounter_ << std::endl;
   }
