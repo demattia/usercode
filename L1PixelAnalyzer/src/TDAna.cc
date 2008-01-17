@@ -270,9 +270,13 @@ TDAna::TDAna(const edm::ParameterSet& iConfig) :
   // ----------
   Nsltt_hjj=0.; // Counter of semileptonic tt decays with h->jj decays
 
-  DEtb_prof_ = new TProfile ( "DEtb_prof", "Et mismeasurement vs Et - b-tags", 100, 0., 1000., 
+  DEtb_prof_ = new TProfile ( "DEtb_prof", "Et mismeasurement vs Et - b-tagged jets", 100, 0., 1000., 
 			      -1000., 1000. );
-  DEtq_prof_ = new TProfile ( "DEtq_prof", "Et mismeasurement vs Et - b-tags", 100, 0., 1000., 
+  DEtq_prof_ = new TProfile ( "DEtq_prof", "Et mismeasurement vs Et - non b-tagged jets", 100, 0., 1000., 
+			      -1000., 1000. );
+  DEtcb_prof_ = new TProfile ( "DEtcb_prof", "Et mismeasurement vs Etc - b-tagged jets", 100, 0., 1000., 
+			      -1000., 1000. );
+  DEtcq_prof_ = new TProfile ( "DEtcq_prof", "Et mismeasurement vs Etc - non b-tagged jets", 100, 0., 1000., 
 			      -1000., 1000. );
 
   Drmax_ = new TH2D ( "Drmax", "Drmax for choices of etmin, etamax", 21, 14, 56, 11, 1.5, 3.7  );
@@ -1592,16 +1596,16 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	JPeta[NJP]=cal->eta();
 	JPphi[NJP]=cal->phi();
 	if ( cal->discriminatorHighEff()>loose_ ) JPtag[NJP]=true;
-	NJP++;
 	// Correct jet Et
 	// --------------
 	if ( JPtag[NJP] ) {
-	  JPetc[NJP]=JPet[NJP]-(tpar[0]*pow(JPet[NJP],2)+tpar[1]*JPet[NJP]+tpar[2]);
+	  JPetc[NJP]=JPet[NJP]+(tpar[0]*pow(JPet[NJP],2)+tpar[1]*JPet[NJP]+tpar[2]);
 	  if ( JPetc[NJP]<0. ) JPetc[NJP]= 0.;
 	} else {
-	  JPetc[NJP]=JPet[NJP]-(upar[0]*pow(JPet[NJP],2)+upar[1]*JPet[NJP]+upar[2]);
+	  JPetc[NJP]=JPet[NJP]+(upar[0]*pow(JPet[NJP],2)+upar[1]*JPet[NJP]+upar[2]);
 	  if ( JPetc[NJP]<0. ) JPetc[NJP]= 0.;
 	}
+	NJP++;
       }
     }
     // Order arrays by Et
@@ -1651,9 +1655,11 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	ijass[nass]=true;
 	nass++;
 	if ( JPtag[tmpind] ) {
-	  DEtb_prof_->Fill(JPetc[tmpind],Parton_pt[ip]-JPetc[tmpind]);
+	  DEtb_prof_->Fill(JPet[tmpind],Parton_pt[ip]-JPet[tmpind]);
+	  DEtcb_prof_->Fill(JPetc[tmpind],Parton_pt[ip]-JPetc[tmpind]);
 	} else {
-	  DEtq_prof_->Fill(JPetc[tmpind],Parton_pt[ip]-JPetc[tmpind]);
+	  DEtq_prof_->Fill(JPet[tmpind],Parton_pt[ip]-JPet[tmpind]);
+	  DEtcq_prof_->Fill(JPetc[tmpind],Parton_pt[ip]-JPetc[tmpind]);
 	}
       }
     }
@@ -2214,16 +2220,16 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	  if ( JHET[iJ]>medium_ ) {
 	    JHEM[iJ]=true;
 	  }
-	  iJ++;
 	  // Correct jet Et
 	  // --------------
 	  if ( JHEM[iJ] ) {
-	    JEtc[iJ]=JEt[iJ]-(tpar[0]*pow(JEt[iJ],2)+tpar[1]*JEt[iJ]+tpar[2]);
+	    JEtc[iJ]=JEt[iJ]+(tpar[0]*pow(JEt[iJ],2)+tpar[1]*JEt[iJ]+tpar[2]);
 	    if ( JEtc[iJ]<0. ) JEtc[iJ] = 0.;
 	  } else {
-	    JEtc[iJ]=JEt[iJ]-(upar[0]*pow(JEt[iJ],2)+upar[1]*JEt[iJ]+upar[2]);
+	    JEtc[iJ]=JEt[iJ]+(upar[0]*pow(JEt[iJ],2)+upar[1]*JEt[iJ]+upar[2]);
 	    if ( JEtc[iJ]<0. ) JEtc[iJ] = 0.;
 	  }
+	  iJ++;
 	}
       }
     } // End loop on cal jet collection
@@ -4439,6 +4445,8 @@ void TDAna::endJob() {
 
   DEtb_prof_->Write();
   DEtq_prof_->Write();
+  DEtcb_prof_->Write();
+  DEtcq_prof_->Write();
 
   Drmax_->Write();
   Drmedall_->Write();

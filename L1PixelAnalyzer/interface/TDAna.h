@@ -19,7 +19,7 @@
 //
 // Original Author:  Marco De Mattia
 //         Created:  Tue May  8 13:05:37 CEST 2007
-// $Id: TDAna.h,v 1.22 2008/01/15 15:06:44 dorigo Exp $
+// $Id: TDAna.h,v 1.24 2008/01/17 16:31:32 dorigo Exp $
 //
 //
 
@@ -262,6 +262,8 @@ class TDAna : public edm::EDAnalyzer {
 
   TProfile * DEtb_prof_;
   TProfile * DEtq_prof_;
+  TProfile * DEtcb_prof_;
+  TProfile * DEtcq_prof_;
 
   TH1D * NJets_;
   TH1D * UncorrSumEt_;
