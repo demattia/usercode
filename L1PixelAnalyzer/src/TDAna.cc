@@ -384,9 +384,9 @@ TDAna::TDAna(const edm::ParameterSet& iConfig) :
   Scprod_ = new TH1D ( "Scprod", "Scalar product of top vector and H versor", 50, -1200., 1200. );
   Thdeta_ = new TH1D ( "Thdeta", "Delta eta top-higgs", 50, -5., 5. );
   M5_ = new TH1D ( "M5", "Mass of five jets from t and h", 50, 0., 2000. );
-  TTMS1_ = new TH1D ( "TTMS1", "Total tag mass with S1 tracks", 50, 0., 40. );
-  TTMS2_ = new TH1D ( "TTMS2", "Total tag mass with S2 tracks", 50, 0., 40. );
-  TTMS3_ = new TH1D ( "TTMS3", "Total tag mass with S3 tracks", 50, 0., 40. );
+  TTMS1_ = new TH1D ( "TTMS1", "Total tag mass with S1 tracks", 50, 0., 80. );
+  TTMS2_ = new TH1D ( "TTMS2", "Total tag mass with S2 tracks", 50, 0., 80. );
+  TTMS3_ = new TH1D ( "TTMS3", "Total tag mass with S3 tracks", 50, 0., 80. );
 
   NJetsN_ = new TH1D ( "NJetsN", "Number of selected jets", 50, 0, 50 );
   UncorrHtN_ = new TH1D ( "UncorrHtN", "Ht with uncorrected jets", 50, 0, 4000 );
@@ -438,9 +438,9 @@ TDAna::TDAna(const edm::ParameterSet& iConfig) :
   ScprodN_ = new TH1D ( "ScprodN", "Scalar product of top vector and H versor", 50, -1200., 1200. );
   ThdetaN_ = new TH1D ( "ThdetaN", "Delta eta top-higgs", 50, -5., 5. );
   M5N_ = new TH1D ( "M5N", "Mass of five jets from t and h", 50, 0., 2000. );
-  TTMS1N_ = new TH1D ( "TTMS1N", "Total tag mass with S1 tracks", 50, 0., 40. );
-  TTMS2N_ = new TH1D ( "TTMS2N", "Total tag mass with S2 tracks", 50, 0., 40. );
-  TTMS3N_ = new TH1D ( "TTMS3N", "Total tag mass with S3 tracks", 50, 0., 40. );
+  TTMS1N_ = new TH1D ( "TTMS1N", "Total tag mass with S1 tracks", 50, 0., 80. );
+  TTMS2N_ = new TH1D ( "TTMS2N", "Total tag mass with S2 tracks", 50, 0., 80. );
+  TTMS3N_ = new TH1D ( "TTMS3N", "Total tag mass with S3 tracks", 50, 0., 80. );
 
   NJetsS_ = new TH1D ( "NJetsS", "Number of selected jets", 50, 0, 50 );
   UncorrHtS_ = new TH1D ( "UncorrHtS", "Ht with uncorrected jets", 50, 0, 4000 );
@@ -492,9 +492,9 @@ TDAna::TDAna(const edm::ParameterSet& iConfig) :
   ScprodS_ = new TH1D ( "ScprodS", "Scalar product of top vector and H versor", 50, -1200., 1200. );
   ThdetaS_ = new TH1D ( "ThdetaS", "Delta eta top-higgs", 50, -5., 5. );
   M5S_ = new TH1D ( "M5S", "Mass of five jets from t and h", 50, 0., 2000. );
-  TTMS1S_ = new TH1D ( "TTMS1S", "Total tag mass with S1 tracks", 50, 0., 40. );
-  TTMS2S_ = new TH1D ( "TTMS2S", "Total tag mass with S2 tracks", 50, 0., 40. );
-  TTMS3S_ = new TH1D ( "TTMS3S", "Total tag mass with S3 tracks", 50, 0., 40. );
+  TTMS1S_ = new TH1D ( "TTMS1S", "Total tag mass with S1 tracks", 50, 0., 80. );
+  TTMS2S_ = new TH1D ( "TTMS2S", "Total tag mass with S2 tracks", 50, 0., 80. );
+  TTMS3S_ = new TH1D ( "TTMS3S", "Total tag mass with S3 tracks", 50, 0., 80. );
 
   NJetsSN_ = new TH1D ( "NJetsSN", "Number of selected jets", 50, 0, 50 );
   UncorrHtSN_ = new TH1D ( "UncorrHtSN", "Ht with uncorrected jets", 50, 0, 4000 );
@@ -546,9 +546,9 @@ TDAna::TDAna(const edm::ParameterSet& iConfig) :
   ScprodSN_ = new TH1D ( "ScprodSN", "Scalar product of top vector and H versor", 50, -1200., 1200. );
   ThdetaSN_ = new TH1D ( "ThdetaSN", "Delta eta top-higgs", 50, -5., 5. );
   M5SN_ = new TH1D ( "M5SN", "Mass of five jets from t and h", 50, 0., 2000. );
-  TTMS1SN_ = new TH1D ( "TTMS1SN", "Total tag mass with S1 tracks", 50, 0., 40. );
-  TTMS2SN_ = new TH1D ( "TTMS2SN", "Total tag mass with S2 tracks", 50, 0., 40. );
-  TTMS3SN_ = new TH1D ( "TTMS3SN", "Total tag mass with S3 tracks", 50, 0., 40. );
+  TTMS1SN_ = new TH1D ( "TTMS1SN", "Total tag mass with S1 tracks", 50, 0., 80. );
+  TTMS2SN_ = new TH1D ( "TTMS2SN", "Total tag mass with S2 tracks", 50, 0., 80. );
+  TTMS3SN_ = new TH1D ( "TTMS3SN", "Total tag mass with S3 tracks", 50, 0., 80. );
 
   NJetsSS_ = new TH1D ( "NJetsSS", "Number of selected jets", 50, 0, 50 );
   UncorrHtSS_ = new TH1D ( "UncorrHtSS", "Ht with uncorrected jets", 50, 0, 4000 );
@@ -600,9 +600,9 @@ TDAna::TDAna(const edm::ParameterSet& iConfig) :
   ScprodSS_ = new TH1D ( "ScprodSS", "Scalar product of top vector and H versor", 50, -1200., 1200. );
   ThdetaSS_ = new TH1D ( "ThdetaSS", "Delta eta top-higgs", 50, -5., 5. );
   M5SS_ = new TH1D ( "M5SS", "Mass of five jets from t and h", 50, 0., 2000. );
-  TTMS1SS_ = new TH1D ( "TTMS1SS", "Total tag mass with S1 tracks", 50, 0., 40. );
-  TTMS2SS_ = new TH1D ( "TTMS2SS", "Total tag mass with S2 tracks", 50, 0., 40. );
-  TTMS3SS_ = new TH1D ( "TTMS3SS", "Total tag mass with S3 tracks", 50, 0., 40. );
+  TTMS1SS_ = new TH1D ( "TTMS1SS", "Total tag mass with S1 tracks", 50, 0., 80. );
+  TTMS2SS_ = new TH1D ( "TTMS2SS", "Total tag mass with S2 tracks", 50, 0., 80. );
+  TTMS3SS_ = new TH1D ( "TTMS3SS", "Total tag mass with S3 tracks", 50, 0., 80. );
 
   NJetsSSN_ = new TH1D ( "NJetsSSN", "Number of selected jets", 50, 0, 50 );
   UncorrHtSSN_ = new TH1D ( "UncorrHtSSN", "Ht with uncorrected jets", 50, 0, 4000 );
@@ -654,9 +654,9 @@ TDAna::TDAna(const edm::ParameterSet& iConfig) :
   ScprodSSN_ = new TH1D ( "ScprodSSN", "Scalar product of top vector and H versor", 50, -1200., 1200. );
   ThdetaSSN_ = new TH1D ( "ThdetaSSN", "Delta eta top-higgs", 50, -5., 5. );
   M5SSN_ = new TH1D ( "M5SSN", "Mass of five jets from t and h", 50, 0., 2000. );
-  TTMS1SSN_ = new TH1D ( "TTMS1SSN", "Total tag mass with S1 tracks", 50, 0., 40. );
-  TTMS2SSN_ = new TH1D ( "TTMS2SSN", "Total tag mass with S2 tracks", 50, 0., 40. );
-  TTMS3SSN_ = new TH1D ( "TTMS3SSN", "Total tag mass with S3 tracks", 50, 0., 40. );
+  TTMS1SSN_ = new TH1D ( "TTMS1SSN", "Total tag mass with S1 tracks", 50, 0., 80. );
+  TTMS2SSN_ = new TH1D ( "TTMS2SSN", "Total tag mass with S2 tracks", 50, 0., 80. );
+  TTMS3SSN_ = new TH1D ( "TTMS3SSN", "Total tag mass with S3 tracks", 50, 0., 80. );
 
   NJetsSSS_ = new TH1D ( "NJetsSSS", "Number of selected jets", 50, 0, 50 );
   UncorrHtSSS_ = new TH1D ( "UncorrHtSSS", "Ht with uncorrected jets", 50, 0, 4000 );
@@ -708,9 +708,9 @@ TDAna::TDAna(const edm::ParameterSet& iConfig) :
   ScprodSSS_ = new TH1D ( "ScprodSSS", "Scalar product of top vector and H versor", 50, -1200., 1200. );
   ThdetaSSS_ = new TH1D ( "ThdetaSSS", "Delta eta top-higgs", 50, -5., 5. );
   M5SSS_ = new TH1D ( "M5SSS", "Mass of five jets from t and h", 50, 0., 2000. );
-  TTMS1SSS_ = new TH1D ( "TTMS1SSS", "Total tag mass with S1 tracks", 50, 0., 40. );
-  TTMS2SSS_ = new TH1D ( "TTMS2SSS", "Total tag mass with S2 tracks", 50, 0., 40. );
-  TTMS3SSS_ = new TH1D ( "TTMS3SSS", "Total tag mass with S3 tracks", 50, 0., 40. );
+  TTMS1SSS_ = new TH1D ( "TTMS1SSS", "Total tag mass with S1 tracks", 50, 0., 80. );
+  TTMS2SSS_ = new TH1D ( "TTMS2SSS", "Total tag mass with S2 tracks", 50, 0., 80. );
+  TTMS3SSS_ = new TH1D ( "TTMS3SSS", "Total tag mass with S3 tracks", 50, 0., 80. );
 
   NJetsSSSN_ = new TH1D ( "NJetsSSSN", "Number of selected jets", 50, 0, 50 );
   UncorrHtSSSN_ = new TH1D ( "UncorrHtSSSN", "Ht with uncorrected jets", 50, 0, 4000 );
@@ -762,9 +762,9 @@ TDAna::TDAna(const edm::ParameterSet& iConfig) :
   ScprodSSSN_ = new TH1D ( "ScprodSSSN", "Scalar product of top vector and H versor", 50, -1200., 1200. );
   ThdetaSSSN_ = new TH1D ( "ThdetaSSSN", "Delta eta top-higgs", 50, -5., 5. );
   M5SSSN_ = new TH1D ( "M5SSSN", "Mass of five jets from t and h", 50, 0., 2000. );
-  TTMS1SSSN_ = new TH1D ( "TTMS1SSSN", "Total tag mass with S1 tracks", 50, 0., 40. );
-  TTMS2SSSN_ = new TH1D ( "TTMS2SSSN", "Total tag mass with S2 tracks", 50, 0., 40. );
-  TTMS3SSSN_ = new TH1D ( "TTMS3SSSN", "Total tag mass with S3 tracks", 50, 0., 40. );
+  TTMS1SSSN_ = new TH1D ( "TTMS1SSSN", "Total tag mass with S1 tracks", 50, 0., 80. );
+  TTMS2SSSN_ = new TH1D ( "TTMS2SSSN", "Total tag mass with S2 tracks", 50, 0., 80. );
+  TTMS3SSSN_ = new TH1D ( "TTMS3SSSN", "Total tag mass with S3 tracks", 50, 0., 80. );
 
   N4NJSSS_ = new TH1D ( "N4NJSSS", "N of 4HEL tags vs N jets", 
 			20, 0, 20 );  // These are filled only for this
@@ -821,9 +821,9 @@ TDAna::TDAna(const edm::ParameterSet& iConfig) :
   ScprodW_ = new TH1D ( "ScprodW", "Scalar product of top vector and H versor", 50, -1200., 1200. );
   ThdetaW_ = new TH1D ( "ThdetaW", "Delta eta top-higgs", 50, -5., 5. );
   M5W_ = new TH1D ( "M5W", "Mass of five jets from t and h", 50, 0., 2000. );
-  TTMS1W_ = new TH1D ( "TTMS1W", "Total tag mass with S1 tracks", 50, 0., 40. );
-  TTMS2W_ = new TH1D ( "TTMS2W", "Total tag mass with S2 tracks", 50, 0., 40. );
-  TTMS3W_ = new TH1D ( "TTMS3W", "Total tag mass with S3 tracks", 50, 0., 40. );
+  TTMS1W_ = new TH1D ( "TTMS1W", "Total tag mass with S1 tracks", 50, 0., 80. );
+  TTMS2W_ = new TH1D ( "TTMS2W", "Total tag mass with S2 tracks", 50, 0., 80. );
+  TTMS3W_ = new TH1D ( "TTMS3W", "Total tag mass with S3 tracks", 50, 0., 80. );
 
   NJetsSW_ = new TH1D ( "NJetsSW", "Number of selected jets", 50, 0, 50 );
   UncorrHtSW_ = new TH1D ( "UncorrHtSW", "Ht with uncorrected jets", 50, 0, 4000 );
@@ -875,9 +875,9 @@ TDAna::TDAna(const edm::ParameterSet& iConfig) :
   ScprodSW_ = new TH1D ( "ScprodSW", "Scalar product of top vector and H versor", 50, -1200., 1200. );
   ThdetaSW_ = new TH1D ( "ThdetaSW", "Delta eta top-higgs", 50, -5., 5. );
   M5SW_ = new TH1D ( "M5SW", "Mass of five jets from t and h", 50, 0., 2000. );
-  TTMS1SW_ = new TH1D ( "TTMS1SW", "Total tag mass with S1 tracks", 50, 0., 40. );
-  TTMS2SW_ = new TH1D ( "TTMS2SW", "Total tag mass with S2 tracks", 50, 0., 40. );
-  TTMS3SW_ = new TH1D ( "TTMS3SW", "Total tag mass with S3 tracks", 50, 0., 40. );
+  TTMS1SW_ = new TH1D ( "TTMS1SW", "Total tag mass with S1 tracks", 50, 0., 80. );
+  TTMS2SW_ = new TH1D ( "TTMS2SW", "Total tag mass with S2 tracks", 50, 0., 80. );
+  TTMS3SW_ = new TH1D ( "TTMS3SW", "Total tag mass with S3 tracks", 50, 0., 80. );
 
   NJetsSSW_ = new TH1D ( "NJetsSSW", "Number of selected jets", 50, 0, 50 );
   UncorrHtSSW_ = new TH1D ( "UncorrHtSSW", "Ht with uncorrected jets", 50, 0, 4000 );
@@ -929,9 +929,9 @@ TDAna::TDAna(const edm::ParameterSet& iConfig) :
   ScprodSSW_ = new TH1D ( "ScprodSSW", "Scalar product of top vector and H versor", 50, -1200., 1200. );
   ThdetaSSW_ = new TH1D ( "ThdetaSSW", "Delta eta top-higgs", 50, -5., 5. );
   M5SSW_ = new TH1D ( "M5SSW", "Mass of five jets from t and h", 50, 0., 2000. );
-  TTMS1SSW_ = new TH1D ( "TTMS1SSW", "Total tag mass with S1 tracks", 50, 0., 40. );
-  TTMS2SSW_ = new TH1D ( "TTMS2SSW", "Total tag mass with S2 tracks", 50, 0., 40. );
-  TTMS3SSW_ = new TH1D ( "TTMS3SSW", "Total tag mass with S3 tracks", 50, 0., 40. );
+  TTMS1SSW_ = new TH1D ( "TTMS1SSW", "Total tag mass with S1 tracks", 50, 0., 80. );
+  TTMS2SSW_ = new TH1D ( "TTMS2SSW", "Total tag mass with S2 tracks", 50, 0., 80. );
+  TTMS3SSW_ = new TH1D ( "TTMS3SSW", "Total tag mass with S3 tracks", 50, 0., 80. );
 
   NJetsSSSW_ = new TH1D ( "NJetsSSSW", "Number of selected jets", 50, 0, 50 );
   UncorrHtSSSW_ = new TH1D ( "UncorrHtSSSW", "Ht with uncorrected jets", 50, 0, 4000 );
@@ -983,9 +983,9 @@ TDAna::TDAna(const edm::ParameterSet& iConfig) :
   ScprodSSSW_ = new TH1D ( "ScprodSSSW", "Scalar product of top vector and H versor", 50, -1200., 1200. );
   ThdetaSSSW_ = new TH1D ( "ThdetaSSSW", "Delta eta top-higgs", 50, -5., 5. );
   M5SSSW_ = new TH1D ( "M5SSSW", "Mass of five jets from t and h", 50, 0., 2000. );
-  TTMS1SSSW_ = new TH1D ( "TTMS1SSSW", "Total tag mass with S1 tracks", 50, 0., 40. );
-  TTMS2SSSW_ = new TH1D ( "TTMS2SSSW", "Total tag mass with S2 tracks", 50, 0., 40. );
-  TTMS3SSSW_ = new TH1D ( "TTMS3SSSW", "Total tag mass with S3 tracks", 50, 0., 40. );
+  TTMS1SSSW_ = new TH1D ( "TTMS1SSSW", "Total tag mass with S1 tracks", 50, 0., 80. );
+  TTMS2SSSW_ = new TH1D ( "TTMS2SSSW", "Total tag mass with S2 tracks", 50, 0., 80. );
+  TTMS3SSSW_ = new TH1D ( "TTMS3SSSW", "Total tag mass with S3 tracks", 50, 0., 80. );
 
   N4NJSSSW_ = new TH1D ( "N4NJSSSW", "N of 4HEL tags vs N jets", 20, 0, 20 );
   E4NJSSSW_ = new TH1D ( "E4NJSSSW", "Efficiency of 4HEL tags vs N jets", 20, 0, 20 );
