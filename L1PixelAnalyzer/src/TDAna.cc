@@ -1327,6 +1327,7 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   }
 
   eventcounter_++;
+  cout << "Event number = " << eventcounter_ << endl;
   if ( eventcounter_/100 == float(eventcounter_)/100. ) {
     std::cout << "Event number " << eventcounter_ << std::endl;
   }
@@ -2218,11 +2219,11 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	  // Correct jet Et
 	  // --------------
 	  if ( JHEM[iJ] ) {
-	    JEtc[iJ]=JEt[iJ]-(tpar[2]*pow(JEt[iJ],2)+tpar[1]*JEt[iJ]+tpar[0]);
-	    if ( JEtc[iJ]<10. ) JEtc[iJ]=10.;
+	    JEtc[iJ]=JEt[iJ]-(tpar[0]*pow(JEt[iJ],2)+tpar[1]*JEt[iJ]+tpar[2]);
+	    if ( JEtc[iJ]<0. ) JEtc[iJ] = 0.;
 	  } else {
-	    JEtc[iJ]=JEt[iJ]-(upar[2]*pow(JEt[iJ],2)+upar[1]*JEt[iJ]+upar[0]);
-	    if ( JEtc[iJ]<10. ) JEtc[iJ]= 10.;
+	    JEtc[iJ]=JEt[iJ]-(upar[0]*pow(JEt[iJ],2)+upar[1]*JEt[iJ]+upar[2]);
+	    if ( JEtc[iJ]<0. ) JEtc[iJ] = 0.;
 	  }
 	}
       }
@@ -2399,6 +2400,7 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	sumhpd4=0.;
 	sumhed6=0.;
 	sumhpd6=0.;
+	ttms1=0.;
 
 	// Compute sum of discriminants
 	// ----------------------------
@@ -3558,6 +3560,8 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
       sumhpd4=0.;
       sumhed6=0.;
       sumhpd6=0.;
+      ttms1=0.;
+
       // Compute sum of discriminants
       // ----------------------------
       for ( int i=0; i<iJmax; i++ ) {
