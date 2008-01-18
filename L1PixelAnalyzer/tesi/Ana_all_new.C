@@ -8,30 +8,30 @@ void Ana_all_new (TString var, TString sel )
   TString pippo = var+sel;
 
   TFile * QCD[16];     
-  QCD[0] = new TFile("./root/TDAna_QCD30-50.root");
-  QCD[1] = new TFile("./root/TDAna_QCD50-80.root");
-  QCD[2] = new TFile("./root/TDAna_QCD80-120.root");
-  QCD[3] = new TFile("./root/TDAna_QCD120-170.root");
-  QCD[4] = new TFile("./root/TDAna_QCD170-230.root");
-  QCD[5] = new TFile("./root/TDAna_QCD230-300.root");
-  QCD[6] = new TFile("./root/TDAna_QCD300-380.root");
-  QCD[7] = new TFile("./root/TDAna_QCD380incl.root");
-  QCD[8] = new TFile("./root/TDAna_EXTRA_QCD30-50.root");
-  QCD[9] = new TFile("./root/TDAna_EXTRA_QCD50-80.root");
-  QCD[10] = new TFile("./root/TDAna_EXTRA_QCD80-120.root");
-  QCD[11] = new TFile("./root/TDAna_EXTRA_QCD120-170.root");
-  QCD[12] = new TFile("./root/TDAna_EXTRA_QCD170-230.root");
-  QCD[13] = new TFile("./root/TDAna_EXTRA_QCD230-300.root");
-  QCD[14] = new TFile("./root/TDAna_EXTRA_QCD300-380.root");
-  QCD[15] = new TFile("./root/TDAna_EXTRA_QCD380incl.root");
+  QCD[0] = new TFile("./root/TDAna_QCD_30-50.root");
+  QCD[1] = new TFile("./root/TDAna_QCD_50-80.root");
+  QCD[2] = new TFile("./root/TDAna_QCD_80-120.root");
+  QCD[3] = new TFile("./root/TDAna_QCD_120-170.root");
+  QCD[4] = new TFile("./root/TDAna_QCD_170-230.root");
+  QCD[5] = new TFile("./root/TDAna_QCD_230-300.root");
+  QCD[6] = new TFile("./root/TDAna_QCD_300-380.root");
+  QCD[7] = new TFile("./root/TDAna_QCD_380-incl.root");
+  QCD[8] = new TFile("./root/TDAna_EXTRA_QCD_30-50.root");
+  QCD[9] = new TFile("./root/TDAna_EXTRA_QCD_50-80.root");
+  QCD[10] = new TFile("./root/TDAna_EXTRA_QCD_80-120.root");
+  QCD[11] = new TFile("./root/TDAna_EXTRA_QCD_120-170.root");
+  QCD[12] = new TFile("./root/TDAna_EXTRA_QCD_170-230.root");
+  QCD[13] = new TFile("./root/TDAna_EXTRA_QCD_230-300.root");
+  //QCD[14] = new TFile("./root/TDAna_EXTRA_QCD_300-380.root");
+  QCD[15] = new TFile("./root/TDAna_EXTRA_QCD_380-incl.root");
   double QCDxs[16] = { 155929000., 20938850., 2949713., 499656., 
 		       100995.,  23855., 6391., 2821., 155929000., 
 		       20938850., 2949713., 499656., 100995.,  
 		       23855., 6391., 2821. };
-  double NQCD[16] = { 86000., 78000., 104000., 96000., 100000., 
-		      102000., 112000., 102000., 130000., 133096.,
-		      281096., 164000., 436000., 346000., 
-		      418000., 406000. };
+  double NQCD[16] = { 170000., 82000., 104000., 96000., 100000., 
+		      102000., 112000., 102000., 130000., 282000.,
+		      282000., 312000., 436000., 346000., 
+		      418000., 406000. }; // last 4 to be checked
   // Sum QCD numbers so that we do not need to change the code below:
   // by adding numbers for each xs we can just sum all samples as always
   // -------------------------------------------------------------------
@@ -43,19 +43,19 @@ void Ana_all_new (TString var, TString sel )
     }
   }
 
-  TFile * QCDMULT[16];     
-  QCDMULT[0] = new TFile("./root/TDAna_MULTI_EXTRA_QCD30-50.root");
-  QCDMULT[1] = new TFile("./root/TDAna_MULTI_EXTRA_QCD50-80.root");
-  QCDMULT[2] = new TFile("./root/TDAna_MULTI_EXTRA_QCD80-120.root");
-  QCDMULT[3] = new TFile("./root/TDAna_MULTI_EXTRA_QCD120-170.root");
-  QCDMULT[4] = new TFile("./root/TDAna_MULTI_EXTRA_QCD170-230.root");
-  QCDMULT[5] = new TFile("./root/TDAna_MULTI_EXTRA_QCD230-300.root");
-  QCDMULT[6] = new TFile("./root/TDAna_MULTI_EXTRA_QCD300-380.root");
-  QCDMULT[7] = new TFile("./root/TDAna_MULTI_EXTRA_QCD380incl.root");
+  TFile * QCDMULT[8];     
+  QCDMULT[0] = new TFile("./root/TDAna_MULTI_EXTRA_QCD_30-50.root");
+  QCDMULT[1] = new TFile("./root/TDAna_MULTI_EXTRA_QCD_50-80.root");
+  QCDMULT[2] = new TFile("./root/TDAna_MULTI_EXTRA_QCD_80-120.root");
+  QCDMULT[3] = new TFile("./root/TDAna_MULTI_EXTRA_QCD_120-170.root");
+  QCDMULT[4] = new TFile("./root/TDAna_MULTI_EXTRA_QCD_170-230.root");
+  //QCDMULT[5] = new TFile("./root/TDAna_MULTI_EXTRA_QCD_230-300.root");
+  //QCDMULT[6] = new TFile("./root/TDAna_MULTI_EXTRA_QCD_300-380.root");
+  //QCDMULT[7] = new TFile("./root/TDAna_MULTI_EXTRA_QCD_380-incl.root");
   double QCDMxs[8] =  { 155929000., 20938850., 2949713., 499656., 
-			100995.,  23855., 6391., 2821. }
+			100995.,  23855., 6391., 2821. };
   double NQCDM[8] = { 11229443., 26347818., 24971508.,  29514603., 
-		      40608575., 32268604., 37943909., 33232000. }
+		      40608575., 32268604., 37943909., 33232000. };
 
   TFile * W[11];
   W[0] = new TFile ("./root/TDAna_W_0JETS.root");
@@ -63,7 +63,7 @@ void Ana_all_new (TString var, TString sel )
   W[2] = new TFile ("./root/TDAna_W_1JETS_100ptw300.root");
   W[3] = new TFile ("./root/TDAna_W_2JETS_0ptw100.root");
   W[4] = new TFile ("./root/TDAna_W_2JETS_100ptw300.root");
-  W[5] = new TFile ("./root/TDAna_W_3JETS_0ptw100.root");
+  // W[5] = new TFile ("./root/TDAna_W_3JETS_0ptw100.root"); 
   W[6] = new TFile ("./root/TDAna_W_3JETS_100ptw300.root");
   W[7] = new TFile ("./root/TDAna_W_4JETS_0ptw100.root");
   W[8] = new TFile ("./root/TDAna_W_4JETS_100ptw300.root");
@@ -71,12 +71,12 @@ void Ana_all_new (TString var, TString sel )
   W[10] = new TFile ("./root/TDAna_W_5JETS_100ptw300.root");
   double Wxs[11] = { 45000., 9200., 250., 2500., 225., 590., 
 		     100., 125., 40., 85., 40. };
-  double NW[11] = { 86000., 40000., 100530., 99523., 105255., 79000., 
+  double NW[11] = { 88000., 40000., 100530., 99523., 105255., 79000., 
 		    88258., 83038., 30796., 59022., 41865. };
 
   TFile * TTH = new TFile("./root/TDAna_TTH_120.root");
   double TTHxs = 0.667 ;
-  double NTTH = 1000000.; // 1652000.; // 96000.;
+  double NTTH = 1634000.; // 1652000.; // 96000.;
 
   TFile * TT[5];
   TT[0] = new TFile("./root/TDAna_TT_0JETS.root");
@@ -86,25 +86,25 @@ void Ana_all_new (TString var, TString sel )
   TT[4] = new TFile("./root/TDAna_TT_4JETS.root");
   // double TTxs[5] = { 619., 176., 34.,  6., 1.5 };  // from web
   double TTxs[5] = { 434., 162., 43., 10., 1.9 };     // from note
-  double NTT[5] = { 57900., 66000., 98159., 14768., 5304. };
+  double NTT[5] = { 57900., 66000., 98159., 14768., 5352. };
 
   TFile * TTPYT;
   TTPYT = new TFile("./root/TDAna_TTBAR.root");
   double TTPYTxs = 650.9;
-  double NTTPYT = ;
+  double NTTPYT = 972000.;
 
-  TFile * ST[3];
-  ST[0] = new TFile("./root/TDAna_SINGLETOP_TQ_TQB_LHC_E.root");
-  ST[1] = new TFile("./root/TDAna_SINGLETOP_TQ_TQB_LHC_MU.root");
-  ST[2] = new TFile("./root/TDAna_SINGLETOP_TQ_TQB_LHC_TAU.root");
-  double STxs[3] = { , , };
-  double NST[3] = { , , };
+//   TFile * ST[3];
+//   ST[0] = new TFile("./root/TDAna_SINGLETOP_TQ_TQB_LHC_E.root");
+//   ST[1] = new TFile("./root/TDAna_SINGLETOP_TQ_TQB_LHC_MU.root");
+//   ST[2] = new TFile("./root/TDAna_SINGLETOP_TQ_TQB_LHC_TAU.root");
+//   double STxs[3] = { 27.43, 26.97, 28.71 };
+//   double NST[3] = { , , };
 
   TFile * ZNN[2];
   ZNN[0] = new TFile("./root/TDAna_ZNUNUJETS_120-170.root");
   ZNN[1] = new TFile("./root/TDAna_ZNUNUJETS_170-230.root");
   double ZNNxs[2] = { 51.47, 15.52 };
-  double NZNN[2] = { , };
+  double NZNN[2] = { 29897., 25600. };
 
   ///////////////////////////////////////////////////////////////////
 
@@ -135,6 +135,7 @@ void Ana_all_new (TString var, TString sel )
   double s2_totQCD[nbins]={0.};
   double totNQCD[16][nbins]={0.};
   for ( int i=0; i<16; i++ ) {
+    if ( i==14 ) i++;
     cout << "Processing QCD file #" << i << " ..." << endl;
     TH1D * Histo = dynamic_cast<TH1D*>(QCD[i]->Get(pippo));
     TH1D * HistoW = dynamic_cast<TH1D*>(QCD[i]->Get(pippo+"W"));
@@ -167,7 +168,7 @@ void Ana_all_new (TString var, TString sel )
   // ---------------
   double totQCDM[nbins]={0.};
   double s2_totQCDM[nbins]={0.};
-  for ( int i=0; i<8; i++ ) {
+  for ( int i=0; i<5; i++ ) {   ///////////////// NNBB needs to be 8
     cout << "Processing QCD MULT file #" << i << " ..." << endl;
     TH1D * Histo = dynamic_cast<TH1D*>(QCDMULT[i]->Get(pippo));
     for ( int ibin=1; ibin<=nbins; ibin++ ) {
@@ -193,7 +194,7 @@ void Ana_all_new (TString var, TString sel )
   // ----------
   double totTT[nbins]={0.};
   double s2_totTT[nbins]={0.};
-  for ( int i=0; i<5; i++ ) {
+  for ( int i=1; i<5; i++ ) { //////////////////////// NNBB
     cout << "Processing TT file #" << i << " ..." << endl;
     TH1D * Histo = dynamic_cast<TH1D*>(TT[i]->Get(pippo));
     for ( int ibin=1; ibin<=nbins; ibin++ ) {
@@ -222,6 +223,7 @@ void Ana_all_new (TString var, TString sel )
   double s2_totW[nbins]={0.};
   double totNW[11][nbins]={0.};
   for ( int i=0; i<11; i++ ) {
+    if ( i==5 ) i++; //////////////// NNBB
     cout << "Processing W file #" << i << " ..." << endl;
     TH1D * Histo = dynamic_cast<TH1D*>(W[i]->Get(pippo));
     TH1D * HistoW = dynamic_cast<TH1D*>(W[i]->Get(pippo+"W"));
@@ -250,19 +252,19 @@ void Ana_all_new (TString var, TString sel )
     }
   }
 
-  // ST :
-  // ----
-  double totST[nbins]={0.};
-  double s2_totST[nbins]={0.};
-  for ( int i=0; i<3; i++ ) {
-    cout << "Processing ST file #" << i << " ..." << endl;
-    TH1D * Histo = dynamic_cast<TH1D*>(ST[i]->Get(pippo));
-    for ( int ibin=1; ibin<=nbins; ibin++ ) {
-      double t=Histo->GetBinContent(ibin);
-      totST[ibin-1]+=t*STxs[i]/NST[i]*Lumfactor;
-      s2_totST[ibin-1]+=t*pow(STxs[i]/NST[i]*Lumfactor,2);
-    }
-  }
+//   // ST :
+//   // ----
+   double totST[nbins]={0.};
+   double s2_totST[nbins]={0.};
+//   for ( int i=0; i<3; i++ ) {
+//     cout << "Processing ST file #" << i << " ..." << endl;
+//     TH1D * Histo = dynamic_cast<TH1D*>(ST[i]->Get(pippo));
+//     for ( int ibin=1; ibin<=nbins; ibin++ ) {
+//       double t=Histo->GetBinContent(ibin);
+//       totST[ibin-1]+=t*STxs[i]/NST[i]*Lumfactor;
+//       s2_totST[ibin-1]+=t*pow(STxs[i]/NST[i]*Lumfactor,2);
+//     }
+//   }
 
   // ZNN :
   // -----
@@ -287,7 +289,7 @@ void Ana_all_new (TString var, TString sel )
     Histo_TT->SetBinContent(ibin,totTT[ibin-1]);
     Histo_TTPYT->SetBinContent(ibin,totTTPYT[ibin-1]); // not in total
     Histo_W->SetBinContent(ibin,totW[ibin-1]);
-    Histo_ST->SetBinContent(ibin,totST[ibin-1]);
+    //Histo_ST->SetBinContent(ibin,totST[ibin-1]);
     Histo_ZNN->SetBinContent(ibin,totZNN[ibin-1]);
     Histo_QCD->SetBinError(ibin,sqrt(s2_totQCD[ibin-1]));
     Histo_QCDM->SetBinError(ibin,sqrt(s2_totQCDM[ibin-1])); // not in total
@@ -295,7 +297,7 @@ void Ana_all_new (TString var, TString sel )
     Histo_TT->SetBinError(ibin,sqrt(s2_totTT[ibin-1]));
     Histo_TTPYT->SetBinError(ibin,sqrt(s2_totTTPYT[ibin-1])); // not in total
     Histo_W->SetBinError(ibin,sqrt(s2_totW[ibin-1]));
-    Histo_ST->SetBinError(ibin,sqrt(s2_totST[ibin-1]));
+    //Histo_ST->SetBinError(ibin,sqrt(s2_totST[ibin-1]));
     Histo_ZNN->SetBinError(ibin,sqrt(s2_totZNN[ibin-1]));
     double grandtot = (totQCD[ibin-1]+totTTH[ibin-1]+totTT[ibin-1]+
 		       totW[ibin-1]+totST[ibin-1]+totZNN[ibin-1]);
@@ -304,6 +306,10 @@ void Ana_all_new (TString var, TString sel )
     Histo_TOT->SetBinContent(ibin,grandtot);
     Histo_TOT->SetBinError(ibin,grandtote);
   }
+
+  double B_int = Histo_TOT->Integral();
+  double S_int = Histo_TTH->Integral();
+  cout << B_int << " " << S_int << " " << S_int/sqrt(B_int) << endl;
   
   TCanvas * QCDcomp = new TCanvas ( "QCDcomp", "Comparison QCD / QCD mult", 600, 600 );
   QCDcomp->Divide(1,2);

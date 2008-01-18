@@ -1,0 +1,29 @@
+Fit_DEt(double xmax){
+
+  //  TFile * G = new TFile ("./root/TDAna_ttH_200k.root");
+  TFile * G = new TFile ("./TDAna_ttH_10k_corr.root");
+  G->cd();
+
+  gStyle->SetOptFit(111111);
+  TCanvas * h = new TCanvas ("h", "Energy correction functions", 600, 500 );
+  h->Divide(2,2);
+  TF1 * P2 = new TF1 ("P2", "[0]*x*x+[1]*x+[2]",0,1000);
+  P2->SetParameters(1,1,0);
+  P2->SetLineColor(kRed);
+  P2->SetLineWidth(1);
+  h->cd(1);
+  DEtb_prof->Draw("PE");
+  h->cd(2);
+  DEtcb_prof->SetMarkerStyle(20);
+  DEtcb_prof->SetMarkerSize(0.5);
+  DEtcb_prof->Fit("P2","","",0,xmax);
+  h->cd(3);
+  DEtb_prof->Draw("PE");
+  h->cd(4);
+  DEtcq_prof->SetMarkerStyle(24);
+  DEtcq_prof->SetMarkerSize(0.5);
+  DEtcq_prof->Fit("P2","","",0,xmax);
+  //h->Print("./ps/Fit_DEt.ps");
+  h->Print("./ps/Fit_DEt_check.ps");
+
+}
