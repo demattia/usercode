@@ -175,22 +175,22 @@ TDAna::TDAna(const edm::ParameterSet& iConfig) :
   // -------------------------------------------------
   TFile * HEDFile = new TFile ("HEDn.root");
   HEDFile->cd();
-  HEDpdf[0] = dynamic_cast<TH1D*> ( HEDFile->Get("HED1"));
-  HPDpdf[0] = dynamic_cast<TH1D*> ( HEDFile->Get("HPD1"));
-  HEDpdf[1] = dynamic_cast<TH1D*> ( HEDFile->Get("HED2"));
-  HPDpdf[1] = dynamic_cast<TH1D*> ( HEDFile->Get("HPD2"));
-  HEDpdf[2] = dynamic_cast<TH1D*> ( HEDFile->Get("HED3"));
-  HPDpdf[2] = dynamic_cast<TH1D*> ( HEDFile->Get("HPD3"));
-  HEDpdf[3] = dynamic_cast<TH1D*> ( HEDFile->Get("HED4"));
-  HPDpdf[3] = dynamic_cast<TH1D*> ( HEDFile->Get("HPD4"));
-  HEDpdf[4] = dynamic_cast<TH1D*> ( HEDFile->Get("HED5"));
-  HPDpdf[4] = dynamic_cast<TH1D*> ( HEDFile->Get("HPD5"));
-  HEDpdf[5] = dynamic_cast<TH1D*> ( HEDFile->Get("HED6"));
-  HPDpdf[5] = dynamic_cast<TH1D*> ( HEDFile->Get("HPD6"));
-  HEDpdf[6] = dynamic_cast<TH1D*> ( HEDFile->Get("HED7"));
-  HPDpdf[6] = dynamic_cast<TH1D*> ( HEDFile->Get("HPD7"));
-  HEDpdf[7] = dynamic_cast<TH1D*> ( HEDFile->Get("HED8"));
-  HPDpdf[7] = dynamic_cast<TH1D*> ( HEDFile->Get("HPD8"));
+  HEDpdf[0] = dynamic_cast<TH1D*> ( HEDFile->Get("HED_0"));
+  HPDpdf[0] = dynamic_cast<TH1D*> ( HEDFile->Get("HPD_0"));
+  HEDpdf[1] = dynamic_cast<TH1D*> ( HEDFile->Get("HED_1"));
+  HPDpdf[1] = dynamic_cast<TH1D*> ( HEDFile->Get("HPD_1"));
+  HEDpdf[2] = dynamic_cast<TH1D*> ( HEDFile->Get("HED_2"));
+  HPDpdf[2] = dynamic_cast<TH1D*> ( HEDFile->Get("HPD_2"));
+  HEDpdf[3] = dynamic_cast<TH1D*> ( HEDFile->Get("HED_3"));
+  HPDpdf[3] = dynamic_cast<TH1D*> ( HEDFile->Get("HPD_3"));
+  HEDpdf[4] = dynamic_cast<TH1D*> ( HEDFile->Get("HED_4"));
+  HPDpdf[4] = dynamic_cast<TH1D*> ( HEDFile->Get("HPD_4"));
+  HEDpdf[5] = dynamic_cast<TH1D*> ( HEDFile->Get("HED_5"));
+  HPDpdf[5] = dynamic_cast<TH1D*> ( HEDFile->Get("HPD_5"));
+  HEDpdf[6] = dynamic_cast<TH1D*> ( HEDFile->Get("HED_6"));
+  HPDpdf[6] = dynamic_cast<TH1D*> ( HEDFile->Get("HPD_6"));
+  HEDpdf[7] = dynamic_cast<TH1D*> ( HEDFile->Get("HED_7"));
+  HPDpdf[7] = dynamic_cast<TH1D*> ( HEDFile->Get("HPD_7"));
  // HEDFile->Close();
 
   // File with Total tag mass distributions (S1) from QCD jets
@@ -261,7 +261,6 @@ TDAna::TDAna(const edm::ParameterSet& iConfig) :
   // --------------------------
   OutputFile = new TFile((conf_.getUntrackedParameter<std::string>("OutputName")).c_str() ,
 			 "RECREATE","L1TrigPixelAnaOutput");
-
   // The file must be opened first, so that becomes the default position for all the histograms
   // ------------------------------------------------------------------------------------------
   OutputFile->cd(); 
@@ -270,6 +269,8 @@ TDAna::TDAna(const edm::ParameterSet& iConfig) :
   // ----------
   Nsltt_hjj=0.; // Counter of semileptonic tt decays with h->jj decays
 
+  // Histograms of delta Et vs Et for jet energy corrections
+  // -------------------------------------------------------
   DEtb_prof_ = new TProfile ( "DEtb_prof", "Et mismeasurement vs Et - b-tagged jets", 100, 0., 1000., 
 			      -1000., 1000. );
   DEtq_prof_ = new TProfile ( "DEtq_prof", "Et mismeasurement vs Et - non b-tagged jets", 100, 0., 1000., 
@@ -279,6 +280,8 @@ TDAna::TDAna(const edm::ParameterSet& iConfig) :
   DEtcq_prof_ = new TProfile ( "DEtcq_prof", "Et mismeasurement vs Etc - non b-tagged jets", 100, 0., 1000., 
 			      -1000., 1000. );
 
+  // Histograms for jet-parton matching
+  // ----------------------------------
   Drmax_ = new TH2D ( "Drmax", "Drmax for choices of etmin, etamax", 21, 14, 56, 11, 1.5, 3.7  );
   Drmedall_ = new TH2D ( "Drmedall", "Drmedall for choices of etmin, etamax", 21, 14, 56, 11, 1.5, 3.7  );
   Drmed07_ = new TH2D ( "Drmed07", "Drmed07 for choices of etmin, etamax", 21, 14, 56, 11, 1.5, 3.7  );
@@ -296,6 +299,8 @@ TDAna::TDAna(const edm::ParameterSet& iConfig) :
   Hrecfrac_ = new TH2D ( "Hrecfrac", "Hrecfrac for choices of etmin, etamax", 21, 14, 56, 11, 1.5, 3.7 );
   Trecfrac_ = new TH2D ( "Trecfrac", "Trecfrac for choices of etmin, etamax", 21, 14, 56, 11, 1.5, 3.7 );
 
+  // Histograms for MC kinematics reconstruction
+  // -------------------------------------------
   MHbest_ = new TH1D ( "MHbest", "Best H mass from jets ass to H partons", 50, 0, 500 );
   MTbest_ = new TH1D ( "MTbest", "Best T mass from jets ass to T partons", 50, 0, 800 );
   MWbest_ = new TH1D ( "MWbest", "Best W mass from jets ass to W partons", 50, 0, 200 );
@@ -319,6 +324,9 @@ TDAna::TDAna(const edm::ParameterSet& iConfig) :
   THnotdphi_ = new TH1D ( "THnotdphi", "Phi difference of NOT T and H", 50, 0., 3.15 );
   THnotproj_ = new TH1D ( "THnotproj", "Momentum of NOT T projected on H direction", 50, -1000., 1000. );
 
+  // Histograms used to obtain shapes of SumHED and SumHPD
+  // for tag matrix, by summing QCD shapes (see HEDn.C)
+  // -----------------------------------------------------
   HED1_ = new TH1D ( "HED1", "HED 1", 200, 0., 40. );
   HPD1_ = new TH1D ( "HPD1", "HPD 1", 200, 0., 40. );
   HED2_ = new TH1D ( "HED2", "HED 2", 200, 0., 40. );
@@ -770,6 +778,8 @@ TDAna::TDAna(const edm::ParameterSet& iConfig) :
   TTMS2SSSN_ = new TH1D ( "TTMS2SSSN", "Total tag mass with S2 tracks", 50, 0., 80. );
   TTMS3SSSN_ = new TH1D ( "TTMS3SSSN", "Total tag mass with S3 tracks", 50, 0., 80. );
 
+  // Histograms to check where are the tags in the Et-ordered jet list
+  // -----------------------------------------------------------------
   N4NJSSS_ = new TH1D ( "N4NJSSS", "N of 4HEL tags vs N jets", 
 			20, 0, 20 );  // These are filled only for this
   E4NJSSS_ = new TH1D ( "E4NJSSS", "Efficiency of 4HEL tags vs N jets", 
@@ -1004,6 +1014,8 @@ TDAna::TDAna(const edm::ParameterSet& iConfig) :
   CorrMEt_SumEtJ_ = new TH2D ( "CorrMEt_SumEtJ", "MEt vs SumEt", 100, 0, 4000, 100, 0, 1000 );
   MEt_SumEtJ_ = new TH2D ( "MEt_SumEtJ", "MEt vs SumEt", 100, 0, 4000, 100, 0, 1000 );
   
+  // Definitions for b-tagging
+  // -------------------------
   loose_  = 2.3; 
   // high eff -> 70.49% b / 32.33% c / 8.64% uds / 10.43% g / 9.98% udsg // P.Schilling 23/10/07
   medium_ = 5.3; 
@@ -1015,6 +1027,8 @@ TDAna::TDAna(const edm::ParameterSet& iConfig) :
   // -------------------       
   rel_lik = 0.;
 
+  // Likelihood histograms
+  // ---------------------
   L_    = new TH1D ("L", "Likelihood 2t passing sel", 50, -10., 10.  );
   LS_   = new TH1D ("LS", "Likelihood 2t passing sel", 50, -10., 10.  );
   LSS_  = new TH1D ("LSS", "Likelihood 2t passing sel", 50, -10., 10.  );
@@ -1248,9 +1262,10 @@ TDAna::TDAna(const edm::ParameterSet& iConfig) :
     stringstream pippo58(line); 
     pippo58 >> PHPTTS[j];
   }
-
   PTagFile.close();
 
+  // End of initializations
+  // ----------------------
   cout << "Done with constructor" << endl;
 
 }
@@ -2079,9 +2094,9 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   edm::Handle<OfflineMEt> caloMET;
   iEvent.getByLabel( offlineMEtLabel_, caloMET );
 
-  double etbins[9]={25.,50.,70.,90.,110.,150.,200.,300.,10000.};
-  double etabins[5]={0.,1.,1.5,2.0,3.0};
-  double ns1bins[9]={2.,3.,4.,5.,6.,7.,8.,9.,100.};
+  double etbounds[9]={25.,50.,70.,90.,110.,150.,200.,300.,10000.};
+  double etabounds[5]={0.,1.,1.5,2.0,3.0};
+  double ns1bounds[9]={2.,3.,4.,5.,6.,7.,8.,9.,100.};
 
   double sumet = caloMET->sumEt();
   double met = caloMET->et();
@@ -2293,7 +2308,6 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
       // Assign tag probability to each jet
       // by finding which bin it belongs to
       // ----------------------------------
-
       int etbin[8]={-1};
       int etabin[8]={-1};
       int ns1bin[8]={-1};
@@ -2301,17 +2315,17 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	// Find out which bin this jet belongs to
 	// --------------------------------------
 	for ( int iet=0; iet<8; iet++ ) {
-	  if ( JEt[i]>etbins[iet] && JEt[i]<=etbins[iet+1] ) {
+	  if ( JEt[i]>etbounds[iet] && JEt[i]<=etbounds[iet+1] ) {
 	    etbin[i]=iet;
 	  }
 	}
 	for ( int ieta=0; ieta<4; ieta++ ) {
-	  if ( fabs(Jeta[i])>=etabins[ieta] && fabs(Jeta[i])<etabins[ieta+1] ) {
+	  if ( fabs(Jeta[i])>=etabounds[ieta] && fabs(Jeta[i])<etabounds[ieta+1] ) {
 	    etabin[i]=ieta;
 	  }
 	}
 	for ( int int1=0; int1<8; int1++ ) {
-	  if ( JN1[i]>=ns1bins[int1] && JN1[i]<ns1bins[int1+1] ) {
+	  if ( JN1[i]>=ns1bounds[int1] && JN1[i]<ns1bounds[int1+1] ) {
 	    ns1bin[i]=int1;
 	  }
 	}
@@ -2321,9 +2335,8 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	  JBin[i] = 999;
 	}
       }
-      
-      for ( int icomb=0; icomb<(int)pow (2.,iJmax); icomb++ ) { // Combinatorial loop ///////////////
-	
+
+      for ( int icomb=0; icomb<(int)pow(2.,iJmax); icomb++ ) { // Combinatorial loop ///////////////
 	// Reset all variables
 	// -------------------
 	m3best=-999;  // Massa del tripletto piu' vicino a 172 GeV
@@ -2355,48 +2368,56 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	double PTOT=1.;
 	double PTOTE2=0.;
 	NHEM=0;
-
+	cout << "In comb loop" << n << endl;
 	for ( int j=iJmax-1; j>=0; j-- ) {
-	  if ( n>=pow(2.,j) ) {
-	    JHEM[j]=true;
-	    n-=pow(2.,j);
-	    PTOT=PTOT*PHETM[JBin[j]];
-	    PTOTE2+=pow(PHETMS[JBin[j]]/PHETM[JBin[j]],2);
-	    NHEM++;
-	    // Extract random TM values from QCD pdf
-	    // -------------------------------------
-	    JMT[j]=MTS1pdf[ns1bin[j]]->GetRandom();
-	    // Extract random HED and HPD values from QCD pdf
-	    // ----------------------------------------------
-	    double x=0.;
-	    for ( ; x<medium_; ) {
-	      x=HEDpdf[ns1bin[j]]->GetRandom();
-	    }   
-	    JHET[j]=x;
-	    x=0.;
-	    for ( ; x<tight_; ) {
-	      x=HPDpdf[ns1bin[j]]->GetRandom();
-	    }   
-	    JHPT[j]=x;
+	  if ( etbin[j]>-1 && etabin[j]>-1 && ns1bin[j]>-1 ) {
+	    if ( n>=pow(2.,j) ) {
+	      JHEM[j]=true;
+	      n-=pow(2.,j);
+	      PTOT=PTOT*PHETM[JBin[j]];
+	      if ( PHETM[JBin[j]]>0 ) PTOTE2+=pow(PHETMS[JBin[j]]/PHETM[JBin[j]],2);
+	      NHEM++;
+	      // Extract random TM values from QCD pdf
+	      // -------------------------------------
+	      JMT[j]=MTS1pdf[ns1bin[j]]->GetRandom();
+	      // Extract random HED and HPD values from QCD pdf
+	      // ----------------------------------------------
+	      double x=0.;
+	      for ( ; x<medium_; ) {
+		x=HEDpdf[ns1bin[j]]->GetRandom();
+	      }   
+	      JHET[j]=x;
+	      x=0.;
+	      for ( ; x<tight_; ) {
+		x=HPDpdf[ns1bin[j]]->GetRandom();
+	      }   
+	      JHPT[j]=x;
+	    } else {
+	      JHEM[j]=false;
+	      PTOT=PTOT*(1.-PHETM[JBin[j]]);
+	      if ( PHETM[JBin[j]]!=1. ) PTOTE2+=pow(PHETMS[JBin[j]]/(1.-PHETM[JBin[j]]),2);
+	      // Extract random TM values from QCD pdf
+	      // -------------------------------------
+	      JMT[j]=MNS1pdf[ns1bin[j]]->GetRandom();
+	      // Extract random HED and HPD values from QCD pdf
+	      // ----------------------------------------------
+	      double x=29.9;
+	      for ( ; x>=medium_; ) {
+		x=HEDpdf[ns1bin[j]]->GetRandom(); 
+	      }   
+	      JHET[j]=x;
+	      x=29.9;
+	      for ( ; x>=tight_; ) {
+		x=HPDpdf[ns1bin[j]]->GetRandom();
+	      }   
+	      JHPT[j]=x;
+	    }
 	  } else {
+	    if ( n>=pow(2.,j) ) n-=pow(2.,j);
 	    JHEM[j]=false;
-	    PTOT=PTOT*(1.-PHETM[JBin[j]]);
-	    PTOTE2+=pow(PHETMS[JBin[j]]/(1.-PHETM[JBin[j]]),2);
-	    // Extract random TM values from QCD pdf
-	    // -------------------------------------
-	    JMT[j]=MNS1pdf[ns1bin[j]]->GetRandom();
-	    // Extract random HED and HPD values from QCD pdf
-	    // ----------------------------------------------
-	    double x=29.9;
-	    for ( ; x>=medium_; ) {
-	      x=HEDpdf[ns1bin[j]]->GetRandom(); 
-	    }   
-	    JHET[j]=x;
-	    x=29.9;
-	    for ( ; x>=tight_; ) {
-	      x=HPDpdf[ns1bin[j]]->GetRandom();
-	    }   
-	    JHPT[j]=x;
+	    JMT[j]=0.;
+	    JHET[j]=0.;
+	    JHPT[j]=0.;
 	  }
 	}
 	PTOTE2=PTOTE2*pow(PTOT,2);
@@ -3607,7 +3628,7 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
       for ( int i=0; i<iJmax; i++ ) {
 	int ns1bin=-1;
 	for ( int int1=0; int1<8; int1++ ) {
-	  if ( JN1[i]>=ns1bins[int1] && JN1[i]<ns1bins[int1+1] ) {
+	  if ( JN1[i]>=ns1bounds[int1] && JN1[i]<ns1bounds[int1+1] ) {
 	    ns1bin=int1;
 	  }
 	}
