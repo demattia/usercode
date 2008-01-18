@@ -22,7 +22,7 @@ source = PoolSource {
     "castor:/castor/cern.ch/user/d/demattia/FastSim/PUHL/TT_0JETS/tt_0jets_27.root",
     "castor:/castor/cern.ch/user/d/demattia/FastSim/PUHL/TT_0JETS/tt_0jets_28.root",
     "castor:/castor/cern.ch/user/d/demattia/FastSim/PUHL/TT_0JETS/tt_0jets_29.root",
-    "castor:/castor/cern.ch/user/d/demattia/FastSim/PUHL/TT_0JETS/tt_0jets_3.root",
+//    "castor:/castor/cern.ch/user/d/demattia/FastSim/PUHL/TT_0JETS/tt_0jets_3.root",
     "castor:/castor/cern.ch/user/d/demattia/FastSim/PUHL/TT_0JETS/tt_0jets_30.root",
     "castor:/castor/cern.ch/user/d/demattia/FastSim/PUHL/TT_0JETS/tt_0jets_31.root",
     "castor:/castor/cern.ch/user/d/demattia/FastSim/PUHL/TT_0JETS/tt_0jets_4.root",
