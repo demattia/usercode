@@ -2368,7 +2368,6 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	double PTOT=1.;
 	double PTOTE2=0.;
 	NHEM=0;
-	cout << "In comb loop" << n << endl;
 	for ( int j=iJmax-1; j>=0; j-- ) {
 	  if ( etbin[j]>-1 && etabin[j]>-1 && ns1bin[j]>-1 ) {
 	    if ( n>=pow(2.,j) ) {
@@ -2387,11 +2386,15 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 		x=HEDpdf[ns1bin[j]]->GetRandom();
 	      }   
 	      JHET[j]=x;
-	      x=0.;
-	      for ( ; x<tight_; ) {
-		x=HPDpdf[ns1bin[j]]->GetRandom();
-	      }   
-	      JHPT[j]=x;
+	      if ( ns1bin[j]==0 ) {
+		JHPT[j]=0.; // NNBB for 2-track jets, HPD=0
+	      } else {
+		x=0.;
+		for ( ; x<tight_; ) { 
+		  x=HPDpdf[ns1bin[j]]->GetRandom();
+		}   
+		JHPT[j]=x;
+	      }
 	    } else {
 	      JHEM[j]=false;
 	      PTOT=PTOT*(1.-PHETM[JBin[j]]);
@@ -2406,11 +2409,15 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 		x=HEDpdf[ns1bin[j]]->GetRandom(); 
 	      }   
 	      JHET[j]=x;
+	      JHPT[j]=x;
+	      if ( ns1bin[j]==0 ) {
+		JHPT[j]=0.;  // NNBB for 2-track jets, HPD=0
+	      } else {
 	      x=29.9;
 	      for ( ; x>=tight_; ) {
 		x=HPDpdf[ns1bin[j]]->GetRandom();
 	      }   
-	      JHPT[j]=x;
+	      }
 	    }
 	  } else {
 	    if ( n>=pow(2.,j) ) n-=pow(2.,j);
