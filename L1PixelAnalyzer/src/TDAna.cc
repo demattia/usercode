@@ -1330,9 +1330,9 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 
   // General definitions
   // -------------------
-  double mhref=123.; 
-  double mtref=200.;   // Massa top ricostruita, >172 per via dello shift in JEcorrs.
-  double mwref=94.;
+  double mhref=117.; 
+  double mtref=186.;   // Massa top ricostruita, >172 per via dello shift in JEcorrs.
+  double mwref=86.;
 
   // L1 Calo
   // -------
