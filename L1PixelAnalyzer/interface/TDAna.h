@@ -937,8 +937,6 @@ class TDAna : public edm::EDAnalyzer {
   float medium_;
   float tight_;
 
-  // --------------
-
   // Parameters of Et correction functions
   double tpar[7];
   double upar[7];
@@ -1020,4 +1018,16 @@ class TDAna : public edm::EDAnalyzer {
   double PHPTMS[1000];
   double PHPTTS[1000];
 
+  // Select if the pixelTrigger must be done
+  bool doPixelTrigger_;
+
+  // Trigger, offline and total events
+  int l1Eff_;
+  int l1PixelEff_;
+  int l1Njets_;
+  int l1MEtSig_;
+  int l1Tags_[4];
+  int pixelNjets_;
+  int pixelMEtSig_;
+  int pixelTags_[4];
 };

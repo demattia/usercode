@@ -105,7 +105,8 @@ TDAna::TDAna(const edm::ParameterSet& iConfig) :
   summaryLabel_( iConfig.getUntrackedParameter<edm::InputTag>( "Summary" ) ),
   numTkCut_( iConfig.getUntrackedParameter<unsigned int>( "TracksMinimumNum_in_PixelJet" ) ),
   QCD_( iConfig.getUntrackedParameter<bool> ( "QCD" ) ),
-  OutputEffFileName( iConfig.getUntrackedParameter<string>( "OutputEffFileName" ) )
+  OutputEffFileName( iConfig.getUntrackedParameter<string>( "OutputEffFileName" ) ),
+  doPixelTrigger_( iConfig.getUntrackedParameter<bool>( "DoPixelTrigger" ) )
 {
 
   // Now do what ever initialization is needed
@@ -1374,7 +1375,18 @@ TDAna::TDAna(const edm::ParameterSet& iConfig) :
       cout << in1+1 << " " << p << "+-" << sp << endl;
     }
   }  
-  
+
+  // L1, offline and total events
+  l1Eff_ = 0;
+  l1PixelEff_ = 0;
+  l1Njets_ = 0;
+  l1MEtSig_ = 0;
+  pixelNjets_ = 0;
+  pixelMEtSig_ = 0;
+  for ( int i=0; i<4; ++i ) {
+    l1Tags_[i] = 0;
+    pixelTags_[i] = 0;
+  }
 
   // End of initializations
   // ----------------------
@@ -1483,14 +1495,22 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 #ifdef DEBUG
   std::cout << "numTkCut = " << numTkCut_ << std::endl;
 #endif
-  
-  L1PixelTrig<SimplePixelJet> PJtrig(2, 0.4, numTkCut_);
+
+  // Using optimized values obtained with L1PixelOptimizer
+  // In order:
+  // - number of pixel jets in the primary vertex,
+  // - deltaZ used to reconstruct the verteces
+  // - minimum number of pixel-tracks in a PixelJet
+  // - minimum Pt of the primary vertex
+  L1PixelTrig<SimplePixelJet> PJtrig(1, 0.1, 2, 112.);
   PJtrig.Fill( pixeljets );
   
 #ifdef DEBUG
   std::cout << "Pixel trigger response = " << PJtrig.Response() << std::endl;
 #endif
-  
+
+  bool pixelResponse = PJtrig.Response();
+
   // Level 1 trigger
   // ---------------
   // All the jets together for the L1Trigger
@@ -1528,24 +1548,28 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   bool response_cen = false;
   L1Trigger.Fill( vec_TriggerCenJet );
   response_cen = L1Trigger.Response();
+  bool response_opt_cen = L1Trigger.Response(230,210,70,70);
   
   // Forward
   // -------
   bool response_for = false;
   L1Trigger.Fill( vec_TriggerForJet );
-   response_for = L1Trigger.Response();
+  response_for = L1Trigger.Response();
+  bool response_opt_for = L1Trigger.Response(230,210,70,70);
   
   // Tau
   // ---
   bool response_tau = false;
   L1Trigger.Fill( vec_TriggerTauJet );
   response_tau = L1Trigger.Response();
+  bool response_opt_tau = L1Trigger.Response(230,210,70,70);
   
   // Full and no-forward
   // -------------------
-  bool response = ( response_cen || response_tau || response_for );
-  bool response_nofor = ( response_cen || response_tau );
-  
+  bool l1Response = ( response_cen || response_tau || response_for );
+  bool l1Response_nofor = ( response_cen || response_tau );
+  bool combinedResponse = ( ( response_opt_cen || response_opt_tau || response_opt_for ) && pixelResponse );
+
   // MEt + Jet
   // ---------
   // Central
@@ -1587,7 +1611,22 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   ESHandle<SetupData> pSetup;
   iSetup.get<SetupRecord>().get(pSetup);
 #endif
-  
+
+  if (l1Response) {
+    ++l1Eff_;
+  }
+  if (combinedResponse) {
+    ++l1PixelEff_;
+  }
+
+  bool response = false;
+  // Chose the trigger to use for the rest of the program
+  if ( doPixelTrigger_ ) {
+    response = combinedResponse;
+  }
+  else {
+    response = l1Response;
+  }
 
   /////////////////////////////////// MC analysis ////////////////////////////
 
@@ -2220,15 +2259,14 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   edm::Handle<OfflineMEt> caloMET;
   iEvent.getByLabel( offlineMEtLabel_, caloMET );
 
+  double etbounds[9]={25.,50.,70.,90.,110.,150.,200.,300.,10000.};
+  double etabounds[5]={0.,1.,1.5,2.0,3.0};
+  double ns1bounds[9]={2.,3.,4.,5.,6.,7.,8.,9.,100.};
 
   double sumet = caloMET->sumEt();
   double met = caloMET->et();
   double metsig = caloMET->mEtSig();
   double metphi = caloMET->phi();
-
-  const double etbounds[9] = {25.,50.,70.,90.,110.,150.,200.,300., 10000.};
-  const double etabounds[5] = {0., 1., 1.5, 2.0, 3.0};
-  const double ns1bounds[9] = {2., 3., 4., 5., 6., 7., 8., 9., 100.};
 
   // Count IC5 jets with Et>=30 GeV and |eta| < 3.0
   // ----------------------------------------------
@@ -2314,6 +2352,8 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   double sumhpd4 = 0.; // Sum of high-pur discriminant for 4 highest HPT jets
   double sumhed6 = 0.; // Sum of high-eff discriminant for 6 highest HET jets
   double sumhpd6 = 0.; // Sum of high-pur discriminant for 6 highest HPT jets
+
+  int trueNHEM = 0; // number of medium tags before the tag matrix
 
   vector<OfflineJet> goodIc5JetVec;
   if ( caloJets->size() != 0 ) {
@@ -2429,6 +2469,10 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
     for ( int ij=0; ij<iJ && ij<NHSJ; ij++ ) { 
       if ( JHEM[ij] ) NHEM++;   // NNNBBB Tags are counted only if in first 8 jets!
     }
+
+    // Take the NHEM at this point, not after the tag matrix
+    trueNHEM = NHEM;
+
     // Compute delta phi angles
     // ------------------------
     if ( iJ>1 ) dp12 = 3.1415926-fabs(fabs(Jphi[0]-Jphi[1])-3.1415926);
@@ -4441,6 +4485,27 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
     std::cout << "ATTENTION: Jet collection empty" << std::endl;
   }    
 
+  // Evaluate the number of events passing offline cuts
+  // Both after the l1Trigger and the pixel-trigger
+  if ( NJetsCut && l1Response ) {
+    ++l1Njets_;
+    if ( MEtSigCut ) {
+      ++l1MEtSig_;
+      for ( int tags=1; tags<5; ++tags ) {
+        if ( trueNHEM >= tags ) ++l1Tags_[tags-1];
+      }
+    }
+  }
+
+  if ( NJetsCut && combinedResponse ) {
+    ++pixelNjets_;
+    if ( MEtSigCut ) {
+      ++pixelMEtSig_;
+      for ( int tags=1; tags<5; ++tags ) {
+        if ( trueNHEM >= tags ) ++pixelTags_[tags-1];
+      }
+    }
+  }
 
 }
 
@@ -4586,6 +4651,65 @@ void TDAna::endJob() {
 	    << setprecision(4) << sf0[0]*100.  << " " 
 	    << setprecision(5) << setw(5) << f0t*100.    << "+-" 
 	    << setprecision(4) << sf0t*100.  << endl;
+
+
+  // Add total trigger and offline informations
+  decayfile << "L1 Trigger" << endl;
+  decayfile << "----------" << endl;
+  float fraction = float(l1Eff_)/float(grandgrandtotal);
+  float error = sqrt(fraction*(1-fraction)/grandgrandtotal);
+  decayfile << "Fraction of events passing the level 1 trigger = " << l1Eff_
+            << "/" << grandgrandtotal << " "
+            << setprecision(5) << setw(5) << fraction*100 << "+-"
+            << setprecision(4) << error*100 << endl;
+  fraction = float(l1Njets_)/float(grandgrandtotal);
+  error = sqrt(fraction*(1-fraction)/grandgrandtotal);
+  decayfile << "Fraction of events passing also NJet >= 5 = " << l1Njets_
+            << "/" << grandgrandtotal << " "
+            << setprecision(5) << setw(5) << fraction*100 << "+-"
+            << setprecision(4) << error*100 << endl;
+  fraction = float(l1MEtSig_)/float(grandgrandtotal);
+  error = sqrt(fraction*(1-fraction)/grandgrandtotal);
+  decayfile << "Fraction of events passing also MEtSig cut = " << l1MEtSig_
+            << "/" << grandgrandtotal << " "
+            << setprecision(5) << setw(5) << fraction*100 << "+-"
+            << setprecision(4) << error*100 << endl;
+  for ( int tags=0; tags<4; ++tags ) {
+    fraction = float(l1Tags_[tags])/float(grandgrandtotal);
+    error = sqrt(fraction*(1-fraction)/grandgrandtotal);
+    decayfile << "Fraction of events with also >= "<< tags+1 << " b-tags = " << l1Tags_[tags]
+              << "/" << grandgrandtotal << " "
+              << setprecision(5) << setw(5) << fraction*100 << "+-"
+              << setprecision(4) << error*100 << endl;
+  }
+  decayfile << "Pixel Trigger" << endl;
+  decayfile << "-------------" << endl;
+  fraction = float(l1PixelEff_)/float(grandgrandtotal);
+  error = sqrt(fraction*(1-fraction)/grandgrandtotal);
+  decayfile << "Fraction of events passing the level 1 pixel-trigger = " << l1PixelEff_
+            << "/" << grandgrandtotal << " "
+            << setprecision(5) << setw(5) << fraction*100 << "+-"
+            << setprecision(4) << error*100 << endl;
+  fraction = float(pixelNjets_)/float(grandgrandtotal);
+  error = sqrt(fraction*(1-fraction)/grandgrandtotal);
+  decayfile << "Fraction of events passing also NJet >= 5 = " << pixelNjets_
+            << "/" << grandgrandtotal << " "
+            << setprecision(5) << setw(5) << fraction*100 << "+-"
+            << setprecision(4) << error*100 << endl;
+  fraction = float(pixelMEtSig_)/float(grandgrandtotal);
+  error = sqrt(fraction*(1-fraction)/grandgrandtotal);
+  decayfile << "Fraction of events passing also MEtSig cut = " << pixelMEtSig_
+            << "/" << grandgrandtotal << " "
+            << setprecision(5) << setw(5) << fraction*100 << "+-"
+            << setprecision(4) << error*100 << endl;
+  for ( int tags=0; tags<4; ++tags ) {
+    fraction = float(pixelTags_[tags])/float(grandgrandtotal);
+    error = sqrt(fraction*(1-fraction)/grandgrandtotal);
+    decayfile << "Fraction of events with also >= "<< tags+1 << " b-tags = " << pixelTags_[tags]
+              << "/" << grandgrandtotal << " "
+              << setprecision(5) << setw(5) << fraction*100 << "+-"
+              << setprecision(4) << error*100 << endl;
+  }
 
   decayfile.close();
 
@@ -5376,7 +5500,7 @@ void TDAna::endJob() {
   PTagEt_->Write();
   PTagEta_->Write();
   PTagNt_->Write();
-  
+
 }
 
 // Define this as a plug-in
