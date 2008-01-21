@@ -1298,6 +1298,70 @@ TDAna::TDAna(const edm::ParameterSet& iConfig) :
   }
   PTagFile.close();
 
+  // Bin boundaries for tag probability
+  // ----------------------------------
+  const double etb[9] = {25.,50.,70.,90.,110.,150.,200.,300., 10000.};
+  const double etab[5] = {0., 1., 1.5, 2.0, 3.0};
+  const double nt1b[9] = {2., 3., 4., 5., 6., 7., 8., 9., 100.};
+
+  // Fill histogram with tag matrix
+  // ------------------------------
+  PTagEt_ = new TH1D ( "PTagEt", "Tag probability versus jet Et", 8, etb );
+  PTagEta_= new TH1D ( "PTagEta", "Tag probability versus jet eta", 4, etab );
+  PTagNt_ = new TH1D ( "PTagNt", "Tag probability versus jet N tracks", 8, nt1b );
+  for ( int iet=0; iet<8; iet++ ){
+    double tag=0;
+    double jet=0;
+    for ( int ieta=0; ieta<4; ieta++ ){
+      for ( int in1=0; in1<8; in1++ ){
+	int j = 100*iet*10*ieta+in1;
+	tag+=N1HETM[j];
+	jet+=N0HETM[j];	  
+      }
+    }
+    if ( jet>0 ) {
+      double p=tag/jet;
+      double sp=sqrt(p*(1-p)/jet);
+      PTagEt_->SetBinContent(iet+1,p);
+      PTagEt_->SetBinError(iet+1,sp);
+    }
+  }  
+  for ( int ieta=0; ieta<4; ieta++ ){
+    double tag=0;
+    double jet=0;
+    for ( int iet=0; iet<8; iet++ ){
+      for ( int in1=0; in1<8; in1++ ){
+	int j = 100*iet*10*ieta+in1;
+	tag+=N1HETM[j];
+	jet+=N0HETM[j];	  
+      }
+    }
+    if ( jet>0 ) {
+      double p=tag/jet;
+      double sp=sqrt(p*(1-p)/jet);
+      PTagEta_->SetBinContent(ieta+1,p);
+      PTagEta_->SetBinError(ieta+1,sp);
+    }
+  }  
+  for ( int in1=0; in1<8; in1++ ){
+    double tag=0;
+    double jet=0;
+    for ( int iet=0; iet<8; iet++ ){
+      for ( int ieta=0; ieta<4; ieta++ ){
+	int j = 100*iet*10*ieta+in1;
+	tag+=N1HETM[j];
+	jet+=N0HETM[j];	  
+      }
+    }
+    if ( jet>0 ) {
+      double p=tag/jet;
+      double sp=sqrt(p*(1-p)/jet);
+      PTagNt_->SetBinContent(in1+1,p);
+      PTagNt_->SetBinError(in1+1,sp);
+    }
+  }  
+  
+
   // End of initializations
   // ----------------------
   cout << "Done with constructor" << endl;
@@ -2142,14 +2206,15 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   edm::Handle<OfflineMEt> caloMET;
   iEvent.getByLabel( offlineMEtLabel_, caloMET );
 
-  double etbounds[9]={25.,50.,70.,90.,110.,150.,200.,300.,10000.};
-  double etabounds[5]={0.,1.,1.5,2.0,3.0};
-  double ns1bounds[9]={2.,3.,4.,5.,6.,7.,8.,9.,100.};
 
   double sumet = caloMET->sumEt();
   double met = caloMET->et();
   double metsig = caloMET->mEtSig();
   double metphi = caloMET->phi();
+
+  const double etbounds[9] = {25.,50.,70.,90.,110.,150.,200.,300., 10000.};
+  const double etabounds[5] = {0., 1., 1.5, 2.0, 3.0};
+  const double ns1bounds[9] = {2., 3., 4., 5., 6., 7., 8., 9., 100.};
 
   // Count IC5 jets with Et>=30 GeV and |eta| < 3.0
   // ----------------------------------------------
@@ -5292,6 +5357,12 @@ void TDAna::endJob() {
   LSSN_->Write();
   LSSSN_->Write();
 
+  // Tag matrix histograms
+  // ---------------------
+  PTagEt_->Write();
+  PTagEta_->Write();
+  PTagNt_->Write();
+  
 }
 
 // Define this as a plug-in

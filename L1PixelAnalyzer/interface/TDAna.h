@@ -19,7 +19,7 @@
 //
 // Original Author:  Marco De Mattia
 //         Created:  Tue May  8 13:05:37 CEST 2007
-// $Id: TDAna.h,v 1.25 2008/01/17 20:10:47 dorigo Exp $
+// $Id: TDAna.h,v 1.26 2008/01/21 08:12:47 dorigo Exp $
 //
 //
 
@@ -937,6 +937,8 @@ class TDAna : public edm::EDAnalyzer {
   float medium_;
   float tight_;
 
+  // --------------
+
   // Parameters of Et correction functions
   double tpar[7];
   double upar[7];
@@ -983,6 +985,12 @@ class TDAna : public edm::EDAnalyzer {
   TH1D * LSN_;
   TH1D * LSSN_;
   TH1D * LSSSN_;
+
+  // Histograms with tag matrix
+  // --------------------------
+  TH1D * PTagEt_; 
+  TH1D * PTagEta_;
+  TH1D * PTagNt_; 
 
   // PTag numbers
   // ------------
