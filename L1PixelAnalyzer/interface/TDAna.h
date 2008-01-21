@@ -19,7 +19,7 @@
 //
 // Original Author:  Marco De Mattia
 //         Created:  Tue May  8 13:05:37 CEST 2007
-// $Id: TDAna.h,v 1.24 2008/01/17 16:31:32 dorigo Exp $
+// $Id: TDAna.h,v 1.25 2008/01/17 20:10:47 dorigo Exp $
 //
 //
 
@@ -938,8 +938,8 @@ class TDAna : public edm::EDAnalyzer {
   float tight_;
 
   // Parameters of Et correction functions
-  double tpar[3];
-  double upar[3];
+  double tpar[7];
+  double upar[7];
 
   double rel_lik;
   double njsss;

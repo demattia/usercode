@@ -3,12 +3,27 @@ Fit_DEt() {
   TFile * G = new TFile ("./root/TDAna_TTH_120.root");
   G->cd();
 
-  double xmax=600;
+  TProfile * B = dynamic_cast<TProfile*>(G->Get("DEtb_prof"));
+  TProfile * Q = dynamic_cast<TProfile*>(G->Get("DEtq_prof"));
+
+  for ( int ibin=0; ibin<100; ibin++ ) {
+    double deb = B->GetBinContent(ibin+1);
+    double s_deb = B->GetBinError(ibin+1);
+    double deq = Q->GetBinContent(ibin+1);
+    double s_deq = Q->GetBinError(ibin+1);
+    //cout << ibin <<  "DEt(b)= " << deb << "+-" << s_deb << " DEt(q)= " << deq << "+-" << s_deq << endl;
+    if ( s_deb<0.01 ) B->SetBinContent(ibin+1,0.);
+    if ( s_deb<0.01 ) B->SetBinError(ibin+1,0.);
+    if ( s_deq<0.01 ) Q->SetBinContent(ibin+1,0.);
+    if ( s_deq<0.01 ) Q->SetBinError(ibin+1,0.);
+  }
+  
+  double xmax=1000;
   gStyle->SetOptFit(111111);
-  TCanvas * h = new TCanvas ("h", "Energy correction functions", 600, 500 );
+  TCanvas * h = new TCanvas ("h", "Energy correction functions", 800, 800 );
   h->Divide(2,2);
   TF1 * P2 = new TF1 ("P2", "[0]*x*x+[1]*x+[2]",0,1000);
-  P2->SetParameters(1,1,0);
+  P2->SetParameters(0,0,0);
   P2->SetLineColor(kRed);
   P2->SetLineWidth(1);
   h->cd(1);
@@ -18,11 +33,31 @@ Fit_DEt() {
   DEtb_prof->SetMarkerSize(0.5);
   DEtb_prof->Fit("P2","","",0,xmax);
   h->cd(3);
-  DEtcb_prof->Draw("PE");
+  DEtcq_prof->Draw("PE");
   h->cd(4);
   DEtq_prof->SetMarkerStyle(24);
   DEtq_prof->SetMarkerSize(0.5);
   DEtq_prof->Fit("P2","","",0,xmax);
-  h->Print("./ps/Fit_DEt.ps");
+  h->Print("./ps/Fit_DEt_P2.ps");
+
+  TCanvas * h2 = new TCanvas ("h2", "Energy correction functions", 800, 800 );
+  h2->Divide(2,1);
+  TF1 * P4 = new TF1 ("P4", "[0]*pow(x,4)+[1]*pow(x,3)+[2]*pow(x,2)+[3]*x+[4]",0,1000);
+  P4->SetParameters(0,0,0,0,0);
+  P4->SetLineColor(kRed);
+  P4->SetLineWidth(1);
+  TF1 * P6 = new TF1 ( "P6", "[0]*pow(x,6)+[1]*pow(x,5)+[2]*pow(x,4)+[3]*pow(x,3)+[4]*pow(x,2)+[5]*pow(x,1)+[6]");
+  P6->SetParameters(0.,0.,0.,0.,0.,0.,0.);
+  P6->SetLineColor(kRed);
+  P6->SetLineWidth(1);
+  h2->cd(1);
+  DEtb_prof->SetMarkerStyle(20);
+  DEtb_prof->SetMarkerSize(0.5);
+  DEtb_prof->Fit("P6","","",0,xmax);
+  h2->cd(2);
+  DEtq_prof->SetMarkerStyle(24);
+  DEtq_prof->SetMarkerSize(0.5);
+  DEtq_prof->Fit("P6","","",0,xmax);
+  h2->Print("./ps/Fit_DEt_P6.ps");
 
 }

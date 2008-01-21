@@ -136,12 +136,46 @@ TDAna::TDAna(const edm::ParameterSet& iConfig) :
 
   // Parameters of Et correction functions
   // -------------------------------------
-  upar[2] =  1.512588;
-  upar[1] = -0.05629097;
-  upar[0] = -0.0002950658;
-  tpar[2] =  9.017700;
-  tpar[1] = -0.08954207;
-  tpar[0] = -0.0003376759;
+//   upar[2] =  1.512588;
+//   upar[1] = -0.05629097;
+//   upar[0] = -0.0002950658;
+//   tpar[2] =  9.017700;
+//   tpar[1] = -0.08954207;
+//   tpar[0] = -0.0003376759;
+  // Pol6 parameters:
+  // ----------------
+  // b-tags
+  // ------
+  //  1  p0           6.55150e-15   1.09289e-16   9.16348e-20   3.26447e+08
+  //  2  p1          -2.07528e-11   1.45156e-13   7.84133e-17  -1.94822e+05
+  //  3  p2           2.42585e-08   1.04566e-10   6.14276e-14   1.60783e+02
+  //  4  p3          -1.28471e-05   6.17959e-08   3.91532e-11   7.25911e-02
+  //  5  p4           2.65480e-03   2.13231e-05   1.54571e-08  -1.39745e-03
+  //  6  p5          -3.66889e-01   3.42189e-03   3.02745e-06  -8.47267e-06
+  //  7  p6           1.69886e+01   1.77644e-01   3.25881e-04  -5.99603e-08
+  tpar[0] = 6.55150e-15;
+  tpar[1] = -2.07528e-11;
+  tpar[2] = 2.42585e-08;
+  tpar[3] = -1.28471e-05;
+  tpar[4] = 2.65480e-03;
+  tpar[5] = -3.66889e-01;
+  tpar[6] = 1.69886e+01;
+  // non-b-tags
+  // ----------
+  //  1  p0           4.23909e-15   5.48031e-17   4.06693e-20   2.68032e+13
+  //  2  p1          -1.78658e-11   4.85489e-14   3.15999e-17  -1.05256e+11
+  //  3  p2           2.52304e-08   3.86624e-11   2.44879e-14   1.49660e+08
+  //  4  p3          -1.49399e-05   2.84783e-08   1.88330e-11  -9.48611e+04
+  //  5  p4           3.37074e-03   1.53051e-05   1.35516e-08   3.03554e+01
+  //  6  p5          -3.93742e-01   2.88642e-03   4.43593e-06  -1.91399e-02
+  //  7  p6           1.05092e+01   1.42165e-01   3.74549e-04   5.74116e-05
+  upar[0] = 4.23909e-15;
+  upar[1] = -1.78658e-11;
+  upar[2] = 2.52304e-08;
+  upar[3] = -1.49399e-05;
+  upar[4] = 3.37074e-03;
+  upar[5] = -3.93742e-01;
+  upar[6] = 1.05092e+01;
 
   // Load file with smoothed histograms to use for Likelihood definition
   // -------------------------------------------------------------------
@@ -1614,10 +1648,24 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	// Correct jet Et
 	// --------------
 	if ( JPtag[NJP] ) {
-	  JPetc[NJP]=JPet[NJP]+(tpar[0]*pow(JPet[NJP],2)+tpar[1]*JPet[NJP]+tpar[2]);
+	  JPetc[NJP]=JPet[NJP]+
+	    tpar[0]*pow(JPet[NJP],6)+
+	    tpar[1]*pow(JPet[NJP],5)+
+	    tpar[2]*pow(JPet[NJP],4)+
+	    tpar[3]*pow(JPet[NJP],3)+
+	    tpar[4]*pow(JPet[NJP],2)+
+	    tpar[5]*JPet[NJP]+
+	    tpar[6];
 	  if ( JPetc[NJP]<0. ) JPetc[NJP]= 0.;
 	} else {
-	  JPetc[NJP]=JPet[NJP]+(upar[0]*pow(JPet[NJP],2)+upar[1]*JPet[NJP]+upar[2]);
+	  JPetc[NJP]=JPet[NJP]+
+	    upar[0]*pow(JPet[NJP],6)+
+	    upar[1]*pow(JPet[NJP],5)+
+	    upar[2]*pow(JPet[NJP],4)+
+	    upar[3]*pow(JPet[NJP],3)+
+	    upar[4]*pow(JPet[NJP],2)+
+	    upar[5]*JPet[NJP]+
+	    upar[6];
 	  if ( JPetc[NJP]<0. ) JPetc[NJP]= 0.;
 	}
 	NJP++;
@@ -2238,10 +2286,24 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	  // Correct jet Et
 	  // --------------
 	  if ( JHEM[iJ] ) {
-	    JEtc[iJ]=JEt[iJ]+(tpar[0]*pow(JEt[iJ],2)+tpar[1]*JEt[iJ]+tpar[2]);
+	    JEtc[iJ]=JEt[iJ]+
+	      tpar[0]*pow(JEt[iJ],6)+
+	      tpar[1]*pow(JEt[iJ],5)+
+	      tpar[2]*pow(JEt[iJ],4)+
+	      tpar[3]*pow(JEt[iJ],3)+
+	      tpar[4]*pow(JEt[iJ],2)+
+	      tpar[5]*JEt[iJ]+
+	      tpar[6];
 	    if ( JEtc[iJ]<0. ) JEtc[iJ] = 0.;
 	  } else {
-	    JEtc[iJ]=JEt[iJ]+(upar[0]*pow(JEt[iJ],2)+upar[1]*JEt[iJ]+upar[2]);
+	    JEtc[iJ]=JEt[iJ]+
+	      upar[0]*pow(JEt[iJ],6)+
+	      upar[1]*pow(JEt[iJ],5)+
+	      upar[2]*pow(JEt[iJ],4)+
+	      upar[3]*pow(JEt[iJ],3)+
+	      upar[4]*pow(JEt[iJ],2)+
+	      upar[5]*JEt[iJ]+
+	      upar[6];
 	    if ( JEtc[iJ]<0. ) JEtc[iJ] = 0.;
 	  }
 	  iJ++;
