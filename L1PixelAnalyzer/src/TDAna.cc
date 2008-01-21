@@ -1300,23 +1300,34 @@ TDAna::TDAna(const edm::ParameterSet& iConfig) :
 
   // Bin boundaries for tag probability
   // ----------------------------------
-  const double etb[9] = {25.,50.,70.,90.,110.,150.,200.,300., 10000.};
-  const double etab[5] = {0., 1., 1.5, 2.0, 3.0};
-  const double nt1b[9] = {2., 3., 4., 5., 6., 7., 8., 9., 100.};
+  double etb[9] = {25.,50.,70.,90.,110.,150.,200.,300., 500.}; // NB last bin is 10000 in reality
+  double etab[5] = {0., 1., 1.5, 2.0, 3.0 };                
+  double nt1b[9] = {2., 3., 4., 5., 6., 7., 8., 9., 10.}; // NB last bin is 100 in reality
 
   // Fill histogram with tag matrix
   // ------------------------------
   PTagEt_ = new TH1D ( "PTagEt", "Tag probability versus jet Et", 8, etb );
   PTagEta_= new TH1D ( "PTagEta", "Tag probability versus jet eta", 4, etab );
   PTagNt_ = new TH1D ( "PTagNt", "Tag probability versus jet N tracks", 8, nt1b );
+  cout << "bin 1 " << PTagEt_->GetBinLowEdge(1) << " " <<  PTagEt_->GetBinWidth(1) << endl;
+  cout << "bin 2 " << PTagEt_->GetBinLowEdge(2) << " " <<  PTagEt_->GetBinWidth(2) << endl;
+  cout << "bin 3 " << PTagEt_->GetBinLowEdge(3) << " " <<  PTagEt_->GetBinWidth(3) << endl;
+  cout << "bin 4 " << PTagEt_->GetBinLowEdge(4) << " " <<  PTagEt_->GetBinWidth(4) << endl;
+  cout << "bin 5 " << PTagEt_->GetBinLowEdge(5) << " " <<  PTagEt_->GetBinWidth(5) << endl;
+  cout << "bin 6 " << PTagEt_->GetBinLowEdge(6) << " " <<  PTagEt_->GetBinWidth(6) << endl;
+  cout << "bin 7 " << PTagEt_->GetBinLowEdge(7) << " " <<  PTagEt_->GetBinWidth(7) << endl;
+  cout << "bin 8 " << PTagEt_->GetBinLowEdge(8) << " " <<  PTagEt_->GetBinWidth(8) << endl;
+
   for ( int iet=0; iet<8; iet++ ){
     double tag=0;
     double jet=0;
     for ( int ieta=0; ieta<4; ieta++ ){
       for ( int in1=0; in1<8; in1++ ){
-	int j = 100*iet*10*ieta+in1;
-	tag+=N1HETM[j];
-	jet+=N0HETM[j];	  
+	int j = 100*iet+10*ieta+in1;
+	tag=tag+N1HETM[j];
+	jet=jet+N0HETM[j];	  
+	cout << iet << " " << ieta << " " << in1 << " bin " << j 
+	     << " : " << tag << "/" << jet << endl;
       }
     }
     if ( jet>0 ) {
@@ -1324,6 +1335,7 @@ TDAna::TDAna(const edm::ParameterSet& iConfig) :
       double sp=sqrt(p*(1-p)/jet);
       PTagEt_->SetBinContent(iet+1,p);
       PTagEt_->SetBinError(iet+1,sp);
+      cout << iet+1 << " " << p << "+-" << sp << endl;
     }
   }  
   for ( int ieta=0; ieta<4; ieta++ ){
@@ -1331,7 +1343,7 @@ TDAna::TDAna(const edm::ParameterSet& iConfig) :
     double jet=0;
     for ( int iet=0; iet<8; iet++ ){
       for ( int in1=0; in1<8; in1++ ){
-	int j = 100*iet*10*ieta+in1;
+	int j = 100*iet+10*ieta+in1;
 	tag+=N1HETM[j];
 	jet+=N0HETM[j];	  
       }
@@ -1341,6 +1353,7 @@ TDAna::TDAna(const edm::ParameterSet& iConfig) :
       double sp=sqrt(p*(1-p)/jet);
       PTagEta_->SetBinContent(ieta+1,p);
       PTagEta_->SetBinError(ieta+1,sp);
+      cout << ieta+1 << " " << p << "+-" << sp << endl;
     }
   }  
   for ( int in1=0; in1<8; in1++ ){
@@ -1348,7 +1361,7 @@ TDAna::TDAna(const edm::ParameterSet& iConfig) :
     double jet=0;
     for ( int iet=0; iet<8; iet++ ){
       for ( int ieta=0; ieta<4; ieta++ ){
-	int j = 100*iet*10*ieta+in1;
+	int j = 100*iet+10*ieta+in1;
 	tag+=N1HETM[j];
 	jet+=N0HETM[j];	  
       }
@@ -1358,6 +1371,7 @@ TDAna::TDAna(const edm::ParameterSet& iConfig) :
       double sp=sqrt(p*(1-p)/jet);
       PTagNt_->SetBinContent(in1+1,p);
       PTagNt_->SetBinError(in1+1,sp);
+      cout << in1+1 << " " << p << "+-" << sp << endl;
     }
   }  
   
