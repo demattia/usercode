@@ -25,7 +25,7 @@ module L1PixelOptimizerModule = L1PixelOptimizer {
 
   // 30 bins with steps of 2 GeV
   untracked double MinPt = 80
-  untracked double MaxPt = 140
+  untracked double MaxPt = 380
 
   // Select if the optimization of the pixel trigger must be done
   untracked bool doTrigger                      = true

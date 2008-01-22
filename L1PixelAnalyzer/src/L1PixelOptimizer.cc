@@ -98,11 +98,12 @@ L1PixelOptimizer::L1PixelOptimizer(const edm::ParameterSet& iConfig) :
   dzIndexSize_ = bins_;
   ptIndexSize_ = 1;
   if ( doPtCutTrig_ ) {
-    ptIndexSize_ = bins_;
+    ptIndexSize_ = 3*bins_;
   }
   numPVindexSize_ = 1;
   if ( doPVnumTrig_ ) {
-    numPVindexSize_ = bins_;
+//    numPVindexSize_ = bins_;
+    numPVindexSize_ = 3;
   }
   EffMultijetPixelSizeEt1_ = 6;
   EffMultijetPixelSizeEt2_ = 7;
@@ -801,17 +802,17 @@ L1PixelOptimizer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
   // Steps of 2 GeV, divide by two to have unitary index
 //   int ptIndexMin = int(minPt_/2.);
 //   int ptIndexMax = int(maxPt_/2.);
-  float ptStep = (maxPt_ - minPt_)/float(bins_);
+  float ptStep = (maxPt_ - minPt_)/float(3*bins_);
 
   // Et cuts
   // -------
   // Et1 - 6 bins
-  int Et1Min = 210;
-  int Et1Max = 270;
+  int Et1Min = 230;
+  int Et1Max = 290;
   int Et1Step = 10;
   // Et2 - 7 bins
-  int Et2Min = 150;
-  int Et2Max = 220;
+  int Et2Min = 170;
+  int Et2Max = 240;
   int Et2Step = 10;
   // Et3 - 6 bins
   int Et3Min = 50;

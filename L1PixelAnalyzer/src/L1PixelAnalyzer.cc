@@ -6,6 +6,7 @@
 #include "AnalysisExamples/AnalysisClasses/interface/Associator.h"
 #include "AnalysisExamples/AnalysisClasses/interface/DeltaPhi.h"
 #include "AnalysisExamples/AnalysisClasses/interface/L1PixelTrig.h"
+#include "AnalysisExamples/AnalysisObjects/interface/SimplePixelJet.h"
 
 //
 // constants, enums and typedefs
@@ -120,7 +121,14 @@ L1PixelAnalyzer::L1PixelAnalyzer(const edm::ParameterSet& iConfig) :
 
   //PixelJet vs GenJets Pt
   PJ_PtRes_ = new TProfile( "PJ_PtRes", "PixelJet vs GenJet Pt", binning, first_bin_et, last_bin_et, first_bin_et, last_bin_et );
+  PJ_EtaRes_ = new TH1F( "PJ_EtaRes", "PixelJet vs GenJet Eta", binning, first_bin_eta, last_bin_eta );
+  PJ_PhiRes_ = new TH1F( "PJ_PhiRes", "PixelJet vs GenJet Phi", binning, first_bin_phi, last_bin_phi );
+  PJ_DeltaRres_ = new TH1F( "PJ_DeltaRres", "PixelJet R from closest GenJet", 100, -0.1, 0.5 );
   PJ_L1J_PtRes_ = new TProfile( "PJ_L1J_PtRes", "PixelJet vs L1Jet Pt", binning, first_bin_et, last_bin_et, first_bin_et, last_bin_et );
+  L1J_PtRes_ = new TProfile( "L1J_PtRes", "L1Jet vs GenJet Pt", binning, first_bin_et, last_bin_et, first_bin_et, last_bin_et );
+  L1J_EtaRes_ = new TH1F( "L1J_EtaRes", "L1Jet vs GenJet Eta", binning, first_bin_eta, last_bin_eta );
+  L1J_PhiRes_ = new TH1F( "L1J_PhiRes", "L1Jet vs GenJet Phi", binning, first_bin_phi, last_bin_phi );
+  L1J_DeltaRres_ = new TH1F( "L1J_DeltaRres", "L1Jet R from closest GenJet", 100, -0.1, 0.5 );
 
   eventcounter = 0;
 }
@@ -160,10 +168,13 @@ L1PixelAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
   edm::Handle<SiPixelRecHitCollection> pixelhits;
 
   // Pixel jets
-  edm::Handle<PixelJetCollection> pixeljets;
+  edm::Handle<PixelJetCollection> pixeljetsWrongEta;
 
   // GenJets
   edm::Handle<reco::GenJetCollection> genJets;
+
+  // Create a new collection with correct eta
+  vector<SimplePixelJet> pixeljets;
 
   // should get rid of this try/catch?
   try {
@@ -190,7 +201,28 @@ L1PixelAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
 
     // PixelJets
     edm::InputTag PixelJetsLabel = conf_.getUntrackedParameter<edm::InputTag>("PixelJetSource");
-    iEvent.getByLabel(PixelJetsLabel, pixeljets);
+    iEvent.getByLabel(PixelJetsLabel, pixeljetsWrongEta);
+
+    PixelJetCollection::const_iterator newPj_it = pixeljetsWrongEta->begin();
+    for ( ; newPj_it!=pixeljetsWrongEta->end(); ++newPj_it ) {
+
+      // Evaluate the correct eta
+      edm::RefVector<std::vector<reco::Track> > vecPjTk = newPj_it->GetPixelTrackRefVec();
+      edm::RefVector<std::vector<reco::Track> >::const_iterator tk_it = vecPjTk.begin();
+      float px = 0.;
+      float py = 0.;
+      float pz = 0.;
+      for( ; tk_it != vecPjTk.end(); ++tk_it ) {
+        px += (*tk_it)->px();
+        py += (*tk_it)->py();
+        pz += (*tk_it)->pz();
+      }
+      float P = sqrt(px*px + py*py + pz*pz);
+      double theta = ( P == 0 ) ? 0 : acos(pz/P);
+      float pj_it_eta = -log(tan(0.5*theta));
+
+      pixeljets.push_back( SimplePixelJet( newPj_it->pt(), pj_it_eta, newPj_it->phi(), newPj_it->z(), newPj_it->tkNum() ) );
+    }
 
     // GenJets
     std::string GenJetsLabel = conf_.getUntrackedParameter<std::string>("GenJetSource");
@@ -364,14 +396,15 @@ L1PixelAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
 
   // PixelJets
   // ---------
-  typedef PixelJetCollection::const_iterator PJ_IT;
-  const PixelJetCollection pjs = *(pixeljets.product());
+  typedef vector<SimplePixelJet>::const_iterator PJ_IT;
+//  const PixelJetCollection pjs = *(pixeljets.product());
+  const vector<SimplePixelJet> pjs = pixeljets;
 #ifdef DEBUG
   std::cout << "Number of pixel-jets: "<< pjs.size() << " pixel-jets" << std::endl;
 #endif
   for (PJ_IT pj_it=pjs.begin(); pj_it!=pjs.end(); ++pj_it) {
     PixelJet_Pt_->Fill(pj_it->pt());
-    PixelJet_Eta_->Fill(pj_it->eta());
+    PixelJet_Eta_->Fill( pj_it->eta());
     PixelJet_Phi_->Fill(pj_it->phi());
     PixelJet_NumTk_->Fill(pj_it->tkNum());
     PixelJet_Vertex_Z_->Fill(pj_it->z());
@@ -392,16 +425,25 @@ L1PixelAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
 //  Associator<PixelJet, reco::Track> associator( 0.5 );
 //  std::auto_ptr<std::map<const PixelJet*, const reco::Track*> > AssocMap( associator.Associate( pjs, tracks ) );
 
-  Associator<PixelJet, reco::GenJet> associator( 0.5 );
-  std::auto_ptr<std::map<const PixelJet*, const reco::GenJet*> > AssocMap( associator.Associate( pjs, genjets ) );
+  Associator<SimplePixelJet, reco::GenJet> associator( 0.5 );
+  std::auto_ptr<std::map<const SimplePixelJet*, const reco::GenJet*> > AssocMap( associator.Associate( pjs, genjets ) );
 
 #ifdef DEBUG
   std::cout << "AssocMap ptr = " << AssocMap.get() << std::endl;
 #endif
 
-  std::map<const PixelJet*, const reco::GenJet*>::const_iterator assoc_it = (*AssocMap).begin();
+  std::map<const SimplePixelJet*, const reco::GenJet*>::const_iterator assoc_it = (*AssocMap).begin();
   for( ; assoc_it != (*AssocMap).end(); ++assoc_it ) {
-    PJ_PtRes_->Fill( assoc_it->first->pt(), assoc_it->second->pt() );
+//     PJ_PtRes_->Fill( assoc_it->first->pt(), assoc_it->second->pt() );
+//     PJ_EtaRes_->Fill( assoc_it->first->eta() - assoc_it->second->eta() );
+//     PJ_PhiRes_->Fill( DeltaPhi( assoc_it->first->phi(), assoc_it->second->phi() ) );
+    PJ_PtRes_->Fill( assoc_it->second->pt(), assoc_it->first->pt() );
+
+    float PJ_deltaEta = assoc_it->second->eta() - assoc_it->first->eta();
+    float PJ_deltaPhi = DeltaPhi( assoc_it->second->phi(), assoc_it->first->phi() );
+    PJ_EtaRes_->Fill( PJ_deltaEta );
+    PJ_PhiRes_->Fill( PJ_deltaPhi );
+    PJ_DeltaRres_->Fill( sqrt( PJ_deltaEta*PJ_deltaEta + PJ_deltaPhi*PJ_deltaPhi ) );
 #ifdef DEBUG
     std::cout << "PJ_pt = " << assoc_it->first->pt() << " , GenJet_pt = " << assoc_it->second->pt() << std::endl;
 #endif
@@ -420,22 +462,38 @@ L1PixelAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
     double tjeta = tj->eta();
 // Use a cut in eta, for |eta| > 1.6 the endcaps start (same cut used for pixeljets)
     if ( fabs(tjeta) < 1.6 ) {
-      vec_Jet.push_back( SimpleJet( tj->et(), tj->eta(), tj->phi() ) );
+      vec_Jet.push_back( SimpleJet( tj->et(), tjeta, tj->phi() ) );
     }
   }
-  Associator<PixelJet, SimpleJet> PJ_L1J_associator( 0.5 );
-  std::auto_ptr<std::map<const PixelJet*, const SimpleJet*> > PJ_L1J_AssocMap( PJ_L1J_associator.Associate( pjs, vec_Jet ) );
+  Associator<SimplePixelJet, SimpleJet> PJ_L1J_associator( 0.5 );
+  std::auto_ptr<std::map<const SimplePixelJet*, const SimpleJet*> > PJ_L1J_AssocMap( PJ_L1J_associator.Associate( pjs, vec_Jet ) );
 
 
-  std::map<const PixelJet*, const SimpleJet*>::const_iterator PJ_L1J_assoc_it = (*PJ_L1J_AssocMap).begin();
+  std::map<const SimplePixelJet*, const SimpleJet*>::const_iterator PJ_L1J_assoc_it = (*PJ_L1J_AssocMap).begin();
   for( ; PJ_L1J_assoc_it != (*PJ_L1J_AssocMap).end(); ++PJ_L1J_assoc_it ) {
-    PJ_L1J_PtRes_->Fill( PJ_L1J_assoc_it->first->pt(), PJ_L1J_assoc_it->second->pt() );
+//    PJ_L1J_PtRes_->Fill( PJ_L1J_assoc_it->first->pt(), PJ_L1J_assoc_it->second->pt() );
+    PJ_L1J_PtRes_->Fill( PJ_L1J_assoc_it->second->pt(), PJ_L1J_assoc_it->first->pt() );
 #ifdef DEBUG
     std::cout << "PJ_pt = " << PJ_L1J_assoc_it->first->pt() << " , SimpleJet_pt = " << PJ_L1J_assoc_it->second->pt() << std::endl;
 #endif
   }
 
-  
+  // Associate L1Jets to GenJets and evaluate the same as for PixelJets
+  Associator<SimpleJet, reco::GenJet> L1J_associator( 0.5 );
+  std::auto_ptr<std::map<const SimpleJet*, const reco::GenJet*> > L1J_AssocMap( L1J_associator.Associate( vec_Jet, genjets ) );
+
+  std::map<const SimpleJet*, const reco::GenJet*>::const_iterator L1J_assoc_it = (*L1J_AssocMap).begin();
+  for( ; L1J_assoc_it != (*L1J_AssocMap).end(); ++L1J_assoc_it ) {
+//     L1J_PtRes_->Fill( L1J_assoc_it->first->pt(), L1J_assoc_it->second->pt() );
+//     L1J_EtaRes_->Fill( L1J_assoc_it->first->eta() - L1J_assoc_it->second->eta() );
+//     L1J_PhiRes_->Fill( DeltaPhi( L1J_assoc_it->first->phi(), L1J_assoc_it->second->phi() ) );
+    L1J_PtRes_->Fill( L1J_assoc_it->second->pt(), L1J_assoc_it->first->pt() );
+    float L1J_deltaEta = L1J_assoc_it->second->eta() - L1J_assoc_it->first->eta();
+    float L1J_deltaPhi = DeltaPhi( L1J_assoc_it->second->phi(), L1J_assoc_it->first->phi() );
+    L1J_EtaRes_->Fill( L1J_deltaEta );
+    L1J_PhiRes_->Fill( L1J_deltaPhi );
+    L1J_DeltaRres_->Fill( sqrt( L1J_deltaEta*L1J_deltaEta + L1J_deltaPhi*L1J_deltaPhi ) );
+  }
 
 
 #ifdef THIS_IS_AN_EVENTSETUP_EXAMPLE

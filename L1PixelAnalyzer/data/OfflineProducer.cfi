@@ -115,6 +115,8 @@ module offlineProd = OfflineProducer {
   // ZnunuJets 230-300 -------> 48
   // ZnunuJets 300-380 -------> 49
 
+  // ttbar inclusive ---------> 50
+
   // other -------------------> 60
   uint32 EventType                              = 6
 }

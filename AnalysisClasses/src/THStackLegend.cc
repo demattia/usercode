@@ -1,4 +1,5 @@
 
+
 #ifndef THSTACKLEGEND_CC
 #define THSTACKLEGEND_CC
 
@@ -22,11 +23,16 @@
 //   ++counter_;
 // }
 
-TH1* THStackLegend::Add(const TH1 * HISTO, const char* LEGEND, const bool & NORMALIZE, const char * FILL) {
+TH1* THStackLegend::Add(const TH1 * HISTO, const char* LEGEND, const bool & NORMALIZE, const char * FILL, const bool & ERRORS ) {
   //  TH1 * HISTO_ = new TH1(*HISTO);
   TH1 * HISTO_ = (TH1*)HISTO->Clone();
   // Do not save this histogram in the current directory
   HISTO_->SetDirectory(0);
+
+  if ( ERRORS ) {
+    HISTO_->Sumw2();
+    HISTO_->SetMarkerSize(0.7);
+  }
 
   if (NORMALIZE) {
     Double_t integral = HISTO_->Integral();
@@ -43,6 +49,7 @@ TH1* THStackLegend::Add(const TH1 * HISTO, const char* LEGEND, const bool & NORM
     HISTO_->SetMarkerStyle(counter_+20);
     HISTO_->SetMarkerColor(counter_);
     HISTO_->SetLineWidth(2);
+    //    HISTO_->SetLineWidth(5-counter_);
   }
   else if ( FILL == "f" ) {
     //   if (counter_ == 4) counter_=counter_+2;

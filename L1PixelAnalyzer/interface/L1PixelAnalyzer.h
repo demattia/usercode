@@ -13,7 +13,7 @@
 //
 // Original Author:  Marco De Mattia
 //         Created:  Tue May  8 13:05:37 CEST 2007
-// $Id: L1PixelAnalyzer.h,v 1.2 2007/07/23 14:57:30 demattia Exp $
+// $Id: L1PixelAnalyzer.h,v 1.6 2007/11/09 17:25:29 demattia Exp $
 //
 //
 
@@ -182,7 +182,14 @@ class L1PixelAnalyzer : public edm::EDAnalyzer {
   TH1F* GenJet_Phi_;
 
   TProfile* PJ_PtRes_;
+  TH1F* PJ_EtaRes_;
+  TH1F* PJ_PhiRes_;
+  TH1F* PJ_DeltaRres_;
   TProfile* PJ_L1J_PtRes_;
+  TProfile* L1J_PtRes_;
+  TH1F* L1J_EtaRes_;
+  TH1F* L1J_PhiRes_;
+  TH1F* L1J_DeltaRres_;
 
   // ----------member data ---------------------------
 };

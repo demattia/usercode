@@ -260,13 +260,13 @@ void MultiplicationAnalyzer::analyze(const edm::Event& iEvent, const edm::EventS
       float jetEt = good_it->et();
       if ( N == 0 ) {
         JETET->Fill( jetEt );
-        if ( jetEt > 30 && fabs(good_it->eta()) < 2.5 ) {
+        if ( jetEt > 25. && fabs(good_it->eta()) < 3. ) {
           JETET_5j->Fill( jetEt );
           if ( mEtSig > 3 ) JETET_5j_s3->Fill( jetEt );
         }
       }
       // Evalute the number of goodJets
-      if ( jetEt > 30 && fabs(good_it->eta()) < 2.5 ) {
+      if ( jetEt > 25. && fabs(good_it->eta()) < 3. ) {
         ++numGoodJets;
       }
 
@@ -277,7 +277,7 @@ void MultiplicationAnalyzer::analyze(const edm::Event& iEvent, const edm::EventS
         if ( diff != 0 ) DPtmod->Fill(diff/(good_it->origEt()));
 
         JETETC->Fill( jetEt );
-        if ( jetEt > 30 && fabs(good_it->eta()) < 2.5 ) {
+        if ( jetEt > 25. && fabs(good_it->eta()) < 3. ) {
           JETETC_5j->Fill( jetEt );
           if ( mEtSig > 3 ) JETETC_5j_s3->Fill( jetEt );
         }

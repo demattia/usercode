@@ -66,7 +66,8 @@ MultiplicationFilter::MultiplicationFilter(const edm::ParameterSet& iConfig) :
   // -----------------------------------------
   eventCounter_=0;
 
-  // Multiplier, pass the minimum et of jets to be changed and alpha factor for MEt
+  // Multiplier, pass the DR of association with GenJets,
+  // the minimum et of jets to be changed and alpha factor for MEt
   multiplier = new Multiplier( 0.3, minMultiplicationEt_, mEtAlpha_ );
 
   // White background for the canvases
@@ -147,8 +148,9 @@ MultiplicationFilter::filter(edm::Event& iEvent, const edm::EventSetup& iSetup)
 
   // Proceed only of at least one jet was changed.
   // This means that if no offlineJet was matched with a GenJet
-  // the event will not saved.
+  // the event will not be saved.
   int numGoodJets = 0;
+  float mEtSig = 0.;
   if ( numChanged != 0 ) {
 
     ++nTotChanged_;
@@ -175,7 +177,9 @@ MultiplicationFilter::filter(edm::Event& iEvent, const edm::EventSetup& iSetup)
 
     // Store the event only if it has at least 5 jets with Et > 25 GeV and eta < 3.0
     if ( numGoodJets >= 5 ) {
-      auto_ptr<OfflineMEt> offlineMEtPtr( new OfflineMEt( offlineMEt->et(), offlineMEt->phi(), offlineMEt->sumEt(), offlineMEt->mEtSig() ) );
+      mEtSig = offlineMEt->mEtSig();
+
+      auto_ptr<OfflineMEt> offlineMEtPtr( new OfflineMEt( offlineMEt->et(), offlineMEt->phi(), offlineMEt->sumEt(), mEtSig ) );
 
       // Summary
       // -------
@@ -200,9 +204,10 @@ MultiplicationFilter::filter(edm::Event& iEvent, const edm::EventSetup& iSetup)
   }
 
   // Store the event only if it has at least 5 jets with Et > 25 GeV and eta < 3.0
+  // && MEt significance > 3.
   bool write = false;
-// Note: num
-  if ( numGoodJets >= 5 && numChanged != 0 ) {
+  // Note: num
+  if ( numGoodJets >= 5 && mEtSig > 3. && numChanged != 0 ) {
     write = true;
     ++nTotWritten_;
   }

@@ -31,8 +31,8 @@ class THStackLegend {
     delete canvas_;
   }
 //  void Add(TH1F * HISTO, char* LEGEND = "", char* FILL = "l");
-  TH1* Add(const TH1 * HISTO, const char* LEGEND = "", const bool & NORMALIZE = false, const char* FILL = "l");
-  TProfile* Add(const TProfile * HISTO, const char* LEGEND = "", const bool & NORMALIZE = false, const char* FILL = "l");
+  TH1* Add(const TH1 * HISTO, const char* LEGEND = "", const bool & NORMALIZE = false, const char* FILL = "l", const bool & ERRORS = false );
+  TProfile* Add(const TProfile * HISTO, const char* LEGEND = "", const bool & NORMALIZE = false, const char* FILL = "l" );
 
   TAxis * GetXaxis() const {
 //    return ( stack_->GetHistogram()->GetXaxis() );
