@@ -20,4 +20,6 @@ module TDAnaModule = TDAna {
 
   untracked uint32 TracksMinimumNum_in_PixelJet = 3
   untracked string OutputEffFileName            = "Efficiency_file.txt"
+
+  untracked bool DoPixelTrigger = false
 }

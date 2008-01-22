@@ -22,4 +22,5 @@ module TDAnaModule = TDAna {
   untracked string OutputEffFileName            = "Efficiency_file.txt"
 
   untracked bool DoPixelTrigger                 = false
+
 }
