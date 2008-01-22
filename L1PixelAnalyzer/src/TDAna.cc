@@ -5,18 +5,18 @@
 //
 // To do:
 //
-// 1) improve likelihood by adding variables included in it
-//    (add histograms at SS level, then modify Smooth.C code,
-//    run TDAna, run Smooth.C on rootple, run TDAna again with
-//    improved functionfileSS.root input)
-//    - Variables to add: chi2mass (seems to discriminate better than chi2extall!)  
+// 1) - improve likelihood by adding variables included in it
+//      (add histograms at SS level, then modify Smooth.C code,
+//      run TDAna, run Smooth.C on rootple, run TDAna again with
+//      improved functionfileSS.root input)
+//    x Variables to add: chi2mass (seems to discriminate better than chi2extall!)  
 //    - NJets
-//    - GoodHt
-//    - M_others
-//    - tag information from tag mass
+//    x GoodHt
+//    x M_others
+//    x tag information from tag mass
 //
 // 2) study other kinematical variables and possibly include them:
-//    - mass of bb system is not yet very well characterized: need to find 
+//    x mass of bb system is not yet very well characterized: need to find 
 //      a better way to select the pair
 //    - sum of Delta R angles between closest b-tag pairs, E.G. loop on
 //      all b-tag jets, compute min(DR) among all, exclude pair, and if
@@ -24,29 +24,29 @@
 //      definition entails computing minimum sum of pair masses. The rationale
 //      is to find gluon splitting b-pairs and discriminate from more spread out
 //      b-jets as in signal topology
-//    - revert logic of M3, M2 selection by first choosing b-pair, then finding
+//    x revert logic of M3, M2 selection by first choosing b-pair, then finding
 //      best triplet among remaining jets, and look for W boson within those
 //    x compute minimum dijet mass in triplet which gives best top mass
-//    - compute angle between best triplet momentum and best b-pair momentum
-//    - compute mass of those two vectors (just mass of five included jets)
+//    x compute angle between best triplet momentum and best b-pair momentum
+//    x compute mass of those two vectors (just mass of five included jets)
 //    - compute average |eta| of first 8 jets
 // 
-// 3) Compute Q-value of signal vs sum of backgrounds for each variable separately
-//    and global likelihood.
-//    Then, optimize global likelihood by picking best variables trying to pick
-//    those with least correlation (e.g. choose either C6 or C8, not both).
+// 3) x Compute Q-value of signal vs sum of backgrounds for each variable separately
+//      and global likelihood.
+//    x Then, optimize global likelihood by picking best variables trying to pick
+//      those with least correlation (e.g. choose either C6 or C8, not both).
 //
-// 4) define pseudoexperiments and produce 2-component fits of likelihood, extract
-//    distribution of signal significance.
+// 4) - define pseudoexperiments and produce 2-component fits of likelihood, extract
+//     distribution of signal significance.
 //
-// 5) Also, NB: corrected jet energies appear overestimated by a good 15%. Because of 
-//    this, the top mass window in Trecfrac is moved to 200 GeV, and the fits likewise
-//    (H window is set at 123). See MTbest, MHbest. MWbest indicates the W peaks at 94.
-//    These values are used for the reference points in the extraction of chisquares.
-//
-// 6) Note: the tag rate matrix should, if possible, be redone to account for the changes,
-//    and if so, some smart way of taking into account correlations could be envisioned.
-//    (changes: etamax 2.5->3.0 and etmin 30->25).
+// 5) x Also, NB: corrected jet energies appear overestimated by a good 15%. Because of 
+//      this, the top mass window in Trecfrac is moved to 200 GeV, and the fits likewise
+//      (H window is set at 123). See MTbest, MHbest. MWbest indicates the W peaks at 94.
+//      These values are used for the reference points in the extraction of chisquares.
+//      --> Use P6 to correct tagged/untagged jets -> ref masses now 86, 186, 117.
+// 6) - Note: the tag rate matrix should, if possible, be redone to account for the changes,
+//      and if so, some smart way of taking into account correlations could be envisioned.
+//      (changes: etamax 2.5->3.0 and etmin 30->25).
 // 
 //
 // --------------------------------------------------------------------------------
@@ -137,12 +137,6 @@ TDAna::TDAna(const edm::ParameterSet& iConfig) :
 
   // Parameters of Et correction functions
   // -------------------------------------
-//   upar[2] =  1.512588;
-//   upar[1] = -0.05629097;
-//   upar[0] = -0.0002950658;
-//   tpar[2] =  9.017700;
-//   tpar[1] = -0.08954207;
-//   tpar[0] = -0.0003376759;
   // Pol6 parameters:
   // ----------------
   // b-tags
@@ -204,6 +198,12 @@ TDAna::TDAna(const edm::ParameterSet& iConfig) :
   HSS_bgr[9] = dynamic_cast<TH1D*> ( FunctionFile->Get("M_othersSS_bgrS"));
   HSS_sig[10]= dynamic_cast<TH1D*> ( FunctionFile->Get("Et6SS_sigS"));
   HSS_bgr[10]= dynamic_cast<TH1D*> ( FunctionFile->Get("Et6SS_bgrS"));
+  HSS_sig[11]= dynamic_cast<TH1D*> ( FunctionFile->Get("SumHED4SS_sigS"));
+  HSS_bgr[11]= dynamic_cast<TH1D*> ( FunctionFile->Get("SumHED4SS_bgrS"));
+  HSS_sig[12]= dynamic_cast<TH1D*> ( FunctionFile->Get("TTMS1SS_sigS"));
+  HSS_bgr[12]= dynamic_cast<TH1D*> ( FunctionFile->Get("TTMS1SS_bgrS"));
+  HSS_sig[13]= dynamic_cast<TH1D*> ( FunctionFile->Get("ScprodSS_sigS"));
+  HSS_bgr[13]= dynamic_cast<TH1D*> ( FunctionFile->Get("ScprodSS_bgrS"));
   //  FunctionFile->Close();
 
   // File with HED and HPD distributions from QCD jets
@@ -1302,22 +1302,22 @@ TDAna::TDAna(const edm::ParameterSet& iConfig) :
   // Bin boundaries for tag probability
   // ----------------------------------
   double etb[9] = {25.,50.,70.,90.,110.,150.,200.,300., 500.}; // NB last bin is 10000 in reality
-  double etab[5] = {0., 1., 1.5, 2.0, 3.0 };                
+  double etab[5] = {0., 1., 1.5, 2.0, 3.0 };                   // (see where matrix is actually used)
   double nt1b[9] = {2., 3., 4., 5., 6., 7., 8., 9., 10.}; // NB last bin is 100 in reality
-
+                                                          // (this is used here for histogramming purposes)
   // Fill histogram with tag matrix
   // ------------------------------
   PTagEt_ = new TH1D ( "PTagEt", "Tag probability versus jet Et", 8, etb );
   PTagEta_= new TH1D ( "PTagEta", "Tag probability versus jet eta", 4, etab );
   PTagNt_ = new TH1D ( "PTagNt", "Tag probability versus jet N tracks", 8, nt1b );
-  cout << "bin 1 " << PTagEt_->GetBinLowEdge(1) << " " <<  PTagEt_->GetBinWidth(1) << endl;
-  cout << "bin 2 " << PTagEt_->GetBinLowEdge(2) << " " <<  PTagEt_->GetBinWidth(2) << endl;
-  cout << "bin 3 " << PTagEt_->GetBinLowEdge(3) << " " <<  PTagEt_->GetBinWidth(3) << endl;
-  cout << "bin 4 " << PTagEt_->GetBinLowEdge(4) << " " <<  PTagEt_->GetBinWidth(4) << endl;
-  cout << "bin 5 " << PTagEt_->GetBinLowEdge(5) << " " <<  PTagEt_->GetBinWidth(5) << endl;
-  cout << "bin 6 " << PTagEt_->GetBinLowEdge(6) << " " <<  PTagEt_->GetBinWidth(6) << endl;
-  cout << "bin 7 " << PTagEt_->GetBinLowEdge(7) << " " <<  PTagEt_->GetBinWidth(7) << endl;
-  cout << "bin 8 " << PTagEt_->GetBinLowEdge(8) << " " <<  PTagEt_->GetBinWidth(8) << endl;
+//   cout << "bin 1 " << PTagEt_->GetBinLowEdge(1) << " " <<  PTagEt_->GetBinWidth(1) << endl;
+//   cout << "bin 2 " << PTagEt_->GetBinLowEdge(2) << " " <<  PTagEt_->GetBinWidth(2) << endl;
+//   cout << "bin 3 " << PTagEt_->GetBinLowEdge(3) << " " <<  PTagEt_->GetBinWidth(3) << endl;
+//   cout << "bin 4 " << PTagEt_->GetBinLowEdge(4) << " " <<  PTagEt_->GetBinWidth(4) << endl;
+//   cout << "bin 5 " << PTagEt_->GetBinLowEdge(5) << " " <<  PTagEt_->GetBinWidth(5) << endl;
+//   cout << "bin 6 " << PTagEt_->GetBinLowEdge(6) << " " <<  PTagEt_->GetBinWidth(6) << endl;
+//   cout << "bin 7 " << PTagEt_->GetBinLowEdge(7) << " " <<  PTagEt_->GetBinWidth(7) << endl;
+//   cout << "bin 8 " << PTagEt_->GetBinLowEdge(8) << " " <<  PTagEt_->GetBinWidth(8) << endl;
 
   for ( int iet=0; iet<8; iet++ ){
     double tag=0;
@@ -1327,8 +1327,8 @@ TDAna::TDAna(const edm::ParameterSet& iConfig) :
 	int j = 100*iet+10*ieta+in1;
 	tag=tag+N1HETM[j];
 	jet=jet+N0HETM[j];	  
-	cout << iet << " " << ieta << " " << in1 << " bin " << j 
-	     << " : " << tag << "/" << jet << endl;
+// 	cout << iet << " " << ieta << " " << in1 << " bin " << j 
+// 	     << " : " << tag << "/" << jet << endl;
       }
     }
     if ( jet>0 ) {
@@ -1386,6 +1386,18 @@ TDAna::TDAna(const edm::ParameterSet& iConfig) :
   for ( int i=0; i<4; ++i ) {
     l1Tags_[i] = 0;
     pixelTags_[i] = 0;
+  }
+
+  // Additional decay information
+  // (only meaningful if it is a tt or tth event)
+  // --------------------------------------------
+  Nttall=0.;
+  Ntthall=0.;
+  for ( int i=0;i<5; i++ ) {
+    for ( int j=0; j<10; j++ ) {
+      Ntt[i][j]=0.;
+      Ntth[i][j]=0.;
+    }
   }
 
   // End of initializations
@@ -1502,7 +1514,7 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   // - deltaZ used to reconstruct the verteces
   // - minimum number of pixel-tracks in a PixelJet
   // - minimum Pt of the primary vertex
-  L1PixelTrig<SimplePixelJet> PJtrig(1, 0.1, 2, 112.);
+  L1PixelTrig<SimplePixelJet> PJtrig(1, 0.4, 5, 170.);
   PJtrig.Fill( pixeljets );
   
 #ifdef DEBUG
@@ -1628,8 +1640,8 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
     response = l1Response;
   }
 
-  /////////////////////////////////// MC analysis ////////////////////////////
-
+  ////////////////////////////////// MC analysis ////////////////////////////
+  
   // Compute events in each final state
   // ----------------------------------
   // Take genParticleCandidates
@@ -1724,10 +1736,7 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   if ( tdecay==8 ) itdecay=7; // mnmn2j
   if ( tdecay==12) itdecay=8; // mntn2j
   if ( tdecay==16) itdecay=9; // tntn2j
-  if ( itdecay==-1 ) {
-    itdecay=0;
-    cout << "Wrong decay assignment" << endl;
-  }
+  if ( itdecay<0 ) itdecay=0;
   total[itdecay][hdecay]++;
   grandtotaltt[hdecay]++;
   grandtotalh[itdecay]++;
@@ -2250,7 +2259,7 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   } // if sl tt decay + h->cc,bb decay
   
   ////////////////////////////////////////////////////////////////////////////////////
-  
+
   // Offline analysis
   // ----------------
 
@@ -2652,7 +2661,7 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	// Compute sum of tag masses
 	// -------------------------
 	for ( int i=0; i<iJmax; i++ ) {
-	  ttms1+=JMT[i];
+	  if ( JHEM[i] ) ttms1+=JMT[i];
 	}
           
 
@@ -2878,12 +2887,12 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 		  spy=py1+py2;
 		  spz=pz1+pz2;
 		  se=sqrt(px1*px1+py1*py1+pz1*pz1)+sqrt(px2*px2+py2*py2+pz2*pz2);
-		}
-		mbbnoh=se*se-spx*spx-spy*spy-spz*spz;
-		if ( mbbnoh>0 ) mbbnoh=sqrt(mbbnoh);
-		if ( mbbnoh>mbbnohmax ) {
-		  mbbnohmax=mbbnoh;
-		  dpbbnohmax=3.1415926-fabs(fabs(Jphi[k1]-Jphi[k2])-3.1415926);
+		  mbbnoh=se*se-spx*spx-spy*spy-spz*spz;
+		  if ( mbbnoh>0 ) mbbnoh=sqrt(mbbnoh);
+		  if ( mbbnoh>mbbnohmax ) {
+		    mbbnohmax=mbbnoh;
+		    dpbbnohmax=3.1415926-fabs(fabs(Jphi[k1]-Jphi[k2])-3.1415926);
+		  }
 		}
 	      }
 	    }      
@@ -3713,7 +3722,7 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	  double fs=0.;
 	  double fb=0.;
 	  rel_lik = 0.;
-	  int bx[11];
+	  int bx[14];
 	  bx[0]= (int)((c8/1.2)*50)+1;
 	  bx[1]= (int)((m8/2500.)*50)+1;
 	  bx[2]= (int)((c6/1.2)*50)+1;
@@ -3725,7 +3734,10 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	  bx[8]= (int)((m5/2000.)*50)+1;
 	  bx[9]= (int)((m_others/1500.)*50.)+1;
 	  bx[10]= (int)((Et6/150.)*50)+1;
-	  for ( int ivar=0; ivar<11; ivar++ ) {
+	  bx[11]= (int)((sumhed4/100.)*50)+1; 
+	  bx[12]= (int)((ttms1/80.)*50)+1.;
+	  bx[13]= (int)(((scprodthbest+1200.)/2400.)*50)+1.;
+	  for ( int ivar=0; ivar<14; ivar++ ) {
 	    if ( bx[ivar]>=1 && bx[ivar]<=50 ) {
 	      fs = HSS_sig[ivar]->GetBinContent(bx[ivar]);
 	      fb = HSS_bgr[ivar]->GetBinContent(bx[ivar]);
@@ -3812,7 +3824,7 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
       // Compute sum of tag masses
       // -------------------------
       for ( int i=0; i<iJmax; i++ ) {
-	ttms1+=JMT[i];
+	if ( JHEM[i] ) ttms1+=JMT[i];
       }
 
       // Fill HED and HPD histograms
@@ -4064,12 +4076,12 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 		spy=py1+py2;
 		spz=pz1+pz2;
 		se=sqrt(px1*px1+py1*py1+pz1*pz1)+sqrt(px2*px2+py2*py2+pz2*pz2);
-	      }
-	      mbbnoh=se*se-spx*spx-spy*spy-spz*spz;
-	      if ( mbbnoh>0 ) mbbnoh=sqrt(mbbnoh);
-	      if ( mbbnoh>mbbnohmax ) {
-		mbbnohmax=mbbnoh;
-		dpbbnohmax=3.1415926-fabs(fabs(Jphi[k1]-Jphi[k2])-3.1415926);
+		mbbnoh=se*se-spx*spx-spy*spy-spz*spz;
+		if ( mbbnoh>0 ) mbbnoh=sqrt(mbbnoh);
+		if ( mbbnoh>mbbnohmax ) {
+		  mbbnohmax=mbbnoh;
+		  dpbbnohmax=3.1415926-fabs(fabs(Jphi[k1]-Jphi[k2])-3.1415926);
+		}
 	      }
 	    }
 	  }      
@@ -4413,7 +4425,7 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 		if ( nt>=4 ) E4NJSSS_->Fill((double)i);
 	      }
 	    }
-	  }
+	  } 
 	}
       }
 
@@ -4423,18 +4435,7 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
       double fs=0.;
       double fb=0.;
       rel_lik = 0.;
-      int bx[11];
-//       bx[0]= (int)((c8/1.2)*50)+1;
-//       bx[1]= (int)((m45bestall/300.)*50)+1;
-//       bx[2]= (int)(chi2extall)+1;
-//       bx[3]= (int)((metsig/20.)*50)+1;
-//       bx[4]= (int)((m8/2000)*50.)+1;
-//       bx[5]= (int)((met/500.)*50)+1;
-//       bx[6]= (int)((dp12/3.2)*50.)+1;
-//       bx[7]= (int)((dp2nd/3.2)*50)+1;
-//       bx[8]= (int)((c6/1.2)*50)+1;
-//       bx[9]= (int)((m6/2500.)*50.)+1;
-//       bx[10]= (int)((sumet/4000.)*50)+1;
+      int bx[14];
       bx[0]= (int)((c8/1.2)*50)+1;
       bx[1]= (int)((m8/2500.)*50)+1;
       bx[2]= (int)((c6/1.2)*50)+1;
@@ -4446,7 +4447,10 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
       bx[8]= (int)((m5/2000.)*50)+1;
       bx[9]= (int)((m_others/1500.)*50.)+1;
       bx[10]= (int)((Et6/150.)*50)+1;
-      for ( int ivar=0; ivar<11; ivar++ ) {
+      bx[11]= (int)((sumhed4/100.)*50)+1;
+      bx[12]= (int)((ttms1/80.)*50)+1.;
+      bx[13]= (int)(((scprodthbest+1200.)/2400.)*50)+1.;
+      for ( int ivar=0; ivar<14; ivar++ ) {
 	if ( bx[ivar]>=1 && bx[ivar]<=50 ) {
 	  fs = HSS_sig[ivar]->GetBinContent(bx[ivar]);
 	  fb = HSS_bgr[ivar]->GetBinContent(bx[ivar]);
@@ -4503,6 +4507,42 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
       ++pixelMEtSig_;
       for ( int tags=1; tags<5; ++tags ) {
         if ( trueNHEM >= tags ) ++pixelTags_[tags-1];
+      }
+    }
+  }
+
+  // And now do same for different top and higgs decays
+  // (only meaningful if it is a tt or tth event)
+  // --------------------------------------------------
+  if ( itdecay>=0 && itdecay<10 ) {
+    Ntt[0][itdecay]++;
+    Nttall++;
+    if ( response && NJetsCut ) {
+      Ntt[1][itdecay]++;
+      if ( MEtSigCut && NHEM>=2 ) {
+	Ntt[2][itdecay]++;
+	if ( NHEM>=3 ) {
+	  Ntt[3][itdecay]++;
+	  if ( NHEM>=4 ) {
+	    Ntt[4][itdecay]++;
+	  }
+	}
+      }
+    }
+    if ( hdecay==1 ) {
+      Ntth[0][itdecay]++;
+      Ntthall++;
+      if ( response && NJetsCut ) {
+	Ntth[1][itdecay]++;
+	if ( MEtSigCut && NHEM>=2 ) {
+	  Ntth[2][itdecay]++;
+	  if ( NHEM>=3 ) {
+	    Ntth[3][itdecay]++;
+	    if ( NHEM>=4 ) {
+	      Ntth[4][itdecay]++;
+	    }
+	  }
+	}
       }
     }
   }
@@ -4711,6 +4751,140 @@ void TDAna::endJob() {
               << setprecision(4) << error*100 << endl;
   }
 
+  // Finally add some more info on particular decays
+  // (only meaningful for tt and ttH events)
+  // -----------------------------------------------
+  decayfile << endl;
+  decayfile << "Additional info of t and H decay: " << endl;
+  decayfile << "----------------------------------" << endl;
+  decayfile << endl;
+  decayfile << "Total processed tt  = " << Nttall << endl;
+  decayfile << endl;
+  decayfile << "Top->hadrons: All/Trig/MEtS+2tag/3tag/4tag: " 
+	    << Ntt[0][0] << " " 
+	    << Ntt[1][0] << " "  
+	    << Ntt[2][0] << " " 
+	    << Ntt[3][0] << " "  
+	    << Ntt[4][0] << endl;
+  decayfile << "Top->en4j:    All/Trig/MEtS+2tag/3tag/4tag: " 
+	    << Ntt[0][1] << " " 
+	    << Ntt[1][1] << " "  
+	    << Ntt[2][1] << " " 
+	    << Ntt[3][1] << " "  
+	    << Ntt[4][1] << endl;
+  decayfile << "Top->mn4j:    All/Trig/MEtS+2tag/3tag/4tag: " 
+	    << Ntt[0][2] << " " 
+	    << Ntt[1][2] << " "  
+	    << Ntt[2][2] << " " 
+	    << Ntt[3][2] << " "  
+	    << Ntt[4][2] << endl;
+  decayfile << "Top->tn4j:    All/Trig/MEtS+2tag/3tag/4tag: " 
+	    << Ntt[0][3] << " " 
+	    << Ntt[1][3] << " "  
+	    << Ntt[2][3] << " " 
+	    << Ntt[3][3] << " "  
+	    << Ntt[4][3] << endl;
+  decayfile << "Top->enen2j:  All/Trig/MEtS+2tag/3tag/4tag: " 
+	    << Ntt[0][4] << " " 
+	    << Ntt[1][4] << " "  
+	    << Ntt[2][4] << " " 
+	    << Ntt[3][4] << " "  
+	    << Ntt[4][4] << endl;
+  decayfile << "Top->enmn2j:  All/Trig/MEtS+2tag/3tag/4tag: " 
+	    << Ntt[0][5] << " " 
+	    << Ntt[1][5] << " "  
+	    << Ntt[2][5] << " " 
+	    << Ntt[3][5] << " "  
+	    << Ntt[4][5] << endl;
+  decayfile << "Top->entn2j:  All/Trig/MEtS+2tag/3tag/4tag: " 
+	    << Ntt[0][6] << " " 
+	    << Ntt[1][6] << " "  
+	    << Ntt[2][6] << " " 
+	    << Ntt[3][6] << " "  
+	    << Ntt[4][6] << endl;
+  decayfile << "Top->mnmn2j:  All/Trig/MEtS+2tag/3tag/4tag: " 
+	    << Ntt[0][7] << " " 
+	    << Ntt[1][7] << " "  
+	    << Ntt[2][7] << " " 
+	    << Ntt[3][7] << " "  
+	    << Ntt[4][7] << endl;
+  decayfile << "Top->mntn2j:  All/Trig/MEtS+2tag/3tag/4tag: " 
+	    << Ntt[0][8] << " " 
+	    << Ntt[1][8] << " "  
+	    << Ntt[2][8] << " " 
+	    << Ntt[3][8] << " "  
+	    << Ntt[4][8] << endl;
+  decayfile << "Top->tntn2j:  All/Trig/MEtS+2tag/3tag/4tag: " 
+	    << Ntt[0][9] << " " 
+	    << Ntt[1][9] << " "  
+	    << Ntt[2][9] << " " 
+	    << Ntt[3][9] << " "  
+	    << Ntt[4][9] << endl;
+  decayfile << endl;
+  decayfile << "Total processed ttH with H->bb = " << Ntthall << endl;
+  decayfile << endl;
+  decayfile << "Subset for H->bb decay: " << endl;
+  decayfile << "Top->hadrons: All/Trig/MEtS+2tag/3tag/4tag: " 
+	    << Ntth[0][0] << " " 
+	    << Ntth[1][0] << " "  
+	    << Ntth[2][0] << " " 
+	    << Ntth[3][0] << " "  
+	    << Ntth[4][0] << endl;
+  decayfile << "Top->en4j:    All/Trig/MEtS+2tag/3tag/4tag: " 
+	    << Ntth[0][1] << " " 
+	    << Ntth[1][1] << " "  
+	    << Ntth[2][1] << " " 
+	    << Ntth[3][1] << " "  
+	    << Ntth[4][1] << endl;
+  decayfile << "Top->mn4j:    All/Trig/MEtS+2tag/3tag/4tag: " 
+	    << Ntth[0][2] << " " 
+	    << Ntth[1][2] << " "  
+	    << Ntth[2][2] << " " 
+	    << Ntth[3][2] << " "  
+	    << Ntth[4][2] << endl;
+  decayfile << "Top->tn4j:    All/Trig/MEtS+2tag/3tag/4tag: " 
+	    << Ntth[0][3] << " " 
+	    << Ntth[1][3] << " "  
+	    << Ntth[2][3] << " " 
+	    << Ntth[3][3] << " "  
+	    << Ntth[4][3] << endl;
+  decayfile << "Top->enen2j:  All/Trig/MEtS+2tag/3tag/4tag: " 
+	    << Ntth[0][4] << " " 
+	    << Ntth[1][4] << " "  
+	    << Ntth[2][4] << " " 
+	    << Ntth[3][4] << " "  
+	    << Ntth[4][4] << endl;
+  decayfile << "Top->enmn2j:  All/Trig/MEtS+2tag/3tag/4tag: " 
+	    << Ntth[0][5] << " " 
+	    << Ntth[1][5] << " "  
+	    << Ntth[2][5] << " " 
+	    << Ntth[3][5] << " "  
+	    << Ntth[4][5] << endl;
+  decayfile << "Top->entn2j:  All/Trig/MEtS+2tag/3tag/4tag: " 
+	    << Ntth[0][6] << " " 
+	    << Ntth[1][6] << " "  
+	    << Ntth[2][6] << " " 
+	    << Ntth[3][6] << " "  
+	    << Ntth[4][6] << endl;
+  decayfile << "Top->mnmn2j:  All/Trig/MEtS+2tag/3tag/4tag: " 
+	    << Ntth[0][7] << " " 
+	    << Ntth[1][7] << " "  
+	    << Ntth[2][7] << " " 
+	    << Ntth[3][7] << " "  
+	    << Ntth[4][7] << endl;
+  decayfile << "Top->mntn2j:  All/Trig/MEtS+2tag/3tag/4tag: " 
+	    << Ntth[0][8] << " " 
+	    << Ntth[1][8] << " "  
+	    << Ntth[2][8] << " " 
+	    << Ntth[3][8] << " "  
+	    << Ntth[4][8] << endl;
+  decayfile << "Top->tntn2j:  All/Trig/MEtS+2tag/3tag/4tag: " 
+	    << Ntth[0][9] << " " 
+	    << Ntth[1][9] << " "  
+	    << Ntth[2][9] << " " 
+	    << Ntth[3][9] << " "  
+	    << Ntth[4][9] << endl;
+   
   decayfile.close();
 
   // Histograms for the study of jet/parton association

@@ -19,7 +19,7 @@
 //
 // Original Author:  Marco De Mattia
 //         Created:  Tue May  8 13:05:37 CEST 2007
-// $Id: TDAna.h,v 1.26 2008/01/21 08:12:47 dorigo Exp $
+// $Id: TDAna.h,v 1.28 2008/01/21 13:27:25 demattia Exp $
 //
 //
 
@@ -189,13 +189,13 @@ class TDAna : public edm::EDAnalyzer {
 
   // Function histograms
   // -------------------
-  TH1D * HSS_sig[11];
-  TH1D * HSS_bgr[11];
+  TH1D * HSS_sig[14];
+  TH1D * HSS_bgr[14];
   TH1D * HEDpdf[8];
   TH1D * HPDpdf[8];
   TH1D * MTS1pdf[8];
   TH1D * MNS1pdf[8];
-  TH1D * MTS2pdf[8];
+  TH1D * MTS2pdf[8]; 
   TH1D * MNS2pdf[8];
   TH1D * MTS3pdf[8];
   TH1D * MNS3pdf[8];
@@ -1030,4 +1030,13 @@ class TDAna : public edm::EDAnalyzer {
   int pixelNjets_;
   int pixelMEtSig_;
   int pixelTags_[4];
+
+  // Some additional stats
+  // (only meaningful if it is a tt or tth event)
+  // --------------------------------------------
+  double Nttall;
+  double Ntthall;
+  double Ntt[5][10];
+  double Ntth[5][10];
+
 };
