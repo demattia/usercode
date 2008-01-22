@@ -1,4 +1,4 @@
-void Ana_all_new (TString var, TString sel ) 
+void Ana_all_new (TString var, TString sel, double mincut=-10000, double maxcut=10000 ) 
 {
 
   // - Controllare tutti i numeri eventi
@@ -22,7 +22,7 @@ void Ana_all_new (TString var, TString sel )
   QCD[11] = new TFile("./root/TDAna_EXTRA_QCD_120-170.root");
   QCD[12] = new TFile("./root/TDAna_EXTRA_QCD_170-230.root");
   QCD[13] = new TFile("./root/TDAna_EXTRA_QCD_230-300.root");
-  //QCD[14] = new TFile("./root/TDAna_EXTRA_QCD_300-380.root");
+  QCD[14] = new TFile("./root/TDAna_EXTRA_QCD_300-380.root");
   QCD[15] = new TFile("./root/TDAna_EXTRA_QCD_380-incl.root");
   double QCDxs[16] = { 155929000., 20938850., 2949713., 499656., 
 		       100995.,  23855., 6391., 2821., 155929000., 
@@ -49,9 +49,9 @@ void Ana_all_new (TString var, TString sel )
   QCDMULT[2] = new TFile("./root/TDAna_MULTI_EXTRA_QCD_80-120.root");
   QCDMULT[3] = new TFile("./root/TDAna_MULTI_EXTRA_QCD_120-170.root");
   QCDMULT[4] = new TFile("./root/TDAna_MULTI_EXTRA_QCD_170-230.root");
-  //QCDMULT[5] = new TFile("./root/TDAna_MULTI_EXTRA_QCD_230-300.root");
-  //QCDMULT[6] = new TFile("./root/TDAna_MULTI_EXTRA_QCD_300-380.root");
-  //QCDMULT[7] = new TFile("./root/TDAna_MULTI_EXTRA_QCD_380-incl.root");
+  QCDMULT[5] = new TFile("./root/TDAna_MULTI_EXTRA_QCD_230-300.root");
+  QCDMULT[6] = new TFile("./root/TDAna_MULTI_EXTRA_QCD_300-380.root");
+  QCDMULT[7] = new TFile("./root/TDAna_MULTI_EXTRA_QCD_380-incl.root");
   double QCDMxs[8] =  { 155929000., 20938850., 2949713., 499656., 
 			100995.,  23855., 6391., 2821. };
   double NQCDM[8] = { 11229443., 26347818., 24971508.,  29514603., 
@@ -63,7 +63,7 @@ void Ana_all_new (TString var, TString sel )
   W[2] = new TFile ("./root/TDAna_W_1JETS_100ptw300.root");
   W[3] = new TFile ("./root/TDAna_W_2JETS_0ptw100.root");
   W[4] = new TFile ("./root/TDAna_W_2JETS_100ptw300.root");
-  // W[5] = new TFile ("./root/TDAna_W_3JETS_0ptw100.root"); 
+  W[5] = new TFile ("./root/TDAna_W_3JETS_0ptw100.root"); 
   W[6] = new TFile ("./root/TDAna_W_3JETS_100ptw300.root");
   W[7] = new TFile ("./root/TDAna_W_4JETS_0ptw100.root");
   W[8] = new TFile ("./root/TDAna_W_4JETS_100ptw300.root");
@@ -93,12 +93,12 @@ void Ana_all_new (TString var, TString sel )
   double TTPYTxs = 650.9;
   double NTTPYT = 972000.;
 
-//   TFile * ST[3];
-//   ST[0] = new TFile("./root/TDAna_SINGLETOP_TQ_TQB_LHC_E.root");
-//   ST[1] = new TFile("./root/TDAna_SINGLETOP_TQ_TQB_LHC_MU.root");
-//   ST[2] = new TFile("./root/TDAna_SINGLETOP_TQ_TQB_LHC_TAU.root");
-//   double STxs[3] = { 27.43, 26.97, 28.71 };
-//   double NST[3] = { , , };
+  TFile * ST[3];
+  ST[0] = new TFile("./root/TDAna_SINGLETOP_TQ_TQB_LHC_E.root");
+  ST[1] = new TFile("./root/TDAna_SINGLETOP_TQ_TQB_LHC_MU.root");
+  ST[2] = new TFile("./root/TDAna_SINGLETOP_TQ_TQB_LHC_TAU.root");
+  double STxs[3] = { 27.43, 26.97, 28.71 };
+  double NST[3] = { 92000, 94000, 94000 }; 
 
   TFile * ZNN[2];
   ZNN[0] = new TFile("./root/TDAna_ZNUNUJETS_120-170.root");
@@ -113,6 +113,11 @@ void Ana_all_new (TString var, TString sel )
   TH1D * H = dynamic_cast<TH1D*>(TTH->Get(pippo));
   double minx=H->GetBinLowEdge(1);
   double maxx=nbins*H->GetBinWidth(1)+minx;
+
+  int imin=(int)((mincut-minx)/(maxx-minx)*50);
+  int imax=(int)((maxcut-minx)/(maxx-minx)*50);
+  if ( imin<1 ) imin=1;
+  if ( imax>nbins ) imax=nbins;
 
   TH1D * Histo_QCD = new TH1D ( pippo+"_QCD", "", nbins, minx, maxx );
   TH1D * Histo_QCDM = new TH1D ( pippo+"_QCDM", "", nbins, minx, maxx );
@@ -135,8 +140,8 @@ void Ana_all_new (TString var, TString sel )
   double s2_totQCD[nbins]={0.};
   double totNQCD[16][nbins]={0.};
   for ( int i=0; i<16; i++ ) {
-    if ( i==14 ) i++;
     cout << "Processing QCD file #" << i << " ..." << endl;
+    if ( i==14 ) i++;
     TH1D * Histo = dynamic_cast<TH1D*>(QCD[i]->Get(pippo));
     TH1D * HistoW = dynamic_cast<TH1D*>(QCD[i]->Get(pippo+"W"));
     // For QCD, we need also total entries in histograms to add a
@@ -163,12 +168,24 @@ void Ana_all_new (TString var, TString sel )
       }
     }
   }
+  // IF WE WANT TO RENORMALIZE QCD MATRIX-WEIGHTED HISTOGRAMS TO NUMBER EXPECTATION:
+  // -------------------------------------------------------------------------------
+//   if ( renormalize_toNqcd ) {
+//     double tt=0.;
+//     for ( int ibin=1; ibin<=nbins; ibin++ ) {
+//       tw += totQCD[ibin-1];
+//       tn += totNQCD[i]
+//     }
+//     for ( int ibin=1; ibin<=nbins; ibin++ ) {
+//       totQCD[ibin-1];
+//     }
+//   }
   
   // QCD Multiplied:
   // ---------------
   double totQCDM[nbins]={0.};
   double s2_totQCDM[nbins]={0.};
-  for ( int i=0; i<5; i++ ) {   ///////////////// NNBB needs to be 8
+  for ( int i=0; i<8; i++ ) { 
     cout << "Processing QCD MULT file #" << i << " ..." << endl;
     TH1D * Histo = dynamic_cast<TH1D*>(QCDMULT[i]->Get(pippo));
     for ( int ibin=1; ibin<=nbins; ibin++ ) {
@@ -194,7 +211,7 @@ void Ana_all_new (TString var, TString sel )
   // ----------
   double totTT[nbins]={0.};
   double s2_totTT[nbins]={0.};
-  for ( int i=1; i<5; i++ ) { //////////////////////// NNBB
+  for ( int i=0; i<5; i++ ) { 
     cout << "Processing TT file #" << i << " ..." << endl;
     TH1D * Histo = dynamic_cast<TH1D*>(TT[i]->Get(pippo));
     for ( int ibin=1; ibin<=nbins; ibin++ ) {
@@ -223,8 +240,8 @@ void Ana_all_new (TString var, TString sel )
   double s2_totW[nbins]={0.};
   double totNW[11][nbins]={0.};
   for ( int i=0; i<11; i++ ) {
-    if ( i==5 ) i++; //////////////// NNBB
     cout << "Processing W file #" << i << " ..." << endl;
+    if ( i==5 ) i++;
     TH1D * Histo = dynamic_cast<TH1D*>(W[i]->Get(pippo));
     TH1D * HistoW = dynamic_cast<TH1D*>(W[i]->Get(pippo+"W"));
     // For W, we need also total entries in histograms to add a
@@ -256,15 +273,15 @@ void Ana_all_new (TString var, TString sel )
 //   // ----
    double totST[nbins]={0.};
    double s2_totST[nbins]={0.};
-//   for ( int i=0; i<3; i++ ) {
-//     cout << "Processing ST file #" << i << " ..." << endl;
-//     TH1D * Histo = dynamic_cast<TH1D*>(ST[i]->Get(pippo));
-//     for ( int ibin=1; ibin<=nbins; ibin++ ) {
-//       double t=Histo->GetBinContent(ibin);
-//       totST[ibin-1]+=t*STxs[i]/NST[i]*Lumfactor;
-//       s2_totST[ibin-1]+=t*pow(STxs[i]/NST[i]*Lumfactor,2);
-//     }
-//   }
+  for ( int i=0; i<3; i++ ) {
+    cout << "Processing ST file #" << i << " ..." << endl;
+    TH1D * Histo = dynamic_cast<TH1D*>(ST[i]->Get(pippo));
+    for ( int ibin=1; ibin<=nbins; ibin++ ) {
+      double t=Histo->GetBinContent(ibin);
+      totST[ibin-1]+=t*STxs[i]/NST[i]*Lumfactor;
+      s2_totST[ibin-1]+=t*pow(STxs[i]/NST[i]*Lumfactor,2);
+    }
+  }
 
   // ZNN :
   // -----
@@ -289,7 +306,7 @@ void Ana_all_new (TString var, TString sel )
     Histo_TT->SetBinContent(ibin,totTT[ibin-1]);
     Histo_TTPYT->SetBinContent(ibin,totTTPYT[ibin-1]); // not in total
     Histo_W->SetBinContent(ibin,totW[ibin-1]);
-    //Histo_ST->SetBinContent(ibin,totST[ibin-1]);
+    Histo_ST->SetBinContent(ibin,totST[ibin-1]);
     Histo_ZNN->SetBinContent(ibin,totZNN[ibin-1]);
     Histo_QCD->SetBinError(ibin,sqrt(s2_totQCD[ibin-1]));
     Histo_QCDM->SetBinError(ibin,sqrt(s2_totQCDM[ibin-1])); // not in total
@@ -297,7 +314,7 @@ void Ana_all_new (TString var, TString sel )
     Histo_TT->SetBinError(ibin,sqrt(s2_totTT[ibin-1]));
     Histo_TTPYT->SetBinError(ibin,sqrt(s2_totTTPYT[ibin-1])); // not in total
     Histo_W->SetBinError(ibin,sqrt(s2_totW[ibin-1]));
-    //Histo_ST->SetBinError(ibin,sqrt(s2_totST[ibin-1]));
+    Histo_ST->SetBinError(ibin,sqrt(s2_totST[ibin-1]));
     Histo_ZNN->SetBinError(ibin,sqrt(s2_totZNN[ibin-1]));
     double grandtot = (totQCD[ibin-1]+totTTH[ibin-1]+totTT[ibin-1]+
 		       totW[ibin-1]+totST[ibin-1]+totZNN[ibin-1]);
@@ -307,9 +324,11 @@ void Ana_all_new (TString var, TString sel )
     Histo_TOT->SetBinError(ibin,grandtote);
   }
 
-  double B_int = Histo_TOT->Integral();
-  double S_int = Histo_TTH->Integral();
-  cout << B_int << " " << S_int << " " << S_int/sqrt(B_int) << endl;
+  double B_int = Histo_TOT->Integral(imin,imax);
+  double S_int = Histo_TTH->Integral(imin,imax);
+  cout << "Selected events: " << B_int << "B, " << S_int << "S. Significance = " << S_int/sqrt(B_int) << endl;
+  cout << "QCD comparison: P= " << Histo_QCD->KolmogorovTest(Histo_QCDM) << endl;
+  cout << "TOP comparison: P= " << Histo_TT->KolmogorovTest(Histo_TTPYT) << endl;
   
   TCanvas * QCDcomp = new TCanvas ( "QCDcomp", "Comparison QCD / QCD mult", 600, 600 );
   QCDcomp->Divide(1,2);
@@ -404,14 +423,52 @@ void Ana_all_new (TString var, TString sel )
   Histo_ZNN->SetLineColor(kGreen);
   Histo_ZNN->DrawCopy("SAMEHISTO");
   Histo_TOT->DrawCopy("PESAME");
-
   b->cd(2);
-  Histo_TOT->SetNormFactor(1);
-  Histo_TOT->Draw("PE");
-  Histo_TTH->SetNormFactor(1);
-  Histo_TTH->Draw("PESAME");
-  Histo_TOT->Draw("PESAME");
-  b->Print(pippo+".ps");
+  Histo_TOT->SetMarkerStyle(20);
+  Histo_TOT->SetMarkerSize(0.4);
+  Histo_TOT->SetMinimum(1.);
+  Histo_TOT->DrawCopy("PE");
+  Histo_QCD->SetMarkerStyle(21);
+  Histo_QCD->SetMarkerSize(0.4);
+  Histo_QCD->SetMarkerColor(kRed);
+  Histo_QCD->SetLineColor(kRed);
+  Histo_QCD->DrawCopy("PESAME");
+  Histo_TTH->SetMarkerStyle(24);
+  Histo_TTH->SetMarkerSize(0.4);
+  Histo_TTH->SetMarkerColor(kBlue);
+  Histo_TTH->SetLineColor(kBlue);
+  Histo_TTH->DrawCopy("PESAME");
+  Histo_TT->SetMarkerStyle(25);
+  Histo_TT->SetMarkerSize(0.4);
+  Histo_TT->SetMarkerColor(kGreen);
+  Histo_TT->SetLineColor(kGreen);
+  Histo_TT->DrawCopy("PESAME");
+  Histo_W->SetMarkerStyle(26);
+  Histo_W->SetMarkerSize(0.4);
+  Histo_W->SetMarkerColor(kCyan);
+  Histo_W->SetLineColor(kCyan);
+  Histo_W->DrawCopy("PESAME");
+  Histo_ST->SetMarkerStyle(27);
+  Histo_ST->SetMarkerSize(0.4);
+  Histo_ST->SetMarkerColor(kBlack);
+  Histo_ST->SetLineColor(kBlack);
+  Histo_ST->DrawCopy("SAMEHISTO");
+  Histo_ZNN->SetMarkerStyle(27);
+  Histo_ZNN->SetMarkerSize(0.4);
+  Histo_ZNN->SetMarkerColor(kGreen);
+  Histo_ZNN->SetLineColor(kGreen);
+  Histo_ZNN->DrawCopy("SAMEHISTO");
+  Histo_TOT->DrawCopy("PESAME");
+  b->Print("./ps/"+pippo+".ps");
+
+  // Histograms to fit:
+  // ------------------
+  TFile * xmia = new TFile("xmia.root","RECREATE");
+  xmia->cd();
+  Histo_TOT->Write();
+  Histo_TTH->Write();
+  xmia->Close();
+
 
   // Close files
   // -----------

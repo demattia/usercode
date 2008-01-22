@@ -26,6 +26,34 @@ void Qvalues_lik (TString sel )
   // Scprod : maximum quality factor 1.01074+-0.00200097 at LR > 1.2
   // M5 : maximum quality factor 1.01335+-0.00219015 at LR > 0.8
   
+  ///////////////////////////////////////
+  // Likelihood Q.factors:
+  // ---------------------
+  //-C8 : maximum quality factor 1.16709+-0.00661793 at LR > 0.6
+  //-M8 : maximum quality factor 1.04187+-0.00556994 at LR > 1.4
+  //-C6 : maximum quality factor 1.11941+-0.00449912 at LR > 0.4
+  //-M6 : maximum quality factor 1.04134+-0.00445692 at LR > 1.2
+  //-SumHED4 : maximum quality factor 1.06108+-0.00713321 at LR > 1.4
+  // SumHED6 : maximum quality factor 1.06003+-0.00878232 at LR > 1.6
+  // MEtSig : maximum quality factor 1.0093+-0.00833529 at LR > 1.6
+  // CorrSumEt : maximum quality factor 1.0082+-0.0014352 at LR > 0.8
+  // GoodHt : maximum quality factor 1.0135+-0.00137209 at LR > 0.8
+  // Hbestcomb : maximum quality factor 1.0071+-0.00154006 at LR > 1.2
+  //-MEtDP1 : maximum quality factor 1.02642+-0.00348194 at LR > 0.8
+  // MEtDP2 : maximum quality factor 1.00866+-0.00298317 at LR > 1.4
+  //-M_others : maximum quality factor 1.01423+-0.003096 at LR > 1.4
+  //-Et6 : maximum quality factor 1.00181+-0.000694712 at LR > 1.2
+  //-Scprod : maximum quality factor 1.02365+-0.00269676 at LR > 1
+  //-Thdeta : maximum quality factor 1.06094+-0.00398558 at LR > 1
+  //-M5 : maximum quality factor 1.03623+-0.00281002 at LR > 0.6
+  // M3best : maximum quality factor 1.00484+-0.00107542 at LR > 1.2
+  
+  // Qvalues.C quality factors:
+  // --------------------------
+
+
+
+
   // In the attempt at defining a yardstick with which to decide which variables
   // are the most discriminating for separating signal from sum of backgrounds,
   // we could consider:
@@ -41,11 +69,11 @@ void Qvalues_lik (TString sel )
   // distributions is the correct measure to quantify how much a 2-comp fit will separate the
   // two).
 
-  const int nvars=24;
+  const int nvars=25;
   TString var[nvars] = { "C8", "M8", "C6", "M6", "MEt", "MEtSig", "CorrSumEt", "GoodHt", 
 			 "Hbestcomb", "Chi2mass", "Mbbnoh", "DPbbnoh", 
 			 "SumHED4", "SumHED6", "MEtDPM", "MEtDP1", "MEtDP2",
-			 "M_others", "Et6", "Scprod", "Thdeta", "M5", "M3best", "Mwbest" }
+			 "M_others", "Et6", "Scprod", "Thdeta", "M5", "M3best", "Mwbest", "TTMS1" }
 
   const int nbins=50;
   const int nbinsl=20;

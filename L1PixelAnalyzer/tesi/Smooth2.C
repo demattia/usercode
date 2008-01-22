@@ -25,11 +25,12 @@ void Smooth (TString sel, double frac_true_err ) {
   
   const int nbins = 50;
   
-  const int nvars=24;
+  const int nvars=25;
   TString var[nvars] = { "C8", "M8", "C6", "M6", "MEt", "MEtSig", "CorrSumEt", "GoodHt", 
 			 "Hbestcomb", "Chi2mass", "Mbbnoh", "DPbbnoh", 
 			 "SumHED4", "SumHED6", "MEtDPM", "MEtDP1", "MEtDP2",
-			 "M_others", "Et6", "Scprod", "Thdeta", "M5", "M3best", "Mwbest" }
+			 "M_others", "Et6", "Scprod", "Thdeta", "M5", "M3best", "Mwbest", 
+			 "TTMS1" }
 
   TString pippo[nvars];
   TString pippotot[nvars];

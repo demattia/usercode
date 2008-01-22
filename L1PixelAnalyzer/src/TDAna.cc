@@ -1560,21 +1560,21 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   bool response_cen = false;
   L1Trigger.Fill( vec_TriggerCenJet );
   response_cen = L1Trigger.Response();
-  bool response_opt_cen = L1Trigger.Response(230,210,70,70);
+  bool response_opt_cen = L1Trigger.Response(230,200,70,70);
   
   // Forward
   // -------
   bool response_for = false;
   L1Trigger.Fill( vec_TriggerForJet );
   response_for = L1Trigger.Response();
-  bool response_opt_for = L1Trigger.Response(230,210,70,70);
+  bool response_opt_for = L1Trigger.Response(230,200,70,70);
   
   // Tau
   // ---
   bool response_tau = false;
   L1Trigger.Fill( vec_TriggerTauJet );
   response_tau = L1Trigger.Response();
-  bool response_opt_tau = L1Trigger.Response(230,210,70,70);
+  bool response_opt_tau = L1Trigger.Response(230,200,70,70);
   
   // Full and no-forward
   // -------------------
@@ -1656,7 +1656,7 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   int foundw=0;
   double Parton_pt[8]={0.};
   double Parton_eta[8]={0.};
-  double Parton_phi[8]={0.};
+  double Parton_phi[8]={0.}; 
   double Parton_mass[8]={0.};
   double Parton_dec[8]={0.};
   int iparton=0;

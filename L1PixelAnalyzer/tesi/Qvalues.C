@@ -16,11 +16,11 @@ void Qvalues (TString sel )
   // distributions is the correct measure to quantify how much a 2-comp fit will separate the
   // two).
 
-  const int nvars=24;
+  const int nvars=25;
   TString var[nvars] = { "C8", "M8", "C6", "M6", "MEt", "MEtSig", "CorrSumEt", "GoodHt", 
 			 "Hbestcomb", "Chi2mass", "Mbbnoh", "DPbbnoh", 
 			 "SumHED4", "SumHED6", "MEtDPM", "MEtDP1", "MEtDP2",
-			 "M_others", "Et6", "Scprod", "Thdeta", "M5", "M3best", "Mwbest" }
+			 "M_others", "Et6", "Scprod", "Thdeta", "M5", "M3best", "Mwbest", "TTMS1" }
   const int nbins=50;
   TString pippo[nvars];
   TString pippotot[nvars];
@@ -316,7 +316,7 @@ void Qvalues (TString sel )
     R_->DrawCopy("PE");
     b->cd(4);
     Q_->DrawCopy("PE");
-    b->Print("./ps/"+pippo[ivar]+"_opt_gt.ps");
+    b->Print("./ps/"+pippo[ivar]+"_"+sel+"opt_gt.ps");
 
     delete S_;
     delete B_;
