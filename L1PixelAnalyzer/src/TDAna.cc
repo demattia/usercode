@@ -2326,7 +2326,7 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   double dpbball = 0.;    // delta phi bb
   double m_others = -999.; // mass of jets not part of best triplet and pair
   double mbbnohmax = -999.; // mass of b pair with highest mass excluding b-jets from h decay
-  double dpbbnohmax = 0.; // angle of b pair with highest mass excluding b-jets from h decay
+  double dpbbnohmax = -999.; // angle of b pair with highest mass excluding b-jets from h decay
   double scprodthbest=0.; // scalar product between top and higgs
   double thdetabest=0.; // delta eta between top and higgs
   double m5=0.;         // mass of five jets assigned to top and higgs
@@ -2551,7 +2551,7 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	dpbball = 0;      // delta phi bb as above
 	m_others = -999;  // mass of jets not part of best triplet and pair
 	mbbnohmax = -999; // mass of b pair with highest mass excluding b-jets from h decay
-	dpbbnohmax = 0;   // angle of b pair with highest mass excluding b-jets from h decay
+	dpbbnohmax = -999;   // angle of b pair with highest mass excluding b-jets from h decay
 	
 	m6=0.;
 	m8=0.;
