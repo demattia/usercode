@@ -306,13 +306,17 @@ TDAna::TDAna(const edm::ParameterSet& iConfig) :
 
   // Histograms of delta Et vs Et for jet energy corrections
   // -------------------------------------------------------
-  DEtb_prof_ = new TProfile ( "DEtb_prof", "Et mismeasurement vs Et - b-tagged jets", 100, 0., 1000., 
+  DEtb_prof_ = new TProfile ( "DEtb_prof", "Et mismeasurement vs Et - b-tagged jets", 
+			      100, 0., 1000., 
 			      -1000., 1000. );
-  DEtq_prof_ = new TProfile ( "DEtq_prof", "Et mismeasurement vs Et - non b-tagged jets", 100, 0., 1000., 
+  DEtq_prof_ = new TProfile ( "DEtq_prof", "Et mismeasurement vs Et - non b-tagged jets", 
+			      100, 0., 1000., 
 			      -1000., 1000. );
-  DEtcb_prof_ = new TProfile ( "DEtcb_prof", "Et mismeasurement vs Etc - b-tagged jets", 100, 0., 1000., 
+  DEtcb_prof_ = new TProfile ( "DEtcb_prof", "Et mismeasurement vs Etc - b-tagged jets", 
+			       100, 0., 1000., 
 			      -1000., 1000. );
-  DEtcq_prof_ = new TProfile ( "DEtcq_prof", "Et mismeasurement vs Etc - non b-tagged jets", 100, 0., 1000., 
+  DEtcq_prof_ = new TProfile ( "DEtcq_prof", "Et mismeasurement vs Etc - non b-tagged jets", 
+			       100, 0., 1000., 
 			      -1000., 1000. );
 
   // Histograms for jet-parton matching
@@ -1086,7 +1090,7 @@ TDAna::TDAna(const edm::ParameterSet& iConfig) :
   int counter=0;
   ifstream Hreadfile ("Hread.asc");
   string line;
-  while (Hreadfile) {
+  while (Hreadfile && counter<1000 ) {
     getline(Hreadfile,line,' ');
     stringstream pippo1(line);
     pippo1 >> Hread[counter];
@@ -1115,7 +1119,7 @@ TDAna::TDAna(const edm::ParameterSet& iConfig) :
   }
   counter=0;
   ifstream Treadfile ("Tread.asc");
-  while (Treadfile) {
+  while (Treadfile && counter<1000 ) {
     getline(Treadfile,line,' ');
     stringstream pippo1(line);
     pippo1 >> Tread[counter];
@@ -2718,7 +2722,11 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	      if ( idr<0 ) idr=0;
 	      if ( idr>9 ) idr=9;
 	      double r = Hread[100*idr+10*ieta+ipt];
-	      if ( Hnotread[100*idr+10*ieta+ipt]>0 ) r=r/Hnotread[100*idr+10*ieta+ipt];
+	      if ( Hnotread[100*idr+10*ieta+ipt]>0 ) {
+		r=r/Hnotread[100*idr+10*ieta+ipt];
+	      } else {
+		r = 10.;
+	      }
 	      if ( r>maxr ) {
 		maxr = r;
 		hbestcomb=m45;
@@ -2812,7 +2820,11 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 		if ( iet<0 ) iet=0;
 		if ( iet>9 ) iet=9;
 		double r = Tread[100*iet+10*idp+ipt];
-		if ( Tnotread[100*iet+10*idp+ipt]>0 ) r=r/Tnotread[100*iet+10*idp+ipt];
+		if ( Tnotread[100*iet+10*idp+ipt]>0 ) {
+		  r=r/Tnotread[100*iet+10*idp+ipt];
+		} else {
+		  r=10.;
+		}
 		if ( r>maxr ) {
 		  maxr = r;
 		  tbestcomb=m123;
@@ -3907,7 +3919,11 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	    if ( idr<0 ) idr=0;
 	    if ( idr>9 ) idr=9;
 	    double r = Hread[100*idr+10*ieta+ipt];
-	    if ( Hnotread[100*idr+10*ieta+ipt]>0 ) r=r/Hnotread[100*idr+10*ieta+ipt];
+	    if ( Hnotread[100*idr+10*ieta+ipt]>0 ) {
+	      r=r/Hnotread[100*idr+10*ieta+ipt];
+	    } else {
+	      r=10.;
+	    }
 	    if ( r>maxr ) {
 	      maxr = r;
 	      hbestcomb=m45;
@@ -4001,7 +4017,11 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	      if ( iet<0 ) iet=0;
 	      if ( iet>9 ) iet=9;
 	      double r = Tread[100*iet+10*idp+ipt];
-	      if ( Tnotread[100*iet+10*idp+ipt]>0 ) r=r/Tnotread[100*iet+10*idp+ipt];
+	      if ( Tnotread[100*iet+10*idp+ipt]>0 ) {
+		r=r/Tnotread[100*iet+10*idp+ipt];
+	      } else {
+		r=10.;
+	      }
 	      if ( r>maxr ) {
 		maxr = r;
 		tbestcomb=m123;
