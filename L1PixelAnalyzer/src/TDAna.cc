@@ -820,13 +820,13 @@ TDAna::TDAna(const edm::ParameterSet& iConfig) :
   // Histograms to check where are the tags in the Et-ordered jet list
   // -----------------------------------------------------------------
   N3NJ_ = new TH1D ( "N3NJ", "N of 3HEL tags vs N jets",  
-		     20, 0, 20 );  // These are filled only for this
+		     20, -0.5, 19.5 );  // These are filled only for this
   E3NJ_ = new TH1D ( "E3NJ", "Efficiency of 3HEL tags vs N jets", 
-		     20, 0, 20 );  // selection and do not require W, N
+		     20, -0.5, 19.5 );  // selection and do not require W, N
   N4NJ_ = new TH1D ( "N4NJ", "N of 4HEL tags vs N jets", 
-		     20, 0, 20 );  // These are filled only for this
+		     20, -0.5, 19.5 );  // These are filled only for this
   E4NJ_ = new TH1D ( "E4NJ", "Efficiency of 4HEL tags vs N jets", 
-		     20, 0, 20 );  // selection and do not require W, N
+		     20, -0.5, 19.5 );  // selection and do not require W, N
 
   NJetsW_ = new TH1D ( "NJetsW", "Number of selected jets", 50, 0, 50 );
   UncorrHtW_ = new TH1D ( "UncorrHtW", "Ht with uncorrected jets", 50, 0, 4000 );
@@ -4276,7 +4276,7 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	    for ( int j=0; j<=i; j++ ) {
 	      if ( JHEM[j] ) nt++;
 	    }
-	    N3NJ_->Fill((double)i);
+	    N3NJ_->Fill((double)i+1);
 	    if ( nt>=3 ) E3NJ_->Fill((double)i+1);
 	  }
 	}
@@ -4286,7 +4286,7 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	    for ( int j=0; j<=i; j++ ) {
 	      if ( JHEM[j] ) nt++;
 	    }
-	    N4NJ_->Fill((double)i);
+	    N4NJ_->Fill((double)i+1);
 	    if ( nt>=4 ) E4NJ_->Fill((double)i+1);
 	  }
 	}
