@@ -19,7 +19,7 @@
 //
 // Original Author:  Marco De Mattia
 //         Created:  Tue May  8 13:05:37 CEST 2007
-// $Id: TDAna.h,v 1.28 2008/01/21 13:27:25 demattia Exp $
+// $Id: TDAna.h,v 1.29 2008/01/22 10:32:33 dorigo Exp $
 //
 //
 
@@ -481,8 +481,10 @@ class TDAna : public edm::EDAnalyzer {
   TH1D * TTMS2SSS_;
   TH1D * TTMS3SSS_;
 
-  TH1D * N4NJSSS_;
-  TH1D * E4NJSSS_;
+  TH1D * N3NJ_;
+  TH1D * E3NJ_;
+  TH1D * N4NJ_;
+  TH1D * E4NJ_;
 
   // Histograms with number of entries
   // ---------------------------------
@@ -919,9 +921,6 @@ class TDAna : public edm::EDAnalyzer {
   TH1D * TTMS1SSSW_;
   TH1D * TTMS2SSSW_;
   TH1D * TTMS3SSSW_;
-
-  TH1D * N4NJSSSW_;
-  TH1D * E4NJSSSW_;
 
   TH2D * UncorrMEt_SumEt_;
   TH2D * CorrMEt_SumEt_; 

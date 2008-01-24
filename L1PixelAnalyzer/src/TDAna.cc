@@ -819,10 +819,14 @@ TDAna::TDAna(const edm::ParameterSet& iConfig) :
 
   // Histograms to check where are the tags in the Et-ordered jet list
   // -----------------------------------------------------------------
-  N4NJSSS_ = new TH1D ( "N4NJSSS", "N of 4HEL tags vs N jets", 
-			20, 0, 20 );  // These are filled only for this
-  E4NJSSS_ = new TH1D ( "E4NJSSS", "Efficiency of 4HEL tags vs N jets", 
-			20, 0, 20 );  // selection and do not require W, N
+  N3NJ_ = new TH1D ( "N3NJ", "N of 3HEL tags vs N jets",  
+		     20, 0, 20 );  // These are filled only for this
+  E3NJ_ = new TH1D ( "E3NJ", "Efficiency of 3HEL tags vs N jets", 
+		     20, 0, 20 );  // selection and do not require W, N
+  N4NJ_ = new TH1D ( "N4NJ", "N of 4HEL tags vs N jets", 
+		     20, 0, 20 );  // These are filled only for this
+  E4NJ_ = new TH1D ( "E4NJ", "Efficiency of 4HEL tags vs N jets", 
+		     20, 0, 20 );  // selection and do not require W, N
 
   NJetsW_ = new TH1D ( "NJetsW", "Number of selected jets", 50, 0, 50 );
   UncorrHtW_ = new TH1D ( "UncorrHtW", "Ht with uncorrected jets", 50, 0, 4000 );
@@ -1039,9 +1043,6 @@ TDAna::TDAna(const edm::ParameterSet& iConfig) :
   TTMS1SSSW_ = new TH1D ( "TTMS1SSSW", "Total tag mass with S1 tracks", 50, 0., 80. );
   TTMS2SSSW_ = new TH1D ( "TTMS2SSSW", "Total tag mass with S2 tracks", 50, 0., 80. );
   TTMS3SSSW_ = new TH1D ( "TTMS3SSSW", "Total tag mass with S3 tracks", 50, 0., 80. );
-
-  N4NJSSSW_ = new TH1D ( "N4NJSSSW", "N of 4HEL tags vs N jets", 20, 0, 20 );
-  E4NJSSSW_ = new TH1D ( "E4NJSSSW", "Efficiency of 4HEL tags vs N jets", 20, 0, 20 );
 
   UncorrMEt_SumEt_ = new TH2D ( "UncorrMEt_SumEt", "MEt vs SumEt", 100, 0, 4000, 100, 0, 1000 );
   CorrMEt_SumEt_ = new TH2D ( "CorrMEt_SumEt", "MEt vs SumEt", 100, 0, 4000, 100, 0, 1000 );
@@ -2119,34 +2120,37 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	    double spz=pz1+pz2+pz3;
 	    m123=pow(e1+e2+e3,2)-pow(spx,2)-pow(spy,2)-pow(spz,2);
 	    if ( m123>0 ) m123=sqrt(m123);
-	    
-	    double pt3 = sqrt(spx*spx+spy*spy);
-	    double scprodth=0.;          // projection of top momentum in h direction
-	    if ( ph2>0 ) scprodth = (spx*pxh+spy*pyh+spz*pzh)/sqrt(ph2);
-	    double ptot3 = sqrt(spx*spx+spy*spy+spz*spz);
-	    double eta3=0.;
-	    if ( ptot3-spz!=0 ) eta3 = 0.5*log((ptot3+spz)/(ptot3-spz));
-	    double phi3 = atan2(spy,spx);
-	    double thdphi = 3.141592-fabs(fabs(phi3-phipair)-3.141592);
-	    double thdeta = eta3-etapair; // angle between momenta of t and h
-	    MTbest_->Fill(m123);
-	    Tpt_->Fill(pt3);
-	    Teta_->Fill(fabs(eta3));
-	    THdeta_->Fill(thdeta);
-	    if ( ph2>0 ) THproj_->Fill(scprodth);
-	    THdphi_->Fill(thdphi);
-	    // Fill matrix with probability of pair
-	    // ------------------------------------
- 	    int ipt=(int)((pt3/600.)*10);
- 	    int idp=(int)((thdphi/3.15)*10);
- 	    int iet=(int)((fabs(eta3)/4.)*10);
- 	    if ( ipt<0 ) ipt=0;
- 	    if ( ipt>9 ) ipt=9;
- 	    if ( idp<0 ) idp=0;
- 	    if ( idp>9 ) idp=9;
- 	    if ( iet<0 ) iet=0;
- 	    if ( iet>9 ) iet=9;
- 	    T[iet*100+idp*10+ipt]++;
+	    // Only for et, eta cuts chosen: compute kinematics of top partons
+	    // ---------------------------------------------------------------
+	    if ( ietmin==5 && ietamax==7 ) { 
+	      double pt3 = sqrt(spx*spx+spy*spy);
+	      double scprodth=0.;          // projection of top momentum in h direction
+	      if ( ph2>0 ) scprodth = (spx*pxh+spy*pyh+spz*pzh)/sqrt(ph2);
+	      double ptot3 = sqrt(spx*spx+spy*spy+spz*spz);
+	      double eta3=0.;
+	      if ( ptot3-spz!=0 ) eta3 = 0.5*log((ptot3+spz)/(ptot3-spz));
+	      double phi3 = atan2(spy,spx);
+	      double thdphi = 3.141592-fabs(fabs(phi3-phipair)-3.141592);
+	      double thdeta = eta3-etapair; // angle between momenta of t and h
+	      MTbest_->Fill(m123);
+	      Tpt_->Fill(pt3);
+	      Teta_->Fill(fabs(eta3));
+	      THdeta_->Fill(thdeta);
+	      if ( ph2>0 ) THproj_->Fill(scprodth);
+	      THdphi_->Fill(thdphi);
+	      // Fill matrix with probability of pair
+	      // ------------------------------------
+	      int ipt=(int)((pt3/600.)*10);
+	      int idp=(int)((thdphi/3.15)*10);
+	      int iet=(int)((fabs(eta3)/4.)*10);
+	      if ( ipt<0 ) ipt=0;
+	      if ( ipt>9 ) ipt=9;
+	      if ( idp<0 ) idp=0;
+	      if ( idp>9 ) idp=9;
+	      if ( iet<0 ) iet=0;
+	      if ( iet>9 ) iet=9;
+	      T[iet*100+idp*10+ipt]++;
+	    }
 	  }
 	  // Mass of two jets from W
 	  // -----------------------
@@ -2361,6 +2365,7 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   bool   JHEM[100];
   double NHSJ = 8; // number of jets from hard subprocess  <---- VERY IMPORTANT PARAMETER
   double NHEM = 0; // number of medium tags
+  double NHEM_ALL = 0; // number of medium tags among ALL iJ jets
   double sumhed4 = 0.; // Sum of high-eff discriminant for 4 highest HET jets
   double sumhpd4 = 0.; // Sum of high-pur discriminant for 4 highest HPT jets
   double sumhed6 = 0.; // Sum of high-eff discriminant for 6 highest HET jets
@@ -2479,8 +2484,9 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	}
       }
     }
-    for ( int ij=0; ij<iJ && ij<NHSJ; ij++ ) { 
-      if ( JHEM[ij] ) NHEM++;   // NNNBBB Tags are counted only if in first 8 jets!
+    for ( int ij=0; ij<iJ; ij++ ) { 
+      if ( JHEM[ij] && ij<NHSJ ) NHEM++;   // NNNBBB Tags are counted only if in first 8 jets!
+      if ( JHEM[ij] ) NHEM_ALL++;
     }
 
     // Take the NHEM at this point, not after the tag matrix
@@ -4261,6 +4267,30 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	TTMS1_->Fill(ttms1);
 	TTMS2_->Fill(ttms2);
 	TTMS3_->Fill(ttms3);
+
+	// Study number of events with 3 or 4 HEM tags vs N jets on which to look for them
+	// -------------------------------------------------------------------------------
+	if ( NHEM_ALL>=3 ) {
+	  for ( int i=0; i<iJ; i++ ) {
+	    int nt=0;
+	    for ( int j=0; j<=i; j++ ) {
+	      if ( JHEM[j] ) nt++;
+	    }
+	    N3NJ_->Fill((double)i);
+	    if ( nt>=3 ) E3NJ_->Fill((double)i);
+	  }
+	}
+	if ( NHEM_ALL>=4 ) {
+	  for ( int i=0; i<iJ; i++ ) {
+	    int nt=0;
+	    for ( int j=0; j<=i; j++ ) {
+	      if ( JHEM[j] ) nt++;
+	    }
+	    N4NJ_->Fill((double)i);
+	    if ( nt>=4 ) E4NJ_->Fill((double)i);
+	  }
+	}
+
 	
 	if ( MEtSigCut && NHEM>=2 ) {
 	  NJetsS_->Fill(goodIc5Jets);
@@ -4436,19 +4466,6 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	    TTMS1SSS_->Fill(ttms1);
 	    TTMS2SSS_->Fill(ttms2);
 	    TTMS3SSS_->Fill(ttms3);
-
-	    // Study number of events with 4HEM tags vs N jets on which to look for them
-	    // -------------------------------------------------------------------------
-	    if ( NHEM>=4 ) {
-	      for ( int i=0; i<iJ; i++ ) {
-		int nt=0;
-		for ( int j=0; j<=i; j++ ) {
-		  if ( JHEM[j] ) nt++;
-		}
-		N4NJSSS_->Fill((double)i);
-		if ( nt>=4 ) E4NJSSS_->Fill((double)i);
-	      }
-	    }
 	  } 
 	}
       }
@@ -5440,8 +5457,10 @@ void TDAna::endJob() {
   TTMS2SSSN_->Write();
   TTMS3SSSN_->Write();
 
-  N4NJSSS_->Write();
-  E4NJSSS_->Write();
+  N3NJ_->Write();
+  E3NJ_->Write();
+  N4NJ_->Write();
+  E4NJ_->Write();
 
   // Histograms with errors squared
   // ------------------------------
@@ -5667,9 +5686,6 @@ void TDAna::endJob() {
   TTMS2SSSW_->Write();
   TTMS3SSSW_->Write();
 
-  N4NJSSSW_->Write();
-  E4NJSSSW_->Write();
-  
   // Profile plots of MET vs SumEt
   // -----------------------------
   UncorrMEt_SumEt_->Write();
