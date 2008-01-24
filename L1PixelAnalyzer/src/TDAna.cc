@@ -2099,7 +2099,7 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	// Mass of three jets from t
 	// -------------------------
 	double m123=0.;
- 	if ( ietmin==5 && ietamax==7 && njt==3 && njh==2 ) {
+ 	if ( njt==3 && njh==2 ) {
 	  if (  JPet[ijt[0]]>etmin && fabs(JPeta[ijt[0]])<etamax  &&
 		JPet[ijt[1]]>etmin && fabs(JPeta[ijt[1]])<etamax  && 
 		JPet[ijt[2]]>etmin && fabs(JPeta[ijt[2]])<etamax ) {
@@ -4277,7 +4277,7 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	      if ( JHEM[j] ) nt++;
 	    }
 	    N3NJ_->Fill((double)i);
-	    if ( nt>=3 ) E3NJ_->Fill((double)i);
+	    if ( nt>=3 ) E3NJ_->Fill((double)i+1);
 	  }
 	}
 	if ( NHEM_ALL>=4 ) {
@@ -4287,7 +4287,7 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	      if ( JHEM[j] ) nt++;
 	    }
 	    N4NJ_->Fill((double)i);
-	    if ( nt>=4 ) E4NJ_->Fill((double)i);
+	    if ( nt>=4 ) E4NJ_->Fill((double)i+1);
 	  }
 	}
 
