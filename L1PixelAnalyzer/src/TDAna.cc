@@ -2177,11 +2177,11 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	      if ( JPet[i1]>etmin && fabs(JPeta[i1])<etamax && considered1<8 ) {
 		considered1++;
 		int considered2=0;
-		for ( int i2=0; i2<NJP-1; i2++ ) {
+		for ( int i2=i1+1; i2<NJP-1; i2++ ) {
 		  if ( JPet[i2]>etmin && fabs(JPeta[i2])<etamax && considered2<8 ) {
 		    considered2++;
 		    int considered3=0;
-		    for ( int i3=0; i3<NJP; i3++ ) {
+		    for ( int i3=i2+1; i3<NJP; i3++ ) {
 		      if ( JPet[i3]>etmin && fabs(JPeta[i3])<etamax && considered3<8 ) {
 			considered3++;
 			if ( ( ijt[0]!=i1 && ijt[0]!=i2 && ijt[0]!=i3 ) ||  
@@ -3758,18 +3758,18 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	  for ( int ivar=0; ivar<14; ivar++ ) {
 	    // Select only the most discriminant ones for a check:
 	    // ---------------------------------------------------
-	    if ( ivar==2 || ivar==5 || ivar==8 || ivar==11 || ivar==13 ) {
-	      if ( bx[ivar]>=1 && bx[ivar]<=50 ) {
-		fs = HSS_sig[ivar]->GetBinContent(bx[ivar]);
-		fb = HSS_bgr[ivar]->GetBinContent(bx[ivar]);
-		if (fb>0 && fs>0 ) {
-		  r *= fs/fb;
-		} else {
-		  if ( fb==0 ) r *= 10.;  // Need to improve this kludge
-		  if ( fs==0 ) r *= 0.1; 
-		}
+	    // if ( ivar==2 || ivar==5 || ivar==8 || ivar==11 || ivar==13 ) {
+	    if ( bx[ivar]>=1 && bx[ivar]<=50 ) {
+	      fs = HSS_sig[ivar]->GetBinContent(bx[ivar]);
+	      fb = HSS_bgr[ivar]->GetBinContent(bx[ivar]);
+	      if (fb>0 && fs>0 ) {
+		r *= fs/fb;
+	      } else {
+		if ( fb==0 ) r *= 10.;  // Need to improve this kludge
+		if ( fs==0 ) r *= 0.1; 
 	      }
 	    }
+	    // } end select 5 most discriminant
 	  }
 	  if ( r>=0 ) {
 	    rel_lik += log(r);
@@ -4494,18 +4494,18 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
       for ( int ivar=0; ivar<14; ivar++ ) {
 	// Select only the most discriminant ones for a check:
 	// ---------------------------------------------------
-	if ( ivar==2 || ivar==5 || ivar==8 || ivar==11 || ivar==13 ) {
-	  if ( bx[ivar]>=1 && bx[ivar]<=50 ) {
-	    fs = HSS_sig[ivar]->GetBinContent(bx[ivar]);
-	    fb = HSS_bgr[ivar]->GetBinContent(bx[ivar]);
-	    if (fb>0 && fs>0 ) {
-	      r *= fs/fb;
-	    } else {
-	      if ( fb==0 ) r *= 10.;  // Need to improve this kludge
-	      if ( fs==0 ) r *= 0.1; 
-	    }
+	//if ( ivar==2 || ivar==5 || ivar==8 || ivar==11 || ivar==13 ) {
+	if ( bx[ivar]>=1 && bx[ivar]<=50 ) {
+	  fs = HSS_sig[ivar]->GetBinContent(bx[ivar]);
+	  fb = HSS_bgr[ivar]->GetBinContent(bx[ivar]);
+	  if (fb>0 && fs>0 ) {
+	    r *= fs/fb;
+	  } else {
+	    if ( fb==0 ) r *= 10.;  // Need to improve this kludge
+	    if ( fs==0 ) r *= 0.1; 
 	  }
 	}
+	// } // end select the 5 most discriminant
       }
       if ( r>=0 ) {
 	rel_lik += log(r);
