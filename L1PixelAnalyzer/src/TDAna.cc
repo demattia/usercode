@@ -4744,26 +4744,26 @@ void TDAna::endJob() {
   float fraction = float(l1Eff_)/float(grandgrandtotal);
   float error = sqrt(fraction*(1-fraction)/grandgrandtotal);
   decayfile << "Fraction of events passing the level 1 trigger = " << l1Eff_
-            << "/" << grandgrandtotal << " "
+            << "/"  << setw(10) << grandgrandtotal << " "
             << setprecision(5) << setw(5) << fraction*100 << "+-"
             << setprecision(4) << error*100 << endl;
   fraction = float(l1Njets_)/float(grandgrandtotal);
   error = sqrt(fraction*(1-fraction)/grandgrandtotal);
   decayfile << "Fraction of events passing also NJet >= 5 = " << l1Njets_
-            << "/" << grandgrandtotal << " "
+            << "/"  << setw(10) << grandgrandtotal << " "
             << setprecision(5) << setw(5) << fraction*100 << "+-"
             << setprecision(4) << error*100 << endl;
   fraction = float(l1MEtSig_)/float(grandgrandtotal);
   error = sqrt(fraction*(1-fraction)/grandgrandtotal);
   decayfile << "Fraction of events passing also MEtSig cut = " << l1MEtSig_
-            << "/" << grandgrandtotal << " "
+            << "/"  << setw(10) << grandgrandtotal << " "
             << setprecision(5) << setw(5) << fraction*100 << "+-"
             << setprecision(4) << error*100 << endl;
   for ( int tags=0; tags<4; ++tags ) {
     fraction = float(l1Tags_[tags])/float(grandgrandtotal);
     error = sqrt(fraction*(1-fraction)/grandgrandtotal);
     decayfile << "Fraction of events with also >= "<< tags+1 << " b-tags = " << l1Tags_[tags]
-              << "/" << grandgrandtotal << " "
+              << "/"  << setw(10) << grandgrandtotal << " "
               << setprecision(5) << setw(5) << fraction*100 << "+-"
               << setprecision(4) << error*100 << endl;
   }
@@ -4772,26 +4772,26 @@ void TDAna::endJob() {
   fraction = float(l1PixelEff_)/float(grandgrandtotal);
   error = sqrt(fraction*(1-fraction)/grandgrandtotal);
   decayfile << "Fraction of events passing the level 1 pixel-trigger = " << l1PixelEff_
-            << "/" << grandgrandtotal << " "
+            << "/" << setw(10) << grandgrandtotal << " "
             << setprecision(5) << setw(5) << fraction*100 << "+-"
             << setprecision(4) << error*100 << endl;
   fraction = float(pixelNjets_)/float(grandgrandtotal);
   error = sqrt(fraction*(1-fraction)/grandgrandtotal);
   decayfile << "Fraction of events passing also NJet >= 5 = " << pixelNjets_
-            << "/" << grandgrandtotal << " "
+            << "/"  << setw(10) << grandgrandtotal << " "
             << setprecision(5) << setw(5) << fraction*100 << "+-"
             << setprecision(4) << error*100 << endl;
   fraction = float(pixelMEtSig_)/float(grandgrandtotal);
   error = sqrt(fraction*(1-fraction)/grandgrandtotal);
   decayfile << "Fraction of events passing also MEtSig cut = " << pixelMEtSig_
-            << "/" << grandgrandtotal << " "
+            << "/"  << setw(10) << grandgrandtotal << " "
             << setprecision(5) << setw(5) << fraction*100 << "+-"
             << setprecision(4) << error*100 << endl;
   for ( int tags=0; tags<4; ++tags ) {
     fraction = float(pixelTags_[tags])/float(grandgrandtotal);
     error = sqrt(fraction*(1-fraction)/grandgrandtotal);
     decayfile << "Fraction of events with also >= "<< tags+1 << " b-tags = " << pixelTags_[tags]
-              << "/" << grandgrandtotal << " "
+              << "/"  << setw(10) << grandgrandtotal << " "
               << setprecision(5) << setw(5) << fraction*100 << "+-"
               << setprecision(4) << error*100 << endl;
   }
