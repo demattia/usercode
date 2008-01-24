@@ -3750,14 +3750,18 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	  bx[12]= (int)((ttms1/80.)*50)+1.;
 	  bx[13]= (int)(((scprodthbest+1200.)/2400.)*50)+1.;
 	  for ( int ivar=0; ivar<14; ivar++ ) {
-	    if ( bx[ivar]>=1 && bx[ivar]<=50 ) {
-	      fs = HSS_sig[ivar]->GetBinContent(bx[ivar]);
-	      fb = HSS_bgr[ivar]->GetBinContent(bx[ivar]);
-	      if (fb>0 && fs>0 ) {
-		r *= fs/fb;
-	      } else {
-		if ( fb==0 ) r *= 10.;  // Need to improve this kludge
-		if ( fs==0 ) r *= 0.1; 
+	    // Select only the most discriminant ones for a check:
+	    // ---------------------------------------------------
+	    if ( ivar==2 || ivar==5 || ivar==8 || ivar==11 || ivar==13 ) {
+	      if ( bx[ivar]>=1 && bx[ivar]<=50 ) {
+		fs = HSS_sig[ivar]->GetBinContent(bx[ivar]);
+		fb = HSS_bgr[ivar]->GetBinContent(bx[ivar]);
+		if (fb>0 && fs>0 ) {
+		  r *= fs/fb;
+		} else {
+		  if ( fb==0 ) r *= 10.;  // Need to improve this kludge
+		  if ( fs==0 ) r *= 0.1; 
+		}
 	      }
 	    }
 	  }
@@ -4471,14 +4475,18 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
       bx[12]= (int)((ttms1/80.)*50)+1.;
       bx[13]= (int)(((scprodthbest+1200.)/2400.)*50)+1.;
       for ( int ivar=0; ivar<14; ivar++ ) {
-	if ( bx[ivar]>=1 && bx[ivar]<=50 ) {
-	  fs = HSS_sig[ivar]->GetBinContent(bx[ivar]);
-	  fb = HSS_bgr[ivar]->GetBinContent(bx[ivar]);
-	  if (fb>0 && fs>0 ) {
-	    r *= fs/fb;
-	  } else {
-	    if ( fb==0 ) r *= 10.;  // Need to improve this kludge
-	    if ( fs==0 ) r *= 0.1; 
+	// Select only the most discriminant ones for a check:
+	// ---------------------------------------------------
+	if ( ivar==2 || ivar==5 || ivar==8 || ivar==11 || ivar==13 ) {
+	  if ( bx[ivar]>=1 && bx[ivar]<=50 ) {
+	    fs = HSS_sig[ivar]->GetBinContent(bx[ivar]);
+	    fb = HSS_bgr[ivar]->GetBinContent(bx[ivar]);
+	    if (fb>0 && fs>0 ) {
+	      r *= fs/fb;
+	    } else {
+	      if ( fb==0 ) r *= 10.;  // Need to improve this kludge
+	      if ( fs==0 ) r *= 0.1; 
+	    }
 	  }
 	}
       }
