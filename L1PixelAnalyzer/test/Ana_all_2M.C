@@ -227,7 +227,7 @@ void Ana_all_new (TString var, TString sel, bool dops, bool renormalize )
     }
     for ( int ibin=1; ibin<=nbins; ibin++ ) {
       totQCD[ibin-1]=totQCD[ibin-1]*(normQCD/tw);
-      s2_totQCD[ibin-1]=s2_totQCD[ibin-1]*(normQCD/tw);
+      s2_totQCD[ibin-1]=s2_totQCD[ibin-1]*pow(normQCD/tw,2);
     }
   }
   
@@ -339,7 +339,7 @@ void Ana_all_new (TString var, TString sel, bool dops, bool renormalize )
     }
     for ( int ibin=1; ibin<=nbins; ibin++ ) {
       totW[ibin-1]=totW[ibin-1]*(normW/tw);
-      s2_totW[ibin-1]=s2_totW[ibin-1]*(normW/tw);
+      s2_totW[ibin-1]=s2_totW[ibin-1]*pow(normW/tw,2);
     }
   }
 
@@ -381,7 +381,7 @@ void Ana_all_new (TString var, TString sel, bool dops, bool renormalize )
     }
     for ( int ibin=1; ibin<=nbins; ibin++ ) {
       totZNN[ibin-1]=totZNN[ibin-1]*(normZ/tw);
-      s2_totZNN[ibin-1]=s2_totZNN[ibin-1]*(normZ/tw);
+      s2_totZNN[ibin-1]=s2_totZNN[ibin-1]*pow(normZ/tw,2);
     }
   }
 
