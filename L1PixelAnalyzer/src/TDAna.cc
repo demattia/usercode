@@ -1092,11 +1092,11 @@ TDAna::TDAna(const edm::ParameterSet& iConfig) :
   ifstream Hreadfile ("Hread.asc");
   string line;
   while (Hreadfile && counter<1000 ) {
-    getline(Hreadfile,line,' ');
+    int tmph1;
+    int tmph2;
+    getline(Hreadfile,line);
     stringstream pippo1(line);
     pippo1 >> Hread[counter];
-    getline(Hreadfile,line);
-    stringstream pippo2(line);
     pippo1 >> Hnotread[counter];
     counter++;
   }
@@ -1121,11 +1121,9 @@ TDAna::TDAna(const edm::ParameterSet& iConfig) :
   counter=0;
   ifstream Treadfile ("Tread.asc");
   while (Treadfile && counter<1000 ) {
-    getline(Treadfile,line,' ');
+    getline(Treadfile,line);
     stringstream pippo1(line);
     pippo1 >> Tread[counter];
-    getline(Treadfile,line);
-    stringstream pippo2(line);
     pippo1 >> Tnotread[counter];
     counter++;
   }
@@ -1137,8 +1135,8 @@ TDAna::TDAna(const edm::ParameterSet& iConfig) :
     tottnot+=Tnotread[i];
   }
   for ( int i=0; i<1000; i++ ) {
-    Tread[i]=Tread[i]/tott;
-    Tnotread[i]=Tnotread[i]/tottnot;
+    if ( tott>0 ) Tread[i]=Tread[i]/tott;
+    if ( tottnot>0 ) Tnotread[i]=Tnotread[i]/tottnot;
   }
 
   // Read PTag file
@@ -1332,8 +1330,6 @@ TDAna::TDAna(const edm::ParameterSet& iConfig) :
 	int j = 100*iet+10*ieta+in1;
 	tag=tag+N1HETM[j];
 	jet=jet+N0HETM[j];	  
-// 	cout << iet << " " << ieta << " " << in1 << " bin " << j 
-// 	     << " : " << tag << "/" << jet << endl;
       }
     }
     if ( jet>0 ) {
@@ -1775,7 +1771,7 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	JPet[NJP]=cal->et();
 	JPeta[NJP]=cal->eta();
 	JPphi[NJP]=cal->phi();
-	if ( cal->discriminatorHighEff()>loose_ ) JPtag[NJP]=true;
+	if ( cal->discriminatorHighEff()>medium_ ) JPtag[NJP]=true;
 	// Correct jet Et
 	// --------------
 	if ( JPtag[NJP] ) {
@@ -2184,9 +2180,17 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 		    for ( int i3=i2+1; i3<NJP; i3++ ) {
 		      if ( JPet[i3]>etmin && fabs(JPeta[i3])<etamax && considered3<8 ) {
 			considered3++;
+			// NNBB We consider only triplets where at least one jet is not from top,
+			// and where all three are chosen among jets other than those from higgs.
+			// This is to mimic what is later done with real data, where one first
+			// picks the Higgs pair, and then finds the best triplet among the remaining
+			// jets, provided one of the three is b-tagged.
+			// ----------------------------------------------------------------------
 			if ( ( ijt[0]!=i1 && ijt[0]!=i2 && ijt[0]!=i3 ) ||  
 			     ( ijt[1]!=i1 && ijt[1]!=i2 && ijt[1]!=i3 ) ||
-			     ( ijt[2]!=i1 && ijt[2]!=i2 && ijt[2]!=i3 ) ) {
+			     ( ijt[2]!=i1 && ijt[2]!=i2 && ijt[2]!=i3 ) &&
+			     i1!=ijh[0] && i1!=ijh[1] && i2!=ijh[0] && i2!=ijh[1] &&
+			     ( JPtag[i1] || JPtag[i2] || JPtag[i3] ) ) {
 			  double px1=JPetc[i1]*cos(JPphi[i1]);
 			  double px2=JPetc[i2]*cos(JPphi[i2]);
 			  double px3=JPetc[i3]*cos(JPphi[i3]);
@@ -2203,8 +2207,7 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 			  double spy=py1+py2+py3;
 			  double spz=pz1+pz2+pz3;
 			  double m123not=pow(e1+e2+e3,2)-pow(spx,2)-pow(spy,2)-pow(spz,2);
-			  if ( m123not>0 ) m123not=sqrt(m123not);
-			  
+			  if ( m123not>0 ) m123not=sqrt(m123not);			  
 			  double pt3 = sqrt(spx*spx+spy*spy);
 			  double scprodth=0.;          // projection of top momentum in h direction
 			  if ( ph2>0 ) scprodth = (spx*pxh+spy*pyh+spz*pzh)/sqrt(ph2);
@@ -2918,7 +2921,7 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 
 	  // Now compute global mass chisquared
 	  // ----------------------------------
-	  chi2 = pow((tbestcomb-mtref)/40.,2)+pow((wbestcomb-mwref)/20.,2)+pow((hbestcomb-mhref)/25.,2);
+	  chi2 = pow((tbestcomb-mtref)/25.,2)+pow((wbestcomb-mwref)/15.,2)+pow((hbestcomb-mhref)/15.,2);
 
 
 	}      // all 5 jets from h and t defined
@@ -4033,6 +4036,9 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 		r=10.;
 	      }
 	      if ( r>maxr ) {
+		cout << iet << " " << idp << " " << ipt << " T=" << Tread[100*iet+10*idp+ipt] 
+		     << " Tnot=" << Tnotread[100*iet+10*idp+ipt]
+		     << " r=" << r << " maxr=" << maxr << " Mt=" << m123 << " Mw=" << mw << endl;
 		maxr = r;
 		tbestcomb=m123;
 		wbestcomb=mw;
@@ -4745,27 +4751,27 @@ void TDAna::endJob() {
   float error = sqrt(fraction*(1-fraction)/grandgrandtotal);
   decayfile << "Fraction of events passing the level 1 trigger = " << l1Eff_
             << "/"  << setw(10) << grandgrandtotal << " "
-            << setprecision(5) << setw(5) << fraction*100 << "+-"
-            << setprecision(4) << error*100 << endl;
+            << setprecision(8) << setw(5) << fraction*100 << "+-"
+            << setprecision(8) << error*100 << endl;
   fraction = float(l1Njets_)/float(grandgrandtotal);
   error = sqrt(fraction*(1-fraction)/grandgrandtotal);
   decayfile << "Fraction of events passing also NJet >= 5 = " << l1Njets_
             << "/"  << setw(10) << grandgrandtotal << " "
-            << setprecision(5) << setw(5) << fraction*100 << "+-"
-            << setprecision(4) << error*100 << endl;
+            << setprecision(8) << setw(5) << fraction*100 << "+-"
+            << setprecision(8) << error*100 << endl;
   fraction = float(l1MEtSig_)/float(grandgrandtotal);
   error = sqrt(fraction*(1-fraction)/grandgrandtotal);
   decayfile << "Fraction of events passing also MEtSig cut = " << l1MEtSig_
             << "/"  << setw(10) << grandgrandtotal << " "
-            << setprecision(5) << setw(5) << fraction*100 << "+-"
-            << setprecision(4) << error*100 << endl;
+            << setprecision(8) << setw(5) << fraction*100 << "+-"
+            << setprecision(8) << error*100 << endl;
   for ( int tags=0; tags<4; ++tags ) {
     fraction = float(l1Tags_[tags])/float(grandgrandtotal);
     error = sqrt(fraction*(1-fraction)/grandgrandtotal);
     decayfile << "Fraction of events with also >= "<< tags+1 << " b-tags = " << l1Tags_[tags]
               << "/"  << setw(10) << grandgrandtotal << " "
-              << setprecision(5) << setw(5) << fraction*100 << "+-"
-              << setprecision(4) << error*100 << endl;
+              << setprecision(8) << setw(5) << fraction*100 << "+-"
+              << setprecision(8) << error*100 << endl;
   }
   decayfile << "Pixel Trigger" << endl;
   decayfile << "-------------" << endl;
@@ -4773,27 +4779,27 @@ void TDAna::endJob() {
   error = sqrt(fraction*(1-fraction)/grandgrandtotal);
   decayfile << "Fraction of events passing the level 1 pixel-trigger = " << l1PixelEff_
             << "/" << setw(10) << grandgrandtotal << " "
-            << setprecision(5) << setw(5) << fraction*100 << "+-"
-            << setprecision(4) << error*100 << endl;
+            << setprecision(8) << setw(5) << fraction*100 << "+-"
+            << setprecision(8) << error*100 << endl;
   fraction = float(pixelNjets_)/float(grandgrandtotal);
   error = sqrt(fraction*(1-fraction)/grandgrandtotal);
   decayfile << "Fraction of events passing also NJet >= 5 = " << pixelNjets_
             << "/"  << setw(10) << grandgrandtotal << " "
-            << setprecision(5) << setw(5) << fraction*100 << "+-"
-            << setprecision(4) << error*100 << endl;
+            << setprecision(8) << setw(5) << fraction*100 << "+-"
+            << setprecision(8) << error*100 << endl;
   fraction = float(pixelMEtSig_)/float(grandgrandtotal);
   error = sqrt(fraction*(1-fraction)/grandgrandtotal);
   decayfile << "Fraction of events passing also MEtSig cut = " << pixelMEtSig_
             << "/"  << setw(10) << grandgrandtotal << " "
-            << setprecision(5) << setw(5) << fraction*100 << "+-"
-            << setprecision(4) << error*100 << endl;
+            << setprecision(8) << setw(5) << fraction*100 << "+-"
+            << setprecision(8) << error*100 << endl;
   for ( int tags=0; tags<4; ++tags ) {
     fraction = float(pixelTags_[tags])/float(grandgrandtotal);
     error = sqrt(fraction*(1-fraction)/grandgrandtotal);
     decayfile << "Fraction of events with also >= "<< tags+1 << " b-tags = " << pixelTags_[tags]
               << "/"  << setw(10) << grandgrandtotal << " "
-              << setprecision(5) << setw(5) << fraction*100 << "+-"
-              << setprecision(4) << error*100 << endl;
+              << setprecision(8) << setw(5) << fraction*100 << "+-"
+              << setprecision(8) << error*100 << endl;
   }
 
   // Finally add some more info on particular decays
@@ -4806,65 +4812,65 @@ void TDAna::endJob() {
   decayfile << "Total processed tt  = " << Nttall << endl;
   decayfile << endl;
   decayfile << "Top->hadrons: All/Trig/MEtS+2tag/3tag/4tag: " 
-	    << Ntt[0][0] << " " 
-	    << Ntt[1][0] << " "  
-	    << Ntt[2][0] << " " 
-	    << Ntt[3][0] << " "  
-	    << Ntt[4][0] << endl;
+	    << setprecision(8) << Ntt[0][0] << " " 
+	    << setprecision(8) << Ntt[1][0] << " "  
+	    << setprecision(8) << Ntt[2][0] << " " 
+	    << setprecision(8) << Ntt[3][0] << " "  
+	    << setprecision(8) << Ntt[4][0] << endl;
   decayfile << "Top->en4j:    All/Trig/MEtS+2tag/3tag/4tag: " 
-	    << Ntt[0][1] << " " 
-	    << Ntt[1][1] << " "  
-	    << Ntt[2][1] << " " 
-	    << Ntt[3][1] << " "  
-	    << Ntt[4][1] << endl;
+	    << setprecision(8) << Ntt[0][1] << " " 
+	    << setprecision(8) << Ntt[1][1] << " "  
+	    << setprecision(8) << Ntt[2][1] << " " 
+	    << setprecision(8) << Ntt[3][1] << " "  
+	    << setprecision(8) << Ntt[4][1] << endl;
   decayfile << "Top->mn4j:    All/Trig/MEtS+2tag/3tag/4tag: " 
-	    << Ntt[0][2] << " " 
-	    << Ntt[1][2] << " "  
-	    << Ntt[2][2] << " " 
-	    << Ntt[3][2] << " "  
-	    << Ntt[4][2] << endl;
+	    << setprecision(8) << Ntt[0][2] << " " 
+	    << setprecision(8) << Ntt[1][2] << " "  
+	    << setprecision(8) << Ntt[2][2] << " " 
+	    << setprecision(8) << Ntt[3][2] << " "  
+	    << setprecision(8) << Ntt[4][2] << endl;
   decayfile << "Top->tn4j:    All/Trig/MEtS+2tag/3tag/4tag: " 
-	    << Ntt[0][3] << " " 
-	    << Ntt[1][3] << " "  
-	    << Ntt[2][3] << " " 
-	    << Ntt[3][3] << " "  
-	    << Ntt[4][3] << endl;
+	    << setprecision(8) << Ntt[0][3] << " " 
+	    << setprecision(8) << Ntt[1][3] << " "  
+	    << setprecision(8) << Ntt[2][3] << " " 
+	    << setprecision(8) << Ntt[3][3] << " "  
+	    << setprecision(8) << Ntt[4][3] << endl;
   decayfile << "Top->enen2j:  All/Trig/MEtS+2tag/3tag/4tag: " 
-	    << Ntt[0][4] << " " 
-	    << Ntt[1][4] << " "  
-	    << Ntt[2][4] << " " 
-	    << Ntt[3][4] << " "  
-	    << Ntt[4][4] << endl;
+	    << setprecision(8) << Ntt[0][4] << " " 
+	    << setprecision(8) << Ntt[1][4] << " "  
+	    << setprecision(8) << Ntt[2][4] << " " 
+	    << setprecision(8) << Ntt[3][4] << " "  
+	    << setprecision(8) << Ntt[4][4] << endl;
   decayfile << "Top->enmn2j:  All/Trig/MEtS+2tag/3tag/4tag: " 
-	    << Ntt[0][5] << " " 
-	    << Ntt[1][5] << " "  
-	    << Ntt[2][5] << " " 
-	    << Ntt[3][5] << " "  
-	    << Ntt[4][5] << endl;
+	    << setprecision(8) << Ntt[0][5] << " " 
+	    << setprecision(8) << Ntt[1][5] << " "  
+	    << setprecision(8) << Ntt[2][5] << " " 
+	    << setprecision(8) << Ntt[3][5] << " "  
+	    << setprecision(8) << Ntt[4][5] << endl;
   decayfile << "Top->entn2j:  All/Trig/MEtS+2tag/3tag/4tag: " 
-	    << Ntt[0][6] << " " 
-	    << Ntt[1][6] << " "  
-	    << Ntt[2][6] << " " 
-	    << Ntt[3][6] << " "  
-	    << Ntt[4][6] << endl;
+	    << setprecision(8) << Ntt[0][6] << " " 
+	    << setprecision(8) << Ntt[1][6] << " "  
+	    << setprecision(8) << Ntt[2][6] << " " 
+	    << setprecision(8) << Ntt[3][6] << " "  
+	    << setprecision(8) << Ntt[4][6] << endl;
   decayfile << "Top->mnmn2j:  All/Trig/MEtS+2tag/3tag/4tag: " 
-	    << Ntt[0][7] << " " 
-	    << Ntt[1][7] << " "  
-	    << Ntt[2][7] << " " 
-	    << Ntt[3][7] << " "  
-	    << Ntt[4][7] << endl;
+	    << setprecision(8) << Ntt[0][7] << " " 
+	    << setprecision(8) << Ntt[1][7] << " "  
+	    << setprecision(8) << Ntt[2][7] << " " 
+	    << setprecision(8) << Ntt[3][7] << " "  
+	    << setprecision(8) << Ntt[4][7] << endl;
   decayfile << "Top->mntn2j:  All/Trig/MEtS+2tag/3tag/4tag: " 
-	    << Ntt[0][8] << " " 
-	    << Ntt[1][8] << " "  
-	    << Ntt[2][8] << " " 
-	    << Ntt[3][8] << " "  
-	    << Ntt[4][8] << endl;
+	    << setprecision(8) << Ntt[0][8] << " " 
+	    << setprecision(8) << Ntt[1][8] << " "  
+	    << setprecision(8) << Ntt[2][8] << " " 
+	    << setprecision(8) << Ntt[3][8] << " "  
+	    << setprecision(8) << Ntt[4][8] << endl;
   decayfile << "Top->tntn2j:  All/Trig/MEtS+2tag/3tag/4tag: " 
-	    << Ntt[0][9] << " " 
-	    << Ntt[1][9] << " "  
-	    << Ntt[2][9] << " " 
-	    << Ntt[3][9] << " "  
-	    << Ntt[4][9] << endl;
+	    << setprecision(8) << Ntt[0][9] << " " 
+	    << setprecision(8) << Ntt[1][9] << " "  
+	    << setprecision(8) << Ntt[2][9] << " " 
+	    << setprecision(8) << Ntt[3][9] << " "  
+	    << setprecision(8) << Ntt[4][9] << endl;
   decayfile << endl;
   decayfile << "Total processed ttH with H->bb = " << Ntthall << endl;
   decayfile << endl;
