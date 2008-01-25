@@ -62,7 +62,7 @@ void Ana_all_new (TString var, TString sel, bool dops, bool renormalize )
 // 			     0.,0.,0.,1.,5.,30.,67.,141.};
   double sigmaQCD[16];
   for ( int i=0; i<16; i++ ) { 
-    if (QCDentries[i]<10) sigmaQCD[i] = (1 + TMath::Sqrt(QCDentries[i] + 0.75));
+    if (QCDentries[i]<=10) sigmaQCD[i] = (1 + TMath::Sqrt(QCDentries[i] + 0.75));
     else sigmaQCD[i] = 1./sqrt(QCDentries[i]);
   };
   
@@ -82,6 +82,7 @@ void Ana_all_new (TString var, TString sel, bool dops, bool renormalize )
   //			100995.,  23855., 6391., 2821. };
   double NQCDM[8] = { 11229443., 26347818., 24971508.,  29514603., 
 		      40608575., 32268604., 37943909., 33232000. };
+  double QCDMentries[8]={0.};
 
   TFile * W[11];
   W[0] = new TFile ("TDAna/TDAna_W_0JETS.root");
@@ -243,6 +244,7 @@ void Ana_all_new (TString var, TString sel, bool dops, bool renormalize )
       double t=Histo->GetBinContent(ibin);
       totQCDM[ibin-1]+=t*QCDxs[i]/NQCDM[i]*Lumfactor;
       s2_totQCDM[ibin-1]+=t*pow(QCDMxs[i]/NQCDM[i]*Lumfactor,2);
+      QCDMentries[i]+=t;
     }
     normQCDMnth[i]=QCDMentries[i]*QCDMxs[i]/NQCDM[i]*Lumfactor;
     normQCDM+=normQCDMnth[i];
@@ -404,6 +406,12 @@ void Ana_all_new (TString var, TString sel, bool dops, bool renormalize )
     Histo_ST->SetBinError(ibin,sqrt(s2_totST[ibin-1]));
     Histo_ZNN->SetBinError(ibin,sqrt(s2_totZNN[ibin-1]));
   }
+
+  cout << "Filling nine bgrs" << QCDMentries[0] << " " << QCDMentries[1]  
+       << " " << QCDMentries[2] << " " << QCDMentries[3] << " " << QCDMentries[4]  
+       << " " << QCDMentries[5] << " " << QCDMentries[6] << " " << QCDMentries[7]  
+    << endl;
+
   // Fill nine different backgrounds based on +- 1-sigma variations in QCD and/or TOP normalization
   // ----------------------------------------------------------------------------------------------
   // QCD: take integral, renormalize it to integral+-sqrt(integral);
@@ -414,13 +422,19 @@ void Ana_all_new (TString var, TString sel, bool dops, bool renormalize )
     if ( isample<5 ) { 
       // TTentries[] is already the square of the error on the number of 
       // entries in the sample
-      sigmaTTint+=pow(normTTnth[isample],2)/TTentries[isample];
+      if ( TTentries[isample]<=10 ) sigmaTTint+=(1 + TMath::Sqrt(TTentries[isample] + 0.75));
+      else sigmaTTint+=pow(normTTnth[isample],2)/TTentries[isample];
+      
     }
    //    sigmaQCDint+=pow(normQCDnth[isample]*sigmaQCD[isample],2);
-      sigmaQCDMint+=pow(normQCDMnth[isample],2)/QCDMentries[isample];
+    if (QCDMentries[i]<=10) sigmaQCDMint+=(1 + TMath::Sqrt(QCDMentries[isample] + 0.75));
+    else sigmaQCDMint+=pow(normQCDMnth[isample],2)/QCDMentries[isample];
   }
   sigmaTTint=sqrt(sigmaTTint);
   sigmaQCDMint=sqrt(sigmaQCDMint);
+
+  cout << "Filling nine bgrs 2 " << endl;
+
   // Nine cases of fluctuations in QCD and/or TT:
   // --------------------------------------------
   double grandtot=0.;;
@@ -430,6 +444,7 @@ void Ana_all_new (TString var, TString sel, bool dops, bool renormalize )
   double tttmp=0.;
   double s2_tttmp=0.;
   for ( int ibin=1; ibin<=nbins; ibin++ ) {
+    cout << "ibin" << ibin << endl;
     // case 0    
     grandtot = (totQCD[ibin-1]+totTTH[ibin-1]+totTT[ibin-1]+
 		totW[ibin-1]+totST[ibin-1]+totZNN[ibin-1]);
@@ -438,6 +453,7 @@ void Ana_all_new (TString var, TString sel, bool dops, bool renormalize )
     Histo_TOT[0]->SetBinContent(ibin,grandtot);
     Histo_TOT[0]->SetBinError(ibin,grandtote);
     // example: grandtot[ifluctuation]=(totQCD[]*normQCDM+sqrt(normQCDM))
+    cout << "ibin" << ibin << endl;
     // case 1: QCD+1 sigma
     // -------------------
     qcdtmp=totQCD[ibin-1]*(normQCDM+sigmaQCDMint)/normQCDM;
@@ -448,7 +464,8 @@ void Ana_all_new (TString var, TString sel, bool dops, bool renormalize )
 		    s2_totW[ibin-1]+s2_totST[ibin-1]+s2_totZNN[ibin-1]);
     Histo_TOT[1]->SetBinContent(ibin,grandtot);
     Histo_TOT[1]->SetBinError(ibin,grandtote);
-    // case 2: TT+1 sigma
+     cout << "ibin" << ibin << endl;
+   // case 2: TT+1 sigma
     // ------------------
     tttmp=totTT[ibin-1]*(normTT+sigmaTTint)/normTT;
     s2_tttmp=s2_totTT[ibin-1]*(normTT+sigmaTTint)/normTT;
@@ -458,7 +475,8 @@ void Ana_all_new (TString var, TString sel, bool dops, bool renormalize )
 		    s2_totW[ibin-1]+s2_totST[ibin-1]+s2_totZNN[ibin-1]);
     Histo_TOT[2]->SetBinContent(ibin,grandtot);
     Histo_TOT[2]->SetBinError(ibin,grandtote);
-    // case 3: QCD-1 sigma
+     cout << "ibin" << ibin << endl;
+   // case 3: QCD-1 sigma
     // -------------------
     qcdtmp=totQCD[ibin-1]*(normQCDM-sigmaQCDMint)/normQCDM;
     s2_qcdtmp=s2_totQCD[ibin-1]*(normQCDM-sigmaQCDMint)/normQCDM;
@@ -469,6 +487,7 @@ void Ana_all_new (TString var, TString sel, bool dops, bool renormalize )
     Histo_TOT[3]->SetBinContent(ibin,grandtot);
     Histo_TOT[3]->SetBinError(ibin,grandtote);
 
+    cout << "ibin" << ibin << endl;
     // case 4: TT-1 sigma
     // ------------------
     tttmp=totTT[ibin-1]*(normTT-sigmaTTint)/normTT;
@@ -480,7 +499,8 @@ void Ana_all_new (TString var, TString sel, bool dops, bool renormalize )
     Histo_TOT[4]->SetBinContent(ibin,grandtot);
     Histo_TOT[4]->SetBinError(ibin,grandtote);
 
-    // case 5: QCD,TT -1 sigma
+     cout << "ibin" << ibin << endl;
+   // case 5: QCD,TT -1 sigma
     // ------------------
     qcdtmp=totQCD[ibin-1]*(normQCDM-sigmaQCDMint)/normQCDM;
     s2_qcdtmp=s2_totQCD[ibin-1]*(normQCDM-sigmaQCDMint)/normQCDM;
@@ -493,6 +513,7 @@ void Ana_all_new (TString var, TString sel, bool dops, bool renormalize )
     Histo_TOT[5]->SetBinContent(ibin,grandtot);
     Histo_TOT[5]->SetBinError(ibin,grandtote);
 
+    cout << "ibin" << ibin << endl;
     // case 6: QCD,TT +1 sigma
     // ------------------
     qcdtmp=totQCD[ibin-1]*(normQCDM+sigmaQCDMint)/normQCDM;
@@ -506,6 +527,7 @@ void Ana_all_new (TString var, TString sel, bool dops, bool renormalize )
     Histo_TOT[6]->SetBinContent(ibin,grandtot);
     Histo_TOT[6]->SetBinError(ibin,grandtote);
 
+    cout << "ibin" << ibin << endl;
     // case 7: QCD+1,TT-1 sigma
     // ------------------
     qcdtmp=totQCD[ibin-1]*(normQCDM+sigmaQCDMint)/normQCDM;
@@ -519,6 +541,7 @@ void Ana_all_new (TString var, TString sel, bool dops, bool renormalize )
     Histo_TOT[7]->SetBinContent(ibin,grandtot);
     Histo_TOT[7]->SetBinError(ibin,grandtote);
 
+    cout << "ibin" << ibin << endl;
     // case 8: QCD-1,TT+1 sigma
     // ------------------
     qcdtmp=totQCD[ibin-1]*(normQCDM-sigmaQCDMint)/normQCDM;
