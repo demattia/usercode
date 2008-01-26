@@ -20,7 +20,8 @@
 // constructors and destructor
 //
 L1PixelAnalyzer::L1PixelAnalyzer(const edm::ParameterSet& iConfig) :
-  conf_( iConfig )
+  conf_( iConfig ),
+  assocR_( iConfig.getUntrackedParameter<double>("AssocR") )
 {
   //now do what ever initialization is needed
 
@@ -167,6 +168,9 @@ L1PixelAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
   edm::Handle<reco::TrackCollection> pixeltracks;
   edm::Handle<SiPixelRecHitCollection> pixelhits;
 
+//   // The Monte Carlo truth (SimTracks)
+//   edm::Handle<edm::SimTrackContainer> theSTC;
+
   // Pixel jets
   edm::Handle<PixelJetCollection> pixeljetsWrongEta;
 
@@ -198,6 +202,10 @@ L1PixelAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
     std::string PixelHitsLabel = conf_.getUntrackedParameter<std::string>("PixelHitSource");
     iEvent.getByLabel(PixelTracksLabel, pixeltracks);
     iEvent.getByLabel(PixelHitsLabel, pixelhits);
+
+//     // SimTracks
+//     iEvent.getByLabel("famosSimHits",theSTC);
+//     const edm::SimTrackContainer* theSimTracks = &(*theSTC);
 
     // PixelJets
     edm::InputTag PixelJetsLabel = conf_.getUntrackedParameter<edm::InputTag>("PixelJetSource");
@@ -316,6 +324,21 @@ L1PixelAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
     PixelTrack_Vertex_Z_->Fill(it->vertex().z());
   }
 
+//   edm::SimTrackContainer::const_iterator simTk_it = theSimTracks->begin();
+
+//   cout << "SimTracks = " << 
+//   cout << "PixelTracks = " << pixeltracks->size() << endl;
+
+//   // Associate PixelTracks and SimTracks
+//   Associator<edm::SimTrack, reco::GenJet> associator( 0.05 );
+//   std::auto_ptr<std::map<const SimplePixelJet*, const reco::GenJet*> > AssocTk( associator.Associate( pjs, genjets ) );
+//   std::map<const SimplePixelJet*, const reco::GenJet*>::const_iterator assocTk_it = AssocTk->begin();
+//   for ( ; assocTk_it != AssocTk->end(); ++assocTk_it ) {
+//     float sigma_pt = assocTk_it;
+    
+//   }
+
+
   // Taken from CMCMSSW/Validation/RecoTrack/plugins/SiPixelTrackingRecHitsValid.cc
   edm::ESHandle<TrackerGeometry> pDD;
   iSetup.get<TrackerDigiGeometryRecord> ().get (pDD);
@@ -425,7 +448,7 @@ L1PixelAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
 //  Associator<PixelJet, reco::Track> associator( 0.5 );
 //  std::auto_ptr<std::map<const PixelJet*, const reco::Track*> > AssocMap( associator.Associate( pjs, tracks ) );
 
-  Associator<SimplePixelJet, reco::GenJet> associator( 0.5 );
+  Associator<SimplePixelJet, reco::GenJet> associator( assocR_ );
   std::auto_ptr<std::map<const SimplePixelJet*, const reco::GenJet*> > AssocMap( associator.Associate( pjs, genjets ) );
 
 #ifdef DEBUG
@@ -465,7 +488,7 @@ L1PixelAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
       vec_Jet.push_back( SimpleJet( tj->et(), tjeta, tj->phi() ) );
     }
   }
-  Associator<SimplePixelJet, SimpleJet> PJ_L1J_associator( 0.5 );
+  Associator<SimplePixelJet, SimpleJet> PJ_L1J_associator( assocR_ );
   std::auto_ptr<std::map<const SimplePixelJet*, const SimpleJet*> > PJ_L1J_AssocMap( PJ_L1J_associator.Associate( pjs, vec_Jet ) );
 
 
@@ -479,7 +502,7 @@ L1PixelAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
   }
 
   // Associate L1Jets to GenJets and evaluate the same as for PixelJets
-  Associator<SimpleJet, reco::GenJet> L1J_associator( 0.5 );
+  Associator<SimpleJet, reco::GenJet> L1J_associator( assocR_ );
   std::auto_ptr<std::map<const SimpleJet*, const reco::GenJet*> > L1J_AssocMap( L1J_associator.Associate( vec_Jet, genjets ) );
 
   std::map<const SimpleJet*, const reco::GenJet*>::const_iterator L1J_assoc_it = (*L1J_AssocMap).begin();
