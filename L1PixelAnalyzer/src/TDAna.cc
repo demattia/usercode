@@ -204,6 +204,14 @@ TDAna::TDAna(const edm::ParameterSet& iConfig) :
   HSS_bgr[12]= dynamic_cast<TH1D*> ( FunctionFile->Get("TTMS1SS_bgrS"));
   HSS_sig[13]= dynamic_cast<TH1D*> ( FunctionFile->Get("ScprodSS_sigS"));
   HSS_bgr[13]= dynamic_cast<TH1D*> ( FunctionFile->Get("ScprodSS_bgrS"));
+  HSS_sig[14]= dynamic_cast<TH1D*> ( FunctionFile->Get("Chi2massSS_sigS"));
+  HSS_bgr[14]= dynamic_cast<TH1D*> ( FunctionFile->Get("Chi2massSS_bgrS"));
+  HSS_sig[15]= dynamic_cast<TH1D*> ( FunctionFile->Get("M3bestSS_sigS"));
+  HSS_bgr[15]= dynamic_cast<TH1D*> ( FunctionFile->Get("M3bestSS_bgrS"));
+  HSS_sig[16]= dynamic_cast<TH1D*> ( FunctionFile->Get("MwbestSS_sigS"));
+  HSS_bgr[16]= dynamic_cast<TH1D*> ( FunctionFile->Get("MwbestSS_bgrS"));
+  HSS_sig[17]= dynamic_cast<TH1D*> ( FunctionFile->Get("SumHED6SS_sigS"));
+  HSS_bgr[17]= dynamic_cast<TH1D*> ( FunctionFile->Get("SumHED6SS_bgrS"));
   //  FunctionFile->Close();
 
   // File with HED and HPD distributions from QCD jets
@@ -1092,8 +1100,6 @@ TDAna::TDAna(const edm::ParameterSet& iConfig) :
   ifstream Hreadfile ("Hread.asc");
   string line;
   while (Hreadfile && counter<1000 ) {
-    int tmph1;
-    int tmph2;
     getline(Hreadfile,line);
     stringstream pippo1(line);
     pippo1 >> Hread[counter];
@@ -2804,7 +2810,7 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 		  mw=(e3+e2)*(e3+e2)-(px3+px2)*(px3+px2)-(py3+py2)*(py3+py2)-(pz3+pz2)*(pz3+pz2);
 		}
 		if ( mw>0 ) mw=sqrt(mw);
-		if ( mwa==0 ) mwa==mw;
+		if ( mwa==0 ) mwa=mw;
 		double spx=px1+px2+px3;
 		double spy=py1+py2+py3;
 		double spz=pz1+pz2+pz3;
@@ -3743,7 +3749,7 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	  double fs=0.;
 	  double fb=0.;
 	  rel_lik = 0.;
-	  int bx[14];
+	  int bx[18];
 	  bx[0]= (int)((c8/1.2)*50)+1;
 	  bx[1]= (int)((m8/2500.)*50)+1;
 	  bx[2]= (int)((c6/1.2)*50)+1;
@@ -3758,10 +3764,11 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	  bx[11]= (int)((sumhed4/100.)*50)+1; 
 	  bx[12]= (int)((ttms1/80.)*50)+1.;
 	  bx[13]= (int)(((scprodthbest+1200.)/2400.)*50)+1.;
-	  for ( int ivar=0; ivar<14; ivar++ ) {
-	    // Select only the most discriminant ones for a check:
-	    // ---------------------------------------------------
-	    // if ( ivar==2 || ivar==5 || ivar==8 || ivar==11 || ivar==13 ) {
+	  bx[14]= (int)((chi2/50.)*50)+1;
+	  bx[15]= (int)((tbestcomb/800.)*50)+1; 
+	  bx[16]= (int)((wbestcomb/500.)*50)+1.;
+	  bx[17]= (int)((sumhed6/100.)*50)+1.;
+	  for ( int ivar=0; ivar<18; ivar++ ) {
 	    if ( bx[ivar]>=1 && bx[ivar]<=50 ) {
 	      fs = HSS_sig[ivar]->GetBinContent(bx[ivar]);
 	      fb = HSS_bgr[ivar]->GetBinContent(bx[ivar]);
@@ -3772,7 +3779,6 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 		if ( fs==0 ) r *= 0.1; 
 	      }
 	    }
-	    // } end select 5 most discriminant
 	  }
 	  if ( r>=0 ) {
 	    rel_lik += log(r);
@@ -4005,7 +4011,7 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 		mw=(e3+e2)*(e3+e2)-(px3+px2)*(px3+px2)-(py3+py2)*(py3+py2)-(pz3+pz2)*(pz3+pz2);
 	      }
 	      if ( mw>0 ) mw=sqrt(mw);
-	      if ( mwa==0 ) mwa==mw;
+	      if ( mwa==0 ) mwa=mw;
 	      double spx=px1+px2+px3;
 	      double spy=py1+py2+py3;
 	      double spz=pz1+pz2+pz3;
@@ -4482,7 +4488,7 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
       double fs=0.;
       double fb=0.;
       rel_lik = 0.;
-      int bx[14];
+      int bx[18];
       bx[0]= (int)((c8/1.2)*50)+1;
       bx[1]= (int)((m8/2500.)*50)+1;
       bx[2]= (int)((c6/1.2)*50)+1;
@@ -4497,10 +4503,11 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
       bx[11]= (int)((sumhed4/100.)*50)+1;
       bx[12]= (int)((ttms1/80.)*50)+1.;
       bx[13]= (int)(((scprodthbest+1200.)/2400.)*50)+1.;
-      for ( int ivar=0; ivar<14; ivar++ ) {
-	// Select only the most discriminant ones for a check:
-	// ---------------------------------------------------
-	//if ( ivar==2 || ivar==5 || ivar==8 || ivar==11 || ivar==13 ) {
+      bx[14]= (int)((chi2/50.)*50)+1;
+      bx[15]= (int)((tbestcomb/800.)*50)+1; 
+      bx[16]= (int)((wbestcomb/500.)*50)+1.;
+      bx[17]= (int)((sumhed6/100.)*50)+1.;
+      for ( int ivar=0; ivar<18; ivar++ ) {
 	if ( bx[ivar]>=1 && bx[ivar]<=50 ) {
 	  fs = HSS_sig[ivar]->GetBinContent(bx[ivar]);
 	  fb = HSS_bgr[ivar]->GetBinContent(bx[ivar]);

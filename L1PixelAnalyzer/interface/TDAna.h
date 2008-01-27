@@ -19,7 +19,7 @@
 //
 // Original Author:  Marco De Mattia
 //         Created:  Tue May  8 13:05:37 CEST 2007
-// $Id: TDAna.h,v 1.29 2008/01/22 10:32:33 dorigo Exp $
+// $Id: TDAna.h,v 1.30 2008/01/24 14:22:05 dorigo Exp $
 //
 //
 
@@ -189,8 +189,8 @@ class TDAna : public edm::EDAnalyzer {
 
   // Function histograms
   // -------------------
-  TH1D * HSS_sig[14];
-  TH1D * HSS_bgr[14];
+  TH1D * HSS_sig[18];
+  TH1D * HSS_bgr[18];
   TH1D * HEDpdf[8];
   TH1D * HPDpdf[8];
   TH1D * MTS1pdf[8];
