@@ -1,0 +1,73 @@
+\documentclass[12pt,a4paper,twoside,english]{report}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%Include packages in our document
+\usepackage{latexsym}
+\usepackage{makeidx}
+\usepackage{showidx}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsfonts}
+\usepackage{amsthm}
+\usepackage{mathrsfs}
+\usepackage{eufrak}
+\usepackage[mathcal,mathscr]{eucal}
+\usepackage[latin1]{inputenc}
+\usepackage[english]{babel}
+\usepackage{fontenc}
+\usepackage{graphics}
+\usepackage{epsfig}
+\usepackage{epsf}
+\usepackage{graphicx}
+\usepackage{wrapfig}
+\usepackage{rotating}
+\usepackage{moreverb}
+\usepackage{setspace}
+\usepackage{fancyhdr}
+%\usepackage{pennames}
+\textheight 21.0cm
+\textwidth 16cm
+\voffset -1.0cm
+\headsep 1.0cm
+\marginparwidth 0cm
+\marginparsep 0cm
+\hoffset 0cm
+\oddsidemargin 1.46cm
+\evensidemargin 0.0cm
+
+\begin{document}
+\begin{table}[h!]
+  \center
+%  \begin{tabular}{||c|c|c|c|c|c|c|c|c|c||}
+%    \hline
+%    \hline
+%    variable: & default & QCD$+1\sigma$ & TT+JETS$+1\sigma$ & QCD$-1\sigma$ & TT+JETS$-1\sigma$ & QCD$+1\sigma$, TT+JETS$+1\sigma$ & QCD$-1\sigma$, TT+JETS$-1\sigma$ & QCD$+1\sigma$, TT+JETS$-1\sigma$ & QCD$-1\sigma$, TT+JETS$+1\sigma$\\
+%    \hline
+%    pull mean:  & $-0.133 \pm 0.033$ & $-0.173 \pm 0.033$ & $-0.091 \pm 0.033$ & $-0.047 \pm 0.036$ & $-0.109 \pm 0.031$ & $-0.189 \pm 0.033$ & $-0.173 \pm 0.033$ & $-0.220 \pm 0.033$ & $-0.124 \pm 0.031$\\
+%    pull sigma: & $ 0.970 \pm 0.027$ & $ 0.990 \pm 0.028$ & $ 0.968 \pm 0.025$ & $ 1.016 \pm 0.035$ & $ 0.943 \pm 0.025$ & $ 0.964 \pm 0.026$ & $ 0.963 \pm 0.028$ & $ 0.983 \pm 0.027$ & $ 0.919 \pm 0.025$\\
+%    \hline
+%    significance: & $3.282 \pm 0.031$ & $3.226 \pm 0.031$ & $3.262 \pm 0.031$ & $3.317 \pm 0.033$ & $3.323 \pm 0.031$ & $3.305 \pm 0.031$ & $3.187 \pm 0.031$ & $3.207 \pm 0.031$ & $3.221 \pm 0.031$\\
+%    \hline
+%    \hline
+%  \end{tabular}
+  \begin{tabular}{||c|c|c|c||}
+    \hline
+    \hline
+    fluctuations                     & pull mean          & pull sigma         & significance     \\
+    \hline
+    default                          & $-0.133 \pm 0.033$ & $ 0.970 \pm 0.027$ & $3.282 \pm 0.031$\\
+    QCD$+1\sigma$                    & $-0.173 \pm 0.033$ & $ 0.990 \pm 0.028$ & $3.226 \pm 0.031$\\
+    TT+JETS$+1\sigma$                & $-0.091 \pm 0.033$ & $ 0.968 \pm 0.025$ & $3.262 \pm 0.031$\\
+    QCD$-1\sigma$                    & $-0.047 \pm 0.036$ & $ 1.016 \pm 0.035$ & $3.317 \pm 0.033$\\
+    TT+JETS$-1\sigma$                & $-0.109 \pm 0.031$ & $ 0.943 \pm 0.025$ & $3.323 \pm 0.031$\\
+    QCD$+1\sigma$, TT+JETS$+1\sigma$ & $-0.189 \pm 0.033$ & $ 0.964 \pm 0.026$ & $3.305 \pm 0.031$\\
+    QCD$-1\sigma$, TT+JETS$-1\sigma$ & $-0.173 \pm 0.033$ & $ 0.963 \pm 0.028$ & $3.187 \pm 0.031$\\
+    QCD$+1\sigma$, TT+JETS$-1\sigma$ & $-0.220 \pm 0.033$ & $ 0.983 \pm 0.027$ & $3.207 \pm 0.031$\\
+    QCD$-1\sigma$, TT+JETS$+1\sigma$ & $-0.124 \pm 0.031$ & $ 0.919 \pm 0.025$ & $3.221 \pm 0.031$\\
+    \hline
+    \hline
+  \end{tabular}
+  \center\caption{\footnotesize{\em Nine cases of fluctuations
+   in the} QCD {\em and/or the} TT+JETS {\em samples.}}
+  \label{t:bkg_fluctuations}
+\end{table}
+\end{document}
