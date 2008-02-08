@@ -1,8 +1,0 @@
-# CalcSiStripClusterXTalk
-module modCalcSiStripClusterXTalk = CalcSiStripClusterXTalk {
-  untracked string oLabelSiStripCluster     = "siStripClusters"
-  untracked string oLabelSiStripClusterInfo = "siStripClusterInfoProducer"
-  untracked string oLabelSiStripDigi        = "SiStripDigis"
-  untracked string oProdInstName            = "ZeroSuppressed"
-  untracked string oOutputFileName	    = "CalcSiStripClusterXTalk_out.root"
-}
