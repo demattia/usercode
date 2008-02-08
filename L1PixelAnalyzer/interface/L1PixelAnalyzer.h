@@ -13,7 +13,7 @@
 //
 // Original Author:  Marco De Mattia
 //         Created:  Tue May  8 13:05:37 CEST 2007
-// $Id: L1PixelAnalyzer.h,v 1.6 2007/11/09 17:25:29 demattia Exp $
+// $Id: L1PixelAnalyzer.h,v 1.7 2008/01/22 14:19:11 demattia Exp $
 //
 //
 
@@ -93,6 +93,14 @@
 #include "DataFormats/TrackReco/interface/TrackFwd.h"
 #include "DataFormats/TrackReco/interface/Track.h"
 
+// MC Truth, SimTrack
+// #include "SimGeneral/HepPDTRecord/interface/ParticleDataTable.h"
+// #include "FastSimulation/Event/interface/FSimEvent.h"
+// #include "FastSimulation/Event/interface/FSimTrack.h"
+// #include "FastSimulation/Event/interface/FSimVertex.h"
+// #include "FastSimulation/Particle/interface/ParticleTable.h"
+#include "SimDataFormats/Track/interface/SimTrackContainer.h"
+
 #include "AnalysisExamples/PixelJet/interface/PixelJet.h"
 
 // GenJets
@@ -125,6 +133,8 @@ class L1PixelAnalyzer : public edm::EDAnalyzer {
   int eventcounter;
 
   edm::ParameterSet conf_;
+  double assocR_;
+
   TFile* OutputFile;
 
   TH1F* L1ExtraCenJetsEt_;
@@ -182,14 +192,28 @@ class L1PixelAnalyzer : public edm::EDAnalyzer {
   TH1F* GenJet_Phi_;
 
   TProfile* PJ_PtRes_;
+  TProfile* PJ_SigmaPtRes_;
+  TProfile* PJ_SigmaPtResFirstHalf_;
+  TProfile* PJ_SigmaPtResSecondHalf_;
   TH1F* PJ_EtaRes_;
   TH1F* PJ_PhiRes_;
   TH1F* PJ_DeltaRres_;
+  TProfile* PJS_PtRes_;
+  TH1F* PJS_EtaRes_;
+  TH1F* PJS_PhiRes_;
+  TH1F* PJS_DeltaRres_;
   TProfile* PJ_L1J_PtRes_;
   TProfile* L1J_PtRes_;
+  TProfile* L1J_SigmaPtRes_;
+  TProfile* L1J_SigmaPtResFirstHalf_;
+  TProfile* L1J_SigmaPtResSecondHalf_;
   TH1F* L1J_EtaRes_;
   TH1F* L1J_PhiRes_;
   TH1F* L1J_DeltaRres_;
+
+  TProfile* pixelTracksRes_;
+
+  TH1F* pixelTrackDeltaR_;
 
   // ----------member data ---------------------------
 };
