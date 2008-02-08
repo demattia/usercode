@@ -19,7 +19,7 @@
 //
 // Original Author:  Marco De Mattia
 //         Created:  Tue May  8 13:05:37 CEST 2007
-// $Id: TDAna.h,v 1.31 2008/01/27 10:07:44 dorigo Exp $
+// $Id: TDAna.h,v 1.32 2008/01/29 10:52:42 demattia Exp $
 //
 //
 
@@ -1035,7 +1035,14 @@ class TDAna : public edm::EDAnalyzer {
   // --------------------------------------------
   double Nttall;
   double Ntthall;
+<<<<<<< TDAna.h
+  double Ntt[5][10];
+  double Ntth[5][10];
+  double Nelec[10];
+  double Nmuon[10];
+=======
   double Ntt[6][10];
   double Ntth[6][10];
 
+>>>>>>> 1.32
 };

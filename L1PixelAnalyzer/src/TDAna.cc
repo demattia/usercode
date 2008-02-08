@@ -1400,12 +1400,15 @@ TDAna::TDAna(const edm::ParameterSet& iConfig) :
   // --------------------------------------------
   Nttall=0.;
   Ntthall=0.;
-  for ( int i=0;i<6; i++ ) {
+  for ( int i=0;i<5; i++ ) {
     for ( int j=0; j<10; j++ ) {
       Ntt[i][j]=0.;
       Ntth[i][j]=0.;
+      Nelec[j]=0.;
+      Nmuon[j]=0.;
     }
   }
+  
 
   // End of initializations
   // ----------------------
@@ -1759,6 +1762,48 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   // -----------
   edm::Handle<OfflineJetCollection> caloJets;
   iEvent.getByLabel( offlineJetLabel_, caloJets );
+
+  // See if we have a good high-Pt electron or muon
+  // ----------------------------------------------
+  bool muonevent = false;
+  for ( GlobalMuonCollection::const_iterator muon = globalMuons->begin(); 
+	muon != globalMuons->end() && !muonevent; ++muon ) {
+    if ( muon->pt()>25 && fabs(muon->eta())<2.5 ) { 
+      // See if there are jets closer than 0.5 from this one
+      // ---------------------------------------------------
+      double dr2min=25.;
+      for ( OfflineJetCollection::const_iterator cal = caloJets->begin(); 
+	    cal != caloJets->end(); ++cal ) {
+	if ( cal->et()>25. ) { 
+	  double d_eta = cal->eta()-muon->eta();
+	  double d_phi = 3.1415926-fabs(fabs(cal->phi()-muon->phi())-3.1415926);
+	  double dr2 = d_eta*d_eta + d_phi*d_phi;
+	  if ( dr2<dr2min ) dr2min=dr2;
+	}
+      }
+      if ( dr2min>0.25 ) muonevent = true;
+    }
+  }
+  bool elecevent = false;
+  for ( SimpleElectronCollection::const_iterator elec = simpleElectrons->begin(); 
+	elec != simpleElectrons->end() && !elecevent; ++elec ) {
+    if ( elec->et()>30 && fabs(elec->eta())<2.5 && elec->hadOverEm()<0.05 ) {
+      // See if there are jets closer than 0.5 from this one
+      // ---------------------------------------------------
+      double dr2min=25.;
+      for ( OfflineJetCollection::const_iterator cal = caloJets->begin(); 
+	    cal != caloJets->end(); ++cal ) {
+	if ( cal->et()>25. && cal->emEnergyFraction()<0.95 ) { 
+	  double d_eta = cal->eta()-elec->eta();
+	  double d_phi = 3.1415926-fabs(fabs(cal->phi()-elec->phi())-3.1415926);
+	  double dr2 = d_eta*d_eta + d_phi*d_phi;
+	  if ( dr2<dr2min ) dr2min=dr2;
+	}
+      }
+      if ( dr2min>0.25 ) elecevent = true;
+    }
+  }
+
   
   // Preliminary creation of jet array ordered by Et for parton-jet matching study only
   // ----------------------------------------------------------------------------------
@@ -4575,38 +4620,34 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   if ( itdecay>=0 && itdecay<10 ) {
     Ntt[0][itdecay]++;
     Nttall++;
-    if ( response ) {
+    if ( response && NJetsCut ) {
       Ntt[1][itdecay]++;
-      if ( NJetsCut && MEtSigCut) {
-        Ntt[5][itdecay]++;
-        if ( NHEM>=2 ) {
-          Ntt[2][itdecay]++;
-          if ( NHEM>=3 ) {
-            Ntt[3][itdecay]++;
-            if ( NHEM>=4 ) {
-              Ntt[4][itdecay]++;
-            }
-          }
-        }
+      if ( MEtSigCut && NHEM>=2 ) {
+	Ntt[2][itdecay]++;
+	if ( NHEM>=3 ) {
+	  Ntt[3][itdecay]++;
+	  if ( elecevent ) Nelec[itdecay]++;
+	  if ( muonevent ) Nmuon[itdecay]++;
+	  if ( NHEM>=4 ) {
+	    Ntt[4][itdecay]++;
+	  }
+	}
       }
     }
     if ( hdecay==1 ) {
       Ntth[0][itdecay]++;
       Ntthall++;
-      if ( response ) {
+      if ( response && NJetsCut ) {
 	Ntth[1][itdecay]++;
-        if ( MEtSigCut && NJetsCut ) {
-          Ntth[5][itdecay]++;
-          if ( NHEM>=2 ) {
-            Ntth[2][itdecay]++;
-            if ( NHEM>=3 ) {
-              Ntth[3][itdecay]++;
-              if ( NHEM>=4 ) {
-                Ntth[4][itdecay]++;
-              }
-            }
-          }
-        }
+	if ( MEtSigCut && NHEM>=2 ) {
+	  Ntth[2][itdecay]++;
+	  if ( NHEM>=3 ) {
+	    Ntth[3][itdecay]++;
+	    if ( NHEM>=4 ) {
+	      Ntth[4][itdecay]++;
+	    }
+	  }
+	}
       }
     }
   }
@@ -4824,147 +4865,147 @@ void TDAna::endJob() {
   decayfile << endl;
   decayfile << "Total processed tt  = " << Nttall << endl;
   decayfile << endl;
-  decayfile << "Top->hadrons: All/Trig/MEtS+NJet/2tag/3tag/4tag: " 
+  decayfile << "Top->hadrons: All/Trig/MEtS+2tag/3tag/3te/3tmu/4tag: " 
 	    << setprecision(8) << Ntt[0][0] << " " 
 	    << setprecision(8) << Ntt[1][0] << " "  
-	    << setprecision(8) << Ntt[5][0] << " "  
 	    << setprecision(8) << Ntt[2][0] << " " 
 	    << setprecision(8) << Ntt[3][0] << " "  
+	    << setprecision(8) << Nelec[0] << " "  
+	    << setprecision(8) << Nmuon[0] << " "  
 	    << setprecision(8) << Ntt[4][0] << endl;
-  decayfile << "Top->en4j:    All/Trig/MEtS+NJet/2tag/3tag/4tag: " 
+  decayfile << "Top->en4j:    All/Trig/MEtS+2tag/3tag/3te/3tmu/4tag: " 
 	    << setprecision(8) << Ntt[0][1] << " " 
 	    << setprecision(8) << Ntt[1][1] << " "  
-	    << setprecision(8) << Ntt[5][1] << " "  
 	    << setprecision(8) << Ntt[2][1] << " " 
 	    << setprecision(8) << Ntt[3][1] << " "  
+	    << setprecision(8) << Nelec[1] << " "  
+	    << setprecision(8) << Nmuon[1] << " "  
 	    << setprecision(8) << Ntt[4][1] << endl;
-  decayfile << "Top->mn4j:    All/Trig/MEtS+NJet/2tag/3tag/4tag: " 
+  decayfile << "Top->mn4j:    All/Trig/MEtS+2tag/3tag/3te/3tmu/4tag: " 
 	    << setprecision(8) << Ntt[0][2] << " " 
 	    << setprecision(8) << Ntt[1][2] << " "  
-	    << setprecision(8) << Ntt[5][2] << " "  
 	    << setprecision(8) << Ntt[2][2] << " " 
 	    << setprecision(8) << Ntt[3][2] << " "  
+	    << setprecision(8) << Nelec[2] << " "  
+	    << setprecision(8) << Nmuon[2] << " "  
 	    << setprecision(8) << Ntt[4][2] << endl;
-  decayfile << "Top->tn4j:    All/Trig/MEtS+NJet/2tag/3tag/4tag: " 
+  decayfile << "Top->tn4j:    All/Trig/MEtS+2tag/3tag/3te/3tmu/4tag: " 
 	    << setprecision(8) << Ntt[0][3] << " " 
 	    << setprecision(8) << Ntt[1][3] << " "  
-	    << setprecision(8) << Ntt[5][3] << " "  
 	    << setprecision(8) << Ntt[2][3] << " " 
 	    << setprecision(8) << Ntt[3][3] << " "  
+	    << setprecision(8) << Nelec[3] << " "  
+	    << setprecision(8) << Nmuon[3] << " "  
 	    << setprecision(8) << Ntt[4][3] << endl;
-  decayfile << "Top->enen2j:  All/Trig/MEtS+NJet/2tag/3tag/4tag: " 
+  decayfile << "Top->enen2j:  All/Trig/MEtS+2tag/3tag/3te/3tmu/4tag: " 
 	    << setprecision(8) << Ntt[0][4] << " " 
 	    << setprecision(8) << Ntt[1][4] << " "  
-	    << setprecision(8) << Ntt[5][4] << " "  
 	    << setprecision(8) << Ntt[2][4] << " " 
 	    << setprecision(8) << Ntt[3][4] << " "  
+	    << setprecision(8) << Nelec[4] << " "  
+	    << setprecision(8) << Nmuon[4] << " "  
 	    << setprecision(8) << Ntt[4][4] << endl;
-  decayfile << "Top->enmn2j:  All/Trig/MEtS+NJet/2tag/3tag/4tag: " 
+  decayfile << "Top->enmn2j:  All/Trig/MEtS+2tag/3tag/3te/3tmu/4tag: " 
 	    << setprecision(8) << Ntt[0][5] << " " 
 	    << setprecision(8) << Ntt[1][5] << " "  
-	    << setprecision(8) << Ntt[5][5] << " "  
 	    << setprecision(8) << Ntt[2][5] << " " 
 	    << setprecision(8) << Ntt[3][5] << " "  
+	    << setprecision(8) << Nelec[5] << " "  
+	    << setprecision(8) << Nmuon[5] << " "  
 	    << setprecision(8) << Ntt[4][5] << endl;
-  decayfile << "Top->entn2j:  All/Trig/MEtS+NJet/2tag/3tag/4tag: " 
+  decayfile << "Top->entn2j:  All/Trig/MEtS+2tag/3tag/3te/3tmu/4tag: " 
 	    << setprecision(8) << Ntt[0][6] << " " 
 	    << setprecision(8) << Ntt[1][6] << " "  
-	    << setprecision(8) << Ntt[5][6] << " "  
 	    << setprecision(8) << Ntt[2][6] << " " 
 	    << setprecision(8) << Ntt[3][6] << " "  
+	    << setprecision(8) << Nelec[6] << " "  
+	    << setprecision(8) << Nmuon[6] << " "  
 	    << setprecision(8) << Ntt[4][6] << endl;
-  decayfile << "Top->mnmn2j:  All/Trig/MEtS+NJet/2tag/3tag/4tag: " 
+  decayfile << "Top->mnmn2j:  All/Trig/MEtS+2tag/3tag/3te/3tmu/4tag: " 
 	    << setprecision(8) << Ntt[0][7] << " " 
 	    << setprecision(8) << Ntt[1][7] << " "  
-	    << setprecision(8) << Ntt[5][7] << " "  
 	    << setprecision(8) << Ntt[2][7] << " " 
 	    << setprecision(8) << Ntt[3][7] << " "  
+	    << setprecision(8) << Nelec[7] << " "  
+	    << setprecision(8) << Nmuon[7] << " "  
 	    << setprecision(8) << Ntt[4][7] << endl;
-  decayfile << "Top->mntn2j:  All/Trig/MEtS+NJet/2tag/3tag/4tag: " 
+  decayfile << "Top->mntn2j:  All/Trig/MEtS+2tag/3tag/3te/3tmu/4tag: " 
 	    << setprecision(8) << Ntt[0][8] << " " 
 	    << setprecision(8) << Ntt[1][8] << " "  
-	    << setprecision(8) << Ntt[5][8] << " "  
 	    << setprecision(8) << Ntt[2][8] << " " 
 	    << setprecision(8) << Ntt[3][8] << " "  
+	    << setprecision(8) << Nelec[8] << " "  
+	    << setprecision(8) << Nmuon[8] << " "  
 	    << setprecision(8) << Ntt[4][8] << endl;
-  decayfile << "Top->tntn2j:  All/Trig/MEtS+NJet/2tag/3tag/4tag: " 
+  decayfile << "Top->tntn2j:  All/Trig/MEtS+2tag/3tag/3te/3tmu/4tag: " 
 	    << setprecision(8) << Ntt[0][9] << " " 
 	    << setprecision(8) << Ntt[1][9] << " "  
-	    << setprecision(8) << Ntt[5][9] << " "  
 	    << setprecision(8) << Ntt[2][9] << " " 
 	    << setprecision(8) << Ntt[3][9] << " "  
+	    << setprecision(8) << Nelec[9] << " "  
+	    << setprecision(8) << Nmuon[9] << " "  
 	    << setprecision(8) << Ntt[4][9] << endl;
   decayfile << endl;
   decayfile << "Total processed ttH with H->bb = " << Ntthall << endl;
   decayfile << endl;
   decayfile << "Subset for H->bb decay: " << endl;
-  decayfile << "Top->hadrons: All/Trig/MEtS+NJet/2tag/3tag/4tag: " 
+  decayfile << "Top->hadrons: All/Trig/MEtS+2tag/3tag/4tag: " 
 	    << Ntth[0][0] << " " 
 	    << Ntth[1][0] << " "  
-	    << Ntth[5][0] << " "  
 	    << Ntth[2][0] << " " 
 	    << Ntth[3][0] << " "  
 	    << Ntth[4][0] << endl;
-  decayfile << "Top->en4j:    All/Trig/MEtS+NJet/2tag/3tag/4tag: " 
+  decayfile << "Top->en4j:    All/Trig/MEtS+2tag/3tag/4tag: " 
 	    << Ntth[0][1] << " " 
 	    << Ntth[1][1] << " "  
-	    << Ntth[5][1] << " "  
 	    << Ntth[2][1] << " " 
 	    << Ntth[3][1] << " "  
 	    << Ntth[4][1] << endl;
-  decayfile << "Top->mn4j:    All/Trig/MEtS+NJet/2tag/3tag/4tag: " 
+  decayfile << "Top->mn4j:    All/Trig/MEtS+2tag/3tag/4tag: " 
 	    << Ntth[0][2] << " " 
 	    << Ntth[1][2] << " "  
-	    << Ntth[5][2] << " "  
 	    << Ntth[2][2] << " " 
 	    << Ntth[3][2] << " "  
 	    << Ntth[4][2] << endl;
-  decayfile << "Top->tn4j:    All/Trig/MEtS+NJet/2tag/3tag/4tag: " 
+  decayfile << "Top->tn4j:    All/Trig/MEtS+2tag/3tag/4tag: " 
 	    << Ntth[0][3] << " " 
 	    << Ntth[1][3] << " "  
-	    << Ntth[5][3] << " "  
 	    << Ntth[2][3] << " " 
 	    << Ntth[3][3] << " "  
 	    << Ntth[4][3] << endl;
-  decayfile << "Top->enen2j:  All/Trig/MEtS+NJet/2tag/3tag/4tag: " 
+  decayfile << "Top->enen2j:  All/Trig/MEtS+2tag/3tag/4tag: " 
 	    << Ntth[0][4] << " " 
 	    << Ntth[1][4] << " "  
-	    << Ntth[5][4] << " "  
 	    << Ntth[2][4] << " " 
 	    << Ntth[3][4] << " "  
 	    << Ntth[4][4] << endl;
-  decayfile << "Top->enmn2j:  All/Trig/MEtS+NJet/2tag/3tag/4tag: " 
+  decayfile << "Top->enmn2j:  All/Trig/MEtS+2tag/3tag/4tag: " 
 	    << Ntth[0][5] << " " 
 	    << Ntth[1][5] << " "  
-	    << Ntth[5][5] << " "  
 	    << Ntth[2][5] << " " 
 	    << Ntth[3][5] << " "  
 	    << Ntth[4][5] << endl;
-  decayfile << "Top->entn2j:  All/Trig/MEtS+NJet/2tag/3tag/4tag: " 
+  decayfile << "Top->entn2j:  All/Trig/MEtS+2tag/3tag/4tag: " 
 	    << Ntth[0][6] << " " 
 	    << Ntth[1][6] << " "  
-	    << Ntth[5][6] << " "  
 	    << Ntth[2][6] << " " 
 	    << Ntth[3][6] << " "  
 	    << Ntth[4][6] << endl;
-  decayfile << "Top->mnmn2j:  All/Trig/MEtS+NJet/2tag/3tag/4tag: " 
+  decayfile << "Top->mnmn2j:  All/Trig/MEtS+2tag/3tag/4tag: " 
 	    << Ntth[0][7] << " " 
 	    << Ntth[1][7] << " "  
-	    << Ntth[5][7] << " "  
 	    << Ntth[2][7] << " " 
 	    << Ntth[3][7] << " "  
 	    << Ntth[4][7] << endl;
-  decayfile << "Top->mntn2j:  All/Trig/MEtS+NJet/2tag/3tag/4tag: " 
+  decayfile << "Top->mntn2j:  All/Trig/MEtS+2tag/3tag/4tag: " 
 	    << Ntth[0][8] << " " 
 	    << Ntth[1][8] << " "  
-	    << Ntth[5][8] << " "  
 	    << Ntth[2][8] << " " 
 	    << Ntth[3][8] << " "  
 	    << Ntth[4][8] << endl;
-  decayfile << "Top->tntn2j:  All/Trig/MEtS+NJet/2tag/3tag/4tag: " 
+  decayfile << "Top->tntn2j:  All/Trig/MEtS+2tag/3tag/4tag: " 
 	    << Ntth[0][9] << " " 
 	    << Ntth[1][9] << " "  
-	    << Ntth[5][9] << " "  
 	    << Ntth[2][9] << " " 
 	    << Ntth[3][9] << " "  
 	    << Ntth[4][9] << endl;
