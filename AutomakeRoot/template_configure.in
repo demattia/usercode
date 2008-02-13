@@ -1,0 +1,9 @@
+dnl AC_INIT(src/hello.cpp)
+AC_INIT(configure.in)
+AC_CONFIG_HEADER(config.h)
+AM_INIT_AUTOMAKE(hello,0.1)
+AC_PROG_CXX
+# Comments can start with # or dnl
+CXXFLAGS="-Wall -ansi -O2 -g"
+AC_PROG_INSTALL
+AC_OUTPUT(Makefile src/Makefile)
