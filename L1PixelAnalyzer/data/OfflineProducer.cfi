@@ -35,7 +35,7 @@ module offlineProd = OfflineProducer {
   // Label for PixelJets
   untracked InputTag PixelJetSource             = PixelJetFinder:PixelJets
 
-  untracked uint32 TracksMinimumNum_in_PixelJet = 3
+//  untracked uint32 TracksMinimumNum_in_PixelJet = 3
 
   untracked string OutputEffFileName            = "Efficiency_file.txt"
 

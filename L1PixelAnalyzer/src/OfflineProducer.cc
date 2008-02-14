@@ -13,7 +13,7 @@
 #include "AnalysisExamples/AnalysisObjects/interface/OfflineMEt.h"
 #include "AnalysisExamples/AnalysisObjects/interface/OfflineJet.h"
 #include "AnalysisExamples/AnalysisObjects/interface/MCParticle.h"
-#include "AnalysisExamples/AnalysisObjects/interface/SimplePixelJet.h"
+//#include "AnalysisExamples/AnalysisObjects/interface/SimplePixelJet.h"
 #include "AnalysisExamples/AnalysisObjects/interface/GlobalMuon.h"
 #include "AnalysisExamples/AnalysisObjects/interface/SimpleElectron.h"
 #include "AnalysisExamples/AnalysisObjects/interface/SimpleTau.h"
@@ -74,7 +74,7 @@ OfflineProducer::OfflineProducer(const edm::ParameterSet& iConfig) :
   electronCandidates_(iConfig.getUntrackedParameter<edm::InputTag>("electronCandidates") ),
   electronHcalIsolation_(iConfig.getUntrackedParameter<edm::InputTag>("electronHcalIsolation") ),
   tauTagInfo_(iConfig.getUntrackedParameter<edm::InputTag>("tauTagInfo") ),
-  numTkCut( iConfig.getUntrackedParameter<unsigned int>( "TracksMinimumNum_in_PixelJet" ) ),
+//  numTkCut( iConfig.getUntrackedParameter<unsigned int>( "TracksMinimumNum_in_PixelJet" ) ),
   OutputEffFileName( iConfig.getUntrackedParameter<string>( "OutputEffFileName" ) ),
   cenJets_( iConfig.getParameter<string>( "CenJets" ) ),
   forJets_( iConfig.getParameter<string>( "ForJets" ) ),
@@ -83,7 +83,7 @@ OfflineProducer::OfflineProducer(const edm::ParameterSet& iConfig) :
   offlineJets_( iConfig.getParameter<string>( "OfflineJets" ) ),
   offlineMEt_( iConfig.getParameter<string>( "OfflineMEt" ) ),
   MCParticles_( iConfig.getParameter<string>( "MCParticles" ) ),
-  simplePixelJets_( iConfig.getParameter<string>( "SimplePixelJets" ) ),
+//  simplePixelJets_( iConfig.getParameter<string>( "SimplePixelJets" ) ),
   globalMuons_( iConfig.getParameter<string>( "GlobalMuons" ) ),
   simpleElectrons_( iConfig.getParameter<string>( "SimpleElectrons" ) ),
   simpleTaus_( iConfig.getParameter<string>( "SimpleTaus" ) ),
@@ -116,7 +116,7 @@ OfflineProducer::OfflineProducer(const edm::ParameterSet& iConfig) :
   // MC
   produces<anaobj::MCParticleCollection>( MCParticles_ );
   // Simple pixel jets
-  produces<anaobj::SimplePixelJetCollection>( simplePixelJets_ );
+//  produces<anaobj::SimplePixelJetCollection>( simplePixelJets_ );
   // Global muons
   produces<anaobj::GlobalMuonCollection>( globalMuons_ );
   // SimpleElectrons
@@ -493,20 +493,20 @@ OfflineProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
   // Pixel jets
   // ----------
 
-  edm::Handle<PixelJetCollection> pixeljetshandle;
-  edm::InputTag PixelJetsLabel = conf_.getUntrackedParameter<edm::InputTag>("PixelJetSource");
-  iEvent.getByLabel(PixelJetsLabel, pixeljetshandle);
+//   edm::Handle<PixelJetCollection> pixeljetshandle;
+//   edm::InputTag PixelJetsLabel = conf_.getUntrackedParameter<edm::InputTag>("PixelJetSource");
+//   iEvent.getByLabel(PixelJetsLabel, pixeljetshandle);
 
-  const PixelJetCollection pixeljets = *(pixeljetshandle.product());
+//   const PixelJetCollection pixeljets = *(pixeljetshandle.product());
 
-  auto_ptr<SimplePixelJetCollection> vec_spj_ptr( new SimplePixelJetCollection );
+//   auto_ptr<SimplePixelJetCollection> vec_spj_ptr( new SimplePixelJetCollection );
 
-  PixelJetCollection::const_iterator pj_it = pixeljets.begin();
-  for ( ; pj_it != pixeljets.end(); ++pj_it ) {
-    vec_spj_ptr->push_back( SimplePixelJet( pj_it->pt(), pj_it->eta(), pj_it->phi(), pj_it->z(), pj_it->tkNum() ) ); 
-  }
+//   PixelJetCollection::const_iterator pj_it = pixeljets.begin();
+//   for ( ; pj_it != pixeljets.end(); ++pj_it ) {
+//     vec_spj_ptr->push_back( SimplePixelJet( pj_it->pt(), pj_it->eta(), pj_it->phi(), pj_it->z(), pj_it->tkNum() ) ); 
+//   }
 
-  iEvent.put( vec_spj_ptr, simplePixelJets_ );
+//   iEvent.put( vec_spj_ptr, simplePixelJets_ );
 
 
   // ParamGlobalMuons

@@ -24,7 +24,7 @@
 //
 // Original Author:  Marco De Mattia
 //         Created:  Tue May  8 13:05:37 CEST 2007
-// $Id: OfflineProducer.h,v 1.1 2007/11/11 16:30:52 demattia Exp $
+// $Id: OfflineProducer.h,v 1.2 2007/11/12 18:01:49 demattia Exp $
 //
 //
 
@@ -105,7 +105,7 @@
 #include "DataFormats/TrackReco/interface/TrackFwd.h"
 #include "DataFormats/TrackReco/interface/Track.h"
 
-#include "AnalysisExamples/PixelJet/interface/PixelJet.h"
+//#include "AnalysisExamples/PixelJet/interface/PixelJet.h"
 
 // GenJets
 #include "DataFormats/JetReco/interface/GenJetCollection.h"
@@ -167,7 +167,7 @@ class OfflineProducer : public edm::EDProducer {
 
   edm::InputTag tauTagInfo_;
 
-  unsigned int numTkCut;
+//  unsigned int numTkCut;
   std::string OutputEffFileName;
 
   // Trigger efficiency counters
@@ -205,7 +205,7 @@ class OfflineProducer : public edm::EDProducer {
   std::string offlineJets_;
   std::string offlineMEt_;
   std::string MCParticles_;
-  std::string simplePixelJets_;
+//  std::string simplePixelJets_;
   std::string globalMuons_;
   std::string simpleElectrons_;
   std::string simpleTaus_;
