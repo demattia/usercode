@@ -1,0 +1,24 @@
+source = PythiaSource 
+{ 
+    untracked int32 pythiaPylistVerbosity = 0
+    untracked bool pythiaHepMCVerbosity = false
+    untracked int32 maxEventsToPrint = 0
+    
+    PSet PythiaParameters = {
+	
+	# This is a vector of ParameterSet names to be read, in this order
+	vstring parameterSets = {
+	    "pythiaUESettings", 
+	    "processParameters"
+	}
+	
+	include "Configuration/Generator/data/PythiaUESettings.cfi"
+	
+	vstring processParameters = {
+	    'MSEL=1               ! QCD hight pT processes',
+	    'CKIN(3)=230.          ! minimum pt hat for hard interactions',
+	    'CKIN(4)=300.          ! maximum pt hat for hard interactions'    
+	}
+	
+    }
+}
