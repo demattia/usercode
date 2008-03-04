@@ -39,7 +39,10 @@
 #include "TrackingTools/TrajectoryState/interface/TrajectoryStateTransform.h"
 #include "FWCore/MessageLogger/interface/MessageLogger.h"
 #include "DataFormats/TrackReco/interface/Track.h"
+#include "DataFormats/TrackReco/interface/TrackFwd.h"
+#include "DataFormats/TrackingRecHit/interface/TrackingRecHit.h"
 #include "AnalysisDataFormats/TrackInfo/interface/TrackInfo.h"
+#include "AnalysisDataFormats/TrackInfo/interface/TrackInfoTrackAssociation.h"
 
 // For the auto pointer
 #include <memory>

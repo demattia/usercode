@@ -87,4 +87,4 @@ AnaObjAnalyzer::endJob() {
 }
 
 //define this as a plug-in
-DEFINE_FWK_MODULE(AnaObjAnalyzer);
+//DEFINE_FWK_MODULE(AnaObjAnalyzer);

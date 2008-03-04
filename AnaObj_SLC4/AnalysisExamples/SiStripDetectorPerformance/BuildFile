@@ -1,9 +1,8 @@
-<flags SEAL_PLUGIN_NAME="AnalysisExamplesSiStripDetectorPerformance">
-
 <use name=FWCore/Framework>
 <use name=FWCore/ParameterSet>
 
 <use name=DataFormats/Common>
+<use name=DataFormats/GeometryVector>
 <use name=DataFormats/SiStripDigi>
 <use name=DataFormats/SiStripCluster>
 <use name=AnalysisDataFormats/SiStripClusterInfo>
@@ -34,10 +33,11 @@
 
 <use name=AnalysisExamples/AnalysisObjects>
 
-<use name=clhep>
+<use name=hepmc>
 <use name=boost>
 <use name=root>
 
+<flags EDM_PLUGIN=1>
 
 <export>
  <lib name=AnalysisExamplesSiStripDetectorPerformance>
@@ -45,6 +45,7 @@
  <use name=FWCore/Framework>
  <use name=FWCore/ParameterSet>
  <use name=DataFormats/Common>
+ <use name=DataFormats/GeometryVector>
  <use name=DataFormats/SiStripDigi>
  <use name=DataFormats/SiStripCluster>
  <use name=AnalysisDataFormats/SiStripClusterInfo>
@@ -77,7 +78,7 @@
 
 <use name=AnalysisExamples/AnalysisObjects>
 
- <use name=clhep>
+ <use name=hepmc>
  <use name=boost>
  <use name=root>
 </export>

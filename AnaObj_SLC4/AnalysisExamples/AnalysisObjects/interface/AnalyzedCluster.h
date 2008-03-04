@@ -58,8 +58,8 @@ namespace anaobj {
     float GlbPos_Z;
 
     // Vectors of digis to the left and right of the cluster
-    std::vector<short> rawDigiAmplitudesL;
-    std::vector<short> rawDigiAmplitudesR;
+    std::vector<float> rawDigiAmplitudesL;
+    std::vector<float> rawDigiAmplitudesR;
 
     // Maps with key tk_id
     std::map<int, int>   sign;

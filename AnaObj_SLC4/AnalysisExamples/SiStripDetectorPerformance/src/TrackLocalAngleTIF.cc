@@ -7,8 +7,8 @@
 #include "AnalysisExamples/SiStripDetectorPerformance/interface/TrackLocalAngleTIF.h"
 
 #include "DataFormats/TrajectorySeed/interface/TrajectorySeedCollection.h"
-#include "FWCore/Framework/interface/ESHandle.h"
 #include "DataFormats/Common/interface/Handle.h"
+#include "FWCore/Framework/interface/ESHandle.h"
 #include "FWCore/Framework/interface/EventSetup.h"
 #include "DataFormats/GeometryVector/interface/GlobalPoint.h"
 #include "DataFormats/GeometryVector/interface/GlobalVector.h"
@@ -24,7 +24,6 @@
 #include "DataFormats/TrackerRecHit2D/interface/ProjectedSiStripRecHit2D.h"
 #include "Geometry/TrackerGeometryBuilder/interface/GluedGeomDet.h"
 #include "Geometry/TrackerGeometryBuilder/interface/StripGeomDetUnit.h"
-//#include "AnalysisDataFormats/TrackInfo/interface/TrackInfoEnum.h"
 
 using namespace std;
 
@@ -80,11 +79,9 @@ std::vector<std::pair<const TrackingRecHit*,float> > TrackLocalAngleTIF::Separat
       const SiStripMatchedRecHit2D* matchedhit=dynamic_cast<const SiStripMatchedRecHit2D*>(&(*(_tkinfoiter->first)));
       const SiStripRecHit2D* hit=dynamic_cast<const SiStripRecHit2D*>(&(*(_tkinfoiter->first)));
       //     LocalVector trackdirection=(_tkinfoiter->second.parameters()).momentum();
-      //       LocalVector trackdirection=(trackinforef->stateOnDet((*_tkinfoiter).first).parameters()).momentum();
-      //       LocalPoint  trackposition =(trackinforef->stateOnDet((*_tkinfoiter).first).parameters()).position();
+      LocalVector trackdirection=(trackinforef->stateOnDet(reco::Combined,_tkinfoiter->first)->parameters()).momentum();
+      LocalPoint  trackposition =(trackinforef->stateOnDet(reco::Combined,_tkinfoiter->first)->parameters()).position();
 
-      LocalVector trackdirection=(trackinforef->stateOnDet(reco::Updated, (*_tkinfoiter).first)->parameters()).momentum();
-      LocalPoint  trackposition =(trackinforef->stateOnDet(reco::Updated, (*_tkinfoiter).first)->parameters()).position();
       // Projected Hit
       ////////////////
       if (phit) {

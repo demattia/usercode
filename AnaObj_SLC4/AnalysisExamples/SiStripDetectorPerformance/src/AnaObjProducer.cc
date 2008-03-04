@@ -129,6 +129,8 @@ void AnaObjProducer::produce(edm::Event& e, const edm::EventSetup& es) {
 
   using namespace edm;
 
+#ifndef SIM
+
   // Get Tickmark Height for each laser. This info is accessed from txt-files since for the old DetId schema it is not
   // available in the DB. This will be accessed from the DB as soon as the new schema will be used!
   if (runnumber!=e.id().run()) // do it only once for each run
@@ -196,6 +198,7 @@ void AnaObjProducer::produce(edm::Event& e, const edm::EventSetup& es) {
 	}
       }
     }
+#endif
 
   // To avoid unhandled exceptions, skip tracking when the track or trackinfo collection cannot be opened
   // (this can happen for example in fnal processing, where the tracking is not done for events  with too many clusters).
@@ -263,7 +266,7 @@ void AnaObjProducer::produce(edm::Event& e, const edm::EventSetup& es) {
   // DetSetVector SiStripClusterInfos
   // --------------------------------
   edm::Handle<edm::DetSetVector<SiStripClusterInfo> > oDSVClusterInfos;
-  e.getByLabel( "siStripClusterInfoProducer", oDSVClusterInfos);
+  e.getByLabel( "siStripClusterInfo", oDSVClusterInfos);
 
   edm::Handle<edm::DetSetVector<SiStripCluster> > oDSVCluster;
   e.getByLabel( "siStripClusters", oDSVCluster);    
@@ -400,6 +403,8 @@ void AnaObjProducer::produce(edm::Event& e, const edm::EventSetup& es) {
 
       int thisapv = int(clusterpos/256.);
 
+#ifndef SIM
+
       for(int i=0; i<v_detid.size(); i++){
 	if(rawId == v_detid[i]){
 	  if(v_apvnum[i]==2){
@@ -413,6 +418,7 @@ void AnaObjProducer::produce(edm::Event& e, const edm::EventSetup& es) {
 	  break;
 	}
       }
+#endif
 
       clustereta       =      getClusterEta( *oIter );
       clustercrosstalk =      getClusterCrossTalk( *oIter );
@@ -497,8 +503,7 @@ void AnaObjProducer::produce(edm::Event& e, const edm::EventSetup& es) {
       analyzedCluster.clustereta       = clustereta;
       analyzedCluster.clustercrosstalk = clustercrosstalk;
       analyzedCluster.geoId            = geoId;
-
-      std::pair<double, double> thickness_and_pitch = moduleThicknessAndPitch( geoId );
+      std::pair<double, double> thickness_and_pitch = moduleThicknessAndPitch( geoId, type );
       analyzedCluster.thickness        = thickness_and_pitch.first;
       analyzedCluster.pitch            = thickness_and_pitch.second;
 
@@ -1298,8 +1303,8 @@ double AnaObjProducer::getClusterEta( const SiStripClusterInfo & CLUSTERINFO ) c
       else {
 	// only needed if amplitudes.size() == 1
 	// Get the vector of amplitudesL and amplitudesR of the strips around the cluster
-	const std::vector<short> * rawDigiAmplitudesL_ptr = &( CLUSTERINFO.rawdigiAmplitudesL() );
-	const std::vector<short> * rawDigiAmplitudesR_ptr = &( CLUSTERINFO.rawdigiAmplitudesR() );
+	const std::vector<float> * rawDigiAmplitudesL_ptr = &( CLUSTERINFO.rawdigiAmplitudesL() );
+	const std::vector<float> * rawDigiAmplitudesR_ptr = &( CLUSTERINFO.rawdigiAmplitudesR() );
 
 	// Take the amplitude of the first strip on the left of the cluster
 	max_L = 0;
@@ -1384,8 +1389,8 @@ double AnaObjProducer::getClusterCrossTalk( const SiStripClusterInfo & CLUSTERIN
 
     // only needed if amplitudes.size() == 1
     // Get the vector of amplitudesL and amplitudesR of the strips around the cluster
-    const std::vector<short> * rawDigiAmplitudesL_ptr = &( CLUSTERINFO.rawdigiAmplitudesL() );
-    const std::vector<short> * rawDigiAmplitudesR_ptr = &( CLUSTERINFO.rawdigiAmplitudesR() );
+    const std::vector<float> * rawDigiAmplitudesL_ptr = &( CLUSTERINFO.rawdigiAmplitudesL() );
+    const std::vector<float> * rawDigiAmplitudesR_ptr = &( CLUSTERINFO.rawdigiAmplitudesR() );
 
     // Take the amplitude of the first strip on the left of the cluster
     max_L = 0;
@@ -1398,7 +1403,7 @@ double AnaObjProducer::getClusterCrossTalk( const SiStripClusterInfo & CLUSTERIN
     max_R = 0;
     if ( rawDigiAmplitudesR_ptr ) {
       if ( rawDigiAmplitudesR_ptr->size() > 0 ) {
-	max_R = (*rawDigiAmplitudesR_ptr)[0];
+	max_R = (int)(*rawDigiAmplitudesR_ptr)[0];
       }
     }
 
@@ -1456,13 +1461,28 @@ double AnaObjProducer::calculateClusterCrossTalk(  const double &rdADC_STRIPL,
 }
 
 // double AnaObjProducer::moduleThickness(const TrackingRecHit* hit)
-std::pair<double, double> AnaObjProducer::moduleThicknessAndPitch(const uint32_t detid)
+std::pair<double, double> AnaObjProducer::moduleThicknessAndPitch(const uint32_t detid, int type)
 {
   double t=0.;
 
   const GeomDetUnit* it = tracker->idToDetUnit(DetId(detid));
+
   // From MTCCNtupleMaker in CMSSW_1_3_5
-  double pitch = ((StripTopology&)it->topology()).pitch();
+  //double pitch = ((StripTopology&)it->topology()).pitch();
+  double pitch;
+
+  const StripGeomDetUnit* sit = dynamic_cast<const StripGeomDetUnit*>(it);
+  if (sit) {
+    if (type==3 || type==5) { // TIB and TOB with constant pitch
+      pitch = (sit->specificTopology()).pitch();
+    }else{ // TID and TEC with variable pitch
+      pitch = -1.;
+    }
+  }else{
+    cout << "\t\t this detID doesn't seem to belong to the Strip Tracker" << endl;
+    pitch = -99.;
+  }
+
   //FIXME throw exception (taken from RecoLocalTracker/SiStripClusterizer/src/SiStripNoiseService.cc)
   if (dynamic_cast<const StripGeomDetUnit*>(it)==0 && dynamic_cast<const PixelGeomDetUnit*>(it)==0) {
     cout << "\t\t this detID doesn't seem to belong to the Tracker" << endl;
@@ -1473,5 +1493,3 @@ std::pair<double, double> AnaObjProducer::moduleThicknessAndPitch(const uint32_t
 
   return (std::make_pair( t, pitch ) );
 }
-
-DEFINE_ANOTHER_FWK_MODULE(AnaObjProducer);

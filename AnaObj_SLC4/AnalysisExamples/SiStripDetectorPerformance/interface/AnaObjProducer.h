@@ -23,6 +23,7 @@
 #include "DataFormats/GeometryVector/interface/GlobalPoint.h"
 #include "DataFormats/GeometryVector/interface/GlobalVector.h"
 #include "DataFormats/GeometryVector/interface/LocalVector.h"
+#include "DataFormats/GeometryVector/interface/GlobalPoint.h"
 #include "DataFormats/Common/interface/EDProduct.h"
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
 #include "DataFormats/TrackReco/interface/Track.h"
@@ -120,7 +121,7 @@ class AnaObjProducer : public edm::EDProducer
   void GetSubDetInfo(StripSubdetector oStripSubdet);
 
 //  double moduleThickness( const TrackingRecHit* hit );
-  std::pair<double, double> moduleThicknessAndPitch( const unsigned int detid );
+  std::pair<double, double> moduleThicknessAndPitch( const unsigned int detid, int subdet_Id);
 
   edm::ParameterSet conf_;
   std::string filename_;
@@ -202,8 +203,8 @@ class AnaObjProducer : public edm::EDProducer
   int      numberofnontkclusters; 
 
   // Vectors of strip amplitudes from clusterinfo
-  const std::vector<short> * rawDigiAmplitudesL_ptr_;
-  const std::vector<short> * rawDigiAmplitudesR_ptr_;
+  const std::vector<float> * rawDigiAmplitudesL_ptr_;
+  const std::vector<float> * rawDigiAmplitudesR_ptr_;
 
   // Tracking particle quantities
   float    trackingparticleE;
