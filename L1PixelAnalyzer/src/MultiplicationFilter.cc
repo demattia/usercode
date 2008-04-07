@@ -160,11 +160,12 @@ MultiplicationFilter::filter(edm::Event& iEvent, const edm::EventSetup& iSetup)
 
     vector<ModOfflineJet>::const_iterator caloJets_it = modOfflineJetPtr->begin();
     for( ; caloJets_it != modOfflineJetPtr->end(); ++caloJets_it ) {
-      float jetEt = caloJets_it->et();
+      double jetEt = caloJets_it->et();
 
       // Save the new jet
       vecOfflineJetsPtr->push_back( OfflineJet( jetEt, caloJets_it->eta(), caloJets_it->phi(), caloJets_it->et(),
                                                 caloJets_it->emEnergyFraction(),
+                                                caloJets_it->vertex(),
                                                 caloJets_it->discriminatorHighEff(), caloJets_it->discriminatorHighPur(),
                                                 caloJets_it->jetMass(),
                                                 caloJets_it->tkNumS1(), caloJets_it->tkSumPtS1(), caloJets_it->tagTkMassS1(),
