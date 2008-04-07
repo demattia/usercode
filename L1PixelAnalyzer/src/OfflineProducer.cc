@@ -5,7 +5,6 @@
 #include "AnalysisExamples/AnalysisClasses/interface/SimpleJet.h"
 #include "AnalysisExamples/AnalysisClasses/interface/Associator.h"
 #include "AnalysisExamples/AnalysisClasses/interface/DeltaPhi.h"
-#include "AnalysisExamples/AnalysisClasses/interface/L1PixelTrig.h"
 
 // Classes to be stored
 #include "AnalysisExamples/AnalysisObjects/interface/BaseJet.h"
@@ -13,7 +12,6 @@
 #include "AnalysisExamples/AnalysisObjects/interface/OfflineMEt.h"
 #include "AnalysisExamples/AnalysisObjects/interface/OfflineJet.h"
 #include "AnalysisExamples/AnalysisObjects/interface/MCParticle.h"
-//#include "AnalysisExamples/AnalysisObjects/interface/SimplePixelJet.h"
 #include "AnalysisExamples/AnalysisObjects/interface/GlobalMuon.h"
 #include "AnalysisExamples/AnalysisObjects/interface/SimpleElectron.h"
 #include "AnalysisExamples/AnalysisObjects/interface/SimpleTau.h"
@@ -28,6 +26,7 @@
 //#include "DataFormats/EgammaCandidates/interface/ElectronFwd.h"
 #include "DataFormats/EgammaCandidates/interface/PixelMatchGsfElectron.h"
 #include "DataFormats/EgammaCandidates/interface/PixelMatchGsfElectronFwd.h"
+#include "DataFormats/GsfTrackReco/interface/GsfTrack.h"
 #include "DataFormats/Candidate/interface/CandAssociation.h"
 #include "DataFormats/METReco/interface/CaloMETCollection.h"
 #include "JetMETCorrections/Objects/interface/JetCorrector.h"
@@ -74,7 +73,6 @@ OfflineProducer::OfflineProducer(const edm::ParameterSet& iConfig) :
   electronCandidates_(iConfig.getUntrackedParameter<edm::InputTag>("electronCandidates") ),
   electronHcalIsolation_(iConfig.getUntrackedParameter<edm::InputTag>("electronHcalIsolation") ),
   tauTagInfo_(iConfig.getUntrackedParameter<edm::InputTag>("tauTagInfo") ),
-//  numTkCut( iConfig.getUntrackedParameter<unsigned int>( "TracksMinimumNum_in_PixelJet" ) ),
   OutputEffFileName( iConfig.getUntrackedParameter<string>( "OutputEffFileName" ) ),
   cenJets_( iConfig.getParameter<string>( "CenJets" ) ),
   forJets_( iConfig.getParameter<string>( "ForJets" ) ),
@@ -83,40 +81,34 @@ OfflineProducer::OfflineProducer(const edm::ParameterSet& iConfig) :
   offlineJets_( iConfig.getParameter<string>( "OfflineJets" ) ),
   offlineMEt_( iConfig.getParameter<string>( "OfflineMEt" ) ),
   MCParticles_( iConfig.getParameter<string>( "MCParticles" ) ),
-//  simplePixelJets_( iConfig.getParameter<string>( "SimplePixelJets" ) ),
   globalMuons_( iConfig.getParameter<string>( "GlobalMuons" ) ),
   simpleElectrons_( iConfig.getParameter<string>( "SimpleElectrons" ) ),
   simpleTaus_( iConfig.getParameter<string>( "SimpleTaus" ) ),
   summary_( iConfig.getParameter<string>( "Summary" ) ),
-  eventType_( iConfig.getParameter<unsigned int>( "EventType" ) )
+  eventType_( iConfig.getParameter<unsigned int>( "EventType" ) ),
+  doL1Trig_( iConfig.getParameter<bool>( "doL1Trig" ) )
 {
   //now do what ever initialization is needed
 
-//  OutputFile = new TFile((conf_.getUntrackedParameter<std::string>("OutputName")).c_str() ,"RECREATE","L1TrigPixelAnaOutput");
-  // The file must be opened first, so that becomes the default position for all the histograms
-//  OutputFile->cd();
-
   // White background for the canvases
   gROOT->SetStyle("Plain");
-
-  HiVar = new HiVariables( ( conf_.getUntrackedParameter<string>("HiVarName") ).c_str() );
 
   eventcounter_ = 0;
 //  PI_ = 3.141593;
   chargedpi_mass_ = 0.13957018;
 
   // L1
-  produces<anaobj::BaseJetCollection>( cenJets_ );
-  produces<anaobj::BaseJetCollection>( forJets_ );
-  produces<anaobj::BaseJetCollection>( tauJets_ );
-  produces<anaobj::BaseMEt>( l1MEt_ );
+  if ( doL1Trig_ ) {
+    produces<anaobj::BaseJetCollection>( cenJets_ );
+    produces<anaobj::BaseJetCollection>( forJets_ );
+    produces<anaobj::BaseJetCollection>( tauJets_ );
+    produces<anaobj::BaseMEt>( l1MEt_ );
+  }
   // Offline
   produces<anaobj::OfflineJetCollection>( offlineJets_ );
   produces<anaobj::OfflineMEt>( offlineMEt_ );
   // MC
   produces<anaobj::MCParticleCollection>( MCParticles_ );
-  // Simple pixel jets
-//  produces<anaobj::SimplePixelJetCollection>( simplePixelJets_ );
   // Global muons
   produces<anaobj::GlobalMuonCollection>( globalMuons_ );
   // SimpleElectrons
@@ -132,9 +124,6 @@ OfflineProducer::~OfflineProducer()
 {
   // do anything here that needs to be done at desctruction time
   // (e.g. close files, deallocate resources etc.)
-
-  // Draw the histograms
-  //  HiVar->Plot();
 
 //  OutputFile->Write();
 }
@@ -189,13 +178,15 @@ OfflineProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
     edm::InputTag L1EtMissLabel = conf_.getUntrackedParameter<edm::InputTag>("l1eEtMissSource");
 
     // Level 1
-    iEvent.getByLabel(L1CJetLabel, l1eCenJets);
-    iEvent.getByLabel(L1FJetLabel, l1eForJets);
-    iEvent.getByLabel(L1TauJetLabel, l1eTauJets);
-    iEvent.getByLabel(L1EtMissLabel, l1eEtMiss);
+    if ( doL1Trig_ ) {
+      iEvent.getByLabel(L1CJetLabel, l1eCenJets);
+      iEvent.getByLabel(L1FJetLabel, l1eForJets);
+      iEvent.getByLabel(L1TauJetLabel, l1eTauJets);
+      iEvent.getByLabel(L1EtMissLabel, l1eEtMiss);
+    }
   }
   catch (...) {
-    std::cerr << "L1TGCT: could not find one of the classes?" << std::endl;
+    std::cerr << "L1TGCT: could not find one of the L1 classes?" << std::endl;
     return;
   }
 
@@ -399,10 +390,15 @@ OfflineProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 
 
     // Passing corrected Et, eta, phi, uncorrected Et, emEnergyFraction
-    vec_IC5Jets_ptr->push_back( OfflineJet( corEt, caloJets_it->eta(), caloJets_it->phi(), caloJets_it->et(),
-//                                            caloJets_it->emEnergyFraction(),
+    vec_IC5Jets_ptr->push_back( OfflineJet( corEt, 
+					    caloJets_it->eta(), 
+					    caloJets_it->phi(), 
+					    caloJets_it->et(),
                                             EmFracFromComp,
-                                            bTagHighEff_it->second, bTagHighPur_it->second,
+					    //  caloJets_it->emEnergyFraction(),
+					    caloJets_it->vertex(),
+                                            bTagHighEff_it->second, 
+					    bTagHighPur_it->second,
                                             jetMass,
                                             tkNum_S1, tkSumPt_S1, bTagTkInvMass_S1,
                                             tkNum_S2, tkSumPt_S2, bTagTkInvMass_S2,
@@ -489,26 +485,6 @@ OfflineProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
     cout << "Semileptonic good event" << endl;
   }
 
-
-  // Pixel jets
-  // ----------
-
-//   edm::Handle<PixelJetCollection> pixeljetshandle;
-//   edm::InputTag PixelJetsLabel = conf_.getUntrackedParameter<edm::InputTag>("PixelJetSource");
-//   iEvent.getByLabel(PixelJetsLabel, pixeljetshandle);
-
-//   const PixelJetCollection pixeljets = *(pixeljetshandle.product());
-
-//   auto_ptr<SimplePixelJetCollection> vec_spj_ptr( new SimplePixelJetCollection );
-
-//   PixelJetCollection::const_iterator pj_it = pixeljets.begin();
-//   for ( ; pj_it != pixeljets.end(); ++pj_it ) {
-//     vec_spj_ptr->push_back( SimplePixelJet( pj_it->pt(), pj_it->eta(), pj_it->phi(), pj_it->z(), pj_it->tkNum() ) ); 
-//   }
-
-//   iEvent.put( vec_spj_ptr, simplePixelJets_ );
-
-
   // ParamGlobalMuons
   // ----------------
 
@@ -523,13 +499,32 @@ OfflineProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
   auto_ptr<GlobalMuonCollection> vec_glbmuon_ptr( new GlobalMuonCollection );
 
   MuonCollection::const_iterator muon_it = paramGlobalMuons->begin();
+  std::cout << "paramGlobalMuons->size(): " << paramGlobalMuons->size() << std::endl;
   for ( ; muon_it != paramGlobalMuons->end(); ++muon_it ) {
-    vec_glbmuon_ptr->push_back( GlobalMuon( muon_it->pt(), muon_it->eta(), muon_it->phi(), muon_it->getCalEnergy().em,
-                                            muon_it->getCalEnergy().had, muon_it->getCalEnergy().ho,
-                                            muon_it->getIsolationR03().sumPt, muon_it->track().get()->normalizedChi2(),
-                                            muon_it->track().get()->numberOfValidHits() ) );
+    std::cout << "inside loop on param muons" << std::endl;
+    vec_glbmuon_ptr->push_back( GlobalMuon( muon_it->pt(), 
+					    muon_it->eta(), 
+					    muon_it->phi(), 
+					    muon_it->charge(),
+					    muon_it->p4(),
+					    muon_it->vertex(),
+					    muon_it->getCalEnergy().em,
+                                            muon_it->getCalEnergy().had, 
+					    muon_it->getCalEnergy().ho,
+                                            muon_it->getIsolationR03().sumPt, 
+                                            muon_it->getIsolationR03().emEt,
+                                            muon_it->getIsolationR03().hadEt,
+                                            muon_it->getIsolationR03().hoEt,
+                                            muon_it->getIsolationR03().nJets,
+                                            muon_it->getIsolationR03().nTracks,
+					    muon_it->track().get()->normalizedChi2(),
+                                            muon_it->track().get()->numberOfValidHits(),
+                                            muon_it->track().get()->dxy(),
+                                            muon_it->track().get()->dxyError() ) );
   }
 
+  //  if ( eventcounter_/100 == float(eventcounter_)/100. )
+    std::cout << "vec_glbmuon_ptr->size(): " << vec_glbmuon_ptr->size() << std::endl;
   iEvent.put( vec_glbmuon_ptr, globalMuons_ );
 
   // ElectronCandidates
@@ -541,7 +536,17 @@ OfflineProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
   for ( ; elec_it != electronHcalIsolation->end(); ++elec_it ) {
     PixelMatchGsfElectronRef elec_ref = elec_it->first.castTo<PixelMatchGsfElectronRef>();
     const PixelMatchGsfElectron & elec = *elec_ref;
-    vec_simpelec_ptr->push_back( SimpleElectron( elec.pt(), elec.eta(), elec.phi(), elec.et(), elec.hadronicOverEm(), elec_it->second ) );
+    vec_simpelec_ptr->push_back( SimpleElectron( elec.pt(), 
+						 elec.eta(), 
+						 elec.phi(),
+						 elec.charge(), 
+						 elec.p4(),
+						 elec.vertex(),
+						 elec.et(), 
+						 elec.hadronicOverEm(), 
+						 elec_it->second,
+						 elec.gsfTrack().get()->dxy(),
+						 elec.gsfTrack().get()->dxyError() ) );
   }
 
   iEvent.put( vec_simpelec_ptr, simpleElectrons_ );
@@ -578,46 +583,46 @@ OfflineProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 
   iEvent.put( vec_simptau_ptr, simpleTaus_ );
 
-
   // Level 1 trigger
   // ---------------
+  if ( doL1Trig_ ) {
 
-  std::auto_ptr<BaseJetCollection> v_CenJets_ptr( new BaseJetCollection );
-  std::auto_ptr<BaseJetCollection> v_ForJets_ptr( new BaseJetCollection );
-  std::auto_ptr<BaseJetCollection> v_TauJets_ptr( new BaseJetCollection );
+    std::auto_ptr<BaseJetCollection> v_CenJets_ptr( new BaseJetCollection );
+    std::auto_ptr<BaseJetCollection> v_ForJets_ptr( new BaseJetCollection );
+    std::auto_ptr<BaseJetCollection> v_TauJets_ptr( new BaseJetCollection );
 
-  // All the jets together fot the L1Trigger
-  vector<SimpleJet> vec_TriggerCenJet;
-  vector<SimpleJet> vec_TriggerForJet;
-  vector<SimpleJet> vec_TriggerTauJet;
-  for ( L1JetParticleCollection::const_iterator tcj = l1eCenJets->begin(); tcj != l1eCenJets->end(); ++tcj ) {
-    vec_TriggerCenJet.push_back( SimpleJet( tcj->et(), tcj->eta(), tcj->phi() ) );
-    v_CenJets_ptr->push_back( BaseJet( tcj->et(), tcj->eta(), tcj->phi() ) );
-  }
-  for ( L1JetParticleCollection::const_iterator tfj = l1eForJets->begin(); tfj != l1eForJets->end(); ++tfj ) {
-    vec_TriggerForJet.push_back( SimpleJet( tfj->et(), tfj->eta(), tfj->phi() ) );
-    v_ForJets_ptr->push_back( BaseJet( tfj->et(), tfj->eta(), tfj->phi() ) );
-  }
-  // Tau jets
-  for ( L1JetParticleCollection::const_iterator ttj = l1eTauJets->begin(); ttj != l1eTauJets->end(); ++ttj ) {
-    vec_TriggerTauJet.push_back( SimpleJet( ttj->et(), ttj->eta(), ttj->phi() ) );
-    v_TauJets_ptr->push_back( BaseJet( ttj->et(), ttj->eta(), ttj->phi() ) );
-  }
+    // All the jets together fot the L1Trigger
+    vector<SimpleJet> vec_TriggerCenJet;
+    vector<SimpleJet> vec_TriggerForJet;
+    vector<SimpleJet> vec_TriggerTauJet;
+    for ( L1JetParticleCollection::const_iterator tcj = l1eCenJets->begin(); tcj != l1eCenJets->end(); ++tcj ) {
+      vec_TriggerCenJet.push_back( SimpleJet( tcj->et(), tcj->eta(), tcj->phi() ) );
+      v_CenJets_ptr->push_back( BaseJet( tcj->et(), tcj->eta(), tcj->phi() ) );
+    }
+    for ( L1JetParticleCollection::const_iterator tfj = l1eForJets->begin(); tfj != l1eForJets->end(); ++tfj ) {
+      vec_TriggerForJet.push_back( SimpleJet( tfj->et(), tfj->eta(), tfj->phi() ) );
+      v_ForJets_ptr->push_back( BaseJet( tfj->et(), tfj->eta(), tfj->phi() ) );
+    }
+    // Tau jets
+    for ( L1JetParticleCollection::const_iterator ttj = l1eTauJets->begin(); ttj != l1eTauJets->end(); ++ttj ) {
+      vec_TriggerTauJet.push_back( SimpleJet( ttj->et(), ttj->eta(), ttj->phi() ) );
+      v_TauJets_ptr->push_back( BaseJet( ttj->et(), ttj->eta(), ttj->phi() ) );
+    }
 
+    // etMiss() method returns et() method (at least for version 1_7_0_pre10)
+    std::auto_ptr<BaseMEt> L1MEt( new BaseMEt( l1eEtMiss->etMiss(), l1eEtMiss->phi(), 0. ) );
 
-  // etMiss() method returns et() method (at least for version 1_7_0_pre10)
-  std::auto_ptr<BaseMEt> L1MEt( new BaseMEt( l1eEtMiss->etMiss(), l1eEtMiss->phi(), 0. ) );
-
-  // Put the L1 jest collections in the event
-  iEvent.put( v_CenJets_ptr, cenJets_ );
-  iEvent.put( v_ForJets_ptr, forJets_ );
-  iEvent.put( v_TauJets_ptr, tauJets_ );
-  try {
-    iEvent.put( L1MEt, l1MEt_ );
-  }
-  catch (...) {
-    cout << "put crash" << endl;
-  }
+    // Put the L1 jest collections in the event
+    iEvent.put( v_CenJets_ptr, cenJets_ );
+    iEvent.put( v_ForJets_ptr, forJets_ );
+    iEvent.put( v_TauJets_ptr, tauJets_ );
+    try {
+      iEvent.put( L1MEt, l1MEt_ );
+    }
+    catch (...) {
+      cout << "put crash" << endl;
+    }
+  } // end if doL1Trig_
 
   // Summary
   // -------

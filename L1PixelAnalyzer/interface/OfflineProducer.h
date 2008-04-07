@@ -12,13 +12,12 @@
  - level 1 calorimetric quantities
  - offline corrected jets (calibration performed here)
  - offline corrected MET, depending on jets corrections
- - MC informations         <---------------------------------- to do
- - B tagging               <---------------------------------- to do
+ - MC informations
+ - B tagging
 
  Evaluates:
- - DPhimin between MET and closest (in phi) offline jet
- - association of MC partons to offline jets            <----- to do
- - association of btags to offline jets                 <----- to do
+ - association of MC partons to offline jets
+ - association of btags to offline jets
 
 */
 //
@@ -78,16 +77,6 @@
 #include "Geometry/CaloTopology/interface/CaloTowerConstituentsMap.h"
 #include "DataFormats/Math/interface/Vector3D.h"
 
-// L1 Pixel
-// #include "DataFormats/TrackerRecHit2D/interface/SiPixelRecHit.h"
-// #include "DataFormats/SiPixelDetId/interface/PXBDetId.h"
-// #include "DataFormats/SiPixelDetId/interface/PXFDetId.h"
-// #include "DataFormats/SiPixelDetId/interface/PixelSubdetector.h"
-
-// #include "Geometry/TrackerGeometryBuilder/interface/PixelGeomDetUnit.h"
-// #include "Geometry/TrackerTopology/interface/RectangularPixelTopology.h"
-
-#include "DataFormats/TrackerRecHit2D/interface/SiPixelRecHitCollection.h"
 #include "FWCore/Framework/interface/ESHandle.h"
 #include "DataFormats/GeometryVector/interface/GlobalPoint.h"
 #include "DataFormats/GeometryVector/interface/GlobalVector.h"
@@ -97,15 +86,11 @@
 #include "TrackingTools/Records/interface/TransientRecHitRecord.h"
 #include "Geometry/TrackerGeometryBuilder/interface/GluedGeomDet.h"
 #include "DataFormats/DetId/interface/DetId.h" 
-#include "DataFormats/SiPixelDetId/interface/PXBDetId.h"
-#include "DataFormats/SiPixelDetId/interface/PXFDetId.h"
 #include "DataFormats/GeometryVector/interface/LocalPoint.h"
 #include "DataFormats/GeometryVector/interface/GlobalPoint.h"
 
 #include "DataFormats/TrackReco/interface/TrackFwd.h"
 #include "DataFormats/TrackReco/interface/Track.h"
-
-//#include "AnalysisExamples/PixelJet/interface/PixelJet.h"
 
 // GenJets
 #include "DataFormats/JetReco/interface/GenJetCollection.h"
@@ -117,9 +102,8 @@
 // Associator for the jets
 #include "AnalysisExamples/AnalysisClasses/interface/Associator.h"
 
-// L1Trigger evaluator
+// Multiple TH1F
 #include "AnalysisExamples/AnalysisClasses/interface/L1Trig.h"
-#include "AnalysisExamples/AnalysisClasses/interface/HiVariables.h"
 #include "AnalysisExamples/AnalysisClasses/interface/MultiTH1F.h"
 
 //
@@ -149,11 +133,6 @@ class OfflineProducer : public edm::EDProducer {
 
   edm::ParameterSet conf_;
 
-  // Use a dynamic construction, or the TFile problem will crash the job
-  // when moving from one input file to another.
-  // The histograms must be created after the TFile is opened.
-  HiVariables * HiVar;
-
   std::string CaloJetAlgorithm, JetCorrectionService, METCollection;
   std::string genParticleCandidates;
   std::string trackCountingHighEffJetTags;
@@ -167,7 +146,7 @@ class OfflineProducer : public edm::EDProducer {
 
   edm::InputTag tauTagInfo_;
 
-//  unsigned int numTkCut;
+  unsigned int numTkCut;
   std::string OutputEffFileName;
 
   // Trigger efficiency counters
@@ -205,13 +184,14 @@ class OfflineProducer : public edm::EDProducer {
   std::string offlineJets_;
   std::string offlineMEt_;
   std::string MCParticles_;
-//  std::string simplePixelJets_;
   std::string globalMuons_;
   std::string simpleElectrons_;
   std::string simpleTaus_;
   // Summary
   std::string summary_;
   unsigned int eventType_;
+
+  bool doL1Trig_;
 
   // TagTracksInvarianMass
   double chargedpi_mass_;

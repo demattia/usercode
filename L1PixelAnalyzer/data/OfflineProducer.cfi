@@ -8,7 +8,6 @@ module offlineProd = OfflineProducer {
   untracked InputTag l1eTauJetsSource           = fastL1CaloSim:Tau
   untracked InputTag l1eEtMissSource            = fastL1CaloSim:
 
-  untracked string HiVarName                    = "HiVariables"
   untracked string CaloJetAlgorithm             = "iterativeCone5CaloJets"
   untracked string JetCorrectionService         = "MCJetCorrectorIcone5"
 
@@ -32,11 +31,6 @@ module offlineProd = OfflineProducer {
   // TauTagInfo
   untracked InputTag tauTagInfo                 = coneIsolationTauJetTags
 
-  // Label for PixelJets
-  untracked InputTag PixelJetSource             = PixelJetFinder:PixelJets
-
-//  untracked uint32 TracksMinimumNum_in_PixelJet = 3
-
   untracked string OutputEffFileName            = "Efficiency_file.txt"
 
   // L1
@@ -51,9 +45,6 @@ module offlineProd = OfflineProducer {
 
   // MC
   string MCParticles                            = "MCParticles"
-
-  // SimplePixelJet
-  string SimplePixelJets                        = "simplePixelJets"
 
   // GlobalMuons
   string GlobalMuons                            = "globalMuons"
@@ -115,8 +106,8 @@ module offlineProd = OfflineProducer {
   // ZnunuJets 230-300 -------> 48
   // ZnunuJets 300-380 -------> 49
 
-  // ttbar inclusive ---------> 50
-
   // other -------------------> 60
   uint32 EventType                              = 6
+
+  bool doL1Trig                                 = false
 }
