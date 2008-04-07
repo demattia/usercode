@@ -7,17 +7,17 @@
 #include <cmath>
 #include <vector>
 
-namespace anaobj {
+/**
+ *
+ * Simple BaseParticle class used as base class for
+ * MCParticles.
+ * It is exactly like BaseJet, but et -> pt.
+ *
+ * Author M. De Mattia - 8/11/2007
+ *
+ */
 
-  /**
-   *
-   * Simple BaseParticle class used as base class for
-   * MCParticles.
-   * It is exactly like BaseJet, but et -> pt.
-   *
-   * Author M. De Mattia - 8/11/2007
-   *
-   */
+namespace anaobj {
 
   class BaseParticle : public BaseAll {
   public:
@@ -31,16 +31,16 @@ namespace anaobj {
     double pt() const {
       return pt_;
     }
-    float px() const {
+    double px() const {
       return pt_*std::cos(phi_);
     }
-    float py() const {
+    double py() const {
       return pt_*std::sin(phi_);
     }
-    float pz() const {
+    double pz() const {
       return pt_*(1-std::exp(-2*eta_))/(2*std::exp(-eta_));
     }
-    float p() const {
+    double p() const {
       return std::sqrt(std::pow(px(),2)+std::pow(py(),2)+std::pow(pz(),2));
     }
     /// To sort the BaseParticles

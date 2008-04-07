@@ -7,16 +7,16 @@
 #include <cmath>
 #include <vector>
 
-namespace anaobj {
+/**
+ *
+ * Simple BaseJet class used for L1Jets and as base class
+ * for IC5 jets.
+ *
+ * Author M. De Mattia - 8/11/2007
+ *
+ */
 
-  /**
-   *
-   * Simple BaseJet class used for L1Jets and as base class
-   * for IC5 jets.
-   *
-   * Author M. De Mattia - 8/11/2007
-   *
-   */
+namespace anaobj {
 
   class BaseJet : public BaseAll {
   public:
@@ -30,16 +30,16 @@ namespace anaobj {
     double et() const {
       return et_;
     }
-    float ex() const {
+    double ex() const {
       return et_*std::cos(phi_);
     }
-    float ey() const {
+    double ey() const {
       return et_*std::sin(phi_);
     }
-    float ez() const {
+    double ez() const {
       return et_*(1-std::exp(-2*eta_))/(2*std::exp(-eta_));
     }
-    float e() const {
+    double e() const {
       return std::sqrt(std::pow(ex(),2)+std::pow(ey(),2)+std::pow(ez(),2));
     }
     /// To sort the BaseJets
