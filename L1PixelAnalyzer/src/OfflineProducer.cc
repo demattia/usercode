@@ -396,6 +396,7 @@ OfflineProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 					    caloJets_it->et(),
                                             EmFracFromComp,
 					    //  caloJets_it->emEnergyFraction(),
+					    caloJets_it->p4(),
 					    caloJets_it->vertex(),
                                             bTagHighEff_it->second, 
 					    bTagHighPur_it->second,
