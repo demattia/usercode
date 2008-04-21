@@ -17,6 +17,16 @@ module TDAnaModule = TDAna {
   untracked InputTag SimpleElectrons            = offlineProd:simpleElectrons
   untracked InputTag SimpleTaus                 = offlineProd:simpleTaus
   untracked InputTag Summary                    = offlineProd:summary
+  
+  untracked InputTag SimVtx 			= famosSimHits
+
+  untracked string trackCountingHighEffJetTags  = "trackCountingHighEffBJetTags"
+  untracked string trackCountingHighPurJetTags  = "trackCountingHighPurBJetTags"
+  untracked string impactParameterTagInfos      = "impactParameterTagInfos"
+	
+  untracked string CaloJetAlgorithm             = "iterativeCone5CaloJets"
+  untracked string JetCorrectionService         = "MCJetCorrectorIcone5"
+
 
   untracked uint32 TracksMinimumNum_in_PixelJet = 3
   untracked string OutputEffFileName            = "Efficiency_file.txt"

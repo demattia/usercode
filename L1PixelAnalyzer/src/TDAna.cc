@@ -50,7 +50,7 @@
 // 
 //
 // --------------------------------------------------------------------------------
-//
+///////////
 // #define DEBUG
 
 #include "AnalysisExamples/L1PixelAnalyzer/interface/TDAna.h"
@@ -68,6 +68,29 @@
 #include "AnalysisExamples/AnalysisObjects/interface/SimpleTau.h"
 #include "AnalysisExamples/AnalysisObjects/interface/Summary.h"
 #include "AnalysisExamples/AnalysisClasses/interface/DeltaR.h"
+
+//======ROBERTO========================
+//-----------------------------
+//vertici e tracce
+//-----------------------------
+
+#include "SimDataFormats/HepMCProduct/interface/HepMCProduct.h"
+#include "DataFormats/Candidate/interface/CandidateFwd.h"
+#include "DataFormats/Math/interface/LorentzVector.h"
+
+// For the offline jets and corrections
+#include "DataFormats/JetReco/interface/CaloJetCollection.h"
+#include "DataFormats/JetReco/interface/CaloJet.h"
+//#include "DataFormats/BTauReco/interface/IsolatedTauTagInfo.h"
+//#include "DataFormats/Candidate/interface/CandAssociation.h"
+#include "JetMETCorrections/Objects/interface/JetCorrector.h"
+
+// For the b-tagging
+#include "DataFormats/BTauReco/interface/JetTag.h"
+//#include "DataFormats/JetReco/interface/JetTracksAssociation.h"
+#include "DataFormats/BTauReco/interface/TrackIPTagInfo.h"
+
+//======ROBERTO========================
 
 // For file output
 // ---------------
@@ -103,11 +126,31 @@ TDAna::TDAna(const edm::ParameterSet& iConfig) :
   simpleElectronLabel_( iConfig.getUntrackedParameter<edm::InputTag>( "SimpleElectrons" ) ),
   simpleTauLabel_( iConfig.getUntrackedParameter<edm::InputTag>( "SimpleTaus" ) ),
   summaryLabel_( iConfig.getUntrackedParameter<edm::InputTag>( "Summary" ) ),
+ 
+ 
+  //=====ROBERTO================================
+  //-----------------------------------
+  //calojets
+  //-----------------------------------
+  CaloJetAlgorithm( iConfig.getUntrackedParameter<string>( "CaloJetAlgorithm" ) ),
+  JetCorrectionService( iConfig.getUntrackedParameter<string>( "JetCorrectionService" ) ),
+  //----------------------------------
+  //tracce e vertici
+  //----------------------------------
+  simVtxLabel_( iConfig.getUntrackedParameter<edm::InputTag>( "SimVtx" ) ),
+  
+  trackCountingHighEffJetTags( iConfig.getUntrackedParameter<string>( "trackCountingHighEffJetTags" ) ),
+  trackCountingHighPurJetTags( iConfig.getUntrackedParameter<string>( "trackCountingHighPurJetTags" ) ),
+  impactParameterTagInfos( iConfig.getUntrackedParameter<string>( "impactParameterTagInfos" ) ),
+  
+  //=====ROBERTO=============================== 
   numTkCut_( iConfig.getUntrackedParameter<unsigned int>( "TracksMinimumNum_in_PixelJet" ) ),
   QCD_( iConfig.getUntrackedParameter<bool> ( "QCD" ) ),
   OutputEffFileName( iConfig.getUntrackedParameter<string>( "OutputEffFileName" ) ),
   doPixelTrigger_( iConfig.getUntrackedParameter<bool>( "DoPixelTrigger" ) )
 {
+  
+ 
 
   // Now do what ever initialization is needed
   // -----------------------------------------
@@ -213,7 +256,7 @@ TDAna::TDAna(const edm::ParameterSet& iConfig) :
   HSS_sig[17]= dynamic_cast<TH1D*> ( FunctionFile->Get("SumHED6SS_sigS"));
   HSS_bgr[17]= dynamic_cast<TH1D*> ( FunctionFile->Get("SumHED6SS_bgrS"));
   //  FunctionFile->Close();
-
+ 
   // File with HED and HPD distributions from QCD jets
   // -------------------------------------------------
   TFile * HEDFile = new TFile ("HEDn.root");
@@ -234,8 +277,8 @@ TDAna::TDAna(const edm::ParameterSet& iConfig) :
   HPDpdf[6] = dynamic_cast<TH1D*> ( HEDFile->Get("HPD_6"));
   HEDpdf[7] = dynamic_cast<TH1D*> ( HEDFile->Get("HED_7"));
   HPDpdf[7] = dynamic_cast<TH1D*> ( HEDFile->Get("HPD_7"));
- // HEDFile->Close();
-
+  // HEDFile->Close();
+  
   // File with Total tag mass distributions (S1) from QCD jets
   // ---------------------------------------------------------
   TFile * TagMassFileS1= new TFile ("TTMnS1.root");
@@ -299,7 +342,7 @@ TDAna::TDAna(const edm::ParameterSet& iConfig) :
   MTS3pdf[7] =  dynamic_cast<TH1D*> ( TagMassFileS3->Get("MTS3_7"));
   MNS3pdf[7] =  dynamic_cast<TH1D*> ( TagMassFileS3->Get("MNS3_7"));
   // TagMassFileS3->Close();
-
+ 
   // File for output histograms
   // --------------------------
   OutputFile = new TFile((conf_.getUntrackedParameter<std::string>("OutputName")).c_str() ,
@@ -390,7 +433,61 @@ TDAna::TDAna(const edm::ParameterSet& iConfig) :
   HPD7_ = new TH1D ( "HPD7", "HPD 7", 200, 0., 40. );
   HED8_ = new TH1D ( "HED8", "HED 8", 200, 0., 40. );
   HPD8_ = new TH1D ( "HPD8", "HPD 8", 200, 0., 40. );
+  //=====ROBERTO================
 
+  // Histograms for different levels of selection in SumEt && Eta
+  HSumEt_= new TH1D ( "HSumEt", "SumEt with selected jets", 50, 0, 4000 );
+  HSumEt_GoodJet_= new TH1D ( "HSumEt_GoodJet", "SumEt with good jets", 50, 0, 4000 );
+
+  //=====ROBERTO================
+  // Histograms for different levels of selection in Et && Eta
+  
+  NHSJEtEtaCut25_= new TH1D ( "NHSJEtEtaCut25", "Number of selected jets - Et 25GeV", 9, -0.5, 8.5 );
+  NHSJEtEtaCut50_= new TH1D ( "NHSJEtEtaCut50", "Number of selected jetS - Et 50GeV", 9, -0.5, 8.5 );
+  NHSJEtEtaCut75_= new TH1D ( "NHSJEtEtaCut75", "Number of selected jets - Et 75GeV", 9, -0.5, 8.5 );
+
+  //=====ROBERTO================
+  //=====ROBERTO================
+  //Histograms for primary vertex and PU vertices
+
+  H_primaryVtxX_ =  new TH1D ("H_primaryVtxX","X of primary vertex of events",100,-0.01,0.01);
+  H_primaryVtxY_ =  new TH1D ("H_primaryVtxY","Y of primary vertex of events",100,-0.01,0.01);
+  H_primaryVtxZ_ =  new TH1D ("H_primaryVtxZ","Z of primary vertex of events",30,-15,15);     
+                   			           
+  H_primaryVtxXY_ = new TH2D("H_primaryVtxXY","x vs y primary vertices",100,-0.01,0.01,100,-0.01,0.01);
+  H_primaryVtxZR_ = new TH2D("H_primaryVtxZR","z vs r primary vertices",30,-15,15,100,0.,0.01);    
+                 
+  H_PUVtxX_ = new TH1D ("H_PUVtxX","X of pileup vertices of event",100,-0.01,0.01);
+  H_PUVtxY_ = new TH1D ("H_PUVtxY","Y of pileup vertices of event",100,-0.01,0.01);
+  H_PUVtxZ_ = new TH1D ("H_PUVtxZ","Z of pileup vertices of event",30,-15,15);
+             	 
+  H_PUVtxXY_ = new TH2D("H_PUVtxXY","x vs y PU vertices",100,-0.01,0.01,100,-0.01,0.01);
+  H_PUVtxZR_ = new TH2D("H_PUVtxZR","z vs r PU vertices",30,-15,15,100,0.,0.01);
+  	     	 
+  H_NPUVtx_ = new TH1D ("H_NPUVtx","# of pileup vertices of events",50,0,50);
+
+  //Histograms for tracks vertices
+
+  H_TksX_  =  new TH1D("H_TksX", "X of tracks" ,100,-0.01,0.01);
+  H_TksY_  =  new TH1D("H_TksY", "Y of tracks" ,100,-0.01,0.01);
+  H_TksZ_  =  new TH1D("H_TksZ", "Z of tracks" ,30,-15,15);     
+                          	     
+  H_TksXY_ = new TH2D("H_TksXY","x vs y of tracks" ,100,-0.01,0.01,100,-0.01,0.01);
+  H_TksZR_ = new TH2D("H_TksZR","z vs r of tracks" ,30,-15,15,100,0.,0.01);
+             
+  H_TksZ_Avg_ = new TH1D("H_TksZ_Avg", "Z of tracks" ,30,-15,15);
+
+  
+  H_SelTk_ =  new TH1D("H_SelTk", "# of selected tracks assigned to a jet " ,30,0,30);
+  H_NTks_S3_ =  new TH1D("H_NTks_S3", "# of tracks S<3 assigned to a jet" ,30,0,30);
+  H_S2DTks_ = new TH1D("H_S2DTks", "Significance of tracks" ,300,-10,10);
+  H_S3DTks_ = new TH1D("H_S3DTks", "Significance of tracks" ,300,-10,10);
+  H_Tks_Z_S3D_ = new TH2D("H_Tks_Z_S3D","z PV vs S3D of tracks" ,30,-15,15,300,-10,10);
+
+  H_Cmin_ =  new TH1D("H_Cmin", "vertex # assigned to a jet " ,50,0,50);
+  H_DeltaZ_ =  new TH1D("H_Deltaz", "Delta Z jet " ,500,0.,5.);
+
+  //=====ROBERTO================
   // Histograms for different levels of selection
   // --------------------------------------------
   NJets_ = new TH1D ( "NJets", "Number of selected jets", 50, 0, 50 );
@@ -770,7 +867,9 @@ TDAna::TDAna(const edm::ParameterSet& iConfig) :
   TTMS1SSS_ = new TH1D ( "TTMS1SSS", "Total tag mass with S1 tracks", 50, 0., 80. );
   TTMS2SSS_ = new TH1D ( "TTMS2SSS", "Total tag mass with S2 tracks", 50, 0., 80. );
   TTMS3SSS_ = new TH1D ( "TTMS3SSS", "Total tag mass with S3 tracks", 50, 0., 80. );
-
+  //======ROBERTO===================
+  DRbbnohSSS_ = new TH1D ("DRbbnohSSS","Dr bb tag no h", 50, 0., 10);  // Dr no bb tag definition  
+  //======ROBERTO===================
   NJetsSSSN_ = new TH1D ( "NJetsSSSN", "Number of selected jets", 50, 0, 50 );
   UncorrHtSSSN_ = new TH1D ( "UncorrHtSSSN", "Ht with uncorrected jets", 50, 0, 4000 );
   CorrHtSSSN_ = new TH1D ( "CorrHtSSSN", "Ht with corrected jets", 50, 0, 4000 );
@@ -1466,6 +1565,8 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
     return;
   }
 
+  //cout << "step 0" << endl;
+
   // Global muons
   // ------------
   edm::Handle < GlobalMuonCollection > globalMuons;
@@ -1491,32 +1592,253 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
     std::cerr << "One of the remaining collections cannot be found" << endl;
   }
 
+  
+  //======ROBERTO=======================
+  //======PileUp
+  
+//  Handle<HepMCProduct> theHepMCProduct;
+  Handle<HepMCProduct> theFamosPileUp;
+
+  // bool genPart = false;
+  
+//   bool source = false;
+//   bool vtxSmeared = false;
+  bool famosPU = false;
+
+  //std::vector< Handle<reco::CandidateCollection> > genEvts;
+  // const reco::CandidateCollection* myGenParticles = 0;
+  //  const HepMC::GenEvent* myGenEvent = 0;
+  const HepMC::GenEvent* myGenPUEvent = 0;
+
+  // Look for the GenEvent
+  std::vector< Handle<HepMCProduct> > evts; 
+  iEvent.getManyByType(evts);
+
+  for ( unsigned i=0; i<evts.size(); ++i ) {
+    //     if (!vtxSmeared && evts[i].provenance()->moduleLabel()=="VtxSmeared") {
+    //       vtxSmeared = true;      
+    //       theHepMCProduct = evts[i];
+    // break; //se ha un vertex smeared esce, ma io voglio anche i pile up per il famospileup
+    //     } else if (!source &&  evts[i].provenance()->moduleLabel()=="source") {
+    //       source = true;
+    //       theHepMCProduct = evts[i];
+    //     } else if (!famosPU &&  evts[i].provenance()->moduleLabel()=="famosPileUp") {
+    //prendo solo le info sui PU, nella source ci sono i vertici primari non smeared, i vertici primari li prendo sotto dalla simvtx
+
+    if (!famosPU &&  evts[i].provenance()->moduleLabel()=="famosPileUp") {
+      famosPU = true;
+      theFamosPileUp = evts[i];
+    }
+  }
+  
+  cout<<"HepMCsize: "<<evts.size()<<endl;
+  cout<<"type= "<<theFamosPileUp.provenance()->moduleLabel()<<endl; 
+  //  cout<<"type 1= "<<theHepMCProduct.provenance()->moduleLabel()<<endl;
+  
+  //   cout<<"Famouspileup size= "<<evts[0].GetEvent()<<endl;
+  
+  // myGenEvent = evts[0]->GetEvent();
+  
+
+//   //Vertici smeared o source
+//   //------------------------
+//   myGenEvent = theHepMCProduct->GetEvent();
+//   //con procedura analoga a quella per il pileup posso leggere i vertici degli eventi
+  
+//   HepMC::GenEvent::vertex_const_iterator viter;
+//   HepMC::GenEvent::vertex_const_iterator vbegin = myGenEvent->vertices_begin();
+//   HepMC::GenEvent::vertex_const_iterator vend = myGenEvent->vertices_end();
+  
+//   int ievt = 0;
+//   //vettore di lorentz vettori
+//   std::vector< math::XYZTLorentzVector > vec_sourceVertex;
+  
+//   // Loop on all source events
+//   for ( viter=vbegin; viter!=vend; ++viter ) { 
+    
+//     // std::cout << "Vertex n0 " << ievt << std::endl;
+    
+//     // The origin vertex (turn it to cm's from GenEvent mm's)
+//     HepMC::GenVertex* v = *viter; 
+    
+//     //tanti sono 0
+//     //se x y diversi da 0 e' il vertice primario
+//     //if( fabs(v->position().x()) > 0. && fabs(v->position().y()) > 0. ){
+    
+//     //se z = 0  e x e y diversi da 0 e' il vertice primario
+//     // if(fabs(v->position().z()) == 0. && fabs(v->position().x()) > 0. && fabs(v->position().y()) > 0. ){
+//     //se t = 0  e x e y diversi da 0 e' il vertice primario
+//     //if(fabs(v->position().t()) == 0. && fabs(v->position().x()) > 0. && fabs(v->position().y()) > 0. ){
+//     //se t=0 e' il vertice primario
+//     //if( fabs(v->position().t()) == 0){
+      
+    
+//       math::XYZTLorentzVector smearedVertex =  
+// 	math::XYZTLorentzVector(v->position().x()/10.,v->position().y()/10.,
+// 				v->position().z()/10.,v->position().t()/10.);
+      
+//       //riempio un vettore con i 4 vettori di tutti i vertici
+//       vec_sourceVertex.push_back(smearedVertex);
+      
+//       cout << "v_x = " << v->position().x()/10.;
+//       cout << " v_y = " << v->position().y()/10.;
+//       cout << " v_z = " << v->position().z()/10.;
+//       cout << " v_t = " << v->position().t()/10. << endl;
+      
+//       ++ievt;
+//       //}
+//   }
+  
+//   cout << "source vertex number = " << ievt << endl;
+//   cout << "vec_sourceVertex size = " <<vec_sourceVertex.size()<<endl;
+//   //vertice primario
+//   HepMC::GenVertex* primaryVertex =  *(myGenEvent->vertices_begin());
+  
+//   // if ( primaryVertex && fabs(primaryVertex->position().z()) > 1e-9 ) {  
+//   if ( primaryVertex ){
+//     HepMC::FourVector theVertex(primaryVertex->position().x(),
+// 				primaryVertex->position().y(),
+// 				primaryVertex->position().z(),
+// 				primaryVertex->position().t());
+    
+//     cout << "primaryVertex_x = " << primaryVertex->position().x()/10.;
+//     cout << " primaryVertex_y = " << primaryVertex->position().y()/10.;
+//     cout << " primaryVertex_z = " << primaryVertex->position().z()/10.;
+//     cout << " primaryVertex_t = " << primaryVertex->position().t()/10. << endl;
+    
+//   }
+
+
+  //Vertici di PileUp
+  //-----------------
+  myGenPUEvent = theFamosPileUp->GetEvent();
+
+  HepMC::GenEvent::vertex_const_iterator vPUiter;
+  HepMC::GenEvent::vertex_const_iterator vPUbegin = myGenPUEvent->vertices_begin();
+  HepMC::GenEvent::vertex_const_iterator vPUend = myGenPUEvent->vertices_end();
+  
+  int iPUevt = 0;
+
+  //vettore di vertici di pile up dell'evento
+  std::vector< math::XYZTLorentzVector > vec_PUVertex;
+  //vettore di vertici, in cui il primo e' il vertice primario
+  std::vector< math::XYZTLorentzVector > vec_Vertices;
+
+  // Loop on all pile-up events
+  for ( vPUiter=vPUbegin; vPUiter!=vPUend; ++vPUiter ) { 
+    
+    // std::cout << "Vertex n0 " << iPUevt << std::endl;
+    
+    // The origin vertex (turn it to cm's from GenEvent mm's)
+    HepMC::GenVertex* vPU = *vPUiter;    
+    math::XYZTLorentzVector PileUpVertex =  
+      math::XYZTLorentzVector(vPU->position().x()/10.,vPU->position().y()/10.,
+			      vPU->position().z()/10.,vPU->position().t()/10.);
+    
+    // Store the position of the PU vertex
+    float PUVtxX =  vPU->position().x()/10.;
+    float PUVtxY =  vPU->position().y()/10.;
+    float PUVtxZ =  vPU->position().z()/10.;
+    //    float PUVtxT =  vPU->position().t()/10.;
+    
+    cout << "vPU_x = " << vPU->position().x()/10. << endl;
+    cout << "vPU_y = " << vPU->position().y()/10. << endl;
+    cout << "vPU_z = " << vPU->position().z()/10. << endl;
+    cout << "vPU_t = " << vPU->position().t()/10. << endl;
+    
+    //riempio un vettore con i vertici di pileup dell'evento
+    vec_PUVertex.push_back(PileUpVertex);
+    
+    //	 math::XYZTLorentzVector mymainVertex = myGenPUEvent->mVtx();
+    
+    H_PUVtxX_->Fill(PUVtxX);
+    H_PUVtxY_->Fill(PUVtxY);
+    H_PUVtxZ_->Fill(PUVtxZ);
+    
+    H_PUVtxXY_->Fill(PUVtxX,PUVtxY);
+    
+    float rPU = sqrt(pow(PUVtxX,2)+pow(PUVtxY,2));
+    
+    H_PUVtxZR_->Fill(PUVtxZ,rPU);
+    
+    ++iPUevt;
+  }
+  
+  H_NPUVtx_->Fill(iPUevt);
+ 
+  cout << "PU vertex number = " << iPUevt << endl;
+  cout << "vec_PUVertex size = " <<vec_PUVertex.size()<<endl;
+  
+  //Vertici primari
+  //---------------
+
+  //simvertex per il vertice primario 
+  // Take the SimVertex collection
+  std::vector<SimVertex> theSimVerteces;
+  Handle<SimVertexContainer> SimVtx;
+  iEvent.getByLabel( simVtxLabel_, SimVtx );
+  cout << "SimVertex size = " << SimVtx->size() << endl;
+  
+
+  // Store the position of the simVertex
+  float simVertexX = SimVtx->begin()->position().x();
+  float simVertexY = SimVtx->begin()->position().y();
+  float simVertexZ = SimVtx->begin()->position().z();
+  float simVertexT = SimVtx->begin()->position().t();
+  
+  cout<<"x sim vertex = "<<simVertexX<<endl;
+  cout<<"y sim vertex = "<<simVertexY<<endl;
+  cout<<"z sim vertex = "<<simVertexZ<<endl;
+
+  //metto via un vettore col vertice primario dell'evento
+  math::XYZTLorentzVector primarySimVertex =  
+    math::XYZTLorentzVector(simVertexX,
+			    simVertexY,
+			    simVertexZ,
+			    simVertexT
+			    );
+
+  //riempio gli istogrammi 
+
+  H_primaryVtxX_->Fill(simVertexX);
+  H_primaryVtxY_->Fill(simVertexY);
+  H_primaryVtxZ_->Fill(simVertexZ);
+                 
+  float simVertexR =  sqrt(pow(simVertexX,2)+pow(simVertexY,2));
+  
+  H_primaryVtxXY_->Fill(simVertexX,simVertexY);
+  H_primaryVtxZR_->Fill(simVertexZ,simVertexR);
+
+  //riempio un vettore con il vertice primario e di seguito i vertici di pile up 
+  //per poi fare il ciclo di associazione ai jet 
+
+  vec_Vertices.push_back(primarySimVertex);
+  vector<math::XYZTLorentzVector>::const_iterator PUVertex_it = vec_PUVertex.begin();
+  for(; PUVertex_it != vec_PUVertex.end(); PUVertex_it++ ){
+      
+    vec_Vertices.push_back(*PUVertex_it);
+  }
+  
+  //======ROBERTO=======================
+  
+
   eventcounter_++;
   if ( eventcounter_/100 == float(eventcounter_)/100. ) {
     std::cout << "Event number " << eventcounter_ << std::endl;
   }
 
+  //cout << "step 1" << endl;
+
   // Pixel jets
   // ----------
   edm::Handle<SimplePixelJetCollection> pixelJetsHandle;
-  iEvent.getByLabel( simplePixelJetLabel_, pixelJetsHandle );
-  const SimplePixelJetCollection pixeljets = *(pixelJetsHandle.product());
-
-  // Count the number of pixeljets with at leas numTkCut_ tracks
-  // -----------------------------------------------------------
-  SimplePixelJetCollection::const_iterator pj_it = pixeljets.begin();
-  int goodPjNum = 0;
-  for ( ; pj_it != pixeljets.end(); ++pj_it ) {
-    if ( pj_it->tkNum() >= int(numTkCut_) ) ++goodPjNum;
+  try {
+    iEvent.getByLabel( simplePixelJetLabel_, pixelJetsHandle );
   }
-
-  // Pixel trigger requiring at least 2 pixel jets coming from the primary vertex
-  // (constructed from pixel jets, and taken as the vertex with the highest ptsum)
-  // -----------------------------------------------------------------------------
-  
-#ifdef DEBUG
-  std::cout << "numTkCut = " << numTkCut_ << std::endl;
-#endif
+  catch (...) {
+    cout << "PixelTrigger required, but no pixeljet collection found" << endl;
+    doPixelTrigger_ = false;
+  }
 
   // Using optimized values obtained with L1PixelOptimizer
   // In order:
@@ -1525,13 +1847,35 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   // - minimum number of pixel-tracks in a PixelJet
   // - minimum Pt of the primary vertex
   L1PixelTrig<SimplePixelJet> PJtrig(1, 0.4, 5, 170.);
-  PJtrig.Fill( pixeljets );
+
+  bool pixelResponse = true;
+
+  if ( doPixelTrigger_ ) {
+    // Count the number of pixeljets with at leas numTkCut_ tracks
+    // -----------------------------------------------------------
+    const SimplePixelJetCollection pixeljets = *(pixelJetsHandle.product());
+    SimplePixelJetCollection::const_iterator pj_it = pixeljets.begin();
+    int goodPjNum = 0;
+    for ( ; pj_it != pixeljets.end(); ++pj_it ) {
+      if ( pj_it->tkNum() >= int(numTkCut_) ) ++goodPjNum;
+    }
+
+    // Pixel trigger requiring at least 2 pixel jets coming from the primary vertex
+    // (constructed from pixel jets, and taken as the vertex with the highest ptsum)
+    // -----------------------------------------------------------------------------
   
 #ifdef DEBUG
-  std::cout << "Pixel trigger response = " << PJtrig.Response() << std::endl;
+    std::cout << "numTkCut = " << numTkCut_ << std::endl;
 #endif
 
-  bool pixelResponse = PJtrig.Response();
+    PJtrig.Fill( pixeljets );
+  
+#ifdef DEBUG
+    std::cout << "Pixel trigger response = " << PJtrig.Response() << std::endl;
+#endif
+
+    pixelResponse = PJtrig.Response();
+  }
 
   // Level 1 trigger
   // ---------------
@@ -1589,7 +1933,7 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   // Full and no-forward
   // -------------------
   bool l1Response = ( response_cen || response_tau || response_for );
-  bool l1Response_nofor = ( response_cen || response_tau );
+  //  bool l1Response_nofor = ( response_cen || response_tau );
   bool combinedResponse = ( ( response_opt_cen || response_opt_tau || response_opt_for ) && pixelResponse );
 
   // MEt + Jet
@@ -1626,8 +1970,8 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   }
   // Full and no-forward
   // -------------------
-  bool response_MEtJet = ( response_MEtJet_cen || response_MEtJet_tau || response_MEtJet_for );
-  bool response_MEtJet_nofor = ( response_MEtJet_cen || response_MEtJet_tau );
+  //bool response_MEtJet = ( response_MEtJet_cen || response_MEtJet_tau || response_MEtJet_for );
+  //bool response_MEtJet_nofor = ( response_MEtJet_cen || response_MEtJet_tau );
   
 #ifdef THIS_IS_AN_EVENTSETUP_EXAMPLE
   ESHandle<SetupData> pSetup;
@@ -1651,6 +1995,8 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   }
 
   ////////////////////////////////// MC analysis ////////////////////////////
+
+  //cout << "step 2" << endl;
   
   // Compute events in each final state
   // ----------------------------------
@@ -1758,10 +2104,427 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
     grandgrandtotalpass++;
   }
 
+  // cout << "step 3" << endl;
+
   // HiVariables
   // -----------
   edm::Handle<OfflineJetCollection> caloJets;
   iEvent.getByLabel( offlineJetLabel_, caloJets );
+  
+  //======ROBERTO================================
+  //Posso mettermi qui per fare il jet track counting
+  //=============================================
+  
+  //----------------------
+  //calojets
+  //----------------------
+   
+  edm::Handle<reco::CaloJetCollection> Alg_caloJets;
+  try {
+    // Offline IC5Jets
+    iEvent.getByLabel( CaloJetAlgorithm, Alg_caloJets );
+  }  
+  catch (...) {
+    std::cerr << "Could not find IC5Jet collection" << std::endl;
+    return;
+  } 
+  
+  //---------------------
+  //tracce e jet
+  //---------------------
+  //====================================
+  //collezioni per b tracce
+  edm::Handle<reco::JetTagCollection> trackCountingHighEff;
+  edm::Handle<reco::JetTagCollection> trackCountingHighPur;
+  edm::Handle<reco::TrackIPTagInfoCollection> iPtagInfos;
+  //le riempio
+  try {
+    // Btags
+    iEvent.getByLabel( trackCountingHighEffJetTags, trackCountingHighEff );
+    iEvent.getByLabel( trackCountingHighPurJetTags, trackCountingHighPur );
+    iEvent.getByLabel( impactParameterTagInfos, iPtagInfos );
+  }
+  catch (...) {
+    std::cerr << "Could not find the b-tagging collection" << std::endl;
+    return;
+  } 
+  
+  
+  // Offline Jets IC5
+  // ----------------
+  
+  // auto_ptr<OfflineJetCollection> vec_IC5Jets_ptr( new OfflineJetCollection );
+  
+  
+  
+  int Alg_caloJetsSize = 0;
+  Alg_caloJetsSize = Alg_caloJets->size();
+  
+  cout<<"calojet size: "<<Alg_caloJetsSize<<endl;
+  
+  // B-tagging
+  // ---------
+  // Brief description of the btagging algorithm (from the workbook page
+  // https://twiki.cern.ch/twiki/bin/view/CMS/WorkBookBTagging):
+  // -------------------------------------------------------------------
+  // "Track Counting" algorithm: This is a very simple tag, exploiting the long lifetime of B hadrons.
+  // It calculates the signed impact parameter significance of all good tracks, and orders them by decreasing significance.
+  // It's b tag discriminator is defined as the significance of the N'th track, where a good value
+  // is N = 2 (for high efficiency) or N = 3 (for high purity).
+  // -------------------------------------------------------------------
+
+  //contatore sui b tag che incremento a ogni giro del ciclo sulle tracce scelte per parametro di impatto
+  //    int tchenum = trackCountingHighEff->size();
+  reco::JetTagCollection::const_iterator bTagHighEff_it = trackCountingHighEff->begin();
+
+  //    int tchpnum = trackCountingHighPur->size();
+  reco::JetTagCollection::const_iterator bTagHighPur_it = trackCountingHighPur->begin();
+
+  int iptkinfonum = 0;
+  iptkinfonum = iPtagInfos->size();
+
+  cout<<"(iptaginfos) "<<iptkinfonum<<endl;
+
+  // Correct offline jets on the fly
+  // const JetCorrector* corrector = JetCorrector::getJetCorrector (JetCorrectionService, iSetup);
+
+  //inizio ciclo sulle tracce e sui jet presi nell'ordine delle tracce 
+  //itera sulle tracce di un jet poi incrementa l'iteratore sui jet e quelli sui b tag
+  //   int taginfocounter = 0;
+  //    int usedjet = 0;
+
+  //Vettori per storage informazioni sulla z vertici piu' vicina al jet
+  //ordinati come i jet,con Cmin che dice quale e' il vertice piu' vicino
+  std::vector<double> vec_Cmin;
+  std::vector<double> vec_DeltaZ;
+  //iteratori su questi vettori 
+  std::vector<double>::const_iterator Cmin_it = vec_Cmin.begin();
+  std::vector<double>::const_iterator DeltaZ_it = vec_DeltaZ.begin();
+
+  reco::CaloJetCollection::const_iterator Alg_caloJets_it = Alg_caloJets->begin();
+  reco::TrackIPTagInfoCollection::const_iterator TkIpTagInfo_it = iPtagInfos->begin();
+  for( ; TkIpTagInfo_it != iPtagInfos->end(); ++TkIpTagInfo_it ) {
+
+    //       if(bTagHighEff_it->second>=medium_){ ///no, perdo l'informazione di accoppiamento tracce jet!!
+    // 	usedjet++;
+    // 	continue;
+    //       }
+ 
+    //vettore di vertici di tracce dell'evento
+    std::vector< math::XYZTLorentzVector > vec_TkVtxs;
+      
+      
+    int Tk_size = 0;
+    Tk_size = TkIpTagInfo_it->tracks().size();
+    cout<<"(tkiptaginfo) tracks size= "<<Tk_size<<endl;
+
+    //     //     ++taginfocounter;
+    //    double scale = corrector->correction( *Alg_caloJets_it );
+    //    double corPt = scale*Alg_caloJets_it->pt();
+    //    double corEt = scale*Alg_caloJets_it->et();
+
+    //     //    int tkNum = TkIpTagInfo_it->selectedTracks().size();
+    //     int tkNum_S1 = 0;
+    //     int tkNum_S2 = 0;
+    //     int tkNum_S3 = 0;
+
+    //     //     int probNum_0 = TkIpTagInfo_it->probabilities(0).size();
+    //     //     int probNum_1 = TkIpTagInfo_it->probabilities(1).size();
+
+    //     double tkSumPt_S1 = 0.;
+    //     double tkSumPt_S2 = 0.;
+    //     double tkSumPt_S3 = 0.;
+
+    // Take the selectedTracks vector
+    //Return the vector of tracks for which the IP information is available Quality cuts are applied to reject fake tracks.
+    const reco::TrackRefVector & vec_TkColl = TkIpTagInfo_it->selectedTracks();
+     
+
+    // Take the IP vector (ordered as the selectedTracks vector)
+    const vector<reco::TrackIPTagInfo::TrackIPData> & vec_TkIP = TkIpTagInfo_it->impactParameterData();
+      
+    //     // Additional vectors to store subgroups of selectedTracks
+    //     TrackRefVector vec_TkColl_S1;
+    //     TrackRefVector vec_TkColl_S2;
+    //     TrackRefVector vec_TkColl_S3;
+ 
+    //# of selected tracks
+    int SelTk_size = 0; 
+    SelTk_size = vec_TkColl.size();
+   
+    cout<<"# Selected Tracks= "<<SelTk_size<<endl;
+      
+    //Histogram for # of tracks assigned to a single jet without S<3 cut
+
+    H_SelTk_->Fill(SelTk_size);
+
+    //# of tracks counter
+    int STk_count = 0;
+      
+    vector<reco::TrackIPTagInfo::TrackIPData>::const_iterator TkIP_it = vec_TkIP.begin();
+
+    RefVector<reco::TrackCollection>::const_iterator TkColl_it = vec_TkColl.begin();
+    for ( ; TkColl_it != vec_TkColl.end(); ++TkColl_it, ++TkIP_it ) {
+      //----------------------------------------------
+      //Reference position on the track: (vx,vy,vz)
+	
+      //dxy = -vx*sin(phi) + vy*cos(phi) [cm]
+      // dsz = vz*cos(lambda) - (vx*cos(phi)+vy*sin(phi))*sin(lambda) [cm]
+	
+      // Geometrically, dxy is the signed distance in the XY plane between the the 
+      //straight line passing through (vx,vy) with azimuthal angle phi and the point (0,0).
+      // The dsz parameter is the signed distance in the SZ plane between the the 
+      //straight line passing through (vx,vy,vz) with angles (phi, lambda) and the 
+      //point (s=0,z=0). The S axis is defined by the projection of the straight line onto 
+      //the XY plane. The convention is to assign the S coordinate for (vx,vy) as the value
+      // vx*cos(phi)+vy*sin(phi). This value is zero when (vx,vy) is the point of 
+      //minimum transverse distance to (0,0).
+	
+      // Note that dxy and dsz provide sensible estimates of the distance from 
+      //the true particle trajectory to (0,0,0) ONLY in two cases:
+
+      // When (vx,vy,z) already corresponds to the point of minimum transverse 
+      //distance to the beam spot or is close to it (so that the differences between 
+      //considering the exact trajectory or a straight line in this range are negligible)
+	
+      // When the track has infinite or extremely high momentum 
+      //-------------------------------------------------
+	
+      //coordinate vertice della traccia
+      double Tk_x = 0.;
+      Tk_x = (*TkColl_it)->vx();
+      cout<<"x traccia: "<<Tk_x<<endl; 
+      double Tk_y = 0.;
+      Tk_y = (*TkColl_it)->vy();
+      cout<<"y traccia: "<<Tk_y<<endl; 
+      double Tk_z = 0.;
+      Tk_z = (*TkColl_it)->vz();
+      cout<<"z traccia: "<<Tk_z<<endl;
+      double Tk_IpS3D = 0.; 
+      Tk_IpS3D = TkIP_it->ip3d.significance();
+      cout<<"significanza 3D IP traccia: "<<Tk_IpS3D<<endl;
+      double Tk_IpS2D = 0.;
+      Tk_IpS2D =TkIP_it->ip2d.significance();
+      cout<<"significanza 2D IP traccia: "<<Tk_IpS2D<<endl;
+
+
+      //metto via un vettore col vertice della traccia e la significanza dell'IP
+      math::XYZTLorentzVector Tk_Vtx =  
+	math::XYZTLorentzVector(Tk_x,
+				Tk_y,
+				Tk_z,
+				Tk_IpS2D
+				);
+      // 	math::XYZTLorentzVector Tk_IpS =
+      // 	  math::XYZTLorentzVector(Tk_IpS2D,
+      // 		 		  Tk_IpS3D,
+      // 				  0.,
+      // 				  0.
+      // 				  );
+	
+      //double reco::TrackBase::error(int i) const [inline]
+      //error on specified element 
+
+      //Error = sqrt (covariance matrix)
+      // 	double S_Tk_z = 0.;
+      // 	S_Tk_z = (*TkColl_it)->error(Tk_z);
+      // 	cout<<"Sigma z traccia: "<<S_Tk_z<<endl;
+
+
+		
+      //riempio un vettore con i vertici delle tracce selected 
+      //per QUESTO valore del iteratore TkIpTagInfo_it
+      vec_TkVtxs.push_back(Tk_Vtx);
+
+	
+      //riempio gli istogrammi 
+      float Tk_R =  sqrt(pow(Tk_x,2)+pow(Tk_y,2));
+
+      H_TksX_->Fill(Tk_x);
+      H_TksY_->Fill(Tk_y);
+      H_TksZ_->Fill(Tk_z);
+		
+      H_TksXY_->Fill(Tk_x,Tk_y);
+      H_TksZR_->Fill(Tk_z,Tk_R);
+
+      H_S2DTks_->Fill(Tk_IpS2D);
+      H_S3DTks_->Fill(Tk_IpS3D);
+      H_Tks_Z_S3D_->Fill(simVertexZ ,Tk_IpS3D);
+	
+      // Take tracks with minimum IP significance
+      //       if ( TkIP_it->ip3d.significance() > 1. ) {
+      //         vec_TkColl_S1.push_back(*TkColl_it);
+      //         tkSumPt_S1 += (*TkColl_it)->pt();
+      //         ++tkNum_S1;
+      //       }
+      //       if ( TkIP_it->ip3d.significance() > 2. ) {
+      //         vec_TkColl_S2.push_back(*TkColl_it);
+      //         tkSumPt_S2 += (*TkColl_it)->pt();
+      //         ++tkNum_S2;
+      //       }
+      //       if ( TkIP_it->ip3d.significance() > 3. ) {
+      //         vec_TkColl_S3.push_back(*TkColl_it);
+      //         tkSumPt_S3 += (*TkColl_it)->pt();
+      //         ++tkNum_S3;
+      //       }
+      //       //       ++tkcount;
+	
+      ++STk_count;
+
+    }// end loop on selected tracks
+      
+    cout<<"size vector tk vertices= "<<vec_TkVtxs.size()<<endl;  
+
+    cout<<"# track processed= "<<STk_count<<endl;
+
+    //-----------------------------------------------------------------------
+    //calcolo il vertice medio delle tracce per questo gruppo di selected tracks
+    //e poi metto i vertici cosi' calcolati in un vettore per un confronto con i vertici di PU e primario
+    //definisco un iteratore che corre sul vettore di vertici delle tracce
+    //-----------------------------------------------------------------------
+    double sum_Tk_z = 0.; //somma delle coordinate z delle tracce
+    double Avg_Tk_z = 0.; //coordinata z media delle tracce
+    int NTks_S3 = 0; //contatore per il numero di tracce con significanza minore di 3
+
+    std::vector< math::XYZTLorentzVector >::const_iterator vec_TkVtxs_it = vec_TkVtxs.begin(); //iteratore sul vettore di vertici delle tracce
+    for( ;  vec_TkVtxs_it!= vec_TkVtxs.end(); ++vec_TkVtxs_it) {
+      //per ogni componente del vettore di vertici di tracce prendo la componente z 
+	
+      if (fabs( vec_TkVtxs_it->t()) < 3.){	//se la significanza 2D della traccia e' < 3 la considero nella media per il calcolo del vertice
+	double z_track = 0. ; 
+	z_track = vec_TkVtxs_it->z();
+	//double test_z_traccia = vec_TkVtxs_it->Z();
+	//cout<<"preso la z traccia "<<z_traccia<<" test = "<<test_z_traccia <<endl;
+	sum_Tk_z += z_track;
+	  
+	NTks_S3++;
+      }
+    }
+
+    H_NTks_S3_->Fill(NTks_S3); // Histogram for # of tracks with S<3 assigned to a jet 
+    // H_S3DTks_->Fill(vec_TkVtxs_it->t()); //Histogram for the significance of the tracks
+
+    //calcolo lo z medio delle tracce come somma delle z delle tracce diviso per il numero di tracce (selected)  
+    //if (vec_TkVtxs.size() != 0  ) {
+    if (NTks_S3 != 0){ //se il numero di tracce con significanza <3 e' diverso da zero calcolo la media
+      Avg_Tk_z = sum_Tk_z/NTks_S3;
+	
+      cout<<"# tracks s<3= "<< NTks_S3 <<endl;
+      cout<<"<Z> tracks= "<< Avg_Tk_z <<endl;
+	
+      H_TksZ_Avg_->Fill(Avg_Tk_z); //istogramma distribuzione z medio
+
+    } 
+    else {
+      cout<<" 0 selected tracks "<<endl;
+    }
+    
+      
+    // Jet mass
+    // double jetMass = 0;
+    //       if ( corEt > corPt ) jetMass = sqrt( corEt*corEt - corPt*corPt );
+
+    //     // Evaluate tag tracks invariant mass
+    //     //    double bTagTkInvMass = tagTracksInvariantMass( vec_TkColl );
+    //     double bTagTkInvMass_S1 = tagTracksInvariantMass( vec_TkColl_S1 );
+    //     double bTagTkInvMass_S2 = tagTracksInvariantMass( vec_TkColl_S2 );
+    //     double bTagTkInvMass_S3 = tagTracksInvariantMass( vec_TkColl_S3 );
+
+    //     double JetVtxZ = 0.;
+    //     JetVtxZ =(*Alg_caloJets_it).vz();
+    //     cout<<"Z del jet= "<<JetVtxZ<<endl;
+
+
+
+    //     // Fill the offline jets collection
+    //     // --------------------------------
+
+    //     // Take the em and had energies to evaluate the emfraction
+    //     // See CMSSW/RecoJets/JetAlgorithms/src/JetMaker.cc.
+    //     // Ignoring HF contribution
+    //     double EmEnergyInEB = Alg_caloJets_it->emEnergyInEB();
+    //     double EmEnergyInEE = Alg_caloJets_it->emEnergyInEE();
+    //     //    double EmEnergyInHF = -(Alg_caloJets_it->emEnergyInHF());
+
+    //     double HadEnergyInEB = Alg_caloJets_it->hadEnergyInHB();
+    //     double HadEnergyInEE = Alg_caloJets_it->hadEnergyInHE();
+    //     //    double HadEnergyInHF = Alg_caloJets_it->hadEnergyInHF();
+
+    //     //     double EmEnergy = EmEnergyInEB + EmEnergyInEE + EmEnergyInHF;
+    //     //     double HadEnergy = HadEnergyInEB + HadEnergyInEE + HadEnergyInHF;
+    //     double EmEnergy = EmEnergyInEB + EmEnergyInEE;
+    //     double HadEnergy = HadEnergyInEB + HadEnergyInEE;
+    //     double TotalEnergy = EmEnergy + HadEnergy;
+
+    //     double EmFracFromComp = 0.;
+    //     if ( TotalEnergy != 0. ) EmFracFromComp = EmEnergy/(TotalEnergy);
+
+
+    // passo anche le info sulle tracce ai vettori    
+    //     // Passing corrected Et, eta, phi, uncorrected Et, emEnergyFraction
+    //     vec_IC5Jets_ptr->push_back( OfflineJet( corEt, Alg_caloJets_it->eta(), Alg_caloJets_it->phi(), Alg_caloJets_it->et(),
+    // 					    //                                            Alg_caloJets_it->emEnergyFraction(),
+    //                                             EmFracFromComp,
+    //                                             bTagHighEff_it->second, bTagHighPur_it->second,
+    //                                             jetMass,
+    //                                             tkNum_S1, tkSumPt_S1, bTagTkInvMass_S1,
+    //                                             tkNum_S2, tkSumPt_S2, bTagTkInvMass_S2,
+    //                                             tkNum_S3, tkSumPt_S3, bTagTkInvMass_S3 ) );
+   
+    //---------------------------------
+    //Delta Z minimo tra jet e vertici
+    //---------------------------------
+
+    double DeltaZ = 1000.;
+    double Cmin = -1.;
+    int Vtx_Counter = 0;
+
+    //loop sui vertici
+    vector<math::XYZTLorentzVector>::const_iterator Vertices_it = vec_Vertices.begin();
+    for(; Vertices_it != vec_Vertices.end() ; Vertices_it++){
+      double Dz_temp = fabs(Avg_Tk_z - Vertices_it->z());
+      Vtx_Counter++;
+      if(Dz_temp < DeltaZ ){
+	DeltaZ = Dz_temp;
+	Cmin = Vtx_Counter; 
+      }//end if 
+      
+    }//end loop sui vertici
+    //riempio ii vettori con le informazioni su DeltaZ e numero del vertice associato
+    vec_Cmin.push_back(Cmin);
+    vec_DeltaZ.push_back(DeltaZ);
+
+   H_Cmin_->Fill(Cmin);
+   H_DeltaZ_->Fill(DeltaZ);
+        
+    ++Alg_caloJets_it;
+    ++bTagHighEff_it;
+    ++bTagHighPur_it;
+  }
+    
+  cout<<"Vector Cmin size= "<<vec_Cmin.size()<<endl;
+  cout<<"Vector DeltaZ size= "<<vec_DeltaZ.size()<<endl;
+
+  // cout<<"used jet= "<<usedjet<<endl;
+
+  //   if ( tchenum != tchpnum ) cout << "diff 1" << endl;
+  //   if ( tchenum != iptkinfonum ) cout << "diff 2" << endl;
+  //   if ( tchpnum != iptkinfonum ) cout << "diff 3" << endl;
+
+  //   if ( tchenum != Alg_caloJetsSize ) cout << "diff jets 1" << endl;
+  //   if ( tchpnum != Alg_caloJetsSize ) cout << "diff jets 1" << endl;
+  //   if ( iptkinfonum != Alg_caloJetsSize ) cout << "diff jets 1" << endl;
+
+  //(non e' piu' vero, prendo i jet da algorithm) Sto gia' prendendo gli offline jet quindi
+  // o questi li metto in un altro handle o non lo faccio proprio
+  // i vec_ic5 hanno le info anche sulle tracce assegnate 
+  //   // Write ic5 jets
+  //   iEvent.put( vec_IC5Jets_ptr, offlineJets_ );
+
+
+
+  //=====ROBERTO=================================
+
 
   // See if we have a good high-Pt electron or muon
   // ----------------------------------------------
@@ -1804,6 +2567,7 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
     }
   }
 
+  //cout << "step 4" << endl;
   
   // Preliminary creation of jet array ordered by Et for parton-jet matching study only
   // ----------------------------------------------------------------------------------
@@ -1953,7 +2717,7 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	      if ( !ipass[ip] ) { // this parton has not been used yet
 		double deta = Parton_eta[ip]-JPeta[ij];
 		double dphi = 3.1415926-fabs(fabs(Parton_phi[ip]-JPphi[ij])-3.1415926);
-		double d_et = fabs(Parton_pt[ip]-JPetc[ij])/Parton_pt[ip];
+		//		double d_et = fabs(Parton_pt[ip]-JPetc[ij])/Parton_pt[ip];
 		double dr2  = deta*deta+dphi*dphi; // +d_et*d_et;
 		if ( dr2<drmin ) {
 		  drmin=dr2;
@@ -2078,7 +2842,7 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	  // First get b-tag indices:
 	  // ------------------------
 	  int indtag=0;
-	  int ijtag[100]={0.};
+	  double ijtag[100]={0.};
 	  for ( int ij=0; ij<NJP; ij++ ) {
 	    if ( JPet[ij]>etmin && fabs(JPeta[ij])<etamax && considered<8 ) {
 	      considered++;
@@ -2120,7 +2884,7 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 		double ptotpair = sqrt((px4+px5)*(px4+px5)+(py4+py5)*(py4+py5)+(pz4+pz5)*(pz4+pz5));
 		double etanotpair=0.;
 		if ( ptotpair-pz4-pz5!=0 ) etanotpair = 0.5*log((ptotpair+pz4+pz5)/(ptotpair-pz4-pz5));
-		double phinotpair=atan2(py4+py5,px4+px5);
+		//		double phinotpair=atan2(py4+py5,px4+px5);
 		MHnot_->Fill(m45not);
 		Hnotpt_->Fill(ptpair);
 		Hnoteta_->Fill(fabs(etanotpair));
@@ -2319,7 +3083,9 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 
     Nsltt_hjj++;
   } // if sl tt decay + h->cc,bb decay
-  
+
+  // cout<<"step 5"<<endl;
+
   ////////////////////////////////////////////////////////////////////////////////////
 
   // Offline analysis
@@ -2339,7 +3105,7 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   double metsig = caloMET->mEtSig();
   double metphi = caloMET->phi();
 
-  // Count IC5 jets with Et>=30 GeV and |eta| < 3.0
+  // Count IC5 jets with Et>=25 GeV and |eta| < 3.0
   // ----------------------------------------------
   double goodIc5Jets = 0.; // Number of selected jets
   double NTagsL = 0.;      // Number of loose b-tags
@@ -2391,7 +3157,9 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   double ttms1=0.;      // total track mass of jets, S1 significance
   double ttms2=0.;
   double ttms3=0.;
-
+  //================ ROBERTO==========================
+  double drbbnoh=0.; // Delta r b-jet no higgs
+  //================ ROBERTO==========================
   // Offline cuts
   // ------------
   bool NJetsCut = false;   // Whether event passes NJet cut
@@ -2417,9 +3185,19 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   int    JN1[100]={0};
   int    JBin[100]={0};
   bool   JHEM[100];
-  double NHSJ = 8; // number of jets from hard subprocess  <---- VERY IMPORTANT PARAMETER
-  double NHEM = 0; // number of medium tags
-  double NHEM_ALL = 0; // number of medium tags among ALL iJ jets
+  //-------
+  int NHSJ = 8; // number of jets from hard subprocess  <---- VERY IMPORTANT PARAMETER
+  int NHEM = 0; // number of medium tags
+  //-------
+
+  //=====ROBERTO==============
+  
+  int NHSJEtEtaCut25 = 0;
+  int NHSJEtEtaCut50 = 0;
+  int NHSJEtEtaCut75 = 0;
+
+  //=====ROBERTO==============
+  double NHEM_ALL = 0.; // number of medium tags among ALL iJ jets
   double sumhed4 = 0.; // Sum of high-eff discriminant for 4 highest HET jets
   double sumhpd4 = 0.; // Sum of high-pur discriminant for 4 highest HPT jets
   double sumhed6 = 0.; // Sum of high-eff discriminant for 6 highest HET jets
@@ -2502,6 +3280,8 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
       }
     } // End loop on cal jet collection
 
+    //cout<<"step 6 "<<endl;
+
     // Sort good jets by Et
     // --------------------
     for ( int times=0; times<iJ; times++ ) {
@@ -2556,7 +3336,37 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
     double hemax[100]={0.};
     double hpmax[100]={0.};
     
+    //======ROBERTO======================= 
+           
+    HSumEt_->Fill(CorrSumEt);
+    HSumEt_GoodJet_->Fill(GoodSumEt);
+    
+    //======ROBERTO=======================
+
+    //======ROBERTO=======================
+    //sl : semileptonic                    
+       
+    for(int ij=0;ij<iJ;ij++){
+      if (JEt[ij]>25.&& fabs(Jeta[ij])<3.) NHSJEtEtaCut25++;
+      if (JEt[ij]>50.&& fabs(Jeta[ij])<3.) NHSJEtEtaCut50++;
+      if (JEt[ij]>75.&& fabs(Jeta[ij])<3.) NHSJEtEtaCut75++;
+    }
+    
+    // std::cout << "# jet con taglio su Et e eta= " <<NHSJEtEtaCut <<std::endl;
+    
+    NHSJEtEtaCut25_->Fill(NHSJEtEtaCut25);
+    NHSJEtEtaCut50_->Fill(NHSJEtEtaCut50);
+    NHSJEtEtaCut75_->Fill(NHSJEtEtaCut75);
+   
+    //======ROBERTO=======================
+ 
+    //@@@@@@@@@@@@@@@@@@@@@@@@@@
+    //@@@@@@@@@@@@@@@@@@@@@@@@@@    
+    // cout<<"step 7 "<<endl;
+
     if ( QCD_ ) { // This is for tag parametrization /////////////////////////////////////
+
+      // cout<<"step 8 "<<endl;
 
       // Assign tags to jets in QCD events according to their probability
       // ----------------------------------------------------------------
@@ -2692,7 +3502,7 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	sumhed6=0.;
 	sumhpd6=0.;
 	ttms1=0.;
-
+	//cout<<"step 9 "<<endl;
 	// Compute sum of discriminants
 	// ----------------------------
 	for ( int i=0; i<iJmax; i++ ) {
@@ -2727,7 +3537,7 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	for ( int i=0; i<iJmax; i++ ) {
 	  if ( JHEM[i] ) ttms1+=JMT[i];
 	}
-          
+
 
 	// ////////////////////////////////////////////////////////////////////////
 	// Top and H kinematics
@@ -2804,6 +3614,7 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	    }
 	  }
 	}
+
 	double px1,px2,px3,py1,py2,py3,pz1,pz2,pz3,e1,e2,e3;
 	double px,py,pz;
 	double spx,spy,spz,se;
@@ -2901,6 +3712,7 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	  }
 	}
 	  
+
 	// Compute mass of jets not selected in triplet of top and doublet of H decay
 	// and mass of 5 jets chosen to be H and T decay products
 	// --------------------------------------------------------------------------
@@ -2944,7 +3756,8 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	  spy=0;
 	  spz=0;
 	  se=0;
-	  double mbbnoh;
+	  double mbbnoh = 0.;
+	  	  	  
 	  for ( int k1=0; k1<iJ-1 && k1<NHSJ-1; k1++ ) {
 	    if ( k1!=ih1a && k1!=ih2a && JHEM[k1] ) {
 	      for ( int k2=k1+1; k2<iJ && k2<NHSJ; k2++ ) { // limit to 8 the number of jets from h.s.
@@ -2965,9 +3778,12 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 		    mbbnohmax=mbbnoh;
 		    dpbbnohmax=3.1415926-fabs(fabs(Jphi[k1]-Jphi[k2])-3.1415926);
 		  }
+		  //======ROBERTO=================
+     		  // drbbnoh=sqrt((Jeta[k2]-Jeta[k1])*(Jeta[k2]-Jeta[k1]) + (Jphi[k2]-Jphi[k1])*(Jphi[k2]-Jphi[k1]));
+		  //======ROBERTO=================
 		}
 	      }
-	    }      
+	    }
 	  }
 
 	  // Now compute global mass chisquared
@@ -3532,7 +4348,7 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	      }
 	      
 	    }
-	  } 
+	  }
 
 	  // Fill error histograms now
 	  // -------------------------
@@ -3795,24 +4611,24 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	  double fb=0.;
 	  rel_lik = 0.;
 	  int bx[18];
-	  bx[0]= (int)((c8/1.2)*50)+1;
-	  bx[1]= (int)((m8/2500.)*50)+1;
-	  bx[2]= (int)((c6/1.2)*50)+1;
-	  bx[3]= (int)((GoodHt/4000.)*50)+1;
-	  bx[4]= (int)((metsig/20.)*50.)+1;
-	  bx[5]= (int)(((thdetabest-5.)/5.)*50)+1;
-	  bx[6]= (int)((hbestcomb/400.)*50.)+1;
-	  bx[7]= (int)((dp2nd/3.2)*50)+1;
-	  bx[8]= (int)((m5/2000.)*50)+1;
-	  bx[9]= (int)((m_others/1500.)*50.)+1;
-	  bx[10]= (int)((Et6/150.)*50)+1;
-	  bx[11]= (int)((sumhed4/100.)*50)+1; 
-	  bx[12]= (int)((ttms1/80.)*50)+1.;
-	  bx[13]= (int)(((scprodthbest+1200.)/2400.)*50)+1.;
-	  bx[14]= (int)((chi2/50.)*50)+1;
-	  bx[15]= (int)((tbestcomb/800.)*50)+1; 
-	  bx[16]= (int)((wbestcomb/500.)*50)+1.;
-	  bx[17]= (int)((sumhed6/100.)*50)+1.;
+	  bx[0]= int(((c8/1.2)*50.)+1.);
+	  bx[1]= (int)((m8/2500.)*50.+1.);
+	  bx[2]= (int)((c6/1.2)*50.+1.);
+	  bx[3]= (int)((GoodHt/4000.)*50.+1.);
+	  bx[4]= (int)((metsig/20.)*50.+1.);
+	  bx[5]= (int)(((thdetabest-5.)/5.)*50.+1.);
+	  bx[6]= (int)((hbestcomb/400.)*50.+1.);
+	  bx[7]= (int)((dp2nd/3.2)*50.+1.);
+	  bx[8]= (int)((m5/2000.)*50.+1.);
+	  bx[9]= (int)((m_others/1500.)*50.+1.);
+	  bx[10]= (int)((Et6/150.)*50.+1.);
+	  bx[11]= (int)((sumhed4/100.)*50.+1.); 
+	  bx[12]= (int)((ttms1/80.)*50.+1.);
+	  bx[13]= (int)(((scprodthbest+1200.)/2400.)*50.+1.);
+	  bx[14]= (int)((chi2/50.)*50.+1.);
+	  bx[15]= (int)((tbestcomb/800.)*50.+1.); 
+	  bx[16]= (int)((wbestcomb/500.)*50.+1.);
+	  bx[17]= (int)((sumhed6/100.)*50.+1.);
 	  for ( int ivar=0; ivar<18; ivar++ ) {
 	    if ( bx[ivar]>=1 && bx[ivar]<=50 ) {
 	      fs = HSS_sig[ivar]->GetBinContent(bx[ivar]);
@@ -3857,7 +4673,12 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 
       } // end for tag combinatorial
       
+      //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+      //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+
     } else { // if not QCD /////////////////////////////////////////////
+
+      //cout<<"step 10 "<<endl;
 
       int iJmax=NHSJ;  // Search for tags in the first NHSJ jets only!
       if ( iJ<iJmax ) iJmax=iJ;
@@ -3929,6 +4750,8 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	if ( ns1bin==7 ) HED8_->Fill(JHET[i]);
 	if ( ns1bin==7 ) HPD8_->Fill(JHPT[i]);
       }
+
+      //cout<<"step 11 "<<endl;
 
       // ////////////////////////////////////////////////////////////////////////
       // Top and H kinematics
@@ -4005,6 +4828,14 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	  }
 	}
       }
+      
+      // cout<<"step 12 "<<endl;
+
+      //===================================
+      // ROBERTO
+      //===================================
+
+
       double px1,px2,px3,py1,py2,py3,pz1,pz2,pz3,e1,e2,e3;
       double px,py,pz;
       double spx,spy,spz,se;
@@ -4016,6 +4847,141 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
       double tbestcomb=0.;
       double wbestcomb=0.;
       maxr=-1.;
+      
+      // First triplet with one b-jet
+      // ----------------------------
+      
+      for ( int i=0; i<iJ-2 && i<NHSJ-2; i++ ) {
+	for ( int j=i+1; j<iJ-1 && j<NHSJ-1; j++ ) {
+	  for ( int k=j+1; k<iJ && k<NHSJ; k++ ) { 
+	    // limit to 8 the number of jets 
+	    // in hard subprocess
+	    // Require that the triplet owns at least one b-tag
+	    // ------------------------------------------------
+	    /*
+	      int ib=-1;	      
+	      if ( JHEM[i] ) ib=i;
+	      if ( JHEM[j] ) ib=j;
+	      if ( JHEM[k] ) ib=k;
+	      if ( (JHEM[i]||JHEM[j]||JHEM[k]) && i!=ih1a && i!=ih2a && j!=ih1a && j!=ih2a 
+	      && k!=ih1a && k!=ih2a ) {
+	    */
+	    //-------------------------------------------------
+	    
+	    
+	    if (  i!=ih1a && i!=ih2a && j!=ih1a && j!=ih2a 
+		  && k!=ih1a && k!=ih2a ) {	  
+	      px1=JEtc[i]*cos(Jphi[i]);
+	      px2=JEtc[j]*cos(Jphi[j]);
+	      px3=JEtc[k]*cos(Jphi[k]);
+	      py1=JEtc[i]*sin(Jphi[i]);
+	      py2=JEtc[j]*sin(Jphi[j]);
+	      py3=JEtc[k]*sin(Jphi[k]);
+	      pz1=JEtc[i]/tan(2*atan(exp(-Jeta[i])));
+	      pz2=JEtc[j]/tan(2*atan(exp(-Jeta[j])));
+	      pz3=JEtc[k]/tan(2*atan(exp(-Jeta[k])));
+	      e1 =sqrt(px1*px1+py1*py1+pz1*pz1);
+	      e2 =sqrt(px2*px2+py2*py2+pz2*pz2);
+	      e3 =sqrt(px3*px3+py3*py3+pz3*pz3);
+	      
+	      if ( m3a==0 ) {
+		m3a=(e1+e2+e3)*(e1+e2+e3)-(px1+px2+px3)*(px1+px2+px3)-
+		  (py1+py2+py3)*(py1+py2+py3)-(pz1+pz2+pz3)*(pz1+pz2+pz3);
+		if ( m3a>0 ) m3a=sqrt(m3a);
+	      }
+	      
+	      // variables for W mass recostruction
+	      double m2jnoh12;
+	      double m2jnoh13;
+	      double m2jnoh23;
+	      
+	      double mw=0.;
+	      
+	      // if ( ib==k ) {
+	      m2jnoh12 =(e1+e2)*(e1+e2)-(px1+px2)*(px1+px2)-(py1+py2)*(py1+py2)-(pz1+pz2)*(pz1+pz2);
+	      //} else if ( ib==j ) {
+	      m2jnoh13 =(e1+e3)*(e1+e3)-(px1+px3)*(px1+px3)-(py1+py3)*(py1+py3)-(pz1+pz3)*(pz1+pz3);
+	      //} else if ( ib==i ) {
+	      m2jnoh23 =(e3+e2)*(e3+e2)-(px3+px2)*(px3+px2)-(py3+py2)*(py3+py2)-(pz3+pz2)*(pz3+pz2);
+	      //}
+	      
+	      // if ( mw>0 ) mw=sqrt(mw);
+	      
+	      if ( m2jnoh12>0 ) m2jnoh12=sqrt(m2jnoh12);
+	      if ( m2jnoh13>0 ) m2jnoh13=sqrt(m2jnoh13);
+	      if ( m2jnoh23>0 ) m2jnoh23=sqrt(m2jnoh23);
+	      
+	      // std::cout << "mass 1&2= " << m2jnoh12 <<"mass 1&3= "<< m2jnoh13 <<"mass 2&3= " <<m2jnoh23 << std::endl;
+	      
+	      // Choose minimum mass for W
+	      
+	      if ( m2jnoh12<m2jnoh13 && m2jnoh12<m2jnoh23 ){
+		mw=m2jnoh12;
+	      }
+	      else if ( m2jnoh13<m2jnoh12 && m2jnoh13<m2jnoh23 ){
+		mw=m2jnoh13;
+	      }
+	      else if ( m2jnoh23<m2jnoh12 && m2jnoh23<m2jnoh13 ){
+		mw=m2jnoh23;
+	      }
+
+	      //
+	      // std::cout << "W mass= "<< mw << std::endl;
+	      //
+	      
+	      if ( mwa==0 ) mwa=mw;
+	      double spx=px1+px2+px3;
+	      double spy=py1+py2+py3;
+	      double spz=pz1+pz2+pz3;
+	      double m123=pow(e1+e2+e3,2)-pow(spx,2)-pow(spy,2)-pow(spz,2);
+	      if ( m123>0 ) m123=sqrt(m123);		
+	      double pt3 = sqrt(spx*spx+spy*spy);
+	      double scprodth=0.;          // projection of top momentum in h direction
+	      if ( ph2>0 ) scprodth = (spx*pxh+spy*pyh+spz*pzh)/sqrt(ph2);
+	      double ptot3 = sqrt(spx*spx+spy*spy+spz*spz);
+	      double eta3=0.;
+	      if ( ptot3-spz!=0 ) eta3 = 0.5*log((ptot3+spz)/(ptot3-spz));
+	      double phi3 = atan2(spy,spx);
+	      double thdphi = 3.141592-fabs(fabs(phi3-phih)-3.141592);
+	      double thdeta = eta3-etah; // angle between momenta of t and h		
+	      int ipt=(int)((pt3/600.)*10);
+	      int idp=(int)((thdphi/3.15)*10);
+	      int iet=(int)((fabs(eta3)/4.)*10);
+	      
+	      if ( ipt<0 ) ipt=0;
+	      if ( ipt>9 ) ipt=9;
+	      if ( idp<0 ) idp=0;
+	      if ( idp>9 ) idp=9;
+	      if ( iet<0 ) iet=0;
+	      if ( iet>9 ) iet=9;
+	      
+	      double r = Tread[100*iet+10*idp+ipt];
+	      
+	      if ( Tnotread[100*iet+10*idp+ipt]>0 ) r=r/Tnotread[100*iet+10*idp+ipt];
+	      
+	      if ( r>maxr ) {
+		maxr = r;
+		tbestcomb=m123;
+		wbestcomb=mw;
+		scprodthbest=scprodth;
+		thdetabest=thdeta;
+		it1a=i;
+		it2a=j;
+		it3a=k;
+	      }
+	      
+	    } // if jet not assigned to h
+	  } // for
+	} // for
+      } // for
+	  
+      //cout<<"step 13 "<<endl;
+      //================================
+      // ROBERTO
+      //================================
+      
+      
+      /*
       // First triplet with one b-jet
       // ----------------------------
       for ( int i=0; i<iJ-2 && i<NHSJ-2; i++ ) {
@@ -4087,9 +5053,9 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 		r=10.;
 	      }
 	      if ( r>maxr ) {
-		cout << iet << " " << idp << " " << ipt << " T=" << Tread[100*iet+10*idp+ipt] 
-		     << " Tnot=" << Tnotread[100*iet+10*idp+ipt]
-		     << " r=" << r << " maxr=" << maxr << " Mt=" << m123 << " Mw=" << mw << endl;
+		//		cout << iet << " " << idp << " " << ipt << " T=" << Tread[100*iet+10*idp+ipt] 
+		//   << " Tnot=" << Tnotread[100*iet+10*idp+ipt]
+		//   << " r=" << r << " maxr=" << maxr << " Mt=" << m123 << " Mw=" << mw << endl;
 		maxr = r;
 		tbestcomb=m123;
 		wbestcomb=mw;
@@ -4104,7 +5070,8 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	  }
 	}
       }
-	  
+      */
+     
       // Compute mass of jets not selected in triplet of top and doublet of H decay
       // and mass of 5 jets chosen to be H and T decay products
       // --------------------------------------------------------------------------
@@ -4148,7 +5115,7 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	spy=0;
 	spz=0;
 	se=0;
-	double mbbnoh;
+	double mbbnoh=0.;
 	for ( int k1=0; k1<iJ-1 && k1<NHSJ-1; k1++ ) {
 	  if ( k1!=ih1a && k1!=ih2a && JHEM[k1] ) {
 	    for ( int k2=k1+1; k2<iJ && k2<NHSJ; k2++ ) { // limit to 8 the number of jets from h.s.
@@ -4168,6 +5135,20 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 		if ( mbbnoh>mbbnohmax ) {
 		  mbbnohmax=mbbnoh;
 		  dpbbnohmax=3.1415926-fabs(fabs(Jphi[k1]-Jphi[k2])-3.1415926);
+		  //		  double deltaeta = 
+
+		  //==================================================
+		  // ROBERTO
+
+		  drbbnoh=sqrt((Jeta[k2]-Jeta[k1])*(Jeta[k2]-Jeta[k1]) + (Jphi[k2]-Jphi[k1])*(Jphi[k2]-Jphi[k1]));
+		  		  		  	  	  
+		  // std::cout << "drbbnoh: " << drbbnoh << std::endl;
+		  
+		  // cout << "drbbnoh: " << drbbnoh << endl;
+		  
+		  // ROBERTO
+		  //==================================================
+
 		}
 	      }
 	    }
@@ -4225,6 +5206,9 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	c6=set/m6;
       }
 
+
+      //cout<<"step 17 "<<endl;
+
       ////////////////////////////////////////////////////////////////
       // Now fill histograms
       // -------------------
@@ -4264,7 +5248,9 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
       UncorrMEt_SumEtJ_->Fill(GoodSumEt,UncorrMEt);
       CorrMEt_SumEtJ_->Fill(GoodSumEt,CorrMEt);
       MEt_SumEtJ_->Fill(GoodSumEt,met);
-      
+
+      //cout<<"step 19 "<<endl;
+
       // Apply trigger requirement
       // -------------------------
       if ( response && NJetsCut ) {
@@ -4324,6 +5310,8 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	TTMS1_->Fill(ttms1);
 	TTMS2_->Fill(ttms2);
 	TTMS3_->Fill(ttms3);
+	
+	//cout<<"step 20 "<<endl;
 
 	// Study number of events with 3 or 4 HEM tags vs N jets on which to look for them
 	// -------------------------------------------------------------------------------
@@ -4348,6 +5336,7 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	  }
 	}
 
+	//cout<<"step 18 "<<endl;
 	
 	if ( MEtSigCut && NHEM>=2 ) {
 	  NJetsS_->Fill(goodIc5Jets);
@@ -4523,9 +5512,14 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	    TTMS1SSS_->Fill(ttms1);
 	    TTMS2SSS_->Fill(ttms2);
 	    TTMS3SSS_->Fill(ttms3);
+	    //=======ROBERTO======================
+	    DRbbnohSSS_->Fill(drbbnoh); // Fill Dr histogram
+	    //=======ROBERTO====================== 
 	  } 
 	}
       }
+
+      //cout<<"step 21 "<<endl;
 
       // Compute Likelihood
       // ------------------
@@ -4534,26 +5528,28 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
       double fb=0.;
       rel_lik = 0.;
       int bx[18];
-      bx[0]= (int)((c8/1.2)*50)+1;
-      bx[1]= (int)((m8/2500.)*50)+1;
-      bx[2]= (int)((c6/1.2)*50)+1;
-      bx[3]= (int)((GoodHt/4000.)*50)+1;
-      bx[4]= (int)((metsig/20.)*50.)+1;
-      bx[5]= (int)(((thdetabest-5.)/5.)*50)+1;
-      bx[6]= (int)((hbestcomb/400.)*50.)+1;
-      bx[7]= (int)((dp2nd/3.2)*50)+1;
-      bx[8]= (int)((m5/2000.)*50)+1;
-      bx[9]= (int)((m_others/1500.)*50.)+1;
-      bx[10]= (int)((Et6/150.)*50)+1;
-      bx[11]= (int)((sumhed4/100.)*50)+1;
-      bx[12]= (int)((ttms1/80.)*50)+1.;
-      bx[13]= (int)(((scprodthbest+1200.)/2400.)*50)+1.;
-      bx[14]= (int)((chi2/50.)*50)+1;
-      bx[15]= (int)((tbestcomb/800.)*50)+1; 
-      bx[16]= (int)((wbestcomb/500.)*50)+1.;
-      bx[17]= (int)((sumhed6/100.)*50)+1.;
+      bx[0]= (int)((c8/1.2)*50.+1.);
+      bx[1]= (int)((m8/2500.)*50.+1.);
+      bx[2]= (int)((c6/1.2)*50.+1.);
+      bx[3]= (int)((GoodHt/4000.)*50.+1.);
+      bx[4]= (int)((metsig/20.)*50.+1.);
+      bx[5]= (int)(((thdetabest-5.)/5.)*50.+1.);
+      bx[6]= (int)((hbestcomb/400.)*50.+1.);
+      bx[7]= (int)((dp2nd/3.2)*50.+1.);
+      bx[8]= (int)((m5/2000.)*50.+1.); 
+      bx[9]= (int)((m_others/1500.)*50.+1.);
+      bx[10]= (int)((Et6/150.)*50.+1.);
+      bx[11]= (int)((sumhed4/100.)*50.+1.);
+      bx[12]= (int)((ttms1/80.)*50.+1.);
+      bx[13]= (int)(((scprodthbest+1200.)/2400.)*50.+1.);
+      bx[14]= (int)((chi2/50.)*50.+1.);
+      bx[15]= (int)((tbestcomb/800.)*50.+1.); 
+      bx[16]= (int)((wbestcomb/500.)*50.+1.);
+      bx[17]= (int)((sumhed6/100.)*50.+1.);
       for ( int ivar=0; ivar<18; ivar++ ) {
 	if ( bx[ivar]>=1 && bx[ivar]<=50 ) {
+	  // cout<< "bx["<<ivar<<"] = " << bx[ivar] << endl;
+	  //cout<< "HSS_sig["<<ivar<<"] = " << HSS_sig[ivar] << endl;
 	  fs = HSS_sig[ivar]->GetBinContent(bx[ivar]);
 	  fb = HSS_bgr[ivar]->GetBinContent(bx[ivar]);
 	  if (fb>0 && fs>0 ) {
@@ -4585,8 +5581,9 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	}
       }
 
+      //cout<<"step 16 "<<endl;
     } // if QCD or not QCD
-
+    // cout<<"step 14 "<<endl;
   } // end if caloJETS.size()
   else {
     std::cout << "ATTENTION: Jet collection empty" << std::endl;
@@ -4652,7 +5649,11 @@ void TDAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
     }
   }
 
+  //cout<<"step 15 "<<endl;
+
 }
+
+
 
 //       method called once each job just before starting event loop  
 // -------------------------------------------------------------------------
@@ -5097,6 +6098,56 @@ void TDAna::endJob() {
   HED8_->Write();
   HPD8_->Write();
 
+  //=====ROBERTO=============
+  // Histograms for events passing GoodSumEt>25. && Jeta<3.
+
+  HSumEt_->Write();
+  HSumEt_GoodJet_->Write();
+  //=====ROBERTO=============
+  // Histograms for events passing JEt>25. && Jeta<3.
+  
+  NHSJEtEtaCut25_->Write();
+  NHSJEtEtaCut50_->Write();
+  NHSJEtEtaCut75_->Write();
+
+  //Histograms for primary vertices and PU vertices
+  H_primaryVtxX_->Write();
+  H_primaryVtxY_->Write(); 
+  H_primaryVtxZ_->Write(); 
+                
+  H_primaryVtxXY_->Write();
+  H_primaryVtxZR_->Write();
+ 
+  H_PUVtxX_->Write(); 
+  H_PUVtxY_->Write(); 
+  H_PUVtxZ_->Write(); 
+  	              
+  H_PUVtxXY_->Write();
+  H_PUVtxZR_->Write();
+  
+  H_NPUVtx_->Write();
+
+  //Histograms for selected tracks vertices
+
+  H_TksX_->Write(); 
+  H_TksY_->Write(); 
+  H_TksZ_->Write(); 
+  
+  H_TksXY_->Write();
+  H_TksZR_->Write();
+
+  H_TksZ_Avg_->Write();
+
+  H_SelTk_->Write();
+  H_NTks_S3_->Write();
+  H_S2DTks_->Write();
+  H_S3DTks_->Write();
+  H_Tks_Z_S3D_->Write();
+
+  H_Cmin_->Write();
+  H_DeltaZ_->Write();
+	
+  //=====ROBERTO=============
   // Histograms for events passing trigger
   // -------------------------------------
   NJets_->Write();
@@ -5482,7 +6533,9 @@ void TDAna::endJob() {
   TTMS1SSS_->Write();
   TTMS2SSS_->Write();
   TTMS3SSS_->Write();
-
+  //=======ROBERTO======================
+  DRbbnohSSS_->Write(); // Write Dr Hist
+  //=======ROBERTO======================
   NJetsSSSN_->Write();
   UncorrHtSSSN_->Write();
   CorrHtSSSN_->Write();
@@ -5800,6 +6853,7 @@ void TDAna::endJob() {
   PTagNt_->Write();
 
 }
+
 
 // Define this as a plug-in
 // ------------------------

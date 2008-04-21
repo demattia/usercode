@@ -46,6 +46,20 @@
 #include "TProfile.h"
 #include "TFile.h"
 
+//=====ROBERTO===================
+//-------------------------
+//tracce e vertici
+//-------------------------
+
+// For the SimVertex
+#include "SimDataFormats/Vertex/interface/SimVertex.h"
+#include "SimDataFormats/Vertex/interface/SimVertexContainer.h"
+
+// GenJets
+#include "DataFormats/JetReco/interface/GenJetCollection.h"
+#include "DataFormats/JetReco/interface/GenJet.h"
+//=====ROBERTO====================
+
 // Data include files
 // ------------------
 
@@ -98,10 +112,12 @@
 // #include "DataFormats/SiPixelDetId/interface/PXFDetId.h"
 // #include "DataFormats/GeometryVector/interface/LocalPoint.h"
 // #include "DataFormats/GeometryVector/interface/GlobalPoint.h"
+//=====ROBERTO==============================
+#include "DataFormats/TrackReco/interface/TrackFwd.h"
+#include "DataFormats/TrackReco/interface/Track.h"
 
-// #include "DataFormats/TrackReco/interface/TrackFwd.h"
-// #include "DataFormats/TrackReco/interface/Track.h"
-
+#include "DataFormats/TrackReco/interface/TrackBase.h"
+//=====ROBERTO==============================
 // #include "AnalysisExamples/PixelJet/interface/PixelJet.h"
 
 // // GenJets
@@ -137,8 +153,8 @@ class TDAna : public edm::EDAnalyzer {
   virtual void beginJob(const edm::EventSetup&) ;
   virtual void analyze(const edm::Event&, const edm::EventSetup&);
   virtual void endJob() ;
-
-//   double PI_;
+ 
+  //   double PI_;
 
   int eventcounter_;
 
@@ -173,6 +189,23 @@ class TDAna : public edm::EDAnalyzer {
   edm::InputTag simpleTauLabel_;
   edm::InputTag summaryLabel_;
 
+  //======ROBERTO==============
+
+  //-----------------------------------
+  //calojets
+  //-----------------------------------
+  std::string CaloJetAlgorithm, JetCorrectionService;
+  
+  //------------------------
+  //tracce e vertici
+  //------------------------
+  edm::InputTag simVtxLabel_;
+  
+  std::string trackCountingHighEffJetTags;
+  std::string trackCountingHighPurJetTags;
+  std::string impactParameterTagInfos;
+
+  //======ROBERTO==============
   unsigned int numTkCut_;
   bool QCD_;
   std::string OutputEffFileName;
@@ -264,7 +297,52 @@ class TDAna : public edm::EDAnalyzer {
   TProfile * DEtq_prof_;
   TProfile * DEtcb_prof_;
   TProfile * DEtcq_prof_;
+  //=====ROBERTO============
+  TH1D * HSumEt_;
+  TH1D * HSumEt_GoodJet_;
 
+  TH1D * NHSJEtEtaCut25_;
+  TH1D * NHSJEtEtaCut50_;
+  TH1D * NHSJEtEtaCut75_;
+  
+  //Histograms for primary vertex and PU vertices
+ 
+  TH1D * H_primaryVtxX_;
+  TH1D * H_primaryVtxY_;
+  TH1D * H_primaryVtxZ_;
+        
+  TH2D * H_primaryVtxXY_;
+  TH2D * H_primaryVtxZR_;
+        
+  TH1D * H_PUVtxX_;
+  TH1D * H_PUVtxY_;
+  TH1D * H_PUVtxZ_;
+        
+  TH2D * H_PUVtxXY_;
+  TH2D * H_PUVtxZR_;
+        
+  TH1D * H_NPUVtx_;
+
+  //Histograms for selected tracks vertices
+
+  TH1D * H_TksX_ ;
+  TH1D * H_TksY_ ;
+  TH1D * H_TksZ_ ;
+  
+  TH2D * H_TksXY_;
+  TH2D * H_TksZR_;
+
+  TH1D * H_TksZ_Avg_;
+
+  TH1D * H_SelTk_;
+  TH1D * H_NTks_S3_; 
+  TH1D * H_S2DTks_;
+  TH1D * H_S3DTks_;
+  TH2D * H_Tks_Z_S3D_;
+
+  TH1D * H_Cmin_;
+  TH1D * H_DeltaZ_;
+  //=====ROBERTO============
   TH1D * NJets_;
   TH1D * UncorrSumEt_;
   TH1D * UncorrHt_;
@@ -480,7 +558,9 @@ class TDAna : public edm::EDAnalyzer {
   TH1D * TTMS1SSS_;
   TH1D * TTMS2SSS_;
   TH1D * TTMS3SSS_;
-
+  //=====ROBERTO============
+  TH1D * DRbbnohSSS_; // DR histogram
+  //=====ROBERTO============
   TH1D * N3NJ_;
   TH1D * E3NJ_;
   TH1D * N4NJ_;
