@@ -26,6 +26,7 @@ namespace anaobj {
 		const double         & PHI, 
 		const double         & UNCORRET, 
 		const double         & EMENERGYFRACTION,
+		const math::XYZTLorentzVector & P4,    
 		const math::XYZPoint & VERTEX,
                 const float          & DISCRIMINATORHIGHEFF, 
 		const float          & DISCRIMINATORHIGHPUR, 
@@ -41,6 +42,7 @@ namespace anaobj {
 		const double & TAGTKMASSS3 ) : BaseJet( ET, ETA, PHI ) {
       uncorrEt_             = UNCORRET;
       emEnergyFraction_     = EMENERGYFRACTION;
+      p4_                   = P4;
       vertex_               = VERTEX;
       discriminatorHighEff_ = DISCRIMINATORHIGHEFF;
       discriminatorHighPur_ = DISCRIMINATORHIGHPUR;
@@ -62,6 +64,7 @@ namespace anaobj {
     OfflineJet() : BaseJet( 0., 0., 0. ) {
       uncorrEt_             = 0.;
       emEnergyFraction_     = 0.;
+      p4_                   = math::XYZTLorentzVector(0.,0.,0.,0.);
       vertex_               = math::XYZPoint(0.,0.,0.);
       discriminatorHighEff_ = 0.;
       discriminatorHighPur_ = 0.;
@@ -81,6 +84,7 @@ namespace anaobj {
     }
     double         uncorrEt()             const { return uncorrEt_;             }
     double         emEnergyFraction()     const { return emEnergyFraction_;     }
+    math::XYZTLorentzVector p4()          const { return p4_;                   }
     math::XYZPoint vertex()               const { return vertex_;               }
     float          discriminatorHighEff() const { return discriminatorHighEff_; }
     float          discriminatorHighPur() const { return discriminatorHighPur_; }
@@ -100,6 +104,7 @@ namespace anaobj {
 
     void setUncorrEt(             const double         & UNCORRET             ) { uncorrEt_             = UNCORRET;             }
     void setEmEnergyFraction(     const double         & EMENERGYFRACTION     ) { emEnergyFraction_     = EMENERGYFRACTION;     }
+    void setP4(                   const math::XYZTLorentzVector & P4          ) { p4_                   = P4;                   }    
     void setVertex(               const math::XYZPoint & VERTEX               ) { vertex_               = VERTEX;               }
     void setDiscriminatorHighEff( const float          & DISCRIMINATORHIGHEFF ) { discriminatorHighEff_ = DISCRIMINATORHIGHEFF; }
     void setDiscriminatorHighPur( const float          & DISCRIMINATORHIGHPUR ) { discriminatorHighPur_ = DISCRIMINATORHIGHPUR; }
@@ -120,6 +125,7 @@ namespace anaobj {
   protected:
     double         uncorrEt_;
     double         emEnergyFraction_;
+    math::XYZTLorentzVector p4_;    
     math::XYZPoint vertex_;
     float          discriminatorHighEff_;
     float          discriminatorHighPur_;

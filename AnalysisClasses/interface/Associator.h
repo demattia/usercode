@@ -37,6 +37,7 @@
 #include "AnalysisExamples/AnalysisObjects/interface/OfflineJet.h"
 
 using namespace anaobj;
+//using namespace reco;
 
 template <class T1, class T2>
   bool Associator_PtSort( const T1* first, const T2* second ) {
@@ -48,23 +49,19 @@ template <class T1, class T2>
   class Associator {
  public:
   Associator( double CONER_CUT ) {
-    PI_ = 3.141593;
+    PI_ = TMath::Pi();
     ConeR_cut_ = CONER_CUT;
   }
-  std::auto_ptr<std::map<const T1*, const T2*> > Associate( const std::vector<T1> & v_T1, const std::vector<T2> & v_T2 );
-//  void Associate( const std::vector<T1> & v_T1, const std::vector<T2> & v_T2 );
+  std::auto_ptr<std::map<const T1*, const T2*> > Associate( const std::vector<T1> & v_T1, 
+							    const std::vector<T2> & v_T2 );
  private:
-//  bool PtSort_( const T1* first, const T1* second ) {
-//    return first->pt() < second->pt();
-//  }
   double PI_;
   double ConeR_cut_;
 };
 
 template <class T1, class T2>
-  std::auto_ptr<std::map<const T1*, const T2*> > Associator<T1, T2>::Associate( const std::vector<T1> & v_T1, const std::vector<T2> & v_T2 ) {
-//  void Associator<T1, T2>::Associate( const std::vector<T1> & v_T1, const std::vector<T2> & v_T2 ) {
-
+  std::auto_ptr<std::map<const T1*, const T2*> > Associator<T1, T2>::Associate( const std::vector<T1> & v_T1, 
+										const std::vector<T2> & v_T2 ) {
   using namespace std;
 
   // Store vector of pointers if are not passed
