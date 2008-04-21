@@ -52,14 +52,9 @@ public:
     PI_ = 3.141593;
     ConeR_cut_ = CONER_CUT;
   }
-<<<<<<< AssociatorEt.h
-  std::auto_ptr<std::map<const T1*, const T2*> > Associate( const std::vector<T1> & v_T1,
-							    const std::vector<T2> & v_T2 );
-=======
   std::auto_ptr<std::map<const T1*, const T2*> > Associate( const std::vector<T1> & v_T1, const std::vector<T2> & v_T2 );
   std::auto_ptr<std::map<const T1*, const T2*> > Associate( std::vector<const T1*> & v_T1, const std::vector<T2> & v_T2 );
   std::auto_ptr<std::map<const T1*, const T2*> > Associate( std::vector<const T1*> & v_T1, std::vector<const T2*> & v_T2 );
->>>>>>> 1.2
 
  private:
   double PI_;
