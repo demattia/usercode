@@ -8,6 +8,7 @@
 #include "AnalysisExamples/AnalysisObjects/interface/BaseParticle.h"
 #include "AnalysisExamples/AnalysisObjects/interface/MCParticle.h"
 #include "AnalysisExamples/AnalysisObjects/interface/SimplePixelJet.h"
+#include "AnalysisExamples/AnalysisObjects/interface/SimpleTrack.h"
 #include "AnalysisExamples/AnalysisObjects/interface/GlobalMuon.h"
 #include "AnalysisExamples/AnalysisObjects/interface/SimpleElectron.h"
 #include "AnalysisExamples/AnalysisObjects/interface/SimpleTau.h"
@@ -121,6 +122,14 @@ namespace {
     edm::Wrapper<anaobj::SimplePixelJetCollection::const_iterator> wcitspjc1;
     anaobj::SimplePixelJetCollection::iterator itspjc1;
     edm::Wrapper<anaobj::SimplePixelJetCollection::iterator> witspjc1;
+
+    // SimpleTracks
+    anaobj::SimpleTrackCollection stc1;
+    edm::Wrapper<anaobj::SimpleTrackCollection> wstc1;
+    anaobj::SimpleTrackCollection::const_iterator citstc1;
+    edm::Wrapper<anaobj::SimpleTrackCollection::const_iterator> wcitstc1;
+    anaobj::SimpleTrackCollection::iterator itstc1;
+    edm::Wrapper<anaobj::SimpleTrackCollection::iterator> witstc1;
 
     // GlobalMuons
     anaobj::GlobalMuonCollection gmc1;

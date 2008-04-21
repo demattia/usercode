@@ -95,6 +95,14 @@
   <class name="std::vector<anaobj::SimplePixelJet>::iterator"/>
   <class name="edm::Wrapper<std::vector<anaobj::SimplePixelJet>::iterator >"/>
 
+  <class name="anaobj::SimpleTrack"/>
+  <class name="std::vector<anaobj::SimpleTrack>"/>
+  <class name="edm::Wrapper<std::vector<anaobj::SimpleTrack> >"/>
+  <class name="std::vector<anaobj::SimpleTrack>::const_iterator"/>
+  <class name="edm::Wrapper<std::vector<anaobj::SimpleTrack>::const_iterator >"/>
+  <class name="std::vector<anaobj::SimpleTrack>::iterator"/>
+  <class name="edm::Wrapper<std::vector<anaobj::SimpleTrack>::iterator >"/>
+
   <class name="anaobj::GlobalMuon"/>
   <class name="std::vector<anaobj::GlobalMuon>"/>
   <class name="edm::Wrapper<std::vector<anaobj::GlobalMuon> >"/>
