@@ -4698,6 +4698,7 @@ void TDAnaProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
       TDAnaObjectPtr->setDp3rd( dp3rd );
       TDAnaObjectPtr->setPtot( 0. );
       TDAnaObjectPtr->setPtotE2( 0. );
+      TDAnaObjectPtr->setL1Trigger( response );
 
 //      std::auto_ptr<TDAnaObject> TDAnaObjectPtr( new TDAnaObject() );
 
