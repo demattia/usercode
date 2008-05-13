@@ -13,6 +13,7 @@
 #include "AnalysisExamples/AnalysisObjects/interface/SimpleElectron.h"
 #include "AnalysisExamples/AnalysisObjects/interface/SimpleTau.h"
 #include "AnalysisExamples/AnalysisObjects/interface/Summary.h"
+#include "AnalysisExamples/AnalysisObjects/interface/TDAnaObject.h"
 #include <vector>
 #include <map>
 
@@ -106,6 +107,8 @@ namespace {
     edm::Wrapper<anaobj::BaseMEt> wmet1;
     anaobj::OfflineMEt offlinemet1;
     edm::Wrapper<anaobj::OfflineMEt> wofflinemet1;
+    anaobj::TDAnaObject tdanaobj1;
+    edm::Wrapper<anaobj::TDAnaObject> wtdanaobj1;
 
     // MCParticles
     anaobj::MCParticleCollection mcparc1;

@@ -76,6 +76,8 @@
   <class name="edm::Wrapper<anaobj::BaseMEt>"/>
   <class name="anaobj::OfflineMEt"/>
   <class name="edm::Wrapper<anaobj::OfflineMEt>"/>
+  <class name="anaobj::TDAnaObject"/>
+  <class name="edm::Wrapper<anaobj::TDAnaObject>"/>
 
   <class name="anaobj::BaseParticle"/>
 
