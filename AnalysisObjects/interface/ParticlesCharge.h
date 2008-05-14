@@ -5,12 +5,12 @@ namespace anaobj {
 
   // particles mass
   // quarks:
-  const double dquarkCharge_ = -1.3;
-  const double uquarkCharge_ =  2.3;
-  const double squarkCharge_ = -1.3;
-  const double cquarkCharge_ =  2.3;
-  const double bquarkCharge_ = -1.3;
-  const double tquarkCharge_ =  2.3;
+  const int dquarkCharge_ = -1; // /3
+  const int uquarkCharge_ =  2; // /3
+  const int squarkCharge_ = -1; // /3
+  const int cquarkCharge_ =  2; // /3
+  const int bquarkCharge_ = -1; // /3
+  const int tquarkCharge_ =  2; // /3
 
   // leptons:
   const int electronCharge_ = -1;
