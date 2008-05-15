@@ -49,7 +49,8 @@ class MultiTH1F {
               const int & BINPAR, const double & FIRSTPAR, const double & LASTPAR,
               TFile* OUTFILE );
 
-  /// Fills the histogram corresponding to the index passed as second parameter with the value passed as first parameter
+  /// Fills the histogram corresponding to the index passed as second parameter 
+  /// with the value passed as first parameter
   void Fill( const double & VAL, const int & PAR );
 
   /// Writes the histograms to file

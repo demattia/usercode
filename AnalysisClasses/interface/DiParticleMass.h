@@ -52,14 +52,6 @@ inline double DiParticleMass ( const T1 * particle1,
   double particle2Py = particle2->py();
   double particle2Pz = particle2->pz();
 
-//  double mass = pow(particle1E+particle2E,2) - 
-//    (pow(particle1Px+particle2Px,2)+
-//     pow(particle1Py+particle2Py,2)+
-//     pow(particle1Pz+particle2Pz,2));
-//
-//  if (mass > 0. ) mass = TMath::Sqrt(mass);
-//  else mass = 0.;
-//  return mass;
   return DiMass(particle1E,particle2E,
 		particle1Px,particle2Px,
 		particle1Py,particle2Py,
