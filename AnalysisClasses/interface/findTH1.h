@@ -53,9 +53,12 @@ void findTH1( std::vector<TH1*>    & outputVector,
   first_source->cd( path );
   TDirectory *current_sourcedir = gDirectory;
   //gain time, do not add the objects in the list in memory
+  Bool_t status = TH1::AddDirectoryStatus();
   TH1::AddDirectory(kFALSE);
 
   // loop over all keys in this directory
+  // loop over all keys in this directory
+  TChain *globChain = 0;
   TIter nextkey( current_sourcedir->GetListOfKeys() );
   TKey *key, *oldkey=0;
   while ( (key = (TKey*)nextkey())) {
@@ -115,10 +118,27 @@ void findTH1( std::vector<TH1*>    & outputVector,
 
         nextsource = (TFile*)sourcelist->After( nextsource );
       }
+    }
+    else if ( obj->IsA()->InheritsFrom( "TTree" ) ) {
+      
+      // loop over all source files create a chain of Trees "globChain"
+      const char* obj_name= obj->GetName();
+      
+      globChain = new TChain(obj_name);
+      globChain->Add(first_source->GetName());
+      TFile *nextsource = (TFile*)sourcelist->After( first_source );
+      //      const char* file_name = nextsource->GetName();
+      // cout << "file name  " << file_name << endl;
+      while ( nextsource ) {
+	
+	globChain->Add(nextsource->GetName());
+	nextsource = (TFile*)sourcelist->After( nextsource );
+      }
     } else if ( obj->IsA()->InheritsFrom( "TDirectory" ) ) {
       // it's a subdirectory
       cout << "Found subdirectory " << obj->GetName() << endl;
-
+      
+      // newdir is now the starting point of another round of finding
       findTH1( outputVector, 
 	       sourcelist, 
 	       variableName, 
@@ -126,14 +146,12 @@ void findTH1( std::vector<TH1*>    & outputVector,
 	       xSecVector,
 	       scale
 	       );
-
+      
     } else {
-
+      
       // object is of no type that we know or can handle
       cout << "Unknown object type, name: "
-           << obj->GetName() << " title: " << obj->GetTitle() << endl;
+	   << obj->GetName() << " title: " << obj->GetTitle() << endl;
     }
-
   }
-
 }

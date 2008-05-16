@@ -41,8 +41,8 @@ class THStackLegend {
 	   const bool & NORMALIZE = false, 
 	   const char * FILL      = "l", 
 	   const bool & ERRORS    = false,
-	         int    COLOR     = 0,
-	         int    MARKER    = 0
+	   const int    COLOR     = 0,
+	   const int    MARKER    = 0
 	   );
   TProfile* Add(const TProfile * HISTO, const char* LEGEND = "", const bool & NORMALIZE = false, const char* FILL = "l" );
 
