@@ -41,7 +41,8 @@ void findTH1( std::vector<TH1*>    & outputVector,
 	      TList                * sourcelist, 
 	      TString                variableName, 
 	      std::vector<TString> & sourceSuffixVector,
-	      std::vector<double>  & xSecVector  
+	      std::vector<double>  & xSecVector,  
+	      bool                   scale = true
 	      ) {
   
   TFile *first_source = (TFile*)sourcelist->First();
@@ -81,7 +82,7 @@ void findTH1( std::vector<TH1*>    & outputVector,
       TString h1Name = h1->GetName();
 
       // Scale by the cross-section factor
-      h1->Scale(xSecVector[0]);
+      if (scale) h1->Scale(xSecVector[0]);
       sourceIndex << 0;
       //      h1->SetName(h1Name+"_"+sourceIndex.str());
       h1->SetName(h1Name+"_"+sourceSuffixVector[0]);
@@ -103,7 +104,7 @@ void findTH1( std::vector<TH1*>    & outputVector,
            TH1 *h2 = (TH1*)(key2->ReadObj())->Clone();
 	   // Scale by the cross section factor
            // before adding.
-           h2->Scale(xSecVector[q]);
+           if (scale) h2->Scale(xSecVector[q]);
 	   sourceIndex << q;
 	   //	   h2->SetName(variableName+"_"+sourceIndex.str());
 	   h2->SetName(variableName+"_"+sourceSuffixVector[q]);
@@ -122,7 +123,8 @@ void findTH1( std::vector<TH1*>    & outputVector,
 	       sourcelist, 
 	       variableName, 
 	       sourceSuffixVector,
-	       xSecVector
+	       xSecVector,
+	       scale
 	       );
 
     } else {
