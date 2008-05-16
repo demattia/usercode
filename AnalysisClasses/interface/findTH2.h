@@ -37,11 +37,11 @@
 #include "TKey.h"
 #include "Riostream.h"
 
-void findTH1( std::vector<TH1*>    & outputVector,
-	      TList                * sourcelist, 
-	      TString                variableName, 
-	      std::vector<TString> & sourceSuffixVector,
-	      std::vector<double>  & xSecVector  
+void findTH2( std::vector<TH2*> & outputVector,
+	      TList             * sourcelist, 
+	      TString             variableName, 
+	      TString             sourceSuffixArray[],
+	      double              crossArray[]
 	      ) {
   
   TFile *first_source = (TFile*)sourcelist->First();
@@ -52,7 +52,7 @@ void findTH1( std::vector<TH1*>    & outputVector,
   first_source->cd( path );
   TDirectory *current_sourcedir = gDirectory;
   //gain time, do not add the objects in the list in memory
-  TH1::AddDirectory(kFALSE);
+  TH2::AddDirectory(kFALSE);
 
   // loop over all keys in this directory
   TIter nextkey( current_sourcedir->GetListOfKeys() );
@@ -66,8 +66,8 @@ void findTH1( std::vector<TH1*>    & outputVector,
     first_source->cd( path );
     TObject *obj = key->ReadObj();
 
-    if ( obj->IsA()->InheritsFrom( "TH1" ) ) {
-      // descendant of TH1 -> merge it
+    if ( obj->IsA()->InheritsFrom( "TH2" ) ) {
+      // descendant of TH2 -> merge it
 
       bool foundName = false;
       if ( variableName == obj->GetName() ) 
@@ -75,16 +75,16 @@ void findTH1( std::vector<TH1*>    & outputVector,
       
       if ( !foundName ) continue;
       cout << "finding histogram " << variableName << endl;
-      TH1 *h1 = (TH1*)obj->Clone();
+      TH2 *h1 = (TH2*)obj->Clone();
 
       std::ostringstream sourceIndex;
       TString h1Name = h1->GetName();
 
       // Scale by the cross-section factor
-      h1->Scale(xSecVector[0]);
+      h1->Scale(crossArray[0]);
       sourceIndex << 0;
       //      h1->SetName(h1Name+"_"+sourceIndex.str());
-      h1->SetName(h1Name+"_"+sourceSuffixVector[0]);
+      h1->SetName(h1Name+"_"+sourceSuffixArray[0]);
       outputVector.push_back(h1);
       sourceIndex.str("");
 
@@ -100,13 +100,13 @@ void findTH1( std::vector<TH1*>    & outputVector,
         nextsource->cd( path );
         TKey *key2 = (TKey*)gDirectory->GetListOfKeys()->FindObject(variableName);
         if (key2) {
-           TH1 *h2 = (TH1*)(key2->ReadObj())->Clone();
+           TH2 *h2 = (TH2*)(key2->ReadObj())->Clone();
 	   // Scale by the cross section factor
            // before adding.
-           h2->Scale(xSecVector[q]);
+           h2->Scale(crossArray[q]);
 	   sourceIndex << q;
 	   //	   h2->SetName(variableName+"_"+sourceIndex.str());
-	   h2->SetName(variableName+"_"+sourceSuffixVector[q]);
+	   h2->SetName(variableName+"_"+sourceSuffixArray[q]);
 	   outputVector.push_back(h2);
 	   sourceIndex.str("");
            q++;
@@ -118,11 +118,11 @@ void findTH1( std::vector<TH1*>    & outputVector,
       // it's a subdirectory
       cout << "Found subdirectory " << obj->GetName() << endl;
 
-      findTH1( outputVector, 
+      findTH2( outputVector, 
 	       sourcelist, 
 	       variableName, 
-	       sourceSuffixVector,
-	       xSecVector
+	       sourceSuffixArray,
+	       crossArray
 	       );
 
     } else {

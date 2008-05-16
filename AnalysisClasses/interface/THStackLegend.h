@@ -19,23 +19,34 @@
 
 class THStackLegend {
  public:
-  THStackLegend( TString TITLE ) {
+  THStackLegend( TString TITLE, 
+		 double RIGHT  = 0.55, 
+		 double BOTTOM = 0.82, 
+		 double LEFT   = 0.76, 
+		 double TOP    = 0.65
+		 ) {
     canvas_ = new TCanvas( TITLE + "_canvas", TITLE, 1000, 800 );
-    stack_ = new THStack( TITLE + "_stack", TITLE );
-    legend_= new TLegend( 0.55, 0.65, 0.76, 0.82 );
+    stack_  = new THStack( TITLE + "_stack",  TITLE );
+    legend_ = new TLegend( RIGHT,BOTTOM,LEFT,TOP );
     counter_ = 1;
-    drawn = false;
+    drawn    = false;
   }
   ~THStackLegend() {
     delete stack_;
     delete canvas_;
   }
-//  void Add(TH1F * HISTO, char* LEGEND = "", char* FILL = "l");
-  TH1* Add(const TH1 * HISTO, const char* LEGEND = "", const bool & NORMALIZE = false, const char* FILL = "l", const bool & ERRORS = false );
+
+  TH1* Add(const TH1  * HISTO, 
+	   const char * LEGEND    = "", 
+	   const bool & NORMALIZE = false, 
+	   const char * FILL      = "l", 
+	   const bool & ERRORS    = false,
+	         int    COLOR     = 0,
+	         int    MARKER    = 0
+	   );
   TProfile* Add(const TProfile * HISTO, const char* LEGEND = "", const bool & NORMALIZE = false, const char* FILL = "l" );
 
   TAxis * GetXaxis() const {
-//    return ( stack_->GetHistogram()->GetXaxis() );
     return ( stack_->GetXaxis() );
   }
 
@@ -44,13 +55,13 @@ class THStackLegend {
   }
 
   void Draw(TString OPTION = "");
-  void Write(TString OPTION = "") const;
+  void Write(TString OPTION = "");
+
  private:
-//  TH1* Add(const TH1 * HISTO, const char* LEGEND = "", const bool & NORMALIZE = false, const char* FILL = "l");
   THStack * stack_;
   TCanvas * canvas_;
   TLegend * legend_;
-  int counter_;
+  int  counter_;
   bool drawn;
 };
 
