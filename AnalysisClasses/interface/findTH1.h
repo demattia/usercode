@@ -109,13 +109,11 @@ void findTH1( std::vector<TH1*>    & outputVector,
            // before adding.
            if (scale) h2->Scale(xSecVector[q]);
 	   sourceIndex << q;
-	   //	   h2->SetName(variableName+"_"+sourceIndex.str());
 	   h2->SetName(variableName+"_"+sourceSuffixVector[q]);
 	   outputVector.push_back(h2);
 	   sourceIndex.str("");
            q++;
         }
-
         nextsource = (TFile*)sourcelist->After( nextsource );
       }
     }
