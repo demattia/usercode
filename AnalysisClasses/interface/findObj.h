@@ -37,10 +37,12 @@
 #include "TKey.h"
 #include "Riostream.h"
 
-void findTH1( std::vector<TH1*>    & outputVector,
+template<class T1>
+void findObj( std::vector<T1*>     & outputVector,
 	      TList                * sourcelist, 
 	      TString                variableName, 
 	      std::vector<TString> & sourceSuffixVector,
+	      TString                objType = "TH1",
 	      std::vector<double>  * xSecVector = 0  
 	      ) {
   
@@ -52,8 +54,8 @@ void findTH1( std::vector<TH1*>    & outputVector,
   first_source->cd( path );
   TDirectory *current_sourcedir = gDirectory;
   //gain time, do not add the objects in the list in memory
-  Bool_t status = TH1::AddDirectoryStatus();
-  TH1::AddDirectory(kFALSE);
+  Bool_t status = T1::AddDirectoryStatus();
+  T1::AddDirectory(kFALSE);
 
   // loop over all keys in this directory
   // loop over all keys in this directory
@@ -78,7 +80,7 @@ void findTH1( std::vector<TH1*>    & outputVector,
       
       if ( !foundName ) continue;
       cout << "finding histogram " << variableName << endl;
-      TH1 *h1 = (TH1*)obj->Clone();
+      T1 *h1 = (T1*)obj->Clone();
 
       std::ostringstream sourceIndex;
       TString h1Name = h1->GetName();
@@ -103,7 +105,7 @@ void findTH1( std::vector<TH1*>    & outputVector,
         nextsource->cd( path );
         TKey *key2 = (TKey*)gDirectory->GetListOfKeys()->FindObject(variableName);
         if (key2) {
-           TH1 *h2 = (TH1*)(key2->ReadObj())->Clone();
+           T1 *h2 = (T1*)(key2->ReadObj())->Clone();
 	   // Scale by the cross section factor
            // before adding.
            if (xSecVector) h2->Scale((*xSecVector)[q]);
@@ -136,7 +138,7 @@ void findTH1( std::vector<TH1*>    & outputVector,
       cout << "Found subdirectory " << obj->GetName() << endl;
       
       // newdir is now the starting point of another round of finding
-      findTH1( outputVector, 
+      findObj( outputVector, 
 	       sourcelist, 
 	       variableName, 
 	       sourceSuffixVector,
