@@ -11,9 +11,9 @@ MultiTH1F::MultiTH1F ( const char* NAME, const char* TITLE,
   // White background for the canvases
   gROOT->SetStyle("Plain");
 
-  binpar_ = BINPAR;
-  firstpar_ = FIRSTPAR;
-  lastpar_ = LASTPAR;
+  binpar_    = BINPAR;
+  firstpar_  = FIRSTPAR;
+  lastpar_   = LASTPAR;
   increment_ = ( lastpar_ - firstpar_ )/double(binpar_);
   TString Name( NAME );
   TString Title( TITLE );
@@ -39,7 +39,9 @@ MultiTH1F::MultiTH1F ( const char* NAME, const char* TITLE,
   for ( int num = 0; num < BINPAR; ++num ) {
     Multi = FIRSTPAR + increment_*double(num);
     snum_ << Multi;
-    vec_MultiHisto_.push_back( new TH1F( Name + "_" + snum_.str(), Title + "_" + snum_.str(), BINVAL, FIRSTVAL, LASTVAL ) );
+    vec_MultiHisto_.push_back( new TH1F( Name + "_" + snum_.str(), 
+					 Title + "_" + snum_.str(), 
+					 BINVAL, FIRSTVAL, LASTVAL ) );
     // Empty the ostringstream
     snum_.str("");
   }
@@ -60,7 +62,7 @@ void MultiTH1F::Write() {
 
   // Put all the duplicate histograms in the subdir
 
-  int sparse = binpar_/5;
+  int sparse = binpar_/2;
   // Center labels for the mean histogram and put one on each bin
   HistoMean_->GetXaxis()->CenterLabels();
   HistoMean_->GetXaxis()->SetNdivisions(HistoMean_->GetSize()-2, false);
@@ -80,12 +82,12 @@ void MultiTH1F::Write() {
     StackLegend_->Add( MultiHisto_ptr, snum_.str().c_str(), true );
 
     // When the bin number is a multiple of one-tenth of the total number of bins
-    // Do this only of there at least 5 histograms
     if ( sparse != 0 ) {
-      if ( float(num+1)/float(sparse) == (num+1)/sparse ) {
-        SparseStackLegend_->Add( MultiHisto_ptr, snum_.str().c_str(), true );
-      }
+    if ( float(num+1)/float(sparse) == (num+1)/sparse ) {
+      SparseStackLegend_->Add( MultiHisto_ptr, snum_.str().c_str(), true );
     }
+}
+
     // Empty the ostringstream
     snum_.str("");
   }
