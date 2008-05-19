@@ -46,14 +46,16 @@ TH1* mergeTH1( TString               outputTH1name,
 
   std::vector<TH1*>::const_iterator inputVector_itr  = inputVector.begin();
   std::vector<double>::const_iterator xSecVector_itr  = xSecVector.begin();
-  TH1 * outputTH1 = (TH1*)(dynamic_cast<TH1*>(*inputVector_itr))->Clone();
+  TH1 * outputTH1 = (TH1*)(*inputVector_itr)->Clone();
+  //  TH1 * outputTH1 = (TH1*)(dynamic_cast<TH1*>(*inputVector_itr))->Clone();
   outputTH1->SetName(outputTH1name);
   if (scale) outputTH1->Scale(*xSecVector_itr);
   ++inputVector_itr;
   ++xSecVector_itr;
   for ( ; inputVector_itr != inputVector.end(); ++inputVector_itr,
 	                                          ++xSecVector_itr) { 
-    TH1 * histo = (TH1*)(dynamic_cast<TH1*>(*inputVector_itr))->Clone();
+    //    TH1 * histo = (TH1*)(dynamic_cast<TH1*>(*inputVector_itr))->Clone();
+    TH1 * histo = (TH1*)(*inputVector_itr)->Clone();
     if (scale) histo->Scale(*xSecVector_itr);
     outputTH1->Add(histo);
     delete histo;
