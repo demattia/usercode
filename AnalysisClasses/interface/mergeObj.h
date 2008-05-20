@@ -37,27 +37,25 @@
 #include "Riostream.h"
 
 template <class T1>
-T1* mergeObj( TString               outputTH1name,
-	       std::vector<T1*>   & inputVector,
-	       std::vector<double> & xSecVector,  
-	       bool                  scale = true
-	       ) {
-
-
-
-  std::vector<T1*>::const_iterator inputVector_itr  = inputVector.begin();
-  std::vector<double>::const_iterator xSecVector_itr  = xSecVector.begin();
-  T1 * outputTH1 = (T1*)(*inputVector_itr)->Clone();
-  outputTH1->SetName(outputTH1name);
-  if (scale) outputTH1->Scale(*xSecVector_itr);
+T1* mergeObj( TString               outputObjname,
+	      std::vector<T1*>    & inputVector,
+	      std::vector<double> & xSecVector,  
+	      bool                  scale = true
+	      ) {
+  
+  std::vector<T1*>::const_iterator inputVector_itr = inputVector.begin();
+  std::vector<double>::const_iterator xSecVector_itr = xSecVector.begin();
+  T1 * outputObj = (T1*)(*inputVector_itr)->Clone();
+  outputObj->SetName(outputObjname);
+  if (scale) outputObj->Scale(*xSecVector_itr);
   ++inputVector_itr;
   ++xSecVector_itr;
   for ( ; inputVector_itr != inputVector.end(); ++inputVector_itr,
 	                                          ++xSecVector_itr) { 
     T1 * histo = (T1*)(*inputVector_itr)->Clone();
     if (scale) histo->Scale(*xSecVector_itr);
-    outputTH1->Add(histo);
+    outputObj->Add(histo);
     delete histo;
   }
-  return outputTH1;
+  return outputObj;
 }
