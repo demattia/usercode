@@ -49,7 +49,7 @@ T1* mergeObj( TString               outputObjname,
   std::vector<double>::const_iterator xSecVector_itr = (*xSecVector).begin()+1;
   for ( ; inputVector_itr != inputVector.end(); ++inputVector_itr,
 	                                        ++xSecVector_itr) { 
-    T1 * histo = (T1*)(inputVector_itr)->Clone();
+    T1 * histo = (T1*)(*inputVector_itr)->Clone();
     if (xSecVector) histo->Scale(*xSecVector_itr);
     outputObj->Add(histo);
     delete histo;
