@@ -41,7 +41,7 @@ template<class T1>
 void findObj( std::vector<T1*>     & outputVector,
 	      TList                * sourcelist, 
 	      TString                variableName, 
-	      std::vector<TString> & sourceSuffixVector,
+	      std::vector<TString> * sourceSuffixVector = 0,
 	      TString                objType = "TH1",
 	      std::vector<double>  * xSecVector = 0  
 	      ) {
@@ -88,8 +88,8 @@ void findObj( std::vector<T1*>     & outputVector,
       // Scale by the cross-section factor
       if (xSecVector) h1->Scale((*xSecVector)[0]);
       sourceIndex << 0;
-      //      h1->SetName(h1Name+"_"+sourceIndex.str());
-      h1->SetName(h1Name+"_"+sourceSuffixVector[0]);
+      if (sourceSuffixVector) h1->SetName(variableName+"_"+(*sourceSuffixVector)[0]);
+      else  h1->SetName(variableName+"_"+sourceIndex.str());
       outputVector.push_back(h1);
       sourceIndex.str("");
 
@@ -110,7 +110,8 @@ void findObj( std::vector<T1*>     & outputVector,
            // before adding.
            if (xSecVector) h2->Scale((*xSecVector)[q]);
 	   sourceIndex << q;
-	   h2->SetName(variableName+"_"+sourceSuffixVector[q]);
+	   if (sourceSuffixVector) h2->SetName(variableName+"_"+(*sourceSuffixVector)[q]);
+	   else h2->SetName(variableName+"_"+sourceIndex.str());
 	   outputVector.push_back(h2);
 	   sourceIndex.str("");
            q++;
