@@ -45,14 +45,11 @@ T1* mergeObj( TString               outputObjname,
   T1 * outputObj = (T1*)(inputVector[0])->Clone();
   outputObj->SetName(outputObjname);
   if (xSecVector) outputObj->Scale((*xSecVector)[0]);
-  //  std::vector<T1*>::const_iterator inputVector_itr = inputVector.begin()+1;
+  typename std::vector<T1*>::const_iterator inputVector_itr = inputVector.begin()+1;
   std::vector<double>::const_iterator xSecVector_itr = (*xSecVector).begin()+1;
-  //  for ( ; inputVector_itr != inputVector.end(); ++inputVector_itr,
-  //	                                        ++xSecVector_itr) { 
-  int index = 1;
-  for ( ; xSecVector_itr != (*xSecVector).end(); ++xSecVector_itr,
-	                                         ++index) { 
-    T1 * histo = (T1*)(inputVector[index])->Clone();
+  for ( ; inputVector_itr != inputVector.end(); ++inputVector_itr,
+	                                        ++xSecVector_itr) { 
+    T1 * histo = (T1*)(inputVector_itr)->Clone();
     if (xSecVector) histo->Scale(*xSecVector_itr);
     outputObj->Add(histo);
     delete histo;
