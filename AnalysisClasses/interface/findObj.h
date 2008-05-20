@@ -71,7 +71,7 @@ void findObj( std::vector<T1*>     & outputVector,
     first_source->cd( path );
     TObject *obj = key->ReadObj();
 
-    if ( obj->IsA()->InheritsFrom( "TH1" ) ) {
+    if ( obj->IsA()->InheritsFrom( objType ) ) {
       // descendant of TH1 -> merge it
 
       bool foundName = false;
@@ -142,6 +142,7 @@ void findObj( std::vector<T1*>     & outputVector,
 	       sourcelist, 
 	       variableName, 
 	       sourceSuffixVector,
+	       objType,
 	       xSecVector
 	       );
       
