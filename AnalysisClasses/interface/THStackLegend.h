@@ -20,14 +20,18 @@
 class THStackLegend {
  public:
   THStackLegend( TString TITLE, 
-		 double RIGHT  = 0.55, 
-		 double BOTTOM = 0.82, 
-		 double LEFT   = 0.76, 
-		 double TOP    = 0.65
+		 double RIGHT  = 0.8, 
+		 double BOTTOM = 0.68, 
+		 double LEFT   = 0.98, 
+		 double TOP    = 0.97
 		 ) {
     canvas_ = new TCanvas( TITLE + "_canvas", TITLE, 1000, 800 );
     stack_  = new THStack( TITLE + "_stack",  TITLE );
     legend_ = new TLegend( RIGHT,BOTTOM,LEFT,TOP );
+    legend_->SetFillColor(0);
+    legend_->SetBorderSize(0);  
+    legend_->SetTextFont(72);
+    legend_->SetTextSize(0.035);
     counter_ = 1;
     drawn    = false;
   }
