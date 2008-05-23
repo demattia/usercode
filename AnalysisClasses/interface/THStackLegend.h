@@ -10,6 +10,7 @@
 
 #include "THStack.h"
 #include "TH1.h"
+#include "AnalysisExamples//AnalysisClasses/interface/ListFashionAttributedHisto.h"
 //#include "TH1F.h"
 #include "TProfile.h"
 #include "TLegend.h"
@@ -18,6 +19,7 @@
 #include <iostream>
 
 class THStackLegend {
+
  public:
   THStackLegend( TString TITLE, 
 		 double RIGHT  = 0.8, 
@@ -40,16 +42,71 @@ class THStackLegend {
     delete canvas_;
   }
 
-  TH1* Add(const TH1  * HISTO, 
-	   const char * LEGEND    = "", 
-	   const bool & NORMALIZE = false, 
-	   const char * FILL      = "l", 
-	   const bool & ERRORS    = false,
-	   const int    COLOR     = 0,
-	   const int    MARKER    = 0
-	   );
-  TProfile* Add(const TProfile * HISTO, const char* LEGEND = "", const bool & NORMALIZE = false, const char* FILL = "l" );
+  template <class T> 
+    T* THStackLegend::Add(const T    * HISTO, 
+			  const char * LEGEND    = "", 
+			  const bool & NORMALIZE = false, 
+			  const char * FILL      = "l", 
+			  const bool & ERRORS    = false,
+			  const bool & DRESSED   = false,
+			  const int    COLOR     = 0,
+			  const int    MARKER    = 0
+			  ) {
+    T * HISTO_ = (T*)HISTO->Clone();
+    // Do not save this histogram in the current directory
+    HISTO_->SetDirectory(0);
+  
+    if ( ERRORS ) {
+      HISTO_->Sumw2();
+      HISTO_->SetMarkerSize(0.7);
+    }
+  
+    if (NORMALIZE) {
+      Double_t integral = HISTO_->Integral();
+      if ( integral != 0. ) {
+	HISTO_->Scale(1./integral);
+      }
+      else {
+	std::cout << "integral = " << integral << std::endl;
+      }
+    }
+    stack_->Add(HISTO_);
+    if ( FILL == "l" || FILL == "p" ) {
+      if ( !DRESSED ) {
+	std::cout << "DRESSED: " << DRESSED << std::endl;
+	std::cout << "COLOR: " << COLOR << std::endl;
+	if ( COLOR ) HISTO_->SetLineColor(COLOR);
+	else HISTO_->SetLineColor(counter_);
+	if ( MARKER ) {
+	  HISTO_->SetMarkerStyle(MARKER);
+	  if ( COLOR ) HISTO_->SetMarkerColor(COLOR);
+	  else HISTO_->SetMarkerColor(counter_);
+	} else {
+	  HISTO_->SetMarkerStyle(counter_+20);
+	  if (COLOR) HISTO_->SetMarkerColor(COLOR);
+	  else HISTO_->SetMarkerColor(counter_);
+	}
+      }
+      HISTO_->SetLineWidth(2);
+    }
+    else if ( FILL == "f" ) {
+      if ( !DRESSED ) {
+	if ( COLOR ) HISTO_->SetFillColor(COLOR);
+	else HISTO_->SetFillColor(counter_+1);
+      }
+    }
+    if ( LEGEND == "" ) {
+      legend_->AddEntry(HISTO_, HISTO_->GetName(), FILL);
+    }
+    else {
+      legend_->AddEntry(HISTO_, LEGEND, FILL);
+    }
+    ++counter_;
+  
+    return HISTO_;
+  }
 
+  
   TAxis * GetXaxis() const {
     return ( stack_->GetXaxis() );
   }
