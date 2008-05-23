@@ -11,10 +11,10 @@ namespace anaobj {
     
     public:
     FashionAttributedHisto( const T*     HISTO, 
-			    const int    COLOR,
-			    const int    FILLSTYLE,
-			    const int    MARKERSTYLE,
-			    const double MARKERSIZE
+			    const int    COLOR       = 1,
+			    const int    FILLSTYLE   = 1,
+			    const int    MARKERSTYLE = 1,
+			    const double MARKERSIZE  = 1.
 			    ) : 
       T( *HISTO ) { 
       
