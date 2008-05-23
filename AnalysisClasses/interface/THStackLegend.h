@@ -124,9 +124,9 @@ T* THStackLegend<T>::Add(const T    * HISTO,
 	else HISTO_->SetMarkerColor(counter_);
       }
     }
+    HISTO_->SetFillColor(0);
     HISTO_->SetLineWidth(2);
-  }
-  else if ( FILL == "f" ) {
+  } else if ( FILL == "f" ) {
     if ( !DRESSED ) {
       if ( COLOR ) HISTO_->SetFillColor(COLOR);
       else HISTO_->SetFillColor(counter_+1);
