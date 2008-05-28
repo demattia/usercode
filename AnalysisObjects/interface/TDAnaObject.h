@@ -75,6 +75,7 @@ namespace anaobj {
       dp3rd_ = 0.;
       ptot_ = 0.;
       ptotE2_ = 0.;
+      l1Trigger_ = false;
     }
 
     TDAnaObject( const double & C8, const double & M8, const double & C6, const double & M6,
@@ -191,10 +192,8 @@ namespace anaobj {
         sumhpd6_(0.),
         dp3rd_(0.),
         ptot_(0.),
-        ptotE2_(0.)
-
-
-
+        ptotE2_(0.),
+        l1Trigger_(false)
     {
     }
     // Getter methods
@@ -254,6 +253,7 @@ namespace anaobj {
     double dp3rd() const { return dp3rd_; }
     double ptot() const { return ptot_; }
     double ptotE2() const { return ptotE2_; }
+    bool l1Trigger() const { return l1Trigger_; }
 
     // Setter methods
     void setC8(const double & C8) { c8_ = C8; }
@@ -312,6 +312,7 @@ namespace anaobj {
     void setDp3rd(const double & DP3RD) { dp3rd_ = DP3RD; }
     void setPtot(const double & PTOT) { ptot_ = PTOT; }
     void setPtotE2(const double & PTOTE2) { ptotE2_ = PTOTE2; }
+    void setL1Trigger(const bool L1TRIGGER) { l1Trigger_ = L1TRIGGER; }
   protected:
     // 25 variables
     double c8_;
@@ -374,6 +375,7 @@ namespace anaobj {
     double dp3rd_;
     double ptot_;
     double ptotE2_;
+    bool l1Trigger_;
   };
 
 }
