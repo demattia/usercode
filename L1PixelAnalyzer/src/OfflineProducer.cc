@@ -63,7 +63,8 @@ L1Trig OfflineProducer::L1Trigger;
 OfflineProducer::OfflineProducer(const edm::ParameterSet& iConfig) :
   conf_( iConfig ),
   CaloJetAlgorithm( iConfig.getUntrackedParameter<string>( "CaloJetAlgorithm" ) ),
-  JetCorrectionService( iConfig.getUntrackedParameter<string>( "JetCorrectionService" ) ),
+  L2JetCorrectionService( iConfig.getUntrackedParameter<string>( "L2JetCorrectionService" ) ),
+  L3JetCorrectionService( iConfig.getUntrackedParameter<string>( "L3JetCorrectionService" ) ),
   METCollection( iConfig.getUntrackedParameter<string>( "METCollection" ) ),
   genParticleCandidates( iConfig.getUntrackedParameter<string>( "genParticleCandidates" ) ),
   trackCountingHighEffJetTags( iConfig.getUntrackedParameter<string>( "trackCountingHighEffJetTags" ) ),
@@ -300,18 +301,32 @@ OfflineProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
   int iptkinfonum = iPtagInfos->size();
 
   // Correct offline jets on the fly
-  const JetCorrector* corrector = JetCorrector::getJetCorrector (JetCorrectionService, iSetup);
+  // const JetCorrector* corrector = JetCorrector::getJetCorrector (JetCorrectionService, iSetup);
 
-//   int taginfocounter = 0;
+  // Use L2+L3 jet corrections (now default in CMSSW)
+  // see https://twiki.cern.ch/twiki/bin/view/CMS/WorkBookJetAnalysis#JetCorrections
+  // ---------------------------------------------------------------------------------
+  // Corrections on the fly taken from RecoJets/JetAnalyzers/src/L2L3CorJetsExample.cc
+  // from the tag jet_corrections_184.
+  // ---------------------------------------------------------------------------------
+  const JetCorrector* corrector_L2 = JetCorrector::getJetCorrector (L2JetCorrectionService,iSetup);
+  const JetCorrector* corrector_L3 = JetCorrector::getJetCorrector (L3JetCorrectionService,iSetup);  
+
+  //   int taginfocounter = 0;
   CaloJetCollection::const_iterator caloJets_it = caloJets->begin();
   TrackIPTagInfoCollection::const_iterator TkIpTagInfo_it = iPtagInfos->begin();
   for( ; TkIpTagInfo_it != iPtagInfos->end(); ++TkIpTagInfo_it ) {
 
 
-//     ++taginfocounter;
-    double scale = corrector->correction( *caloJets_it );
-    double corPt = scale*caloJets_it->pt();
-    double corEt = scale*caloJets_it->et();
+    //     ++taginfocounter;
+    //    double scale = corrector->correction( *caloJets_it );
+    //    double corPt = scale*caloJets_it->pt();
+    //    double corEt = scale*caloJets_it->et();
+
+    double scale_L2 = corrector_L2->correction(caloJets_it->p4());
+    double scale_L3 = corrector_L3->correction(scale_L2*caloJets_it->p4());
+    double corPt = scale_L3*scale_L2*caloJets_it->pt();
+    double corEt = scale_L3*scale_L2*caloJets_it->et();
 
 //    int tkNum = TkIpTagInfo_it->selectedTracks().size();
     int tkNum_S1 = 0;

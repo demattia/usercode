@@ -9,7 +9,8 @@ module offlineProd = OfflineProducer {
   untracked InputTag l1eEtMissSource            = fastL1CaloSim:
 
   untracked string CaloJetAlgorithm             = "iterativeCone5CaloJets"
-  untracked string JetCorrectionService         = "MCJetCorrectorIcone5"
+  untracked string L2JetCorrectionService       = "L2RelativeJetCorrectorIcone5"
+  untracked string L3JetCorrectionService       = "L3AbsoluteJetCorrectorIcone5"
 
   untracked string genParticleCandidates        = "genParticleCandidates"
 
