@@ -1,6 +1,7 @@
 #ifndef LISTFASHIONATTRIBUTEDHISTO_H
 #define LISTFASHIONATTRIBUTEDHISTO_H
 
+#include <iostream>
 #include "AnalysisExamples/AnalysisClasses/interface/FashionAttributedHisto.h"
 
 namespace anaobj {

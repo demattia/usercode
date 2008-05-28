@@ -31,15 +31,15 @@ class THStackLegend {
 
   ~THStackLegend();
 
-  T* THStackLegend::Add(const T    * HISTO, 
-			const char * LEGEND    = "", 
-			const bool & NORMALIZE = false, 
-			const char * FILL      = "l", 
-			const bool & ERRORS    = false,
-			const bool & DRESSED   = false,
-			const int    COLOR     = 0,
-			const int    MARKER    = 0
-			);
+  T* Add(const T    * HISTO, 
+	 const char * LEGEND    = "", 
+	 const bool & NORMALIZE = false, 
+	 const char * FILL      = "l", 
+	 const bool & ERRORS    = false,
+	 const bool & DRESSED   = false,
+	 const int    COLOR     = 0,
+	 const int    MARKER    = 0
+	 );
   
   TAxis * GetXaxis() const;
   TAxis * GetYaxis() const;
