@@ -17,6 +17,9 @@
 #include "AnalysisExamples/AnalysisObjects/interface/SimpleTau.h"
 #include "AnalysisExamples/AnalysisObjects/interface/Summary.h"
 
+// For Tracks
+#include "AnalysisExamples/AnalysisObjects/interface/SimpleTrack.h"
+
 // For the offline jets and corrections
 #include "DataFormats/JetReco/interface/CaloJetCollection.h"
 #include "DataFormats/JetReco/interface/CaloJet.h"
@@ -81,6 +84,7 @@ OfflineProducer::OfflineProducer(const edm::ParameterSet& iConfig) :
   l1MEt_( iConfig.getParameter<string>( "L1MEt" ) ),
   offlineJets_( iConfig.getParameter<string>( "OfflineJets" ) ),
   offlineMEt_( iConfig.getParameter<string>( "OfflineMEt" ) ),
+  simpleTracks_( iConfig.getParameter<string>( "SimpleTracks" ) ),
   MCParticles_( iConfig.getParameter<string>( "MCParticles" ) ),
   globalMuons_( iConfig.getParameter<string>( "GlobalMuons" ) ),
   simpleElectrons_( iConfig.getParameter<string>( "SimpleElectrons" ) ),
@@ -108,6 +112,8 @@ OfflineProducer::OfflineProducer(const edm::ParameterSet& iConfig) :
   // Offline
   produces<anaobj::OfflineJetCollection>( offlineJets_ );
   produces<anaobj::OfflineMEt>( offlineMEt_ );
+  // SimpleTracks
+  produces<anaobj::SimpleTrackCollection>( simpleTracks_ );
   // MC
   produces<anaobj::MCParticleCollection>( MCParticles_ );
   // Global muons
@@ -278,6 +284,14 @@ OfflineProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
   // ----------------
 
   auto_ptr<OfflineJetCollection> vec_IC5Jets_ptr( new OfflineJetCollection );
+  auto_ptr<SimpleTrackCollection> vec_AssocTracks_ptr( new SimpleTrackCollection );
+
+  // Step 0: Declare Ref and RefProd
+  OfflineJetRefProd offlineJetRefProd = iEvent.getRefBeforePut<OfflineJetCollection>(offlineJets_);
+  SimpleTrackRefProd simpleTrackRefProd = iEvent.getRefBeforePut<SimpleTrackCollection>(simpleTracks_);
+  // Declare key_type (counter for the Ref)
+  OfflineJetRef::key_type offlineJetId = 0;
+  SimpleTrackRef::key_type simpleTrackId = 0;
 
   int caloJetsSize = caloJets->size();
 
@@ -313,6 +327,12 @@ OfflineProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
   const JetCorrector* corrector_L3 = JetCorrector::getJetCorrector (L3JetCorrectionService,iSetup);  
 
   //   int taginfocounter = 0;
+
+  // ATTENTION: if the same track is shared between more jets, it will appear more times in the SimpleTrackCollection
+  // This can be avoided creating a map to check if the track was already inserted.
+  // Map with key = (eta, phi) and value = index in the collection
+  map<pair<double, double>, int > noDoublesMap;
+
   CaloJetCollection::const_iterator caloJets_it = caloJets->begin();
   TrackIPTagInfoCollection::const_iterator TkIpTagInfo_it = iPtagInfos->begin();
   for( ; TkIpTagInfo_it != iPtagInfos->end(); ++TkIpTagInfo_it ) {
@@ -328,56 +348,35 @@ OfflineProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
     double corPt = scale_L3*scale_L2*caloJets_it->pt();
     double corEt = scale_L3*scale_L2*caloJets_it->et();
 
+    // Collection of tracks associated to the current caloJet
+    SimpleTrackCollection vec_SimpleTracks;
+
 //    int tkNum = TkIpTagInfo_it->selectedTracks().size();
-    int tkNum_S1 = 0;
-    int tkNum_S2 = 0;
-    int tkNum_S3 = 0;
+//    int tkNum_S1 = 0;
+//    int tkNum_S2 = 0;
+//    int tkNum_S3 = 0;
 
 //     int probNum_0 = TkIpTagInfo_it->probabilities(0).size();
 //     int probNum_1 = TkIpTagInfo_it->probabilities(1).size();
 
-    double tkSumPt_S1 = 0.;
-    double tkSumPt_S2 = 0.;
-    double tkSumPt_S3 = 0.;
+//    double tkSumPt_S1 = 0.;
+//    double tkSumPt_S2 = 0.;
+//    double tkSumPt_S3 = 0.;
     const TrackRefVector & vec_TkColl = TkIpTagInfo_it->selectedTracks();
     // Take the IP vector (ordered as the selectedTracks vector)
     const vector<TrackIPTagInfo::TrackIPData> & vec_TkIP = TkIpTagInfo_it->impactParameterData();
     // Additional vectors to store subgroups of selectedTracks
-    TrackRefVector vec_TkColl_S1;
-    TrackRefVector vec_TkColl_S2;
-    TrackRefVector vec_TkColl_S3;
+//    TrackRefVector vec_TkColl_S1;
+//    TrackRefVector vec_TkColl_S2;
+//    TrackRefVector vec_TkColl_S3;
 
-    vector<TrackIPTagInfo::TrackIPData>::const_iterator TkIP_it = vec_TkIP.begin();
-    RefVector<TrackCollection>::const_iterator TkColl_it = vec_TkColl.begin();
-    for ( ; TkColl_it != vec_TkColl.end(); ++TkColl_it, ++TkIP_it ) {
-      // Take tracks with minimum IP significance
-      if ( TkIP_it->ip3d.significance() > 1. ) {
-        vec_TkColl_S1.push_back(*TkColl_it);
-        tkSumPt_S1 += (*TkColl_it)->pt();
-        ++tkNum_S1;
-      }
-      if ( TkIP_it->ip3d.significance() > 2. ) {
-        vec_TkColl_S2.push_back(*TkColl_it);
-        tkSumPt_S2 += (*TkColl_it)->pt();
-        ++tkNum_S2;
-      }
-      if ( TkIP_it->ip3d.significance() > 3. ) {
-        vec_TkColl_S3.push_back(*TkColl_it);
-        tkSumPt_S3 += (*TkColl_it)->pt();
-        ++tkNum_S3;
-      }
-//       ++tkcount;
-    }
 
     // Jet mass
     double jetMass = 0;
     if ( corEt > corPt ) jetMass = sqrt( corEt*corEt - corPt*corPt );
 
     // Evaluate tag tracks invariant mass
-//    double bTagTkInvMass = tagTracksInvariantMass( vec_TkColl );
-    double bTagTkInvMass_S1 = tagTracksInvariantMass( vec_TkColl_S1 );
-    double bTagTkInvMass_S2 = tagTracksInvariantMass( vec_TkColl_S2 );
-    double bTagTkInvMass_S3 = tagTracksInvariantMass( vec_TkColl_S3 );
+    double bTagTkInvMass = tagTracksInvariantMass( vec_TkColl );
 
     // Fill the offline jets collection
     // --------------------------------
@@ -402,23 +401,64 @@ OfflineProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
     double EmFracFromComp = 0.;
     if ( TotalEnergy != 0. ) EmFracFromComp = EmEnergy/(TotalEnergy);
 
+    // Create the new offlineJet here as will be filled with the references to the associated tracks in the next loop
+    OfflineJet offlineJet( corEt, 
+                           caloJets_it->eta(), 
+                           caloJets_it->phi(), 
+                           caloJets_it->et(),
+                           EmFracFromComp,
+                           //  caloJets_it->emEnergyFraction(),
+                           caloJets_it->p4(),
+                           caloJets_it->vertex(),
+                           bTagHighEff_it->second, 
+                           bTagHighPur_it->second,
+                           jetMass,
+                           bTagTkInvMass );
 
+    vector<TrackIPTagInfo::TrackIPData>::const_iterator TkIP_it = vec_TkIP.begin();
+    RefVector<TrackCollection>::const_iterator TkColl_it = vec_TkColl.begin();
+    for ( ; TkColl_it != vec_TkColl.end(); ++TkColl_it, ++TkIP_it ) {
+      // Fill the SimpleTrackCollection
+
+//      if(Et_Jet>jetEtCut && fabs(Tk_IpS2D) < 3.  && eta_Jet < 3 ){
+
+      // Create a new SimpleTrack and set the reference to the corresponding jet
+      double tkEta = (*TkColl_it)->eta();
+      double tkPhi = (*TkColl_it)->phi();
+
+      pair<map<pair<double, double>, int >::iterator, bool > element(noDoublesMap.insert( make_pair( make_pair(tkEta, tkPhi), simpleTrackId ) ));
+      // First is an iterator to the newly inserted member or the already found one
+      // The second entry in the map element is the index of the track in the new collection. It
+      // coinciedes with simpleTrackId if the element was newly inserted.
+
+      // Store the reference to the track in the offlineJet
+      offlineJet.addTkRef( SimpleTrackRef( simpleTrackRefProd, (element.first)->second ) );
+
+      // If a new insertion was made (no correspondence was found in the map, i.e. new track)
+      if( element.second ) {
+        SimpleTrack simpleTk( (*TkColl_it)->pt(),
+                              tkEta,
+                              tkPhi,
+                              (*TkColl_it)->dz(),
+                              (*TkColl_it)->dzError() );
+        simpleTk.addJetRef( OfflineJetRef( offlineJetRefProd, offlineJetId ) );
+
+        vec_AssocTracks_ptr->push_back( simpleTk );
+        // Increase the tkCounter only if the track was effectively inserted
+        ++simpleTrackId;
+      }
+      // if it was already associated, add the reference to this jet
+      else {
+        (*vec_AssocTracks_ptr)[(element.first)->second].addJetRef( OfflineJetRef( offlineJetRefProd, offlineJetId ) );
+      }
+
+//      }
+
+    }
 
     // Passing corrected Et, eta, phi, uncorrected Et, emEnergyFraction
-    vec_IC5Jets_ptr->push_back( OfflineJet( corEt, 
-					    caloJets_it->eta(), 
-					    caloJets_it->phi(), 
-					    caloJets_it->et(),
-                                            EmFracFromComp,
-					    //  caloJets_it->emEnergyFraction(),
-					    caloJets_it->p4(),
-					    caloJets_it->vertex(),
-                                            bTagHighEff_it->second, 
-					    bTagHighPur_it->second,
-                                            jetMass,
-                                            tkNum_S1, tkSumPt_S1, bTagTkInvMass_S1,
-                                            tkNum_S2, tkSumPt_S2, bTagTkInvMass_S2,
-                                            tkNum_S3, tkSumPt_S3, bTagTkInvMass_S3 ) );
+    vec_IC5Jets_ptr->push_back( offlineJet );
+    ++offlineJetId;
     ++caloJets_it;
     ++bTagHighEff_it;
     ++bTagHighPur_it;
@@ -434,6 +474,9 @@ OfflineProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 
   // Write ic5 jets
   iEvent.put( vec_IC5Jets_ptr, offlineJets_ );
+
+  // Write the collection of SimpleTracks associated to the jets
+  iEvent.put( vec_AssocTracks_ptr, simpleTracks_ );
 
 
   // HepMC

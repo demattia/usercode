@@ -23,7 +23,7 @@
 //
 // Original Author:  Marco De Mattia
 //         Created:  Tue May  8 13:05:37 CEST 2007
-// $Id: OfflineProducer.h,v 1.5 2008/04/21 09:42:03 tosi Exp $
+// $Id: OfflineProducer.h,v 1.6 2008/05/28 15:04:49 demattia Exp $
 //
 //
 
@@ -183,6 +183,7 @@ class OfflineProducer : public edm::EDProducer {
   // Offline
   std::string offlineJets_;
   std::string offlineMEt_;
+  std::string simpleTracks_;
   std::string MCParticles_;
   std::string globalMuons_;
   std::string simpleElectrons_;
