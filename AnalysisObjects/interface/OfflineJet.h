@@ -4,20 +4,25 @@
 #include "FWCore/Framework/interface/Frameworkfwd.h"
 #include "DataFormats/Candidate/interface/Particle.h"
 #include "AnalysisExamples/AnalysisObjects/interface/BaseJet.h"
+#include "DataFormats/Common/interface/RefVector.h"
 
 #include <cmath>
 #include <vector>
 
-/**
- *
- * Used for offline jets. Includes b-tagging informations.
- * Inherits from BaseJet.
- *
- * Author M. De Mattia - 8/11/2007
- *
- */
+#include "AnalysisExamples/AnalysisObjects/interface/SimpleTrack.h"
 
 namespace anaobj {
+
+  class SimpleTrack;
+  
+  /**
+   *
+   * Used for offline jets. Includes b-tagging informations.
+   * Inherits from BaseJet.
+   *
+   * Author M. De Mattia - 8/11/2007
+   *
+   */
 
   class OfflineJet : public BaseJet {
   public:
@@ -30,16 +35,8 @@ namespace anaobj {
 		const math::XYZPoint & VERTEX,
                 const float          & DISCRIMINATORHIGHEFF, 
 		const float          & DISCRIMINATORHIGHPUR, 
-		const double & JETMASS,
-                const int      TKNUMS1, 
-		const double & TKSUMPTS1, 
-		const double & TAGTKMASSS1,
-                const int      TKNUMS2, 
-		const double & TKSUMPTS2, 
-		const double & TAGTKMASSS2,
-                const int      TKNUMS3, 
-		const double & TKSUMPTS3, 
-		const double & TAGTKMASSS3 ) : BaseJet( ET, ETA, PHI ) {
+		const double         & JETMASS,
+                const double         & BTAGTKINVMASS ) : BaseJet( ET, ETA, PHI ) {
       uncorrEt_             = UNCORRET;
       emEnergyFraction_     = EMENERGYFRACTION;
       p4_                   = P4;
@@ -47,18 +44,7 @@ namespace anaobj {
       discriminatorHighEff_ = DISCRIMINATORHIGHEFF;
       discriminatorHighPur_ = DISCRIMINATORHIGHPUR;
       jetMass_              = JETMASS;
-
-      tkNumS1_     = TKNUMS1;
-      tkSumPtS1_   = TKSUMPTS1;
-      tagTkMassS1_ = TAGTKMASSS1;
-
-      tkNumS2_     = TKNUMS2;
-      tkSumPtS2_   = TKSUMPTS2;
-      tagTkMassS2_ = TAGTKMASSS2;
-
-      tkNumS3_     = TKNUMS3;
-      tkSumPtS3_   = TKSUMPTS3;
-      tagTkMassS3_ = TAGTKMASSS3;
+      bTagTkInvMass_        = BTAGTKINVMASS;
     }
     // Default constructor, only needed for classes.h
     OfflineJet() : BaseJet( 0., 0., 0. ) {
@@ -69,18 +55,7 @@ namespace anaobj {
       discriminatorHighEff_ = 0.;
       discriminatorHighPur_ = 0.;
       jetMass_              = 0.;
-
-      tkNumS1_     = 0;
-      tkSumPtS1_   = 0.;
-      tagTkMassS1_ = 0.;
-
-      tkNumS2_     = 0;
-      tkSumPtS2_   = 0.;
-      tagTkMassS2_ = 0.;
-
-      tkNumS3_     = 0;
-      tkSumPtS3_   = 0.;
-      tagTkMassS3_ = 0.;
+      bTagTkInvMass_        = 0.;
     }
     double         uncorrEt()             const { return uncorrEt_;             }
     double         emEnergyFraction()     const { return emEnergyFraction_;     }
@@ -89,18 +64,10 @@ namespace anaobj {
     float          discriminatorHighEff() const { return discriminatorHighEff_; }
     float          discriminatorHighPur() const { return discriminatorHighPur_; }
     double         jetMass()              const { return jetMass_;              }
-
-    int    tkNumS1()     const { return tkNumS1_;     }
-    double tkSumPtS1()   const { return tkSumPtS1_;   }
-    double tagTkMassS1() const { return tagTkMassS1_; }
-
-    int    tkNumS2()     const { return tkNumS2_;     }
-    double tkSumPtS2()   const { return tkSumPtS2_;   }
-    double tagTkMassS2() const { return tagTkMassS2_; }
-
-    int    tkNumS3()     const { return tkNumS3_;     }
-    double tkSumPtS3()   const { return tkSumPtS3_;   }
-    double tagTkMassS3() const { return tagTkMassS3_; }
+    double         bTagTkInvMass()        const { return bTagTkInvMass_;        }
+    const edm::RefVector<std::vector<SimpleTrack> > tkRefVec() const {
+      return vecTrackRef_;
+    }
 
     void setUncorrEt(             const double         & UNCORRET             ) { uncorrEt_             = UNCORRET;             }
     void setEmEnergyFraction(     const double         & EMENERGYFRACTION     ) { emEnergyFraction_     = EMENERGYFRACTION;     }
@@ -109,18 +76,10 @@ namespace anaobj {
     void setDiscriminatorHighEff( const float          & DISCRIMINATORHIGHEFF ) { discriminatorHighEff_ = DISCRIMINATORHIGHEFF; }
     void setDiscriminatorHighPur( const float          & DISCRIMINATORHIGHPUR ) { discriminatorHighPur_ = DISCRIMINATORHIGHPUR; }
     void setJetMass(              const double         & JETMASS              ) { jetMass_              = JETMASS;              }
-
-    void setTkNumS1(     const int      TKNUMS1     ) { tkNumS1_     = TKNUMS1;     }
-    void setTkSumPtS1(   const double & TKSUMPTS1   ) { tkSumPtS1_   = TKSUMPTS1;   }
-    void setTagTkMassS1( const double & TAGTKMASSS1 ) { tagTkMassS1_ = TAGTKMASSS1; }
-
-    void setTkNumS2(     const int      TKNUMS2     ) { tkNumS2_     = TKNUMS2;     }
-    void setTkSumPtS2(   const double & TKSUMPTS2   ) { tkSumPtS2_   = TKSUMPTS2;   }
-    void setTagTkMassS2( const double & TAGTKMASSS2 ) { tagTkMassS2_ = TAGTKMASSS2; }
-
-    void setTkNumS3(     const int      TKNUMS3     ) { tkNumS3_     = TKNUMS3;     }
-    void setTkSumPtS3(   const double & TKSUMPTS3   ) { tkSumPtS3_   = TKSUMPTS3;   }
-    void setTagTkMassS3( const double & TAGTKMASSS3 ) { tagTkMassS3_ = TAGTKMASSS3; }
+    void setbTagTkInvMass(        const double         & BTAGTKINVMASS        ) { bTagTkInvMass_        = BTAGTKINVMASS;        }
+    void addTkRef( edm::Ref<std::vector<SimpleTrack> > TRACKREF ) {
+      vecTrackRef_.push_back(TRACKREF);
+    }
 
   protected:
     double         uncorrEt_;
@@ -130,22 +89,14 @@ namespace anaobj {
     float          discriminatorHighEff_;
     float          discriminatorHighPur_;
     double         jetMass_;
-
-    int    tkNumS1_;
-    double tkSumPtS1_;
-    double tagTkMassS1_;
-
-    int    tkNumS2_;
-    double tkSumPtS2_;
-    double tagTkMassS2_;
-
-    int    tkNumS3_;
-    double tkSumPtS3_;
-    double tagTkMassS3_;
+    double         bTagTkInvMass_;
+    edm::RefVector<std::vector<SimpleTrack> > vecTrackRef_;
   };
 
   typedef std::vector<OfflineJet> OfflineJetCollection;
-
+  typedef edm::Ref<OfflineJetCollection> OfflineJetRef;
+  typedef edm::RefProd<OfflineJetCollection> OfflineJetRefProd;
+  typedef edm::RefVector<OfflineJetCollection> OfflineJetRefVector;
 }
 
 #endif // OFFLINEJET_H

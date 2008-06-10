@@ -101,6 +101,17 @@ namespace {
     edm::Wrapper<anaobj::OfflineJetCollection::const_iterator> wcitofflinejetc1;
     anaobj::OfflineJetCollection::iterator itofflinejetc1;
     edm::Wrapper<anaobj::OfflineJetCollection::iterator> witofflinejetc1;
+    anaobj::OfflineJetRef rofflinejet1;
+    edm::Wrapper<anaobj::OfflineJetRef> wrofflinejet1;
+    anaobj::OfflineJetRefProd rpofflinejet1;
+    edm::Wrapper<anaobj::OfflineJetRefProd> wrpofflinejet1;
+    anaobj::OfflineJetRefVector rvofflinejet1;
+    edm::Wrapper<anaobj::OfflineJetRefVector> wvofflinejet1;
+    anaobj::OfflineJetRefVector::const_iterator citofflinejet1;
+    edm::Wrapper<anaobj::OfflineJetRefVector::const_iterator> wcitofflinejet1;
+    anaobj::OfflineJetRefVector::iterator itofflinejet1;
+    edm::Wrapper<anaobj::OfflineJetRefVector::iterator> witofflinejet1;
+    std::auto_ptr<anaobj::OfflineJetRef> apofflinejet1;
 
     // Not necessary for the producer, maybe needed for FWLite, adding it anyway
     anaobj::BaseMEt met1;
@@ -127,12 +138,23 @@ namespace {
     edm::Wrapper<anaobj::SimplePixelJetCollection::iterator> witspjc1;
 
     // SimpleTracks
-    anaobj::SimpleTrackCollection stc1;
-    edm::Wrapper<anaobj::SimpleTrackCollection> wstc1;
-    anaobj::SimpleTrackCollection::const_iterator citstc1;
-    edm::Wrapper<anaobj::SimpleTrackCollection::const_iterator> wcitstc1;
-    anaobj::SimpleTrackCollection::iterator itstc1;
-    edm::Wrapper<anaobj::SimpleTrackCollection::iterator> witstc1;
+    anaobj::SimpleTrackCollection stk1;
+    edm::Wrapper<anaobj::SimpleTrackCollection> wstk1;
+    anaobj::SimpleTrackCollection::const_iterator citstk1;
+    edm::Wrapper<anaobj::SimpleTrackCollection::const_iterator> wcitstk1;
+    anaobj::SimpleTrackCollection::iterator itstk1;
+    edm::Wrapper<anaobj::SimpleTrackCollection::iterator> witstk1;
+    anaobj::SimpleTrackRef rstk1;
+    edm::Wrapper<anaobj::SimpleTrackRef> wrstk1;
+    anaobj::SimpleTrackRefProd rpstk1;
+    edm::Wrapper<anaobj::SimpleTrackRefProd> wrpstk1;
+    anaobj::SimpleTrackRefVector rvstk1;
+    edm::Wrapper<anaobj::SimpleTrackRefVector> wvstk1;
+    anaobj::SimpleTrackRefVector::const_iterator citrstk1;
+    edm::Wrapper<anaobj::SimpleTrackRefVector::const_iterator> wcitrstk1;
+    anaobj::SimpleTrackRefVector::iterator itrstk1;
+    edm::Wrapper<anaobj::SimpleTrackRefVector::iterator> witrstk1;
+    std::auto_ptr<anaobj::SimpleTrackRef> apstk1;
 
     // GlobalMuons
     anaobj::GlobalMuonCollection gmc1;
