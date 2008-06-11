@@ -23,7 +23,7 @@
 //
 // Original Author:  Marco De Mattia
 //         Created:  Tue May  8 13:05:37 CEST 2007
-// $Id: OfflineProducer.h,v 1.6 2008/05/28 15:04:49 demattia Exp $
+// $Id: OfflineProducer.h,v 1.7 2008/06/10 13:14:36 demattia Exp $
 //
 //
 
@@ -133,7 +133,8 @@ class OfflineProducer : public edm::EDProducer {
 
   edm::ParameterSet conf_;
 
-  std::string CaloJetAlgorithm, L2JetCorrectionService, L3JetCorrectionService, METCollection;
+  std::string CaloJetAlgorithm, L2JetCorrectionService, L3JetCorrectionService;
+  std::string METCollection, L2METCollection, L3METCollection;
   std::string genParticleCandidates;
   std::string trackCountingHighEffJetTags;
   std::string trackCountingHighPurJetTags;

@@ -69,6 +69,8 @@ OfflineProducer::OfflineProducer(const edm::ParameterSet& iConfig) :
   L2JetCorrectionService( iConfig.getUntrackedParameter<string>( "L2JetCorrectionService" ) ),
   L3JetCorrectionService( iConfig.getUntrackedParameter<string>( "L3JetCorrectionService" ) ),
   METCollection( iConfig.getUntrackedParameter<string>( "METCollection" ) ),
+  L2METCollection( iConfig.getUntrackedParameter<string>( "L2METCollection" ) ),
+  L3METCollection( iConfig.getUntrackedParameter<string>( "L3METCollection" ) ),
   genParticleCandidates( iConfig.getUntrackedParameter<string>( "genParticleCandidates" ) ),
   trackCountingHighEffJetTags( iConfig.getUntrackedParameter<string>( "trackCountingHighEffJetTags" ) ),
   trackCountingHighPurJetTags( iConfig.getUntrackedParameter<string>( "trackCountingHighPurJetTags" ) ),
@@ -156,6 +158,8 @@ OfflineProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 
   // Offline
   edm::Handle<reco::CaloMETCollection> caloMET;
+  edm::Handle<reco::CaloMETCollection> caloL2MET;
+  edm::Handle<reco::CaloMETCollection> caloL3MET;
   edm::Handle<reco::CaloJetCollection> caloJets;
 
   edm::Handle<reco::JetTagCollection> trackCountingHighEff;
@@ -200,6 +204,8 @@ OfflineProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
   try {
     // Offline MEt
     iEvent.getByLabel( METCollection, caloMET );
+    iEvent.getByLabel( L2METCollection, caloL2MET );
+    iEvent.getByLabel( L3METCollection, caloL3MET );
   }
   catch (...) {
     std::cerr << "Could not find METCollection" << std::endl;
@@ -268,6 +274,8 @@ OfflineProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
   // ---
 
   const reco::CaloMET * MET = &( *(caloMET->begin()) );
+  const reco::CaloMET * L2MET = &( *(caloL2MET->begin()) );
+  const reco::CaloMET * L3MET = &( *(caloL3MET->begin()) );
 
   // -----------------------------
   // ATTENTION
@@ -275,7 +283,7 @@ OfflineProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
   // Not including DPhiMin for now
   // -----------------------------
   //  auto_ptr<OfflineMEt> offlineMEt( new OfflineMEt( MET->et(), MET->phi(), MET->sumEt(), MET->mEtSig(), 0. ) );
-  auto_ptr<OfflineMEt> offlineMEt( new OfflineMEt( MET->et(), MET->phi(), MET->sumEt(), MET->mEtSig() ) );
+  auto_ptr<OfflineMEt> offlineMEt( new OfflineMEt( MET->et(), L2MET->et(), L3MET->et(), MET->phi(), MET->sumEt(), MET->mEtSig() ) );
 
   iEvent.put( offlineMEt, offlineMEt_ );
 

@@ -18,9 +18,10 @@ module offlineProd = OfflineProducer {
   untracked string trackCountingHighPurJetTags  = "trackCountingHighPurBJetTags"
   untracked string impactParameterTagInfos      = "impactParameterTagInfos"
 
-  //  untracked string METCollection          = "met"
-  // Corrected MET using IC5 jets corrected with MCJets.
-  untracked string METCollection                = "corMetType1Icone5"
+  untracked string METCollection          = "met"
+  // Corrected MET using IC5 jets corrected with L2 and L3 corrections.
+  untracked string L2METCollection                = "L2corMetType1Icone5"
+  untracked string L3METCollection                = "L3corMetType1Icone5"
 
   // ParamGlobalMuons
   untracked InputTag ParamGlobalMuons           = paramMuons:ParamGlobalMuons
