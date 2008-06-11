@@ -3,6 +3,7 @@
 #include "AnalysisExamples/AnalysisObjects/interface/AnalyzedCluster.h"
 #include "AnalysisExamples/AnalysisObjects/interface/BaseJet.h"
 #include "AnalysisExamples/AnalysisObjects/interface/BaseMEt.h"
+#include "AnalysisExamples/AnalysisObjects/interface/BaseVertex.h"
 #include "AnalysisExamples/AnalysisObjects/interface/OfflineMEt.h"
 #include "AnalysisExamples/AnalysisObjects/interface/OfflineJet.h"
 #include "AnalysisExamples/AnalysisObjects/interface/BaseParticle.h"
@@ -155,6 +156,17 @@ namespace {
     anaobj::SimpleTrackRefVector::iterator itrstk1;
     edm::Wrapper<anaobj::SimpleTrackRefVector::iterator> witrstk1;
     std::auto_ptr<anaobj::SimpleTrackRef> apstk1;
+
+    // BaseVertex
+    anaobj::BaseVertexCollection svtx1;
+    edm::Wrapper<anaobj::BaseVertexCollection> wsvtx1;
+    anaobj::BaseVertexCollection::const_iterator citsvtx1;
+    edm::Wrapper<anaobj::BaseVertexCollection::const_iterator> wcitsvtx1;
+    anaobj::BaseVertexCollection::iterator itsvtx1;
+    edm::Wrapper<anaobj::BaseVertexCollection::iterator> witsvtx1;
+    anaobj::BaseVertexRef rsvtx1;
+    edm::Wrapper<anaobj::BaseVertexRef> wrsvtx1;
+    std::auto_ptr<anaobj::BaseVertexRef> apsvtx1;
 
     // GlobalMuons
     anaobj::GlobalMuonCollection gmc1;

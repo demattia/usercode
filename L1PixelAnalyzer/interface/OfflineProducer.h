@@ -23,7 +23,7 @@
 //
 // Original Author:  Marco De Mattia
 //         Created:  Tue May  8 13:05:37 CEST 2007
-// $Id: OfflineProducer.h,v 1.7 2008/06/10 13:14:36 demattia Exp $
+// $Id: OfflineProducer.h,v 1.8 2008/06/11 11:13:20 demattia Exp $
 //
 //
 
@@ -139,6 +139,7 @@ class OfflineProducer : public edm::EDProducer {
   std::string trackCountingHighEffJetTags;
   std::string trackCountingHighPurJetTags;
   std::string impactParameterTagInfos;
+  std::string recoVertexLabel_;
 
   edm::InputTag paramGlobalMuons_;
 
@@ -185,6 +186,7 @@ class OfflineProducer : public edm::EDProducer {
   std::string offlineJets_;
   std::string offlineMEt_;
   std::string simpleTracks_;
+  std::string baseVertices_;
   std::string MCParticles_;
   std::string globalMuons_;
   std::string simpleElectrons_;

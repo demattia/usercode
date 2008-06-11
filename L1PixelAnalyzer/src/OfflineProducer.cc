@@ -42,6 +42,9 @@
 //#include "DataFormats/JetReco/interface/JetTracksAssociation.h"
 #include "DataFormats/BTauReco/interface/TrackIPTagInfo.h"
 
+// For the reconstructed vertices collection
+#include "DataFormats/VertexReco/interface/Vertex.h"
+
 // For file output
 #include <fstream>
 #include <sstream>
@@ -75,6 +78,7 @@ OfflineProducer::OfflineProducer(const edm::ParameterSet& iConfig) :
   trackCountingHighEffJetTags( iConfig.getUntrackedParameter<string>( "trackCountingHighEffJetTags" ) ),
   trackCountingHighPurJetTags( iConfig.getUntrackedParameter<string>( "trackCountingHighPurJetTags" ) ),
   impactParameterTagInfos( iConfig.getUntrackedParameter<string>( "impactParameterTagInfos" ) ),
+  recoVertexLabel_( iConfig.getUntrackedParameter<string>( "RecoVertices" ) ),
   paramGlobalMuons_(iConfig.getUntrackedParameter<edm::InputTag>("ParamGlobalMuons") ),
   electronCandidates_(iConfig.getUntrackedParameter<edm::InputTag>("electronCandidates") ),
   electronHcalIsolation_(iConfig.getUntrackedParameter<edm::InputTag>("electronHcalIsolation") ),
@@ -87,6 +91,7 @@ OfflineProducer::OfflineProducer(const edm::ParameterSet& iConfig) :
   offlineJets_( iConfig.getParameter<string>( "OfflineJets" ) ),
   offlineMEt_( iConfig.getParameter<string>( "OfflineMEt" ) ),
   simpleTracks_( iConfig.getParameter<string>( "SimpleTracks" ) ),
+  baseVertices_( iConfig.getParameter<string>( "OfflineVertices" ) ),
   MCParticles_( iConfig.getParameter<string>( "MCParticles" ) ),
   globalMuons_( iConfig.getParameter<string>( "GlobalMuons" ) ),
   simpleElectrons_( iConfig.getParameter<string>( "SimpleElectrons" ) ),
@@ -116,6 +121,8 @@ OfflineProducer::OfflineProducer(const edm::ParameterSet& iConfig) :
   produces<anaobj::OfflineMEt>( offlineMEt_ );
   // SimpleTracks
   produces<anaobj::SimpleTrackCollection>( simpleTracks_ );
+  // BaseVertex
+  produces<anaobj::BaseVertexCollection>( baseVertices_ );
   // MC
   produces<anaobj::MCParticleCollection>( MCParticles_ );
   // Global muons
@@ -260,6 +267,17 @@ OfflineProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
     std::cerr << "Could not find the TauTagInfo collection" << std::endl;
   }
 
+  // Reco vertex collection
+  Handle<reco::VertexCollection> verticesHandle;
+  std::vector<reco::Vertex> recoVertices;
+  try {
+    iEvent.getByLabel( recoVertexLabel_ , verticesHandle );
+    recoVertices = *( verticesHandle.product() );
+  }
+  catch (...) {
+    std::cerr << "Could not find the recovertex collection" << std::endl;
+    return;
+  }
 
   eventcounter_++;
   if ( eventcounter_/100 == float(eventcounter_)/100. ) {
@@ -650,6 +668,18 @@ OfflineProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
   }
 
   iEvent.put( vec_simptau_ptr, simpleTaus_ );
+
+  // RecoVertex
+  // ----------
+
+  auto_ptr<BaseVertexCollection> vec_baseVertex_ptr( new BaseVertexCollection );
+
+  std::vector<reco::Vertex>::const_iterator recoVerticesIt = recoVertices.begin();
+  for(; recoVerticesIt != recoVertices.end(); ++recoVerticesIt){
+    vec_baseVertex_ptr->push_back( BaseVertex( recoVerticesIt->z(), recoVerticesIt->zError() ) );
+  }
+
+  iEvent.put( vec_baseVertex_ptr, baseVertices_ );
 
   // Level 1 trigger
   // ---------------

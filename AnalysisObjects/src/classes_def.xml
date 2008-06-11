@@ -115,6 +115,16 @@
   <class name="edm::RefVector<std::vector<anaobj::SimpleTrack>,anaobj::SimpleTrack,edm::refhelper::FindUsingAdvance<std::vector<anaobj::SimpleTrack>,anaobj::SimpleTrack> >"/>
   <class name="edm::Wrapper<edm::RefVector<std::vector<anaobj::SimpleTrack>,anaobj::SimpleTrack,edm::refhelper::FindUsingAdvance<std::vector<anaobj::SimpleTrack>,anaobj::SimpleTrack> > >"/>
 
+  <class name="anaobj::BaseVertex"/>
+  <class name="std::vector<anaobj::BaseVertex>"/>
+  <class name="edm::Wrapper<std::vector<anaobj::BaseVertex> >"/>
+  <class name="std::vector<anaobj::BaseVertex>::const_iterator"/>
+  <class name="edm::Wrapper<std::vector<anaobj::BaseVertex>::const_iterator >"/>
+  <class name="std::vector<anaobj::BaseVertex>::iterator"/>
+  <class name="edm::Wrapper<std::vector<anaobj::BaseVertex>::iterator >"/>
+  <class name="edm::Ref<std::vector<anaobj::BaseVertex>,anaobj::BaseVertex,edm::refhelper::FindUsingAdvance<std::vector<anaobj::BaseVertex>,anaobj::BaseVertex> >"/>
+  <class name="edm::Wrapper<edm::Ref<std::vector<anaobj::BaseVertex>,anaobj::BaseVertex,edm::refhelper::FindUsingAdvance<std::vector<anaobj::BaseVertex>,anaobj::BaseVertex> > >"/>
+
   <class name="anaobj::GlobalMuon"/>
   <class name="std::vector<anaobj::GlobalMuon>"/>
   <class name="edm::Wrapper<std::vector<anaobj::GlobalMuon> >"/>
