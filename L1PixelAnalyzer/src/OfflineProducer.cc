@@ -440,7 +440,8 @@ OfflineProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
                               tkEta,
                               tkPhi,
                               (*TkColl_it)->dz(),
-                              (*TkColl_it)->dzError() );
+                              (*TkColl_it)->dzError(),
+                              TkIP_it->ip2d.significance() );
         simpleTk.addJetRef( OfflineJetRef( offlineJetRefProd, offlineJetId ) );
 
         vec_AssocTracks_ptr->push_back( simpleTk );
