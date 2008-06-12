@@ -51,11 +51,7 @@ for line in f:
         if varName == 'randomSeeds':
             randomSeeds = varValue.split(',')
         if varName == 'useSkipEvents':
-            useSkipEvents = varValue.strip()
-            if ( varValue == "True" ):
-                useSkipEvents = True
-            else:
-                useSkipEvents = False
+            useSkipEvents = varValue.split(',')
 
 # print "totalNumberOfEvents = " + str(totalNumberOfEvents)
 # print "eventsPerJob = " + str(int(eventsPerJob[0]))
@@ -79,7 +75,20 @@ if (not(len(outDir) == typeNum and len(workingDir) == typeNum and len(totalNumbe
 # Loop on all the types, create subdirs with files to run and submit the jobs
 for type in range(typeNum):
 
-    jobsNum = int(totalNumberOfEvents[type])/int(eventsPerJob[type])
+    useSkipEventsType = True
+    try:
+        if ( useSkipEvents[type] == "False" ):
+            useSkipEventsType = False
+    except (IndexError):
+        print "No useSkipEvents specified, using default value True"
+
+    # If all the events are required, create a single job with maxEvents = -1
+    if ( totalNumberOfEvents[type].strip() == "-1" ):
+        jobsNum = 1
+        eventsPerJob[type] = -1
+    # Else split the jobs
+    else:
+        jobsNum = int(totalNumberOfEvents[type])/int(eventsPerJob[type])
     print
     print "Total number of events = " + str(int(totalNumberOfEvents[type]))
     print "Events per job = " + str(eventsPerJob[type])
@@ -113,7 +122,7 @@ for type in range(typeNum):
                     # print "temp = " + temp
                     outFile.write(s.replace( temp, str(eventsPerJob[type]) ))
                 # Set the skipEvents variable
-                elif( s.find("skipEvents") != -1 ):
+                elif( s.find("skipEvents") != -1 and useSkipEventsType == True ):
                     temp = s.split("=")
                     temp = temp[1].strip()
                     # print temp
