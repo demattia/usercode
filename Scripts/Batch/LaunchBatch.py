@@ -129,8 +129,8 @@ for type in range(typeNum):
                     outFile.write(s.replace( temp, str(skipEvents) ))
                     skipEventsFound = True
                 # Change the output file name
-                elif( s.find(outFileName[type]) != -1 ):
-                    temp = outFileName[type].split('.')[0]
+                elif( s.find(outFileName[type].strip()) != -1 ):
+                    temp = (outFileName[type].split('.')[0]).strip()
                     outFile.write(s.replace( temp, temp + "_" + str(i) ) )
                 else:
                     # Loop on all the random seeds and change them
@@ -167,16 +167,16 @@ for type in range(typeNum):
         for s in open('batch_test.csh'):
             # Set the cmssw dir where to do eval scram
             if( s.find("cmsswDir") != -1 ):
-                batchFile.write(s.replace('cmsswDir', cmsswDir))
+                batchFile.write(s.replace('cmsswDir', cmsswDir.strip()))
             elif( s.find("cfgFile") != -1 ):
                 tempCfgFileName = cfgFile[type].split('/')
-                tempCfgFileName = tempCfgFileName[len(tempCfgFileName)-1].split('.')[0]
+                tempCfgFileName = (tempCfgFileName[len(tempCfgFileName)-1].split('.')[0]).strip()
                 currentDir = os.getcwd()
-                batchFile.write(s.replace('cfgFile', currentDir + "/" + workingDir[type] + "/"+ tempCfgFileName+'_'+str(i)+'.cfg'))
+                batchFile.write(s.replace('cfgFile', currentDir.strip() + "/" + workingDir[type].strip() + "/"+ tempCfgFileName+'_'+str(i)+'.cfg'))
                 # Get the current working dir
             elif( s.find("outFileName") != -1 ):
                 temp = outFileName[type].split('.')
-                batchFile.write(s.replace('outFileName', temp[0]+"_"+str(i)+".root").replace('outDir', outDir[type]))
+                batchFile.write(s.replace('outFileName', temp[0].strip()+"_"+str(i)+".root").replace('outDir', outDir[type].strip()))
             else:
                 batchFile.write(s)
 
