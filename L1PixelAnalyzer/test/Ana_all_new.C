@@ -1,71 +1,251 @@
-void Ana_all (TString var, TString sel ) 
+void Ana_all_new (TString var, TString sel, bool dops, double mincut=-10000, double maxcut=10000 ) 
 {
+
+  // - Controllare tutti i numeri eventi
+  // - Sezione d'urto single top ? Modificare!
 
   const int nbins=50;
   TString pippo = var+sel;
 
-  TFile * QCD[8];     
-  QCD[0] = new TFile("./root/TDAna_QCD30-50_tk3.root");
-  QCD[1] = new TFile("./root/TDAna_QCD50-80_tk3.root");
-  QCD[2] = new TFile("./root/TDAna_QCD80-120_tk3.root");
-  QCD[3] = new TFile("./root/TDAna_QCD120-170_tk3.root");
-  QCD[4] = new TFile("./root/TDAna_QCD170-230_tk3.root");
-  QCD[5] = new TFile("./root/TDAna_QCD230-300_tk3.root");
-  QCD[6] = new TFile("./root/TDAna_QCD300-380_tk3.root");
-  QCD[7] = new TFile("./root/TDAna_QCD380incl_tk3.root");
-  double QCDxs[8] = { 155929000., 20938850., 2949713., 499656., 100995.,  23855., 6391., 2821.};
-  double NQCD[8] = { 86000., 78000., 104000., 96000., 100000., 102000., 112000., 102000.};
+  TFile * QCD[16];     
+  QCD[0] = new TFile("./root_final/TDAna_QCD_30-50.root");
+  QCD[1] = new TFile("./root_final/TDAna_QCD_50-80.root");
+  QCD[2] = new TFile("./root_final/TDAna_QCD_80-120.root");
+  QCD[3] = new TFile("./root_final/TDAna_QCD_120-170.root");
+  QCD[4] = new TFile("./root_final/TDAna_QCD_170-230.root");
+  QCD[5] = new TFile("./root_final/TDAna_QCD_230-300.root");
+  QCD[6] = new TFile("./root_final/TDAna_QCD_300-380.root");
+  QCD[7] = new TFile("./root_final/TDAna_QCD_380-incl.root");
+  QCD[8] = new TFile("./root_final/TDAna_EXTRA_QCD_30-50.root");
+  QCD[9] = new TFile("./root_final/TDAna_EXTRA_QCD_50-80.root");
+  QCD[10] = new TFile("./root_final/TDAna_EXTRA_QCD_80-120.root");
+  QCD[11] = new TFile("./root_final/TDAna_EXTRA_QCD_120-170.root");
+  QCD[12] = new TFile("./root_final/TDAna_EXTRA_QCD_170-230.root");
+  QCD[13] = new TFile("./root_final/TDAna_EXTRA_QCD_230-300.root");
+  QCD[14] = new TFile("./root_final/TDAna_EXTRA_QCD_300-380.root");
+  QCD[15] = new TFile("./root_final/TDAna_EXTRA_QCD_380-incl.root");
+//   double QCDxs[16] = { 155929000., 20938850., 2949713., 499656., 
+// 		       100995.,  23855., 6391., 2821., 155929000., 
+// 		       20938850., 2949713., 499656., 100995.,  
+// 		       23855., 6391., 2821. };
+  double QCDxs[16] = { 163000000., 21600000., 3080000., 494000., 101000., 24500., 6240., 2821., 
+		       163000000., 21600000., 3080000., 494000., 101000., 24500., 6240., 2821. };
+  double NQCD[16] = { 170000., 82000., 104000., 96000., 100000., 
+		      102000., 112000., 102000., 130000., 282000.,
+		      282000., 312000., 436000., 346000., 
+		      418000., 406000. }; // last 4 to be checked
+  // Sum QCD numbers so that we do not need to change the code below:
+  // by adding numbers for each xs we can just sum all samples as always
+  // -------------------------------------------------------------------
+  for ( int i=0; i<16; i++ ) {
+    if ( i<8 ) {
+      NQCD[i] = NQCD[i]+NQCD[i+8];
+    } else {
+      NQCD[i] = NQCD[i-8]; // they have already changed, so this is correct
+    }
+  }
+
+  TFile * QCDMULT[8];     
+  QCDMULT[0] = new TFile("./root_final/TDAna_MULTI_EXTRA_QCD_30-50.root");
+  QCDMULT[1] = new TFile("./root_final/TDAna_MULTI_EXTRA_QCD_50-80.root");
+  QCDMULT[2] = new TFile("./root_final/TDAna_MULTI_EXTRA_QCD_80-120.root");
+  QCDMULT[3] = new TFile("./root_final/TDAna_MULTI_EXTRA_QCD_120-170.root");
+  QCDMULT[4] = new TFile("./root_final/TDAna_MULTI_EXTRA_QCD_170-230.root");
+  QCDMULT[5] = new TFile("./root_final/TDAna_MULTI_EXTRA_QCD_230-300.root");
+  QCDMULT[6] = new TFile("./root_final/TDAna_MULTI_EXTRA_QCD_300-380.root");
+  QCDMULT[7] = new TFile("./root_final/TDAna_MULTI_EXTRA_QCD_380-incl.root");
+  double QCDMxs[8] =  { 163000000., 21600000., 3080000., 494000., 
+			101000., 245000., 6240., 2821. };
+  //                    155929000., 20938850., 2949713., 499656., 
+  //			100995.,  23855., 6391., 2821. };
+  double NQCDM[8] = { 11229443., 26347818., 24971508.,  29514603., 
+		      40608575., 32268604., 37943909., 33232000. };
 
   TFile * W[11];
-  W[0] = new TFile ("./root/TDAna_W0w_tk3.root");
-  W[1] = new TFile ("./root/TDAna_W10w_tk3.root");
-  W[2] = new TFile ("./root/TDAna_W11w_tk3.root");
-  W[3] = new TFile ("./root/TDAna_W20w_tk3.root");
-  W[4] = new TFile ("./root/TDAna_W21w_tk3.root");
-  W[5] = new TFile ("./root/TDAna_W30w_tk3.root");
-  W[6] = new TFile ("./root/TDAna_W31w_tk3.root");
-  W[7] = new TFile ("./root/TDAna_W40w_tk3.root");
-  W[8] = new TFile ("./root/TDAna_W41w_tk3.root");
-  W[9] = new TFile ("./root/TDAna_W50w_tk3.root");
-  W[10] = new TFile ("./root/TDAna_W51w_tk3.root");
-  double Wxs[11] = { 45000., 9200., 250., 2500., 225., 590., 100., 125., 40., 85., 40. };
+  W[0] = new TFile ("./root_final/TDAna_W_0JETS.root");
+  W[1] = new TFile ("./root_final/TDAna_W_1JETS_0ptw100.root");
+  W[2] = new TFile ("./root_final/TDAna_W_1JETS_100ptw300.root");
+  W[3] = new TFile ("./root_final/TDAna_W_2JETS_0ptw100.root");
+  W[4] = new TFile ("./root_final/TDAna_W_2JETS_100ptw300.root");
+  W[5] = new TFile ("./root_final/TDAna_W_3JETS_0ptw100.root"); 
+  W[6] = new TFile ("./root_final/TDAna_W_3JETS_100ptw300.root");
+  W[7] = new TFile ("./root_final/TDAna_W_4JETS_0ptw100.root");
+  W[8] = new TFile ("./root_final/TDAna_W_4JETS_100ptw300.root");
+  W[9] = new TFile ("./root_final/TDAna_W_5JETS_0ptw100.root");
+  W[10] = new TFile ("./root_final/TDAna_W_5JETS_100ptw300.root");
+  double Wxs[11] = { 45000., 9200., 250., 2500., 225., 590., 
+		     100., 125., 40., 85., 40. };
   double NW[11] = { 88000., 40000., 100530., 99523., 105255., 79000., 
 		    88258., 83038., 30796., 59022., 41865. };
 
-  TFile * TTH = new TFile("./root/TDAna_ttH_120_tk3.root");
+  TFile * TTH = new TFile("./root_final/TDAna_TTH_120.root");
   double TTHxs = 0.667 ;
-  double NTTH = 1000000.; // 1652000.; // 96000.;
+  double NTTH = 1178000; // 1634000.; // 1652000.; // 96000.;
 
   TFile * TT[5];
-  TT[0] = new TFile("./root/TDAna_TT0_tk3.root");
-  TT[1] = new TFile("./root/TDAna_TT1_tk3.root");
-  TT[2] = new TFile("./root/TDAna_TT2_tk3.root");
-  TT[3] = new TFile("./root/TDAna_TT3_tk3.root");
-  TT[4] = new TFile("./root/TDAna_TT4_tk3.root");
+  TT[0] = new TFile("./root_final/TDAna_TT_0JETS.root");
+  TT[1] = new TFile("./root_final/TDAna_TT_1JETS.root");
+  TT[2] = new TFile("./root_final/TDAna_TT_2JETS.root");
+  TT[3] = new TFile("./root_final/TDAna_TT_3JETS.root");
+  TT[4] = new TFile("./root_final/TDAna_TT_4JETS.root");
   // double TTxs[5] = { 619., 176., 34.,  6., 1.5 };  // from web
   double TTxs[5] = { 434., 162., 43., 10., 1.9 };     // from note
-  double NTT[5] = { 57900., 66000., 98159., 14768., 5304. };
+  double NTT[5] = { 57900., 66000., 98159., 14768., 5352. };
+
+  TFile * TTPYT;
+  TTPYT = new TFile("./root_final/TDAna_TTBAR.root");
+  double TTPYTxs = 650.9;
+  double NTTPYT = 972000.;
+
+  TFile * ST[3];
+  ST[0] = new TFile("./root_final/TDAna_SINGLETOP_TQ_TQB_LHC_E.root");
+  //ST[1] = new TFile("./root_final/TDAna_SINGLETOP_TQ_TQB_LHC_MU.root");
+  ST[2] = new TFile("./root_final/TDAna_SINGLETOP_TQ_TQB_LHC_TAU.root");
+  double STxs[3] = { 27.43, 26.97, 28.71 };
+  double NST[3] = { 92000, 94000, 94000 }; 
+
+  TFile * ZNN[2];
+  ZNN[0] = new TFile("./root_final/TDAna_ZNUNUJETS_120-170.root");
+  ZNN[1] = new TFile("./root_final/TDAna_ZNUNUJETS_170-230.root");
+  double ZNNxs[2] = { 51.47, 15.52 };
+  double NZNN[2] = { 29897., 25600. };
+
+  ///////////////////////////////////////////////////////////////////
 
   double Lumfactor = 100000; // 100/fb of luminosity assumed in histograms
   
   TH1D * H = dynamic_cast<TH1D*>(TTH->Get(pippo));
   double minx=H->GetBinLowEdge(1);
   double maxx=nbins*H->GetBinWidth(1)+minx;
+
+  int imin=(int)((mincut-minx)/(maxx-minx)*50);
+  int imax=(int)((maxcut-minx)/(maxx-minx)*50);
+  if ( imin<1 ) imin=1;
+  if ( imax>nbins ) imax=nbins;
+
   TH1D * Histo_QCD = new TH1D ( pippo+"_QCD", "", nbins, minx, maxx );
+  TH1D * Histo_QCDM = new TH1D ( pippo+"_QCDM", "", nbins, minx, maxx );
   TH1D * Histo_TTH = new TH1D ( pippo+"_TTH", "", nbins, minx, maxx );
   TH1D * Histo_TT = new TH1D ( pippo+"_TT", "", nbins, minx, maxx );
+  TH1D * Histo_TTPYT = new TH1D ( pippo+"_TTPYT", "", nbins, minx, maxx );
   TH1D * Histo_W = new TH1D ( pippo+"_W", "", nbins, minx, maxx );
+  TH1D * Histo_ST = new TH1D ( pippo+"_ST", "", nbins, minx, maxx );
+  TH1D * Histo_ZNN = new TH1D ( pippo+"_ZNN", "", nbins, minx, maxx );
 
   TH1D * Histo_TOT = new TH1D ( pippo+"_TOT", "", nbins, minx, maxx );
 
   // Extract sum histograms with the right normalization and errors
   // --------------------------------------------------------------
+
+  // QCD plus EXTRA QCD:
+  // -------------------
+  double totWQCD[16][nbins]={0.};
+  double totQCD[nbins]={0.};
+  double s2_totQCD[nbins]={0.};
+  double totNQCD[16][nbins]={0.};
+  for ( int i=0; i<16; i++ ) {
+    //if ( i==5 ) i++; //////////////////////////////////////////////////////////////////// NB
+    cout << "Processing QCD file #" << i << " ..." << endl;
+    TH1D * Histo = dynamic_cast<TH1D*>(QCD[i]->Get(pippo));
+    TH1D * HistoW = dynamic_cast<TH1D*>(QCD[i]->Get(pippo+"W"));
+    // For QCD, we need also total entries in histograms to add a
+    // Poisson fluke contribution to total errors from matrix:
+    // ----------------------------------------------------------
+    TH1D * HistoN = dynamic_cast<TH1D*>(QCD[i]->Get(pippo+"N"));    
+    for ( int ibin=1; ibin<=nbins; ibin++ ) {
+      double t=Histo->GetBinContent(ibin);
+      double s2t=HistoW->GetBinContent(ibin);
+      double n=HistoN->GetBinContent(ibin);
+      totWQCD[i][ibin-1]+=t*QCDxs[i]/NQCD[i]*Lumfactor;
+      s2_totQCD[ibin-1]+=s2t*pow(QCDxs[i]/NQCD[i]*Lumfactor,2);
+      totNQCD[i][ibin-1]+=n;
+    }
+  }
+  // Once grandtotals of weights are computed for each bin, we can
+  // add to the total s2 the Poisson contribution 1/sqrt(N) * T
+  // -------------------------------------------------------------
+  for ( int i=0; i<16; i++ ) {
+    for ( int ibin=1; ibin<=nbins; ibin++ ) {
+      totQCD[ibin-1]+=totWQCD[i][ibin-1];
+      if ( totNQCD[i][ibin-1]>0 ) {
+	s2_totQCD[ibin-1]+=pow(totWQCD[i][ibin-1],2)/totNQCD[i][ibin-1];
+      }
+    }
+  }
+  // IF WE WANT TO RENORMALIZE QCD MATRIX-WEIGHTED HISTOGRAMS TO NUMBER EXPECTATION:
+  // -------------------------------------------------------------------------------
+//   if ( renormalize_toNqcd ) {
+//     double tt=0.;
+//     for ( int ibin=1; ibin<=nbins; ibin++ ) {
+//       tw += totQCD[ibin-1];
+//       tn += totNQCD[i]
+//     }
+//     for ( int ibin=1; ibin<=nbins; ibin++ ) {
+//       totQCD[ibin-1];
+//     }
+//   }
+  
+  // QCD Multiplied:
+  // ---------------
+  double totQCDM[nbins]={0.};
+  double s2_totQCDM[nbins]={0.};
+  for ( int i=0; i<8; i++ ) { 
+    cout << "Processing QCD MULT file #" << i << " ..." << endl;
+    TH1D * Histo = dynamic_cast<TH1D*>(QCDMULT[i]->Get(pippo));
+    for ( int ibin=1; ibin<=nbins; ibin++ ) {
+      double t=Histo->GetBinContent(ibin);
+      totQCDM[ibin-1]+=t*QCDxs[i]/NQCDM[i]*Lumfactor;
+      s2_totQCDM[ibin-1]+=t*pow(QCDMxs[i]/NQCDM[i]*Lumfactor,2);
+    }
+  }
+
+  // TTH:
+  // ----
+  double totTTH[nbins]={0.};
+  double s2_totTTH[nbins]={0.};
+  cout << "Processing TTH file " << " ..." << endl;
+  TH1D * Histo = dynamic_cast<TH1D*>(TTH->Get(pippo));
+  for ( int ibin=1; ibin<=nbins; ibin++ ) {
+    double t=Histo->GetBinContent(ibin);
+    totTTH[ibin-1]+=t*TTHxs/NTTH*Lumfactor;
+    s2_totTTH[ibin-1]+=t*pow(TTHxs/NTTH*Lumfactor,2);
+  }
+
+  // TT AlpGen:
+  // ----------
+  double totTT[nbins]={0.};
+  double s2_totTT[nbins]={0.};
+  for ( int i=0; i<5; i++ ) { 
+    cout << "Processing TT file #" << i << " ..." << endl;
+    TH1D * Histo = dynamic_cast<TH1D*>(TT[i]->Get(pippo));
+    for ( int ibin=1; ibin<=nbins; ibin++ ) {
+      double t=Histo->GetBinContent(ibin);
+      totTT[ibin-1]+=t*TTxs[i]/NTT[i]*Lumfactor;
+      s2_totTT[ibin-1]+=t*pow(TTxs[i]/NTT[i]*Lumfactor,2);
+    }
+  }
+
+  // TTPYT:
+  // ------
+  double totTTPYT[nbins]={0.};
+  double s2_totTTPYT[nbins]={0.};
+  cout << "Processing TTPYT file " << " ..." << endl;
+  TH1D * Histo = dynamic_cast<TH1D*>(TTPYT->Get(pippo));
+  for ( int ibin=1; ibin<=nbins; ibin++ ) {
+    double t=Histo->GetBinContent(ibin);
+    totTTPYT[ibin-1]+=t*TTPYTxs/NTTPYT*Lumfactor;
+    s2_totTTPYT[ibin-1]+=t*pow(TTPYTxs/NTTPYT*Lumfactor,2);
+  }
+
+  // W files:
+  // --------
   double totWW[11][nbins]={0.};
   double totW[nbins]={0.};
   double s2_totW[nbins]={0.};
   double totNW[11][nbins]={0.};
   for ( int i=0; i<11; i++ ) {
     cout << "Processing W file #" << i << " ..." << endl;
+    //if ( i==6 ) i++;
     TH1D * Histo = dynamic_cast<TH1D*>(W[i]->Get(pippo));
     TH1D * HistoW = dynamic_cast<TH1D*>(W[i]->Get(pippo+"W"));
     // For W, we need also total entries in histograms to add a
@@ -93,80 +273,124 @@ void Ana_all (TString var, TString sel )
     }
   }
 
-  double totWQCD[8][nbins]={0.};
-  double totQCD[nbins]={0.};
-  double s2_totQCD[nbins]={0.};
-  double totNQCD[8][nbins]={0.};
-  for ( int i=0; i<8; i++ ) {
-    cout << "Processing QCD file #" << i << " ..." << endl;
-    TH1D * Histo = dynamic_cast<TH1D*>(QCD[i]->Get(pippo));
-    TH1D * HistoW = dynamic_cast<TH1D*>(QCD[i]->Get(pippo+"W"));
-    // For QCD, we need also total entries in histograms to add a
-    // Poisson fluke contribution to total errors from matrix:
-    // ----------------------------------------------------------
-    TH1D * HistoN = dynamic_cast<TH1D*>(QCD[i]->Get(pippo+"N"));    
+//   // ST :
+//   // ----
+   double totST[nbins]={0.};
+   double s2_totST[nbins]={0.};
+  for ( int i=0; i<3; i++ ) {
+    cout << "Processing ST file #" << i << " ..." << endl;
+    if ( i==1 ) i++; ////////////////////////// NB
+    TH1D * Histo = dynamic_cast<TH1D*>(ST[i]->Get(pippo));
     for ( int ibin=1; ibin<=nbins; ibin++ ) {
       double t=Histo->GetBinContent(ibin);
-      double s2t=HistoW->GetBinContent(ibin);
-      double n=HistoN->GetBinContent(ibin);
-      totWQCD[i][ibin-1]+=t*QCDxs[i]/NQCD[i]*Lumfactor;
-      s2_totQCD[ibin-1]+=s2t*pow(QCDxs[i]/NQCD[i]*Lumfactor,2);
-      totNQCD[i][ibin-1]+=n;
+      totST[ibin-1]+=t*STxs[i]/NST[i]*Lumfactor;
+      s2_totST[ibin-1]+=t*pow(STxs[i]/NST[i]*Lumfactor,2);
     }
   }
-  // Once grandtotals of weights are computed for each bin, we can
-  // add to the total s2 the Poisson contribution 1/sqrt(N) * T
-  // -------------------------------------------------------------
-  for ( int i=0; i<8; i++ ) {
-    for ( int ibin=1; ibin<=nbins; ibin++ ) {
-      totQCD[ibin-1]+=totWQCD[i][ibin-1];
-      if ( totNQCD[i][ibin-1]>0 ) {
-	s2_totQCD[ibin-1]+=pow(totWQCD[i][ibin-1],2)/totNQCD[i][ibin-1];
-      }
-    }
-  }
-  
-  double totTT[nbins]={0.};
-  double s2_totTT[nbins]={0.};
-  for ( int i=0; i<5; i++ ) {
-    cout << "Processing TT file #" << i << " ..." << endl;
-    TH1D * Histo = dynamic_cast<TH1D*>(TT[i]->Get(pippo));
+
+  // ZNN :
+  // -----
+  double totZNN[nbins]={0.};
+  double s2_totZNN[nbins]={0.};
+  for ( int i=0; i<2; i++ ) {
+    cout << "Processing ZNN file #" << i << " ..." << endl;
+    TH1D * Histo = dynamic_cast<TH1D*>(ZNN[i]->Get(pippo));
     for ( int ibin=1; ibin<=nbins; ibin++ ) {
       double t=Histo->GetBinContent(ibin);
-      totTT[ibin-1]+=t*TTxs[i]/NTT[i]*Lumfactor;
-      s2_totTT[ibin-1]+=t*pow(TTxs[i]/NTT[i]*Lumfactor,2);
+      totZNN[ibin-1]+=t*ZNNxs[i]/NZNN[i]*Lumfactor;
+      s2_totZNN[ibin-1]+=t*pow(ZNNxs[i]/NZNN[i]*Lumfactor,2);
     }
-  }
-  double totTTH[nbins]={0.};
-  double s2_totTTH[nbins]={0.};
-  cout << "Processing TTH file " << " ..." << endl;
-  TH1D * Histo = dynamic_cast<TH1D*>(TTH->Get(pippo));
-  for ( int ibin=1; ibin<=nbins; ibin++ ) {
-    double t=Histo->GetBinContent(ibin);
-    totTTH[ibin-1]+=t*TTHxs/NTTH*Lumfactor;
-    s2_totTTH[ibin-1]+=t*pow(TTHxs/NTTH*Lumfactor,2);
   }
 
   // OK now fill total histograms
   // ----------------------------
   for ( int ibin=1; ibin<=nbins; ibin++ ) {
     Histo_QCD->SetBinContent(ibin,totQCD[ibin-1]);
+    Histo_QCDM->SetBinContent(ibin,totQCDM[ibin-1]); // not in total
     Histo_TTH->SetBinContent(ibin,totTTH[ibin-1]);
     Histo_TT->SetBinContent(ibin,totTT[ibin-1]);
+    Histo_TTPYT->SetBinContent(ibin,totTTPYT[ibin-1]); // not in total
     Histo_W->SetBinContent(ibin,totW[ibin-1]);
+    Histo_ST->SetBinContent(ibin,totST[ibin-1]);
+    Histo_ZNN->SetBinContent(ibin,totZNN[ibin-1]);
     Histo_QCD->SetBinError(ibin,sqrt(s2_totQCD[ibin-1]));
+    Histo_QCDM->SetBinError(ibin,sqrt(s2_totQCDM[ibin-1])); // not in total
     Histo_TTH->SetBinError(ibin,sqrt(s2_totTTH[ibin-1]));
     Histo_TT->SetBinError(ibin,sqrt(s2_totTT[ibin-1]));
+    Histo_TTPYT->SetBinError(ibin,sqrt(s2_totTTPYT[ibin-1])); // not in total
     Histo_W->SetBinError(ibin,sqrt(s2_totW[ibin-1]));
-    double grandtot = totQCD[ibin-1]+totTTH[ibin-1]+totTT[ibin-1]+totW[ibin-1];
-    double grandtote= sqrt(s2_totQCD[ibin-1]+s2_totTTH[ibin-1]+s2_totTT[ibin-1]+s2_totW[ibin-1]);
+    Histo_ST->SetBinError(ibin,sqrt(s2_totST[ibin-1]));
+    Histo_ZNN->SetBinError(ibin,sqrt(s2_totZNN[ibin-1]));
+    double grandtot = (totQCD[ibin-1]+totTTH[ibin-1]+totTT[ibin-1]+
+		       totW[ibin-1]+totST[ibin-1]+totZNN[ibin-1]);
+    double grandtote= sqrt(s2_totQCD[ibin-1]+s2_totTTH[ibin-1]+s2_totTT[ibin-1]+
+			   s2_totW[ibin-1]+s2_totST[ibin-1]+s2_totZNN[ibin-1]);
     Histo_TOT->SetBinContent(ibin,grandtot);
     Histo_TOT->SetBinError(ibin,grandtote);
   }
+
+  double B_int = Histo_TOT->Integral(imin,imax);
+  double S_int = Histo_TTH->Integral(imin,imax);
+  cout << "Selected events: " << B_int << "B, " << S_int << "S. Significance = " << S_int/sqrt(B_int) << endl;
+  cout << "QCD comparison: P= " << Histo_QCD->KolmogorovTest(Histo_QCDM) << endl;
+  cout << "TOP comparison: P= " << Histo_TT->KolmogorovTest(Histo_TTPYT) << endl;
   
+  TCanvas * QCDcomp = new TCanvas ( "QCDcomp", "Comparison QCD / QCD mult", 600, 600 );
+  QCDcomp->Divide(1,2);
+  QCDcomp->cd(1);
+  QCDcomp->GetPad(1)->SetLogy();
+  Histo_QCD->SetMarkerStyle(21);
+  Histo_QCD->SetMarkerSize(0.4);
+  Histo_QCD->SetMarkerColor(kRed);
+  Histo_QCD->SetLineColor(kRed);
+  Histo_QCD->DrawCopy("PE");
+  Histo_QCDM->SetMarkerStyle(21);
+  Histo_QCDM->SetMarkerSize(0.4);
+  Histo_QCDM->SetMarkerColor(kBlue);
+  Histo_QCDM->SetLineColor(kBlue);
+  Histo_QCDM->DrawCopy("PESAME");
+  QCDcomp->cd(2);
+  Histo_QCD->SetMarkerStyle(21);
+  Histo_QCD->SetMarkerSize(0.4);
+  Histo_QCD->SetMarkerColor(kRed);
+  Histo_QCD->SetLineColor(kRed);
+  Histo_QCD->DrawCopy("PE");
+  Histo_QCDM->SetMarkerStyle(21);
+  Histo_QCDM->SetMarkerSize(0.4);
+  Histo_QCDM->SetMarkerColor(kBlue);
+  Histo_QCDM->SetLineColor(kBlue);
+  Histo_QCDM->DrawCopy("PESAME");
+  if ( dops ) QCDcomp->Print("./ps/"+pippo+"_QCDcomp.ps");
+
+  TCanvas * TTcomp = new TCanvas ( "TTcomp", "Comparison TT AlpGen / TT Pythia", 600, 600 );
+  TTcomp->Divide(1,2);
+  TTcomp->cd(1);
+  TTcomp->GetPad(1)->SetLogy();
+  Histo_TT->SetMarkerStyle(21);
+  Histo_TT->SetMarkerSize(0.4);
+  Histo_TT->SetMarkerColor(kRed);
+  Histo_TT->SetLineColor(kRed);
+  Histo_TT->DrawCopy("PE");
+  Histo_TTPYT->SetMarkerStyle(21);
+  Histo_TTPYT->SetMarkerSize(0.4);
+  Histo_TTPYT->SetMarkerColor(kBlue);
+  Histo_TTPYT->SetLineColor(kBlue);
+  Histo_TTPYT->DrawCopy("PESAME");
+  TTcomp->cd(2);
+  Histo_TT->SetMarkerStyle(21);
+  Histo_TT->SetMarkerSize(0.4);
+  Histo_TT->SetMarkerColor(kRed);
+  Histo_TT->SetLineColor(kRed);
+  Histo_TT->DrawCopy("PE");
+  Histo_TTPYT->SetMarkerStyle(21);
+  Histo_TTPYT->SetMarkerSize(0.4);
+  Histo_TTPYT->SetMarkerColor(kBlue);
+  Histo_TTPYT->SetLineColor(kBlue);
+  Histo_TTPYT->DrawCopy("PESAME");
+  if ( dops ) TTcomp->Print("./ps/"+pippo+"_TTcomp.ps");
+
   TCanvas * b = new TCanvas ("b", "Kinematics comparison", 700, 700 );
-  b->Divide(1,2);
-  
+  b->Divide(1,2);  
   b->cd(1);
   b->GetPad(1)->SetLogy();
   Histo_TOT->SetMarkerStyle(20);
@@ -193,21 +417,63 @@ void Ana_all (TString var, TString sel )
   Histo_W->SetMarkerColor(kCyan);
   Histo_W->SetLineColor(kCyan);
   Histo_W->DrawCopy("PESAME");
+  Histo_ST->SetMarkerStyle(27);
+  Histo_ST->SetMarkerSize(0.4);
+  Histo_ST->SetMarkerColor(kBlack);
+  Histo_ST->SetLineColor(kBlack);
+  Histo_ST->DrawCopy("SAMEHISTO");
+  Histo_ZNN->SetMarkerStyle(27);
+  Histo_ZNN->SetMarkerSize(0.4);
+  Histo_ZNN->SetMarkerColor(kGreen);
+  Histo_ZNN->SetLineColor(kGreen);
+  Histo_ZNN->DrawCopy("SAMEHISTO");
   Histo_TOT->DrawCopy("PESAME");
-
   b->cd(2);
-  Histo_TOT->SetNormFactor(1);
-  Histo_TOT->Draw("PE");
-  Histo_QCD->SetNormFactor(1);
-  Histo_QCD->Draw("PESAME");
-  Histo_TTH->SetNormFactor(1);
-  Histo_TTH->Draw("PESAME");
-  Histo_TT->SetNormFactor(1);
-  Histo_TT->Draw("PESAME");
-  Histo_W->SetNormFactor(1);
-  Histo_W->Draw("PESAME");
-  Histo_TOT->Draw("PESAME");
-  b->Print(pippo+".ps");
+  Histo_TOT->SetMarkerStyle(20);
+  Histo_TOT->SetMarkerSize(0.4);
+  Histo_TOT->SetMinimum(1.);
+  Histo_TOT->DrawCopy("PE");
+  Histo_QCD->SetMarkerStyle(21);
+  Histo_QCD->SetMarkerSize(0.4);
+  Histo_QCD->SetMarkerColor(kRed);
+  Histo_QCD->SetLineColor(kRed);
+  Histo_QCD->DrawCopy("PESAME");
+  Histo_TTH->SetMarkerStyle(24);
+  Histo_TTH->SetMarkerSize(0.4);
+  Histo_TTH->SetMarkerColor(kBlue);
+  Histo_TTH->SetLineColor(kBlue);
+  Histo_TTH->DrawCopy("PESAME");
+  Histo_TT->SetMarkerStyle(25);
+  Histo_TT->SetMarkerSize(0.4);
+  Histo_TT->SetMarkerColor(kGreen);
+  Histo_TT->SetLineColor(kGreen);
+  Histo_TT->DrawCopy("PESAME");
+  Histo_W->SetMarkerStyle(26);
+  Histo_W->SetMarkerSize(0.4);
+  Histo_W->SetMarkerColor(kCyan);
+  Histo_W->SetLineColor(kCyan);
+  Histo_W->DrawCopy("PESAME");
+  Histo_ST->SetMarkerStyle(27);
+  Histo_ST->SetMarkerSize(0.4);
+  Histo_ST->SetMarkerColor(kBlack);
+  Histo_ST->SetLineColor(kBlack);
+  Histo_ST->DrawCopy("SAMEHISTO");
+  Histo_ZNN->SetMarkerStyle(27);
+  Histo_ZNN->SetMarkerSize(0.4);
+  Histo_ZNN->SetMarkerColor(kGreen);
+  Histo_ZNN->SetLineColor(kGreen);
+  Histo_ZNN->DrawCopy("SAMEHISTO");
+  Histo_TOT->DrawCopy("PESAME");
+  if ( dops ) b->Print("./ps/"+pippo+".ps");
+
+//   // Histograms to fit:
+//   // ------------------
+   TFile * xmia = new TFile("xmia.root","RECREATE");
+   xmia->cd();
+   Histo_TOT->Write();
+   Histo_TTH->Write();
+   xmia->Close();
+
 
   // Close files
   // -----------

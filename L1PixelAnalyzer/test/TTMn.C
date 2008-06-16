@@ -1,4 +1,4 @@
-void TTMnS1 () {
+void TTMn () {
   
   const int nbins=400;
   
@@ -179,13 +179,13 @@ void TTMnS1 () {
   MN[7]->SetMarkerColor(kGreen);
   MN[7]->SetLineColor(kGreen);
   MN[7]->DrawCopy("PESAME");
-  b->Print("./ps/TTMnS1.ps");
+  b->Print("./ps/TTMn.ps");
   
   // Close files
   // -----------
-  TFile * File = new TFile ("TTMnS1.root","RECREATE");
+  TFile * File = new TFile ("TTMn.root","RECREATE");
   File->cd();
-  for ( int i=0; i<8; i++ ) { 
+  for ( int i=0; i<8; i++ ) {
     MT[i]->Write();
     MN[i]->Write();
   }
