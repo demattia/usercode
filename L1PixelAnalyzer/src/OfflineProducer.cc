@@ -301,7 +301,7 @@ OfflineProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
   // Not including DPhiMin for now
   // -----------------------------
   //  auto_ptr<OfflineMEt> offlineMEt( new OfflineMEt( MET->et(), MET->phi(), MET->sumEt(), MET->mEtSig(), 0. ) );
-  auto_ptr<OfflineMEt> offlineMEt( new OfflineMEt( MET->et(), L2MET->et(), L3MET->et(), MET->phi(), MET->sumEt(), MET->mEtSig() ) );
+  auto_ptr<OfflineMEt> offlineMEt( new OfflineMEt( MET->et(), L2MET->et(), L3MET->et(), MET->phi(), L2MET->phi(), L3MET->phi(), MET->sumEt(), L2MET->sumEt(), L3MET->sumEt(), MET->mEtSig(), L2MET->mEtSig(), L3MET->mEtSig() ) );
 
   iEvent.put( offlineMEt, offlineMEt_ );
 
@@ -377,25 +377,14 @@ OfflineProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
     // Collection of tracks associated to the current caloJet
     SimpleTrackCollection vec_SimpleTracks;
 
-//    int tkNum = TkIpTagInfo_it->selectedTracks().size();
-//    int tkNum_S1 = 0;
-//    int tkNum_S2 = 0;
-//    int tkNum_S3 = 0;
+    //    int tkNum = TkIpTagInfo_it->selectedTracks().size();
 
-//     int probNum_0 = TkIpTagInfo_it->probabilities(0).size();
-//     int probNum_1 = TkIpTagInfo_it->probabilities(1).size();
+    //     int probNum_0 = TkIpTagInfo_it->probabilities(0).size();
+    //     int probNum_1 = TkIpTagInfo_it->probabilities(1).size();
 
-//    double tkSumPt_S1 = 0.;
-//    double tkSumPt_S2 = 0.;
-//    double tkSumPt_S3 = 0.;
     const TrackRefVector & vec_TkColl = TkIpTagInfo_it->selectedTracks();
     // Take the IP vector (ordered as the selectedTracks vector)
     const vector<TrackIPTagInfo::TrackIPData> & vec_TkIP = TkIpTagInfo_it->impactParameterData();
-    // Additional vectors to store subgroups of selectedTracks
-//    TrackRefVector vec_TkColl_S1;
-//    TrackRefVector vec_TkColl_S2;
-//    TrackRefVector vec_TkColl_S3;
-
 
     // Jet mass
     double jetMass = 0;
