@@ -161,7 +161,9 @@ OfflineProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
   edm::Handle < L1JetParticleCollection > l1eCenJets;
   edm::Handle < L1JetParticleCollection > l1eForJets;
   edm::Handle < L1JetParticleCollection > l1eTauJets;
-  edm::Handle < L1EtMissParticle > l1eEtMiss;
+  // edm::Handle < L1EtMissParticle > l1eEtMiss;
+  // Taken from DQM/GCTMonitor/src/GCTMonitor.cc in 1_8_4
+  edm::Handle<L1EtMissParticleCollection> l1eEtMiss;
 
   // Offline
   edm::Handle<reco::CaloMETCollection> caloMET;
@@ -697,7 +699,9 @@ OfflineProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
     }
 
     // etMiss() method returns et() method (at least for version 1_7_0_pre10)
-    std::auto_ptr<BaseMEt> L1MEt( new BaseMEt( l1eEtMiss->etMiss(), l1eEtMiss->phi(), 0. ) );
+    // std::auto_ptr<BaseMEt> L1MEt( new BaseMEt( l1eEtMiss->etMiss(), l1eEtMiss->phi(), 0. ) );
+    // Taken from using the new definition with the vector<met> from 1_8_4
+    std::auto_ptr<BaseMEt> L1MEt( new BaseMEt( l1eEtMiss->begin()->etMiss(), l1eEtMiss->begin()->phi(), 0. ) );
 
     // Put the L1 jest collections in the event
     iEvent.put( v_CenJets_ptr, cenJets_ );
