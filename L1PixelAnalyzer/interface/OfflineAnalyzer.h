@@ -24,7 +24,7 @@
 //
 // Original Author:  Marco De Mattia
 //         Created:  Tue May  8 13:05:37 CEST 2007
-// $Id: OfflineAnalyzer.h,v 1.4 2007/12/20 12:28:47 demattia Exp $
+// $Id: OfflineAnalyzer.h,v 1.5 2008/01/14 13:27:00 demattia Exp $
 //
 //
 
@@ -49,72 +49,6 @@
 #include "TProfile.h"
 #include "TFile.h"
 
-// Data includes
-// -------------
-
-// // // GCT and RCT data formats
-// // #include "DataFormats/L1GlobalCaloTrigger/interface/L1GctCollections.h"
-// // #include "DataFormats/L1GlobalCaloTrigger/interface/L1GctEtSums.h"
-// // #include "DataFormats/L1CaloTrigger/interface/L1CaloCollections.h"
-
-// // L1Extra
-// // #include "DataFormats/CaloTowers/interface/CaloTowerCollection.h"
-// #include "DataFormats/Candidate/interface/Candidate.h"
-// #include "DataFormats/Candidate/interface/CandidateFwd.h"
-
-// #include "DataFormats/L1Trigger/interface/L1EmParticle.h"
-// #include "DataFormats/L1Trigger/interface/L1JetParticle.h"
-// #include "DataFormats/L1Trigger/interface/L1MuonParticle.h"
-// #include "DataFormats/L1Trigger/interface/L1EtMissParticle.h"
-// #include "DataFormats/L1Trigger/interface/L1ParticleMap.h"
-
-// #include "DataFormats/EcalDigi/interface/EcalDigiCollections.h"
-// #include "DataFormats/HcalDigi/interface/HcalDigiCollections.h"
-
-// #include "FastSimulation/L1CaloTriggerProducer/interface/FastL1Region.h"
-// // No BitInfos for release versions
-// #include "FastSimDataFormats/External/interface/FastL1BitInfo.h"
-
-// #include "Geometry/CaloTopology/interface/CaloTowerConstituentsMap.h"
-// #include "DataFormats/Math/interface/Vector3D.h"
-
-// // L1 Pixel
-// // #include "DataFormats/TrackerRecHit2D/interface/SiPixelRecHit.h"
-// // #include "DataFormats/SiPixelDetId/interface/PXBDetId.h"
-// // #include "DataFormats/SiPixelDetId/interface/PXFDetId.h"
-// // #include "DataFormats/SiPixelDetId/interface/PixelSubdetector.h"
-
-// // #include "Geometry/TrackerGeometryBuilder/interface/PixelGeomDetUnit.h"
-// // #include "Geometry/TrackerTopology/interface/RectangularPixelTopology.h"
-
-// #include "DataFormats/TrackerRecHit2D/interface/SiPixelRecHitCollection.h"
-// #include "FWCore/Framework/interface/ESHandle.h"
-// #include "DataFormats/GeometryVector/interface/GlobalPoint.h"
-// #include "DataFormats/GeometryVector/interface/GlobalVector.h"
-// #include "DataFormats/GeometryVector/interface/LocalVector.h"
-// #include "Geometry/TrackerGeometryBuilder/interface/TrackerGeometry.h"
-// #include "Geometry/Records/interface/TrackerDigiGeometryRecord.h"
-// #include "TrackingTools/Records/interface/TransientRecHitRecord.h"
-// #include "Geometry/TrackerGeometryBuilder/interface/GluedGeomDet.h"
-// #include "DataFormats/DetId/interface/DetId.h" 
-// #include "DataFormats/SiPixelDetId/interface/PXBDetId.h"
-// #include "DataFormats/SiPixelDetId/interface/PXFDetId.h"
-// #include "DataFormats/GeometryVector/interface/LocalPoint.h"
-// #include "DataFormats/GeometryVector/interface/GlobalPoint.h"
-
-// #include "DataFormats/TrackReco/interface/TrackFwd.h"
-// #include "DataFormats/TrackReco/interface/Track.h"
-
-// #include "AnalysisExamples/PixelJet/interface/PixelJet.h"
-
-// // GenJets
-// #include "DataFormats/JetReco/interface/GenJetCollection.h"
-// #include "DataFormats/JetReco/interface/GenJet.h"
-
-// // Calo MEt
-// #include "DataFormats/METReco/interface/CaloMET.h"
-
-
 // Associator for the jets
 #include "AnalysisExamples/AnalysisClasses/interface/Associator.h"
 
@@ -122,7 +56,6 @@
 #include "AnalysisExamples/AnalysisClasses/interface/L1Trig.h"
 #include "AnalysisExamples/AnalysisClasses/interface/HiVariables.h"
 #include "AnalysisExamples/AnalysisClasses/interface/MultiTH1F.h"
-#include "AnalysisExamples/AnalysisClasses/interface/L1PixelTrig.h"
 
 //
 // class declaration
@@ -167,7 +100,6 @@ class OfflineAnalyzer : public edm::EDAnalyzer {
   edm::InputTag offlineJetLabel_;
   edm::InputTag offlineMEtLabel_;
   edm::InputTag MCParticleLabel_;
-  edm::InputTag simplePixelJetLabel_;
   edm::InputTag globalMuonLabel_;
   edm::InputTag simpleElectronLabel_;
   edm::InputTag simpleTauLabel_;
@@ -184,14 +116,11 @@ class OfflineAnalyzer : public edm::EDAnalyzer {
   TH1F * corr_JetPt_IC5_;
   TH1F * JetNumber_IC5_;
 
-  TH1F * MEt_CorrIC5_Pt_;
-  TH1F * MEt_CorrIC5_Phi_;
-  TH1F * MEt_CorrIC5_SumEt_;
-  TH1F * MEt_CorrIC5_mEtSig_;
-
-  TH1F * PixelJet_dz_;
-  TH1F * PixelJet_Num_;
-  TH1F * PixelJet_Track_Num_;
+  int corrTypeNum_;
+  vector<TH1F *> MEtPt_;
+  vector<TH1F *> MEtPhi_;
+  vector<TH1F *> MEtSumEt_;
+  vector<TH1F *> MEtmEtSig_;
 
   // Means
   MultiTH1F * Multi_Vertex_Dz_;
@@ -273,42 +202,8 @@ class OfflineAnalyzer : public edm::EDAnalyzer {
   double dzmax_;
   int bins_;
 
-  // Pixel trigger efficiency
-  TH1F ** EffMultijetPixel_;
-  TH1F ** EffMultijetPixelEt1_;
-  TH1F ** EffMultijetPixelEt2_;
-  TH1F ** EffMultijetPixelEt3_;
-  TH1F ** EffMultijetPixelEt4_;
-  TH1F ** EffMEtJetPixel_;
-  int EffMultijetPixelSize_;
-  int EffMultijetPixelSizeEt1_;
-  int EffMultijetPixelSizeEt2_;
-  int EffMultijetPixelSizeEt3_;
-  int EffMultijetPixelSizeEt4_;
-  int EffMEtJetPixelSize_;
-  int ** EffMultijetPixelArray_;
-  int ** EffMultijetPixelArrayEt1_;
-  int ** EffMultijetPixelArrayEt2_;
-  int ** EffMultijetPixelArrayEt3_;
-  int ** EffMultijetPixelArrayEt4_;
-  int ** EffMEtJetPixelArray_;
-
-  // Offline efficiency
-  TH1F ** offlineEffMultijetPixel_;
-  TH1F ** offlineEffMEtJetPixel_;
-  int offlineEffMultijetPixelSize_;
-  int offlineEffMEtJetPixelSize_;
-  int ** offlineEffMultijetPixelArray_;
-  int ** offlineEffMEtJetPixelArray_;
-
   // Directory in the root file to hold the multiple histograms
   TDirectory *DirVertexDz_;
-
-  // PixelTrigger alone efficiency
-  int pixelTrig_3_;
-  int pixelTrig_4_;
-  int pixelTrig_5_;
-  int pixelTrig_6_;
 
   int *numgoodpjeff_;
   int *numgoodpjeff_3_;

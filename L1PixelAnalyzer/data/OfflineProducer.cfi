@@ -3,10 +3,10 @@ module offlineProd = OfflineProducer {
   //  untracked string OutputName = "L1TrigPixelAna.root"
 
   // Labels for L1Extra digis
-  untracked InputTag l1eCentralJetsSource       = fastL1CaloSim:Central
-  untracked InputTag l1eForwardJetsSource       = fastL1CaloSim:Forward
-  untracked InputTag l1eTauJetsSource           = fastL1CaloSim:Tau
-  untracked InputTag l1eEtMissSource            = fastL1CaloSim:
+  untracked InputTag l1eCentralJetsSource       = l1extraParticles:Central
+  untracked InputTag l1eForwardJetsSource       = l1extraParticles:Forward
+  untracked InputTag l1eTauJetsSource           = l1extraParticles:Tau
+  untracked InputTag l1eEtMissSource            = l1extraParticles:
 
   untracked string CaloJetAlgorithm             = "iterativeCone5CaloJets"
   untracked string L2JetCorrectionService       = "L2RelativeJetCorrectorIcone5"
