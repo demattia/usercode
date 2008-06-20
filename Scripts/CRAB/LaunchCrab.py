@@ -106,7 +106,7 @@ for type in range(typeNum):
     skipEvents = 0
 
     print
-    print "Creating job files, any previously existing file will be overwritten"
+    print "Creating job files, if the target ui_working_dir exists the jobs will not be created"
     print
     os.system("mkdir -p " + workingDir[type])
 
@@ -167,6 +167,9 @@ for type in range(typeNum):
             else:
                 outFile.write(s)
 
+        # Close the file or crab won't be able to use it
+        outFile.close()
+
         if skipEventsFound == False and useSkipEvents == True:
             print 'No skipEvents field found in the cfg file, please add it to the source module'
             exit()
@@ -204,6 +207,11 @@ for type in range(typeNum):
                     temp = s.split("=")
                     temp = temp[1].strip()
                     crabFile.write(s.replace(temp, storagePath[type]))
+                elif( s.find("ui_working_dir") != -1 ):
+                    temp = s.split("=")
+                    temp = temp[1].strip()
+                    crabJobDir = currentDir.strip() + "/" + workingDir[type].strip() + "/" + "CRAB_"+str(i)
+                    crabFile.write(s.replace(temp, crabJobDir))
                 else:
                     crabFile.write(s)
             else:
@@ -215,8 +223,13 @@ for type in range(typeNum):
         skipEvents += int(eventsPerJob[type])
 
         # Make the crab script executable and run it
-        os.system("chmod 777 " + crabFileName)
-        # os.system("bsub -R \"pool>40\" -q 8nh -J " + tempCfgFileName + "<" + crabFileName)
+        print "crab -create -cfg " + crabFileName
+        os.system("crab -create -cfg " + crabFileName)
+        print "Hacking crab. This is only needed in 1_8_4 (hopefully). Requires crab_2_1_2 to work."
+        print "./hack_crab.sh " + crabJobDir
+        os.system("./hack_crab.sh " + crabJobDir)
+        print "crab -submit -c " + crabJobDir
+        os.system("crab -submit -c "+crabJobDir)
 
     # end of loop on jobs
 
