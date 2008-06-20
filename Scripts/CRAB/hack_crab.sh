@@ -1,5 +1,15 @@
 #!/bin/bash
 
+# Hacks crab to get around the sandbox limit in 1_8_4 for FastSim.
+# Works only with crab 2_1_2, newer versions do not use a directory
+# modified by this script.
+#
+# How to use:
+# move the root files in FastSimulation/MaterialEffects/data
+# out of the data dir. Create the crab job, use the script and then
+# submit the job.
+
+
 if test -z "$1"; then
   CRABDIR=`ls -drt crab_0_* | tail -1`
 else
