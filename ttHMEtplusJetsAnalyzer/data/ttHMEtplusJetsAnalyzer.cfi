@@ -1,0 +1,19 @@
+module ttHMEtplusJetsAnalyzerModule = ttHMEtplusJetsAnalyzer {
+
+  // untracked string OutputName                   = "ttHMEtplusJetsAnalyzer.root"
+
+  // Labels for the objects to be opened
+  untracked InputTag CenJets                    = offlineProd:cenJets
+  untracked InputTag ForJets                    = offlineProd:forJets
+  untracked InputTag TauJets                    = offlineProd:tauJets
+  untracked InputTag L1MEt                      = offlineProd:l1MEt
+  untracked InputTag OfflineJets                = offlineProd:offlineJets
+  untracked InputTag OfflineMEt                 = offlineProd:offlineMEt
+  untracked InputTag MCParticles                = offlineProd:MCParticles
+  untracked InputTag GlobalMuons                = offlineProd:globalMuons
+  untracked InputTag SimpleElectrons            = offlineProd:simpleElectrons
+  untracked InputTag SimpleTaus                 = offlineProd:simpleTaus
+  untracked InputTag Summary                    = offlineProd:summary
+  untracked bool     withL1ForwardJets          = true
+
+}
