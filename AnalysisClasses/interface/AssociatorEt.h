@@ -104,7 +104,7 @@ std::auto_ptr<std::map<const T1*, const T2*> > AssociatorEt<T1, T2>::Associate( 
 
   using namespace std;
 
-  sort( v_T1_ptr.begin(), v_T1_ptr.end(), AssociatorEt_PtSort<T1, T1> );
+//  sort( v_T1_ptr.begin(), v_T1_ptr.end(), AssociatorEt_PtSort<T1, T1> );
 //  sort( v_T2_ptr.begin(), v_T2_ptr.end(), AssociatorEt_PtSort<T2, T2> );
 
   // Map to be returned
