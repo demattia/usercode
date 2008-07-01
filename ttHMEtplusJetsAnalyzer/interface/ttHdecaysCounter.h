@@ -25,12 +25,20 @@ public:
   ttHdecaysCounter(const TString & outFileName = TString("ttHdecays.txt"));
   // ~ttHdecaysCounter();
   /// uses the MCParticleCollection to determine the type of event and adds the count in the matrix
-  void countDecays(const MCParticleCollection & mcParticles);
+  pair<int,int> countDecays(const MCParticleCollection & mcParticles);
   /** write the decay type counts in the text file. The bool it receives is used to decide if to append
    * to an existing file or to create a new one (deleting any previously existing file with the same name).
    * By default it creates a new file (append = false).
    */
   void writeDecays(bool append = false);
+  /// Return a copy of the vector containing pointers to the MCPartons associated to the ttH decay
+  vector<const MCParticle *> partons() const {
+    return decayPartons_;
+  }
+  /// Return a copy of the vector containing pointers to the MCPartons associated to the hadronic partons of the ttH decay
+  vector<const MCParticle *> hadronicPartons() const {
+    return hadronicDecayPartons_;
+  }
 
 private:
   // Notation:
@@ -42,6 +50,10 @@ private:
   int eventCounter_;
   int higgsDecayNumbers_;
   int ttDecayNumbers_;
+
+  // Vectors with the pointers to the partons from the decay of the H and the ttbar for quicker access later.
+  vector<const MCParticle *> decayPartons_;
+  vector<const MCParticle *> hadronicDecayPartons_;
 };
 
 #endif // TTHDECAYSCOUNTER_H

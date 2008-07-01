@@ -20,17 +20,17 @@ ttHdecaysCounter::ttHdecaysCounter(const TString & OUTFILENAME) {
   outFileName_ = OUTFILENAME;
 }
 
-void ttHdecaysCounter::countDecays(const MCParticleCollection & mcParticles) {
+pair<int,int> ttHdecaysCounter::countDecays(const MCParticleCollection & mcParticles) {
+
+  // Clear the vectors
+  decayPartons_.clear();
+  hadronicDecayPartons_.clear();
 
   ++eventCounter_;
 
   int foundw=0;
   int iparton=0;
 
-  // Array with the pointers to the partons from the decay of the H and the ttbar for quicker access later.
-  // At most 8, but not all are necessarily used.
-  vector<const MCParticle *> decayPartons;
-  vector<const MCParticle *> hadronicDecayPartons;
 
   // NB we know that the block is filled with top and antitop first, then Higgs
   // So we need not worry about messing up W's from top and from H ...
@@ -51,7 +51,7 @@ void ttHdecaysCounter::countDecays(const MCParticleCollection & mcParticles) {
       foundw++;
       // For hadronic W decay from top, store info on partons
       if ( iparton<8 ) {
-        decayPartons.push_back(&(*MCp));
+        decayPartons_.push_back(&(*MCp));
         // The decay types we distinguish for W+ and W- are 4: jets, enu, munu, taunu
         // For the W+
         if ( mPid == 24 ) {
@@ -69,22 +69,22 @@ void ttHdecaysCounter::countDecays(const MCParticleCollection & mcParticles) {
         }
         // Store the hadronic partons from W decays, if any
         if (absPid<6) {
-          hadronicDecayPartons.push_back(&(*MCp));
+          hadronicDecayPartons_.push_back(&(*MCp));
         }
         iparton++;
       }
     }
     // Store information on b partons from t, tbar
     if ( absMpid==6 && absPid==5 && iparton<8 ) {
-      decayPartons.push_back(&(*MCp));
-      hadronicDecayPartons.push_back(&(*MCp));
+      decayPartons_.push_back(&(*MCp));
+      hadronicDecayPartons_.push_back(&(*MCp));
       iparton++;
     }
     // Store the partons from the Higgs decay
     if ( mPid==25 && iparton<8 ) {
-      decayPartons.push_back(&(*MCp));
+      decayPartons_.push_back(&(*MCp));
       if (absPid<6) {
-        hadronicDecayPartons.push_back(&(*MCp));
+        hadronicDecayPartons_.push_back(&(*MCp));
       }
       // Determine Higgs decay type
       if ( absPid == 4 ) HdecayType = 0;       // H->cc
@@ -105,16 +105,19 @@ void ttHdecaysCounter::countDecays(const MCParticleCollection & mcParticles) {
   if ( HdecayType == -1 ) HdecayType = 4;
 
   // Parton vectors filled. Check the type of the event and increase the counter.
-  if ( WplusDecayType + WminusDecayType == 2 )    decayTypes_[HdecayType][0]++; // tt->6jets
-  if ( WplusDecayType + WminusDecayType == 11 )   decayTypes_[HdecayType][1]++; // tt->enu4jets
-  if ( WplusDecayType + WminusDecayType == 101 )  decayTypes_[HdecayType][2]++; // tt->munu4jets
-  if ( WplusDecayType + WminusDecayType == 1001 ) decayTypes_[HdecayType][3]++; // tt->taunu4jets
-  if ( WplusDecayType + WminusDecayType == 20 )   decayTypes_[HdecayType][4]++; // tt->enuenu2jets
-  if ( WplusDecayType + WminusDecayType == 110 )  decayTypes_[HdecayType][5]++; // tt->enumunu2jets
-  if ( WplusDecayType + WminusDecayType == 1010 ) decayTypes_[HdecayType][6]++; // tt->enutaunu2jets
-  if ( WplusDecayType + WminusDecayType == 200 )  decayTypes_[HdecayType][7]++; // tt->munumunu2jets
-  if ( WplusDecayType + WminusDecayType == 1100 ) decayTypes_[HdecayType][8]++; // tt->munutaunu2jets
-  if ( WplusDecayType + WminusDecayType == 2000 ) decayTypes_[HdecayType][9]++; // tt->taunutaunu2jets
+  int ttDecayType = WplusDecayType + WminusDecayType;
+  if ( ttDecayType == 2 )    decayTypes_[HdecayType][0]++; // tt->6jets
+  if ( ttDecayType == 11 )   decayTypes_[HdecayType][1]++; // tt->enu4jets
+  if ( ttDecayType == 101 )  decayTypes_[HdecayType][2]++; // tt->munu4jets
+  if ( ttDecayType == 1001 ) decayTypes_[HdecayType][3]++; // tt->taunu4jets
+  if ( ttDecayType == 20 )   decayTypes_[HdecayType][4]++; // tt->enuenu2jets
+  if ( ttDecayType == 110 )  decayTypes_[HdecayType][5]++; // tt->enumunu2jets
+  if ( ttDecayType == 1010 ) decayTypes_[HdecayType][6]++; // tt->enutaunu2jets
+  if ( ttDecayType == 200 )  decayTypes_[HdecayType][7]++; // tt->munumunu2jets
+  if ( ttDecayType == 1100 ) decayTypes_[HdecayType][8]++; // tt->munutaunu2jets
+  if ( ttDecayType == 2000 ) decayTypes_[HdecayType][9]++; // tt->taunutaunu2jets
+
+  return(make_pair(HdecayType,ttDecayType));
 }
 
 void ttHdecaysCounter::writeDecays(bool append) {

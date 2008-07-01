@@ -28,6 +28,21 @@
 
 #include "AnalysisExamples/ttHMEtplusJetsAnalyzer/interface/ttHdecaysCounter.h"
 
+// Classes to be accessed
+// ----------------------
+#include "AnalysisExamples/AnalysisObjects/interface/BaseJet.h"
+#include "AnalysisExamples/AnalysisObjects/interface/BaseMEt.h"
+#include "AnalysisExamples/AnalysisObjects/interface/OfflineMEt.h"
+#include "AnalysisExamples/AnalysisObjects/interface/OfflineJet.h"
+#include "AnalysisExamples/AnalysisObjects/interface/SimpleTrack.h"
+#include "AnalysisExamples/AnalysisObjects/interface/MCParticle.h"
+#include "AnalysisExamples/AnalysisObjects/interface/GlobalMuon.h"
+#include "AnalysisExamples/AnalysisObjects/interface/SimpleElectron.h"
+#include "AnalysisExamples/AnalysisObjects/interface/SimpleTau.h"
+#include "AnalysisExamples/AnalysisObjects/interface/Summary.h"
+#include "AnalysisExamples/AnalysisClasses/interface/DeltaR.h"
+#include "AnalysisExamples/AnalysisClasses/interface/SimpleJet.h"
+
 using namespace std;
 using namespace anaobj;
 using namespace edm;
@@ -38,6 +53,10 @@ class ttHMEtplusJetsAnalyzer : public edm::EDAnalyzer {
 public:
   explicit ttHMEtplusJetsAnalyzer(const edm::ParameterSet&);
   ~ttHMEtplusJetsAnalyzer();
+  /// To check if a good muon is found in the event
+  bool goodMuon( const GlobalMuonCollection & globalMuons, const OfflineJetCollection & caloJets );
+  /// To check if a good electron is found in the event
+  bool goodElectron( const SimpleElectronCollection & simpleElectrons, const OfflineJetCollection & caloJets );
 
 private:
   virtual void beginJob(const edm::EventSetup&);
@@ -59,7 +78,7 @@ private:
   edm::InputTag summaryLabel_;
   bool withL1ForwardJets_;
 
-  int eventcounter_;
+  int eventCounter_;
 
   // Declare as static so that only one exists, even if more
   // than one TDAna object is created

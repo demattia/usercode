@@ -9,23 +9,6 @@
 
 #include "AnalysisExamples/ttHMEtplusJetsAnalyzer/interface/ttHMEtplusJetsAnalyzer.h"
 
-#include <FWCore/Framework/interface/Frameworkfwd.h>
-
-// Classes to be accessed
-// ----------------------
-#include "AnalysisExamples/AnalysisObjects/interface/BaseJet.h"
-#include "AnalysisExamples/AnalysisObjects/interface/BaseMEt.h"
-#include "AnalysisExamples/AnalysisObjects/interface/OfflineMEt.h"
-#include "AnalysisExamples/AnalysisObjects/interface/OfflineJet.h"
-#include "AnalysisExamples/AnalysisObjects/interface/SimpleTrack.h"
-#include "AnalysisExamples/AnalysisObjects/interface/MCParticle.h"
-#include "AnalysisExamples/AnalysisObjects/interface/GlobalMuon.h"
-#include "AnalysisExamples/AnalysisObjects/interface/SimpleElectron.h"
-#include "AnalysisExamples/AnalysisObjects/interface/SimpleTau.h"
-#include "AnalysisExamples/AnalysisObjects/interface/Summary.h"
-#include "AnalysisExamples/AnalysisClasses/interface/DeltaR.h"
-#include "AnalysisExamples/AnalysisClasses/interface/SimpleJet.h"
-
 L1Trig ttHMEtplusJetsAnalyzer::L1Trigger;
 
 // Constructors and destructor
@@ -44,7 +27,7 @@ ttHMEtplusJetsAnalyzer::ttHMEtplusJetsAnalyzer(const edm::ParameterSet& iConfig)
   simpleTauLabel_( iConfig.getUntrackedParameter<edm::InputTag>( "SimpleTaus" ) ),
   summaryLabel_( iConfig.getUntrackedParameter<edm::InputTag>( "Summary" ) ),
   withL1ForwardJets_( iConfig.getUntrackedParameter<bool>("withL1ForwardJets") ),
-  eventcounter_(0),
+  eventCounter_(0),
   l1Eff_(0)
 {
   countTTHdecays_ = new ttHdecaysCounter("ttHdecays.txt");
@@ -108,9 +91,9 @@ void ttHMEtplusJetsAnalyzer::analyze(const edm::Event& iEvent, const edm::EventS
   // --- end loading handles with collections ---
   // --------------------------------------------
 
-  eventcounter_++;
-  if ( eventcounter_/100 == float(eventcounter_)/100. ) {
-    std::cout << "Event number " << eventcounter_ << std::endl;
+  eventCounter_++;
+  if ( eventCounter_/100 == float(eventCounter_)/100. ) {
+    std::cout << "Event number " << eventCounter_ << std::endl;
   }
   // ------------------- //
   // L1 Trigger response //
@@ -128,11 +111,29 @@ void ttHMEtplusJetsAnalyzer::analyze(const edm::Event& iEvent, const edm::EventS
   // ----------------------------------- //
   // Determine the type of event from MC //
   // ----------------------------------- //
-
   edm::Handle < MCParticleCollection > MCpartons;
   iEvent.getByLabel( MCParticleLabel_, MCpartons );
+  // The first index is for the Higgs decay, the second for the ttbar.
+  // Check ttHdecaysCounter for the decay codes.
+  pair<int,int> decayType(countTTHdecays_->countDecays(*MCpartons));
+  // ----------------------------------- //
 
-  countTTHdecays_->countDecays(*MCpartons);
+  // ------------------------------------------------ //
+  // Check if a good electron or muon is in the event //
+  // ------------------------------------------------ //
+  edm::Handle<OfflineJetCollection> caloJets;
+  iEvent.getByLabel( offlineJetLabel_, caloJets );
+  //  bool goodElectronFound = goodElectron( *simpleElectrons, *caloJets);
+  //  bool goodMuonFound = goodMuon( *globalMuons, *caloJets);
+  // ------------------------------------------------ //
+
+  // Associate partons to offlineJets only for H->bb/cc and tt->leptons+4jets decays
+  int higgsDecayType = decayType.first;
+  int ttDecayType = decayType.second;
+  if ( (higgsDecayType == 0 || higgsDecayType == 1) && (ttDecayType == 11 || ttDecayType == 101 || ttDecayType == 1001) ) {
+    cout << "ttH->MEt+4Jets decay" << endl;
+  }
+
 }
 
 //       method called once each job just before starting event loop  
@@ -148,6 +149,50 @@ void ttHMEtplusJetsAnalyzer::endJob() {
   countTTHdecays_->writeDecays();
   delete countTTHdecays_;
 }
+
+// See if we have a good high-Pt electron or muon
+// ----------------------------------------------
+bool ttHMEtplusJetsAnalyzer::goodMuon( const GlobalMuonCollection & globalMuons, const OfflineJetCollection & caloJets ) {
+  bool muonEvent = false;
+  for ( GlobalMuonCollection::const_iterator muon = globalMuons.begin(); 
+	muon != globalMuons.end() && !muonEvent; ++muon ) {
+    if ( muon->pt()>25 && fabs(muon->eta())<2.5 ) { 
+      // See if there are jets closer than 0.5 from this one
+      // ---------------------------------------------------
+      double dRmin=25.;
+      for ( OfflineJetCollection::const_iterator cal = caloJets.begin(); 
+	    cal != caloJets.end(); ++cal ) {
+	if ( cal->et()>25. ) { 
+	  double dR = DeltaR(cal->eta(), cal->phi(), muon->eta(), muon->phi());
+	  if ( dR<dRmin ) dRmin=dR;
+	}
+      }
+      if ( dRmin>0.25 ) muonEvent = true;
+    }
+  }
+  return muonEvent;
+}
+bool ttHMEtplusJetsAnalyzer::goodElectron( const SimpleElectronCollection & simpleElectrons, const OfflineJetCollection & caloJets ) {
+  bool elecEvent = false;
+  for ( SimpleElectronCollection::const_iterator elec = simpleElectrons.begin(); 
+	elec != simpleElectrons.end() && !elecEvent; ++elec ) {
+    if ( elec->et()>30 && fabs(elec->eta())<2.5 && elec->hadOverEm()<0.05 ) {
+      // See if there are jets closer than 0.5 from this one
+      // ---------------------------------------------------
+      double dRmin=25.;
+      for ( OfflineJetCollection::const_iterator cal = caloJets.begin(); 
+	    cal != caloJets.end(); ++cal ) {
+	if ( cal->et()>25. && cal->emEnergyFraction()<0.95 ) { 
+	  double dR = DeltaR(cal->eta(), cal->phi(), elec->eta(), elec->phi());
+	  if ( dR<dRmin ) dRmin=dR;
+	}
+      }
+      if ( dRmin>0.25 ) elecEvent = true;
+    }
+  }
+  return elecEvent;
+}
+
 
 #endif // TTHMETPLUSJETSANALYZER_CC
 

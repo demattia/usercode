@@ -1,0 +1,13 @@
+module HadTopAndHiggsMassProbabilityModule = HadTopAndHiggsMassProbability {
+
+  // Labels for the objects to be opened
+  untracked InputTag OfflineJets                = offlineProd:offlineJets
+  untracked InputTag MCParticles                = offlineProd:MCParticles
+  untracked string OutputName                   = "HadTopAndHiggsMassProbability.root"
+  untracked uint32 EtBinNum                     = 10
+  untracked double EtBinSize                    = 50.
+  untracked uint32 EtaBinNum                    = 10
+  untracked double EtaBinSize                   = 0.4
+  untracked uint32 DRbinNum                     = 10
+  untracked double DRbinSize                    = 0.4
+}
