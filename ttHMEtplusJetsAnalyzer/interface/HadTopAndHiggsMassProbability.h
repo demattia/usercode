@@ -57,11 +57,19 @@ private:
 
   edm::InputTag offlineJetLabel_;
   edm::InputTag MCParticleLabel_;
+  double jetEtCut_;
+  double jetEtaCut_;
 
   TFile * outputFile_;
 
   TProfile * jetVsMCpEt_;
   TH1F * higgsMassTrue_;
+  TH1F * trueHiggsPairEt_;
+  TH1F * trueHiggsPairEta_;
+  TH1F * trueHiggsPairDR_;
+  TH1F * falseHiggsPairEt_;
+  TH1F * falseHiggsPairEta_;
+  TH1F * falseHiggsPairDR_;
 
   // Bins for the probability matrix
   unsigned int etBinNum_;
