@@ -1,0 +1,26 @@
+<use name=AnalysisExamples/AnalysisClasses>
+<use name=AnalysisExamples/AnalysisObjects>
+<use name=FWCore/Framework>
+<use name=Foundation/PluginManager>
+<use name=FWCore/ParameterSet>
+<use name=FWCore/Utilities>
+<flags EDM_PLUGIN=1>
+<export>
+  <use name=AnalysisExamples/AnalysisClasses>
+  <use name=AnalysisExamples/AnalysisObjects>
+  <use name=FWCore/Framework>
+  <use name=Foundation/PluginManager>
+  <use name=FWCore/ParameterSet>
+  <use name=FWCore/Utilities>
+  <lib name=AnalysisExamplesttHMEtplusJetsAnalyzer>
+</export>
+
+<export>
+  <use name=AnalysisExamples/AnalysisClasses>
+  <use name=AnalysisExamples/AnalysisObjects>
+  <use name=FWCore/Framework>
+  <use name=Foundation/PluginManager>
+  <use name=FWCore/ParameterSet>
+  <use name=FWCore/Utilities>
+  <lib name=AnalysisExamplesHadTopAndHiggsMassProbability>
+</export>
