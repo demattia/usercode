@@ -5,12 +5,18 @@ module HadTopAndHiggsMassProbabilityModule = HadTopAndHiggsMassProbability {
   untracked InputTag MCParticles                = offlineProd:MCParticles
   untracked string OutputName                   = "HadTopAndHiggsMassProbability.root"
   // Bins and respective size for the trueH and falseH matrices
-  untracked uint32 EtBinNum                     = 10
-  untracked double EtBinSize                    = 50.
-  untracked uint32 EtaBinNum                    = 10
-  untracked double EtaBinSize                   = 0.4
-  untracked uint32 DRbinNum                     = 10
-  untracked double DRbinSize                    = 0.4
+  untracked uint32 HiggsEtBinNum                 = 10
+  untracked double HiggsEtBinSize                = 50.
+  untracked uint32 HiggsEtaBinNum                = 10
+  untracked double HiggsEtaBinSize               = 0.4
+  untracked uint32 HiggsDRbinNum                 = 10
+  untracked double HiggsDRbinSize                = 0.4
+  untracked uint32 HadronicTopEtBinNum          = 10
+  untracked double HadronicTopEtBinSize         = 60.
+  untracked uint32 HadronicTopEtaBinNum         = 10
+  untracked double HadronicTopEtaBinSize        = 0.4
+  untracked uint32 DPhiHiggsHadronicTopBinNum   = 10
+  untracked double DPhiHiggsHadronicTopBinSize  = 0.315
   // Cuts on the jets
   untracked double JetEtCut                     = 25.
   untracked double JetEtaCut                    = 3.0

@@ -70,18 +70,32 @@ private:
   TH1F * falseHiggsPairEt_;
   TH1F * falseHiggsPairEta_;
   TH1F * falseHiggsPairDR_;
+  TH1F * trueHadronicTopTripletEt_;
+  TH1F * trueHadronicTopTripletEta_;
+  TH1F * trueHadronicTopTripletDphiHiggsHadronicTop_;
+  TH1F * falseHadronicTopTripletEt_;
+  TH1F * falseHadronicTopTripletEta_;
+  TH1F * falseHadronicTopTripletDphiHiggsHadronicTop_;
 
   // Bins for the probability matrix
-  unsigned int etBinNum_;
-  double etBinSize_;
-  unsigned int etaBinNum_;
-  double etaBinSize_;
-  unsigned int dRbinNum_;
-  double dRbinSize_;
+  unsigned int higgsEtBinNum_;
+  double higgsEtBinSize_;
+  unsigned int higgsEtaBinNum_;
+  double higgsEtaBinSize_;
+  unsigned int higgsDRbinNum_;
+  double higgsDRbinSize_;
+  unsigned int hadronicTopEtBinNum_;
+  double hadronicTopEtBinSize_;
+  unsigned int hadronicTopEtaBinNum_;
+  double hadronicTopEtaBinSize_;
+  unsigned int dPhiHiggsHadronicTopBinNum_;
+  double dPhiHiggsHadronicTopBinSize_;
 
   // This will be the multidimensional array
   unsigned int *** trueH_;
   unsigned int *** falseH_;
+  unsigned int *** trueHadronicTop_;
+  unsigned int *** falseHadronicTop_;
 };
 
 #endif // HADTOPANDHIGGSMASSPROBABILITY_H

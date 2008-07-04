@@ -6,6 +6,7 @@
 #include "AnalysisExamples/AnalysisClasses/interface/SumJets.h"
 
 #include <fstream>
+#include <memory>
 
 HadTopAndHiggsMassProbability::HadTopAndHiggsMassProbability(const ParameterSet & iConfig) :
   conf_(iConfig),
@@ -13,12 +14,18 @@ HadTopAndHiggsMassProbability::HadTopAndHiggsMassProbability(const ParameterSet 
   MCParticleLabel_( iConfig.getUntrackedParameter<edm::InputTag>( "MCParticles" ) ),
   jetEtCut_(iConfig.getUntrackedParameter<double>( "JetEtCut" ) ),
   jetEtaCut_(iConfig.getUntrackedParameter<double>( "JetEtaCut" ) ),
-  etBinNum_( iConfig.getUntrackedParameter<unsigned int>( "EtBinNum" ) ),
-  etBinSize_( iConfig.getUntrackedParameter<double>( "EtBinSize" ) ),
-  etaBinNum_( iConfig.getUntrackedParameter<unsigned int>( "EtaBinNum" ) ),
-  etaBinSize_( iConfig.getUntrackedParameter<double>( "EtaBinSize" ) ),
-  dRbinNum_( iConfig.getUntrackedParameter<unsigned int>( "DRbinNum" ) ),
-  dRbinSize_( iConfig.getUntrackedParameter<double>( "DRbinSize" ) )
+  higgsEtBinNum_( iConfig.getUntrackedParameter<unsigned int>( "HiggsEtBinNum" ) ),
+  higgsEtBinSize_( iConfig.getUntrackedParameter<double>( "HiggsEtBinSize" ) ),
+  higgsEtaBinNum_( iConfig.getUntrackedParameter<unsigned int>( "HiggsEtaBinNum" ) ),
+  higgsEtaBinSize_( iConfig.getUntrackedParameter<double>( "HiggsEtaBinSize" ) ),
+  higgsDRbinNum_( iConfig.getUntrackedParameter<unsigned int>( "HiggsDRbinNum" ) ),
+  higgsDRbinSize_( iConfig.getUntrackedParameter<double>( "HiggsDRbinSize" ) ),
+  hadronicTopEtBinNum_( iConfig.getUntrackedParameter<unsigned int>( "HadronicTopEtBinNum" ) ),
+  hadronicTopEtBinSize_( iConfig.getUntrackedParameter<double>( "HadronicTopEtBinSize" ) ),
+  hadronicTopEtaBinNum_( iConfig.getUntrackedParameter<unsigned int>( "HadronicTopEtaBinNum" ) ),
+  hadronicTopEtaBinSize_( iConfig.getUntrackedParameter<double>( "HadronicTopEtaBinSize" ) ),
+  dPhiHiggsHadronicTopBinNum_( iConfig.getUntrackedParameter<unsigned int>( "DPhiHiggsHadronicTopBinNum" ) ),
+  dPhiHiggsHadronicTopBinSize_( iConfig.getUntrackedParameter<double>( "DPhiHiggsHadronicTopBinSize" ) )
 {
   countTTHdecays_ = new ttHdecaysCounter("ttHdecays.txt");
 
@@ -35,25 +42,52 @@ HadTopAndHiggsMassProbability::HadTopAndHiggsMassProbability(const ParameterSet 
   jetVsMCpEt_ = new TProfile("jetVsMCpEt", "jet-et vs parton-pt", 100, 0, 600, 0, 600);
   higgsMassTrue_ = new TH1F("higgsMassTrue", "mass of the two b-jets associated to the MC Higgs", 100, 0, 200);
 
-  // True and flase Higgs pair histograms
+  // True and false Higgs pair histograms
   trueHiggsPairEt_ = new TH1F("trueHiggsPairEt", "Et of the two b-jets associated to the MC Higgs", 100, 0, 200);
   trueHiggsPairEta_ = new TH1F("trueHiggsPairEta", "Eta of the two b-jets associated to the MC Higgs", 100, -3, 3);
   trueHiggsPairDR_ = new TH1F("trueHiggsPairDR", "#DeltaR of the two b-jets associated to the MC Higgs", 100, 0, 10);
   falseHiggsPairEt_ = new TH1F("falseHiggsPairEt", "Et of two b-jets not associated to the MC Higgs", 100, 0, 200);
   falseHiggsPairEta_ = new TH1F("falseHiggsPairEta", "Eta of two b-jets not associated to the MC Higgs", 100, -3, 3);
   falseHiggsPairDR_ = new TH1F("falseHiggsPairDR", "#DeltaR of two b-jets not associated to the MC Higgs", 100, 0, 10);
+  // True and false hadronic top triplet histograms
+  trueHadronicTopTripletEt_ = new TH1F("trueHadronicTopTripletEt", "Et of the three jets associated to the MC hadronic top", 100, 0, 300);
+  trueHadronicTopTripletEta_ = new TH1F("trueHadronicTopTripletEta", "Eta of the three jets associated to the MC hadronic top", 100, -3, 3);
+  trueHadronicTopTripletDphiHiggsHadronicTop_ = new TH1F("trueHadronicTopTripletDphiHiggsHadronicTop",
+                                                         "#Delta#Phi of the three jets associated to the MC hadronic top", 100, 0, 3.15);
+  falseHadronicTopTripletEt_ = new TH1F("falseHadronicTopTripletEt", "Et of the three jets not associated to the MC hadronic top", 100, 0, 300);
+  falseHadronicTopTripletEta_ = new TH1F("falseHadronicTopTripletEta", "Eta of the three jets not associated to the MC hadronic top", 100, -3, 3);
+  falseHadronicTopTripletDphiHiggsHadronicTop_ = new TH1F("falseHadronicTopTripletDphiHiggsHadronicTop",
+                                                          "#Delta#Phi of the three jets not associated to the MC hadronic top", 100, 0, 3.15);
 
-  trueH_ = new unsigned int**[etBinNum_];
-  falseH_ = new unsigned int**[etBinNum_];
-  for(unsigned int i=0; i != etBinNum_; ++i) {
-    trueH_[i] = new unsigned int*[etaBinNum_];
-    falseH_[i] = new unsigned int*[etaBinNum_];
-    for(unsigned int j=0; j != etaBinNum_; ++j) {
-      trueH_[i][j] = new unsigned int[dRbinNum_];
-      falseH_[i][j] = new unsigned int[dRbinNum_];
-      for(unsigned int k=0; k != dRbinNum_; ++k) {
-        trueH_[i][j][k] = 0;
-        falseH_[i][j][k] = 0;
+
+  // Initialized to 1, not 0, since they are used to evaluate fractions
+  // ------------------------------------------------------------------
+  trueH_ = new unsigned int**[higgsEtBinNum_];
+  falseH_ = new unsigned int**[higgsEtBinNum_];
+  for(unsigned int i=0; i != higgsEtBinNum_; ++i) {
+    trueH_[i] = new unsigned int*[higgsEtaBinNum_];
+    falseH_[i] = new unsigned int*[higgsEtaBinNum_];
+    for(unsigned int j=0; j != higgsEtaBinNum_; ++j) {
+      trueH_[i][j] = new unsigned int[higgsDRbinNum_];
+      falseH_[i][j] = new unsigned int[higgsDRbinNum_];
+      for(unsigned int k=0; k != higgsDRbinNum_; ++k) {
+        trueH_[i][j][k] = 1;
+        falseH_[i][j][k] = 1;
+      }
+    }
+  }
+
+  trueHadronicTop_ = new unsigned int**[hadronicTopEtBinNum_];
+  falseHadronicTop_ = new unsigned int**[hadronicTopEtBinNum_];
+  for(unsigned int i=0; i != hadronicTopEtBinNum_; ++i) {
+    trueHadronicTop_[i] = new unsigned int*[hadronicTopEtaBinNum_];
+    falseHadronicTop_[i] = new unsigned int*[hadronicTopEtaBinNum_];
+    for(unsigned int j=0; j != hadronicTopEtaBinNum_; ++j) {
+      trueHadronicTop_[i][j] = new unsigned int[dPhiHiggsHadronicTopBinNum_];
+      falseHadronicTop_[i][j] = new unsigned int[dPhiHiggsHadronicTopBinNum_];
+      for(unsigned int k=0; k != dPhiHiggsHadronicTopBinNum_; ++k) {
+        trueHadronicTop_[i][j][k] = 1;
+        falseHadronicTop_[i][j][k] = 1;
       }
     }
   }
@@ -112,6 +146,9 @@ void HadTopAndHiggsMassProbability::analyze(const edm::Event& iEvent, const edm:
   int ttDecayType = decayType.second;
   if ( (higgsDecayType == 0 || higgsDecayType == 1) && (ttDecayType == 11 || ttDecayType == 101 || ttDecayType == 1001) ) {
 
+    // To hold the true Higgs b-jet pair (if any). Needed by the top triplet.
+    auto_ptr<BaseJet> trueHiggsPair;
+
     AssociatorEt<MCParticle, OfflineJet> assocJetMCpartons(0.5);
     auto_ptr<mapMCpJet> mapPtr(assocJetMCpartons.Associate(ttHpartons, goodJets));
     for ( mapMCpJet::const_iterator mapIt = mapPtr->begin(); mapIt != mapPtr->end(); ++mapIt ) {
@@ -149,13 +186,13 @@ void HadTopAndHiggsMassProbability::analyze(const edm::Event& iEvent, const edm:
             double pairEta = summedJet.eta();
 
             // Determine bin index
-            int etId = int(pairEt/etBinSize_);
-            int etaId = int(fabs(pairEta)/etaBinSize_);
-            int dRId = int(dR/dRbinSize_);
+            int etId = int(pairEt/higgsEtBinSize_);
+            int etaId = int(fabs(pairEta)/higgsEtaBinSize_);
+            int dRId = int(dR/higgsDRbinSize_);
             if ( etId < 0 || etaId < 0 || dRId < 0 ) cout << "Error: index < 0, will crash..." << endl;
-            if ( etId>int(etBinNum_-1) ) etId = etBinNum_-1;
-            if ( etaId>int(etaBinNum_-1) ) etaId = etaBinNum_-1;
-            if ( dRId>int(dRbinNum_-1) ) dRId = dRbinNum_-1;
+            if ( etId>int(higgsEtBinNum_-1) ) etId = higgsEtBinNum_-1;
+            if ( etaId>int(higgsEtaBinNum_-1) ) etaId = higgsEtaBinNum_-1;
+            if ( dRId>int(higgsDRbinNum_-1) ) dRId = higgsDRbinNum_-1;
 
             // If both b-tagged jets are associated bb from H fill HcombTrue.txt
             if ( abs(parton1->pid()) == 5 && abs(parton2->pid()) == 5 && parton1->mPid() == 25 && parton2->mPid() == 25 ) {
@@ -168,6 +205,8 @@ void HadTopAndHiggsMassProbability::analyze(const edm::Event& iEvent, const edm:
               trueHiggsPairEta_->Fill(pairEta);
               trueHiggsPairDR_->Fill(dR);
               (trueH_[etId][etaId][dRId])++;
+              // Save the true Higgs b-jet pair for the following top triplet
+              trueHiggsPair = auto_ptr<BaseJet>(new BaseJet(summedJet));
             }
             // else fill HcombFalse.txt
             else {
@@ -184,50 +223,87 @@ void HadTopAndHiggsMassProbability::analyze(const edm::Event& iEvent, const edm:
 
     // Need to evaluate the DPhi between the hadronic top and the true Higgs.
     // Search for the top only if the trueHiggs was found
-    for ( mapMCpJet::const_iterator mapIt = mapPtr->begin(); mapIt != mapPtr->end(); ++mapIt ) {
-      const MCParticle * parton1 = mapIt->first;
-      // if it is associated to a parton from a top
-      if ( abs(parton1->mPid()) == 6 ) {
+    if (trueHiggsPair.get() != 0) {
+      for ( mapMCpJet::const_iterator mapIt = mapPtr->begin(); mapIt != mapPtr->end(); ++mapIt ) {
+        const MCParticle * parton1 = mapIt->first;
 
         mapMCpJet::const_iterator subMapIt = mapIt;
         ++subMapIt;
         for ( ; subMapIt != mapPtr->end(); ++subMapIt ) {
           const MCParticle * parton2 = subMapIt->first;
-          // if it is associated to the same top as the first parton
-          if ( parton2->mPid() == parton1->mPid() ) {
-            // Take the third jet, starting from the next to the second
-            BaseJet summedJet( sumJets( mapIt->second, subMapIt->second ) );
+          // Take the third jet, starting from the next to the second
+          BaseJet summedJet( sumJets( mapIt->second, subMapIt->second ) );
 
-            mapMCpJet::const_iterator subSubMapIt = subMapIt;
-            ++subSubMapIt;
-            for ( ; subSubMapIt != mapPtr->end(); ++subSubMapIt ) {
-              const MCParticle * parton3 = subSubMapIt->first;
-              // if also the third parton comes from the same top
-              if ( parton3->mPid() == parton2->mPid() ) {
-                const OfflineJet * jet3 = subSubMapIt->second;
-                BaseJet tripletJet( sumJets( &summedJet, jet3 ) );
-                // trueTop_[etId][etaId][];
-              }
+          mapMCpJet::const_iterator subSubMapIt = subMapIt;
+          ++subSubMapIt;
+          for ( ; subSubMapIt != mapPtr->end(); ++subSubMapIt ) {
+            const MCParticle * parton3 = subSubMapIt->first;
+            const OfflineJet * jet3 = subSubMapIt->second;
+            BaseJet tripletJet( sumJets( &summedJet, jet3 ) );
+
+            double etHadronicTop = tripletJet.et();
+            double etaHadronicTop = tripletJet.eta();
+            double dPhiHiggsHadronicTop = DeltaPhi(trueHiggsPair->phi(), tripletJet.phi());
+            // Determine bin index
+            int etId = int(etHadronicTop/hadronicTopEtBinSize_);
+            int etaId = int(fabs(etaHadronicTop)/hadronicTopEtaBinSize_);
+            int dPhiHiggsHadronicTopId = int(dPhiHiggsHadronicTop/dPhiHiggsHadronicTopBinSize_);
+            if ( etId < 0 || etaId < 0 || dPhiHiggsHadronicTopId < 0 ) cout << "Error: index < 0, will crash..." << endl;
+            if ( etId>int(hadronicTopEtBinNum_-1) ) etId = hadronicTopEtBinNum_-1;
+            if ( etaId>int(hadronicTopEtaBinNum_-1) ) etaId = hadronicTopEtaBinNum_-1;
+            if ( dPhiHiggsHadronicTopId>int(dPhiHiggsHadronicTopBinNum_-1) ) dPhiHiggsHadronicTopId = dPhiHiggsHadronicTopId-1;
+
+            // if all three jets are associated to partons from the same top
+            // mPid = 6+24+24 = 54 or mPid = -6-24-24 = -54
+            if ( abs(parton1->mPid() + parton2->mPid() + parton3->mPid()) == 54 ) {
+              trueHadronicTopTripletEt_->Fill(etHadronicTop);
+              trueHadronicTopTripletEta_->Fill(etaHadronicTop);
+              trueHadronicTopTripletDphiHiggsHadronicTop_->Fill(dPhiHiggsHadronicTop);
+              (trueHadronicTop_[etId][etaId][dPhiHiggsHadronicTopId])++;
+            }
+            else {
+              falseHadronicTopTripletEt_->Fill(etHadronicTop);
+              falseHadronicTopTripletEta_->Fill(etaHadronicTop);
+              falseHadronicTopTripletDphiHiggsHadronicTop_->Fill(dPhiHiggsHadronicTop);
+              (falseHadronicTop_[etId][etaId][dPhiHiggsHadronicTopId])++;
             }
           }
         }
       }
-    }
-
+    } // end if (true Higgs b-jet pair was found)
   } // end if( (H->cc || H->bb) && 4j )
 
   // Write the trueH_ and falseH_ to a txt file
   // ------------------------------------------
   ofstream higgsFile("HiggsPairProbability.txt");
   // The first line has informations on bin numbers and sizes
-  higgsFile << "etBinNum = "  << etBinNum_  << "etBinSize = "  << etBinSize_
-            << "etaBinNum = " << etaBinNum_ << "etaBinSize = " << etaBinSize_
-            << "dRbinNum = "  << dRbinNum_  << "dRbinSize = "  << dRbinSize_ << endl;
+  higgsFile << "etBinNum = "  << higgsEtBinNum_  << "etBinSize = "  << higgsEtBinSize_
+            << "etaBinNum = " << higgsEtaBinNum_ << "etaBinSize = " << higgsEtaBinSize_
+            << "dRbinNum = "  << higgsDRbinNum_  << "dRbinSize = "  << higgsDRbinSize_ << endl;
   // The following lines have the counts for trueHiggs and falseHiggs pairs
-  for(unsigned int i=0; i != etBinNum_; ++i) {
-    for(unsigned int j=0; j != etaBinNum_; ++j) {
-      for(unsigned int k=0; k != dRbinNum_; ++k) {
-        higgsFile << "trueHiggs["<<i<<"]["<<j<<"]["<<k<<"] = " << trueH_[i][j][k] << " falseHiggs["<<i<<"]["<<j<<"]["<<k<<"] = " << falseH_[i][j][k] << endl;
+  for(unsigned int i=0; i != higgsEtBinNum_; ++i) {
+    for(unsigned int j=0; j != higgsEtaBinNum_; ++j) {
+      for(unsigned int k=0; k != higgsDRbinNum_; ++k) {
+        higgsFile <<  "trueHiggs["<<i<<"]["<<j<<"]["<<k<<"] = "  << trueH_[i][j][k]
+                  << " falseHiggs["<<i<<"]["<<j<<"]["<<k<<"] = " << falseH_[i][j][k] << endl;
+      }
+    }
+  }
+  higgsFile.close();
+
+  // Write the trueHadronicTop_ and falseHadronicTop_ to a txt file
+  // --------------------------------------------------------------
+  ofstream hadronicTopFile("HadronicTopTripletProbability.txt");
+  // The first line has informations on bin numbers and sizes
+  higgsFile << "etBinNum = "                   << hadronicTopEtBinNum_        << "etBinSize = "                   << hadronicTopEtBinSize_
+            << "etaBinNum = "                  << hadronicTopEtaBinNum_       << "etaBinSize = "                  << hadronicTopEtaBinSize_
+            << "dPhiHiggsHadronicTopBinNum = " << dPhiHiggsHadronicTopBinNum_ << "dPhiHiggsHadronicTopBinSize = " << dPhiHiggsHadronicTopBinSize_ << endl;
+  // The following lines have the counts for trueHiggs and falseHiggs pairs
+  for(unsigned int i=0; i != hadronicTopEtBinNum_; ++i) {
+    for(unsigned int j=0; j != hadronicTopEtaBinNum_; ++j) {
+      for(unsigned int k=0; k != dPhiHiggsHadronicTopBinNum_; ++k) {
+        hadronicTopFile <<  "trueHadronicTop["<<i<<"]["<<j<<"]["<<k<<"] = "  << trueHadronicTop_[i][j][k]
+                        << " falseHadronicTop["<<i<<"]["<<j<<"]["<<k<<"] = " << falseHadronicTop_[i][j][k] << endl;
       }
     }
   }
@@ -247,13 +323,22 @@ void HadTopAndHiggsMassProbability::endJob() {
   delete countTTHdecays_;
 
   // delete the multidimensional arrays
-  for(unsigned int i=0; i != etBinNum_; ++i) {
-    for(unsigned int j=0; j != etaBinNum_; ++j) {
+  for(unsigned int i=0; i != higgsEtBinNum_; ++i) {
+    for(unsigned int j=0; j != higgsEtaBinNum_; ++j) {
       delete[] trueH_[i][j];
       delete[] falseH_[i][j];
     }
     delete[] trueH_[i];
     delete[] falseH_[i];
+  }
+
+  for(unsigned int i=0; i != hadronicTopEtBinNum_; ++i) {
+    for(unsigned int j=0; j != hadronicTopEtaBinNum_; ++j) {
+      delete[] trueHadronicTop_[i][j];
+      delete[] falseHadronicTop_[i][j];
+    }
+    delete[] trueHadronicTop_[i];
+    delete[] falseHadronicTop_[i];
   }
 
   // Save histograms
@@ -266,6 +351,13 @@ void HadTopAndHiggsMassProbability::endJob() {
   falseHiggsPairEt_->Write();
   falseHiggsPairEta_->Write();
   falseHiggsPairDR_->Write();
+
+  trueHadronicTopTripletEt_->Write();
+  trueHadronicTopTripletEta_->Write();
+  trueHadronicTopTripletDphiHiggsHadronicTop_->Write();
+  falseHadronicTopTripletEt_->Write();
+  falseHadronicTopTripletEta_->Write();
+  falseHadronicTopTripletDphiHiggsHadronicTop_->Write();
 
   outputFile_->Write();
 }
