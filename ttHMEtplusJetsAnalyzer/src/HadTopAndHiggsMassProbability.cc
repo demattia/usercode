@@ -41,6 +41,7 @@ HadTopAndHiggsMassProbability::HadTopAndHiggsMassProbability(const ParameterSet 
   // Create histograms
   jetVsMCpEt_ = new TProfile("jetVsMCpEt", "jet-et vs parton-pt", 100, 0, 600, 0, 600);
   higgsMassTrue_ = new TH1F("higgsMassTrue", "mass of the two b-jets associated to the MC Higgs", 100, 0, 200);
+  hadronicTopMassTrue_ = new TH1F("hadronicTopMassTrue", "mass of the three jets associated to the MC top", 100, 0, 300);
 
   // True and false Higgs pair histograms
   trueHiggsPairEt_ = new TH1F("trueHiggsPairEt", "Et of the two b-jets associated to the MC Higgs", 100, 0, 200);
@@ -256,6 +257,8 @@ void HadTopAndHiggsMassProbability::analyze(const edm::Event& iEvent, const edm:
             // if all three jets are associated to partons from the same top
             // mPid = 6+24+24 = 54 or mPid = -6-24-24 = -54
             if ( abs(parton1->mPid() + parton2->mPid() + parton3->mPid()) == 54 ) {
+              double hadronicTopMass = sqrt(pow((mapIt->second)->e()+(subMapIt->second)->e()+jet3->e(),2) - pow(tripletJet.e(),2));
+              hadronicTopMassTrue_->Fill(hadronicTopMass);
               trueHadronicTopTripletEt_->Fill(etHadronicTop);
               trueHadronicTopTripletEta_->Fill(etaHadronicTop);
               trueHadronicTopTripletDphiHiggsHadronicTop_->Fill(dPhiHiggsHadronicTop);
@@ -295,10 +298,10 @@ void HadTopAndHiggsMassProbability::analyze(const edm::Event& iEvent, const edm:
   // --------------------------------------------------------------
   ofstream hadronicTopFile("HadronicTopTripletProbability.txt");
   // The first line has informations on bin numbers and sizes
-  higgsFile << "etBinNum = "                   << hadronicTopEtBinNum_        << "etBinSize = "                   << hadronicTopEtBinSize_
+  hadronicTopFile << "etBinNum = "                   << hadronicTopEtBinNum_        << "etBinSize = "                   << hadronicTopEtBinSize_
             << "etaBinNum = "                  << hadronicTopEtaBinNum_       << "etaBinSize = "                  << hadronicTopEtaBinSize_
             << "dPhiHiggsHadronicTopBinNum = " << dPhiHiggsHadronicTopBinNum_ << "dPhiHiggsHadronicTopBinSize = " << dPhiHiggsHadronicTopBinSize_ << endl;
-  // The following lines have the counts for trueHiggs and falseHiggs pairs
+  // The following lines have the counts for trueHadronicTop and falsHadronicTop pairs
   for(unsigned int i=0; i != hadronicTopEtBinNum_; ++i) {
     for(unsigned int j=0; j != hadronicTopEtaBinNum_; ++j) {
       for(unsigned int k=0; k != dPhiHiggsHadronicTopBinNum_; ++k) {
@@ -307,7 +310,7 @@ void HadTopAndHiggsMassProbability::analyze(const edm::Event& iEvent, const edm:
       }
     }
   }
-  higgsFile.close();
+  hadronicTopFile.close();
 }
 
 //       method called once each job just before starting event loop  

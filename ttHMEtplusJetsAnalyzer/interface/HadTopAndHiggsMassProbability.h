@@ -70,6 +70,7 @@ private:
   TH1F * falseHiggsPairEt_;
   TH1F * falseHiggsPairEta_;
   TH1F * falseHiggsPairDR_;
+  TH1F * hadronicTopMassTrue_;
   TH1F * trueHadronicTopTripletEt_;
   TH1F * trueHadronicTopTripletEta_;
   TH1F * trueHadronicTopTripletDphiHiggsHadronicTop_;
