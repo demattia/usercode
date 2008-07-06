@@ -15,5 +15,9 @@ module ttHMEtplusJetsAnalyzerModule = ttHMEtplusJetsAnalyzer {
   untracked InputTag SimpleTaus                 = offlineProd:simpleTaus
   untracked InputTag Summary                    = offlineProd:summary
   untracked bool     withL1ForwardJets          = true
-
+  untracked string   HiggsFileName              = "HiggsPairProbability.txt"
+  untracked string   HadronicTopFileName        = "HadronicTopTripletProbability.txt"
+  untracked string   QCDfileName                = "QCDbTagProbability.txt"
+  untracked double   JetEtCut                   = 25.
+  untracked double   JetEtaCut                  = 3.0
 }

@@ -280,9 +280,9 @@ void HadTopAndHiggsMassProbability::analyze(const edm::Event& iEvent, const edm:
   // ------------------------------------------
   ofstream higgsFile("HiggsPairProbability.txt");
   // The first line has informations on bin numbers and sizes
-  higgsFile << "etBinNum = "  << higgsEtBinNum_  << "etBinSize = "  << higgsEtBinSize_
-            << "etaBinNum = " << higgsEtaBinNum_ << "etaBinSize = " << higgsEtaBinSize_
-            << "dRbinNum = "  << higgsDRbinNum_  << "dRbinSize = "  << higgsDRbinSize_ << endl;
+  higgsFile <<  "etBinNum = "  << higgsEtBinNum_  << " etBinSize = "  << higgsEtBinSize_
+            << " etaBinNum = " << higgsEtaBinNum_ << " etaBinSize = " << higgsEtaBinSize_
+            << " dRbinNum = "  << higgsDRbinNum_  << " dRbinSize = "  << higgsDRbinSize_ << endl;
   // The following lines have the counts for trueHiggs and falseHiggs pairs
   for(unsigned int i=0; i != higgsEtBinNum_; ++i) {
     for(unsigned int j=0; j != higgsEtaBinNum_; ++j) {
@@ -298,9 +298,9 @@ void HadTopAndHiggsMassProbability::analyze(const edm::Event& iEvent, const edm:
   // --------------------------------------------------------------
   ofstream hadronicTopFile("HadronicTopTripletProbability.txt");
   // The first line has informations on bin numbers and sizes
-  hadronicTopFile << "etBinNum = "                   << hadronicTopEtBinNum_        << "etBinSize = "                   << hadronicTopEtBinSize_
-            << "etaBinNum = "                  << hadronicTopEtaBinNum_       << "etaBinSize = "                  << hadronicTopEtaBinSize_
-            << "dPhiHiggsHadronicTopBinNum = " << dPhiHiggsHadronicTopBinNum_ << "dPhiHiggsHadronicTopBinSize = " << dPhiHiggsHadronicTopBinSize_ << endl;
+  hadronicTopFile <<  "etBinNum = "                   << hadronicTopEtBinNum_        << " etBinSize = "                   << hadronicTopEtBinSize_
+                  << " etaBinNum = "                  << hadronicTopEtaBinNum_       << " etaBinSize = "                  << hadronicTopEtaBinSize_
+                  << " dPhiHiggsHadronicTopBinNum = " << dPhiHiggsHadronicTopBinNum_ << " dPhiHiggsHadronicTopBinSize = " << dPhiHiggsHadronicTopBinSize_ << endl;
   // The following lines have the counts for trueHadronicTop and falsHadronicTop pairs
   for(unsigned int i=0; i != hadronicTopEtBinNum_; ++i) {
     for(unsigned int j=0; j != hadronicTopEtaBinNum_; ++j) {

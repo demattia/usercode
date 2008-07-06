@@ -42,6 +42,9 @@
 #include "AnalysisExamples/AnalysisObjects/interface/Summary.h"
 #include "AnalysisExamples/AnalysisClasses/interface/DeltaR.h"
 #include "AnalysisExamples/AnalysisClasses/interface/SimpleJet.h"
+#include "AnalysisExamples/AnalysisObjects/interface/Particle.h"
+
+#include <string>
 
 using namespace std;
 using namespace anaobj;
@@ -62,6 +65,12 @@ private:
   virtual void beginJob(const edm::EventSetup&);
   virtual void analyze(const edm::Event&, const edm::EventSetup&);
   virtual void endJob() ;
+  /** Used to fill the matrices for the probability of Higgs jet pairs, top jet triplets and also the b-tag probability matrix for qcd
+   * takes by reference the *** because it creates them with new inside and assign the pointers to new values
+   */
+  void fillProbabilityMatrices(const string & probabilityFileName, unsigned int * binNum, double * binSize, unsigned int ***& trueArray, unsigned int ***& falseArray);
+  /// Used to evaluate the ratios and select the combinations of jets
+  double evalHiggsPairProbability(const Particle<const OfflineJet> & higgsCandidate) const;
 
   edm::ParameterSet conf_;
 
@@ -77,6 +86,11 @@ private:
   edm::InputTag simpleTauLabel_;
   edm::InputTag summaryLabel_;
   bool withL1ForwardJets_;
+  string higgsFileName_;
+  string hadronicTopFileName_;
+  string qcdFileName_;
+  double jetEtCut_;
+  double jetEtaCut_;
 
   int eventCounter_;
 
@@ -88,6 +102,21 @@ private:
   int l1Eff_;
 
   ttHdecaysCounter * countTTHdecays_;
+
+  // This will be the multidimensional array
+  unsigned int *** trueH_;
+  unsigned int *** falseH_;
+  unsigned int *** trueHadronicTop_;
+  unsigned int *** falseHadronicTop_;
+  unsigned int *** taggedJet_;
+  unsigned int *** notTaggedJet_;
+
+  unsigned int higgsBinNum_[3];
+  double higgsBinSize_[3];
+  unsigned int hadronicTopBinNum_[3];
+  double hadronicTopBinSize_[3];
+  unsigned int qcdBinNum_[3];
+  double qcdBinSize_[3];
 };
 
 
