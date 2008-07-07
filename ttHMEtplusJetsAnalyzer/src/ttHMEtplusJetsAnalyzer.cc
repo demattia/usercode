@@ -65,16 +65,15 @@ ttHMEtplusJetsAnalyzer::ttHMEtplusJetsAnalyzer(const edm::ParameterSet& iConfig)
   qcdFileName_(iConfig.getUntrackedParameter<string>("QCDfileName") ),
   jetEtCut_(iConfig.getUntrackedParameter<double>("JetEtCut") ),
   jetEtaCut_(iConfig.getUntrackedParameter<double>("JetEtaCut") ),
+  outputFileName_(iConfig.getUntrackedParameter<string>("OutputFileName") ),
   eventCounter_(0),
   l1Eff_(0)
 {
   countTTHdecays_ = new ttHdecaysCounter("ttHdecays.txt");
 
-  // Load the matrices for Higgs, hadronic top and QCD b-tag probabiliy from the files
-  // ---------------------------------------------------------------------------------
-  fillProbabilityMatrices( higgsFileName_, higgsBinNum_, higgsBinSize_, trueH_, falseH_ );
-  fillProbabilityMatrices( hadronicTopFileName_, hadronicTopBinNum_, hadronicTopBinSize_, trueHadronicTop_, falseHadronicTop_ );
-  fillProbabilityMatrices( qcdFileName_, qcdBinNum_, qcdBinSize_, taggedJet_, notTaggedJet_ );
+  outputFile_ = new TFile(outputFileName_.c_str(), "RECREATE");
+
+  eventVariables2Tags_ = new EventVariables(higgsFileName_, hadronicTopFileName_, qcdFileName_, "2tags", outputFile_);
 
 }
 
@@ -190,20 +189,22 @@ void ttHMEtplusJetsAnalyzer::analyze(const edm::Event& iEvent, const edm::EventS
   // Require at least two b-tags
   if ( goodbTaggedJets.size() >= 2 ) {
 
-    // Create pairs of b-jets and evaluate their probability to come from the Higgs decay
-    //  vector<pair<true/false ratio, candidate> >
-    vector<pair<double, Particle<const OfflineJet> > > bTaggedPairs;
-    vector<const OfflineJet *>::const_iterator bTaggedJetIt = goodbTaggedJets.begin();
-    for ( ; bTaggedJetIt != goodbTaggedJets.end(); ++bTaggedJetIt ) {
-      vector<const OfflineJet *>::const_iterator subbTaggedJetIt = bTaggedJetIt+1;
-      for ( ; subbTaggedJetIt != goodbTaggedJets.end(); ++subbTaggedJetIt ) {
-        // bTaggedPairs.push_back(pairStruct( *bTaggedJetIt, *subbTaggedJetIt ));
-        Particle<const OfflineJet> higgsCandidate( *bTaggedJetIt );
-        higgsCandidate.add( *subbTaggedJetIt );
-        bTaggedPairs.push_back( make_pair( evalHiggsPairProbability(higgsCandidate), higgsCandidate ) ); 
-        cout << "true/false ratio = " << bTaggedPairs.back().first << endl;
-      }
-    }
+    eventVariables2Tags_->fill( goodJets, goodbTaggedJets );
+
+//     // Create pairs of b-jets and evaluate their probability to come from the Higgs decay
+//     //  vector<pair<true/false ratio, candidate> >
+//     vector<pair<double, Particle<const OfflineJet> > > bTaggedPairs;
+//     vector<const OfflineJet *>::const_iterator bTaggedJetIt = goodbTaggedJets.begin();
+//     for ( ; bTaggedJetIt != goodbTaggedJets.end(); ++bTaggedJetIt ) {
+//       vector<const OfflineJet *>::const_iterator subbTaggedJetIt = bTaggedJetIt+1;
+//       for ( ; subbTaggedJetIt != goodbTaggedJets.end(); ++subbTaggedJetIt ) {
+//         // bTaggedPairs.push_back(pairStruct( *bTaggedJetIt, *subbTaggedJetIt ));
+//         Particle<const OfflineJet> higgsCandidate( *bTaggedJetIt );
+//         higgsCandidate.add( *subbTaggedJetIt );
+//         bTaggedPairs.push_back( make_pair( evalHiggsPairProbability(higgsCandidate), higgsCandidate ) ); 
+//         cout << "true/false ratio = " << bTaggedPairs.back().first << endl;
+//       }
+//     }
 
 
 
@@ -238,6 +239,8 @@ void ttHMEtplusJetsAnalyzer::endJob() {
 
   countTTHdecays_->writeDecays();
   delete countTTHdecays_;
+  delete eventVariables2Tags_;
+  outputFile_->Write();
 }
 
 // See if we have a good high-Pt electron or muon
@@ -282,114 +285,6 @@ bool ttHMEtplusJetsAnalyzer::goodElectron( const SimpleElectronCollection & simp
   }
   return elecEvent;
 }
-
-
-
-void ttHMEtplusJetsAnalyzer::fillProbabilityMatrices(const string & probabilityFileName, unsigned int * binNum, double * binSize, unsigned int ***& trueArray, unsigned int ***&falseArray ) {
-
-  ifstream probabilityFile(probabilityFileName.c_str());
-  if ( !probabilityFile.is_open() ) {
-    cout << "file: " << probabilityFileName << "not found or unable to open" << endl;
-    exit(1);
-  }
-
-  string line;
-  // Read the first line with the bin numbers and sizes
-  getline(probabilityFile, line);
-  stringstream probabilityCounts(line);
-  // This loop is based on the text file structure
-  string skip;
-  int wordCount=0;
-  int binNumCount=0;
-  int binSizeCount=0;
-  while ( !probabilityCounts.eof() ) {
-    ++wordCount;
-    // Take every three words
-    if ( wordCount%3 == 0 ) {
-      // Every six words there is the size of the bins, in the other case is the number of bins
-      if ( wordCount%6 != 0 ) {
-        probabilityCounts >> binNum[binNumCount];
-        // cout << "binNum_["<<binNumCount<<"] = " << binNum[binNumCount] << endl;
-        ++binNumCount;
-      }
-      else {
-        probabilityCounts >> binSize[binSizeCount];
-        // cout << "binSize_["<<binSizeCount<<"] = " << binSize[binSizeCount] << endl;
-        ++binSizeCount;
-      }
-    }
-    // Skip the rest of the words
-    else {
-      probabilityCounts >> skip;
-    }
-  }
-
-  // Create and fill the arrays
-  trueArray = new unsigned int**[binNum[0]];
-  falseArray = new unsigned int**[binNum[0]];
-  for(unsigned int i=0; i < binNum[0]; ++i) {
-    trueArray[i] = new unsigned int*[binNum[1]];
-    falseArray[i] = new unsigned int*[binNum[1]];
-    for(unsigned int j=0; j < binNum[1]; ++j) {
-      trueArray[i][j] = new unsigned int[binNum[2]];
-      falseArray[i][j] = new unsigned int[binNum[2]];
-      for (unsigned int k=0; k < binNum[2]; ++k) {
-        if ( probabilityFile.eof() ) { 
-          cout << "ERROR: not enough lines in the file for the required bins" << endl;
-          exit(1);
-        }
-
-        getline(probabilityFile, line);
-        stringstream probabilityCounts(line);
-        for ( int w=0; w<6; ++w ) {
-          // The second word is for the true case probability
-          if( w == 2 ) {
-            probabilityCounts >> trueArray[i][j][k];
-            // cout << "trueArray["<<i<<"]["<<j<<"]["<<k<<"] = " << trueArray[i][j][k];
-            // The fourth word is for the false case probability
-          }
-          if( w == 4 ) {
-            probabilityCounts >> falseArray[i][j][k];
-            // cout << " trueArray["<<i<<"]["<<j<<"]["<<k<<"] = " << falseArray[i][j][k] << endl;;
-          }
-          // Skip the other words
-          else probabilityCounts >> skip;
-        }
-      }
-
-    }
-  }
-}
-
-double ttHMEtplusJetsAnalyzer::evalHiggsPairProbability(const Particle<const OfflineJet> & higgsCandidate) const {
-
-  // Determine bin index
-  int etId = int(higgsCandidate.pt()/higgsBinSize_[0]);
-  int etaId = int(fabs(higgsCandidate.eta())/higgsBinSize_[1]);
-  if ( higgsCandidate.components().size() != 2 ) {
-    cout << "Error: higgsCandidate does not have 2 component jets" << endl;
-    exit(1);
-  }
-  const OfflineJet * jet1 = (higgsCandidate.components())[0];
-  const OfflineJet * jet2 = (higgsCandidate.components())[1];
-  int dRId = int( DeltaR( jet1->eta(), jet1->phi(), jet2->eta(), jet2->phi())/higgsBinSize_[2] );
-  if ( etId < 0 || etaId < 0 || dRId < 0 ) cout << "Error: index < 0, will crash..." << endl;
-  if ( etId>int(higgsBinNum_[0]-1) ) etId = higgsBinNum_[0]-1;
-  if ( etaId>int(higgsBinNum_[1]-1) ) etaId = higgsBinNum_[1]-1;
-  if ( dRId>int(higgsBinNum_[2]-1) ) dRId = higgsBinNum_[2]-1;
-
-  cout << "before crash" << endl;
-  cout << "etId = " << etId << endl;
-  cout << "etaId = " << etaId << endl;
-  cout << "dRId = " << dRId << endl;
-  cout << "trueH_["<<etId<<"]["<<etaId<<"]["<<dRId<<"] = " << trueH_[etId][etaId][dRId] << endl;
-  cout << "falseH_["<<etId<<"]["<<etaId<<"]["<<dRId<<"] = " << falseH_[etId][etaId][dRId] << endl;
-
-  cout << "before before crash" << endl;
-
-  return (double(trueH_[etId][etaId][dRId])/double(falseH_[etId][etaId][dRId]));
-}
-
 
 #endif // TTHMETPLUSJETSANALYZER_CC
 

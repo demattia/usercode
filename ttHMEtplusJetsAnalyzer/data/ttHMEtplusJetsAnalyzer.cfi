@@ -20,4 +20,5 @@ module ttHMEtplusJetsAnalyzerModule = ttHMEtplusJetsAnalyzer {
   untracked string   QCDfileName                = "QCDbTagProbability.txt"
   untracked double   JetEtCut                   = 25.
   untracked double   JetEtaCut                  = 3.0
+  untracked string   OutputFileName             = "ttHMEtplusJetsAnalyzer.root"
 }
