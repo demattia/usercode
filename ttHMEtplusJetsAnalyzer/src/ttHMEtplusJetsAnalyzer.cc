@@ -149,6 +149,10 @@ void ttHMEtplusJetsAnalyzer::analyze(const edm::Event& iEvent, const edm::EventS
   // Evaluate level 1 efficiency for multijet and met+jet
   if (responsePair.first || responsePair.second) ++l1Eff_;
 
+  // Take the offlineMEt
+  edm::Handle<OfflineMEt> offlineMEt;
+  iEvent.getByLabel( offlineMEtLabel_, offlineMEt );
+
   // ----------------------------------- //
   // Determine the type of event from MC //
   // ----------------------------------- //
@@ -186,10 +190,11 @@ void ttHMEtplusJetsAnalyzer::analyze(const edm::Event& iEvent, const edm::EventS
     }
   }
 
+
   // Require at least two b-tags
   if ( goodbTaggedJets.size() >= 2 ) {
 
-    eventVariables2Tags_->fill( goodJets, goodbTaggedJets );
+    eventVariables2Tags_->fill( goodJets, goodbTaggedJets, &(*offlineMEt) );
 
 //     // Create pairs of b-jets and evaluate their probability to come from the Higgs decay
 //     //  vector<pair<true/false ratio, candidate> >

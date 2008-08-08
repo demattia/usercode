@@ -30,22 +30,38 @@ EventVariables::EventVariables( const string & higgsFileName, const string & had
     dirName.Append(suffix);
   }
 
-  outputDir_ = outputFile_->mkdir("EventVariables");
+  outputDir_ = outputFile_->mkdir(dirName);
   outputDir_->cd();
 
   higgsMass_       = new TH1D( "higgsMass" + suffix, "reconstructed higgs mass" + suffix, 50, 0, 300 );
   hadronicTopMass_ = new TH1D( "hadronicTopMass" + suffix, "reconstructed hadronic top mass" + suffix, 50, 0, 800 );
+
+  firstNjetsMass_[0]        = new TH1D( "first6jetsMass" + suffix, "Mass reconstructed with the first 6 jets" + suffix, 50, 0, 2000 );
+  firstNjetsCentrality_[0]  = new TH1D( "first6jetsCentrality" + suffix, "Centrality reconstructed with the first 6 jets" + suffix, 50, 0, 10 );
+  firstNjetsMass_[1]        = new TH1D( "first8jetsMass" + suffix, "Mass reconstructed with the first 8 jets" + suffix, 50, 0, 2000 );
+  firstNjetsCentrality_[1]  = new TH1D( "first8jetsCentrality" + suffix, "Centrality reconstructed with the first 8 jets" + suffix, 50, 0, 10 );
+  hadronicTopProjectionAlongHiggsDirection_ = new TH1D( "hadronicTopProjectionAlongHiggsDirection" + suffix, "Hadronic Top projection along Higgs direction" + suffix, 50, 0, 500 );
+  deltaEtaHadronicTopHiggs_ = new TH1D( "deltaEtaHadronicTopHiggs" + suffix, "deltaEta hadronicTop-Higgs" + suffix, 50, -3., 3. );
+  goodHt_                   = new TH1D( "goodHt" + suffix, "Ht evaluated with all selected jets" + suffix, 50, 0, 1000 );
+  mEtSig_                   = new TH1D( "mEtSig" + suffix, "Missing Et significance" + suffix, 50, 0, 10 );
+  deltaPhiMEtNthLeadingJet_[0] = new TH1D( "deltaPhiMEt1stLeadingJet" + suffix, "deltaPhi between MEt and 1st leading jet" + suffix, 50, 0., 3.14 );
+  deltaPhiMEtNthLeadingJet_[1] = new TH1D( "deltaPhiMEt2ndLeadingJet" + suffix, "deltaPhi between MEt and 2nd leading jet" + suffix, 50, 0., 3.14 );
+  deltaPhiMEtNthLeadingJet_[2] = new TH1D( "deltaPhiMEt3rdLeadingJet" + suffix, "deltaPhi between MEt and 3rd leading jet" + suffix, 50, 0., 3.14 );
+  hadronicTopPlusHiggsMass_ = new TH1D( "hadronicTopPlusHiggsMass" + suffix, "Mass of the 5 jets from hadronic Top and Higgs" + suffix, 50, 0., 1000 );
 }
 
-void EventVariables::fill( vector<const OfflineJet *> jetCollection, const vector<const OfflineJet *> & bTaggedJetCollection ) {
+void EventVariables::fill( vector<const OfflineJet *> jetCollection, const vector<const OfflineJet *> & bTaggedJetCollection, const OfflineMEt * offlineMEt ) {
 
   // First of all sort the collection in Et. The first is the most energetic
   // Do this here, not inside the method to do it only once.
   sort( jetCollection.rbegin(), jetCollection.rend(), sortOfflineJetPtr );
 
+  // This also fills the corresponding histograms
   Particle<const OfflineJet> first6jets( firstNjetsParticle( jetCollection, 6 ) );
   Particle<const OfflineJet> first8jets( firstNjetsParticle( jetCollection, 8 ) );
 
+  // Evaluates variables on all "good" jets and fills corresponding histograms
+  allGoodJetsVariables( jetCollection, offlineMEt);
 
   // Create pairs of b-jets and evaluate their probability to come from the Higgs decay
   //  vector<pair<true/false ratio, candidate> >
@@ -89,7 +105,22 @@ void EventVariables::fill( vector<const OfflineJet *> jetCollection, const vecto
       }
     }
     sort( hadronicTopTriplet.rbegin(), hadronicTopTriplet.rend(), sortParticlesByProbability );
-    hadronicTopMass_->Fill((hadronicTopTriplet.front().second).mass());
+    Particle<const OfflineJet> * selectedHadronicTop = &(hadronicTopTriplet.front().second);
+    hadronicTopMass_->Fill(selectedHadronicTop->mass());
+
+    // Selected hadronic Top momentum projection along Higgs direction.
+    // Note that the object has the operator* overloaded and that this operator requires a pointer to a BaseParticle.
+    double scalarProd = (*selectedHadronicTop*selectedHiggs)/sqrt(*selectedHiggs*selectedHiggs);
+    hadronicTopProjectionAlongHiggsDirection_->Fill( scalarProd );
+    double deltaEtaHadronicTopHiggs = selectedHadronicTop->eta() - selectedHiggs->eta();
+    deltaEtaHadronicTopHiggs_->Fill( deltaEtaHadronicTopHiggs );
+
+    // Mass reconstructed with the 5 total jets from Higgs and hadronicTop
+    Particle<const OfflineJet> hadronicTopPlusHiggs;
+    hadronicTopPlusHiggs.add(selectedHiggs);
+    hadronicTopPlusHiggs.add(selectedHadronicTop);
+    hadronicTopPlusHiggsMass_->Fill( hadronicTopPlusHiggs.mass() );
+
   } // end if jetCollection.size() >= 3
 
 }
@@ -100,6 +131,16 @@ EventVariables::~EventVariables() {
 
   higgsMass_->Write();
   hadronicTopMass_->Write();
+  firstNjetsMass_[0]->Write();
+  firstNjetsMass_[1]->Write();
+  firstNjetsCentrality_[0]->Write();
+  firstNjetsCentrality_[1]->Write();
+  hadronicTopProjectionAlongHiggsDirection_->Write();
+  deltaEtaHadronicTopHiggs_->Write();
+  goodHt_->Write();
+  mEtSig_->Write();
+  for( int i=0; i<3; ++i ) deltaPhiMEtNthLeadingJet_[i]->Write();
+  hadronicTopPlusHiggsMass_->Write();
 
   // delete the multidimensional arrays
   for(unsigned int i=0; i != higgsBinNum_[0]; ++i) {
@@ -218,13 +259,38 @@ Particle<const OfflineJet> EventVariables::firstNjetsParticle( const vector<cons
     }
   }
 
-  double firstNjetsMass = firstNjets.mass();
-  double firstNjetsCentrality = 0.;
-  if ( firstNjetsMass != 0 ) firstNjetsCentrality = firstNjets.e()/firstNjets.mass();
-  cout << "mass of the first "<<N<< " jets = " << firstNjetsMass << endl;
-  cout << "centrality of the first "<<N<<" jets = " << firstNjetsCentrality << endl;
+  unsigned int index = 100;
+  if ( N == 6 ) index = 0;
+  if ( N == 8 ) index = 1;
+
+  if ( index != 100 ) {
+    double firstNjetsMass = firstNjets.mass();
+    firstNjetsMass_[index]->Fill( firstNjetsMass );
+    double firstNjetsCentrality = 0.;
+    if ( firstNjetsMass != 0 ) firstNjetsCentrality = firstNjets.e()/firstNjets.mass();
+    firstNjetsCentrality_[index]->Fill( firstNjetsCentrality );
+  }
 
   return firstNjets;
+}
+
+void EventVariables::allGoodJetsVariables( const vector<const OfflineJet *> & offlineJets, const OfflineMEt * offlineMEt ) {
+
+  double offlineMEtPhi = offlineMEt->phi();
+
+  double goodSumEt = 0.;
+  int nthLeadingJet = 0;
+  vector<const OfflineJet *>::const_iterator jetPtr = offlineJets.begin();
+  for ( ; jetPtr != offlineJets.end(); ++jetPtr, ++nthLeadingJet ) {
+    goodSumEt += (*jetPtr)->et();
+    // DeltaPhi between the MEt and the second leading jet. Evaluate at most only for the first 3 jets.
+    if ( nthLeadingJet < 3 ) {
+      deltaPhiMEtNthLeadingJet_[nthLeadingJet]->Fill( DeltaPhi( offlineMEtPhi, (*jetPtr)->phi() ) );
+    }
+  }
+  goodHt_->Fill(goodSumEt + offlineMEt->corrL3et());
+  mEtSig_->Fill(offlineMEt->corrL3mEtSig());
+
 }
 
 double EventVariables::evalHiggsPairProbability(const Particle<const OfflineJet> & higgsCandidate) const {

@@ -13,6 +13,7 @@
  */
 
 #include "AnalysisExamples/AnalysisObjects/interface/OfflineJet.h"
+#include "AnalysisExamples/AnalysisObjects/interface/OfflineMEt.h"
 #include "AnalysisExamples/AnalysisObjects/interface/Particle.h"
 #include "TString.h"
 #include "TH1D.h"
@@ -32,7 +33,7 @@ public:
   EventVariables( const string & higgsFileName, const string & hadronicTopFileName, const string & qcdFileName, TString suffix, TFile * outputFile );
   ~EventVariables();
   /// Used to pass the collections. Takes the jetCollection by value since it modifies it removing the jets associated to the Higgs.
-  void fill( vector<const OfflineJet *> jetCollection, const vector<const OfflineJet *> & bTaggedJetCollection );
+  void fill( vector<const OfflineJet *> jetCollection, const vector<const OfflineJet *> & bTaggedJetCollection, const OfflineMEt * offlineMEt );
 
 private:
 
@@ -42,6 +43,8 @@ private:
   void fillProbabilityMatrices(const string & probabilityFileName, unsigned int * binNum, double * binSize, unsigned int ***& trueArray, unsigned int ***& falseArray);
   /// Used to evaluate a vector of the first N jets in the event
   Particle<const OfflineJet> firstNjetsParticle( const vector<const OfflineJet *> & jetCollection, const int N ) const;
+  /// Used to evaluate variables on all the selected jets (Ht, SumEt, ...)
+  void allGoodJetsVariables( const vector<const OfflineJet *> & offlineJets, const OfflineMEt * offlineMEt );
   /// Used to evaluate the ratios and select the combinations of jets for the Higgs candidates
   double evalHiggsPairProbability(const Particle<const OfflineJet> & higgsCandidate) const;
   /// Used to evaluate the ratios and select the combinations of jets for the hadronic top candidates
@@ -65,6 +68,15 @@ private:
   // Histograms
   TH1D * higgsMass_;
   TH1D * hadronicTopMass_;
+  TH1D * firstNjetsMass_[2];
+  TH1D * firstNjetsCentrality_[2];
+  TH1D * hadronicTopProjectionAlongHiggsDirection_;
+  TH1D * deltaEtaHadronicTopHiggs_;
+  TH1D * goodHt_;
+  TH1D * mEtSig_;
+  TH1D * deltaPhiMEtNthLeadingJet_[3];
+  TH1D * hadronicTopPlusHiggsMass_;
+
   TFile * outputFile_;
   TDirectory * outputDir_;
 };
