@@ -30,10 +30,10 @@ using namespace anaobj;
 
 class EventVariables {
 public:
-  EventVariables( const string & higgsFileName, const string & hadronicTopFileName, const string & qcdFileName, TString suffix, TFile * outputFile );
+  EventVariables( const string & higgsFileName, const string & hadronicTopFileName, const string & qcdFileName, TString suffix, TFile * outputFile, bool fillHistograms = true );
   ~EventVariables();
   /// Used to pass the collections. Takes the jetCollection by value since it modifies it removing the jets associated to the Higgs.
-  void fill( vector<const OfflineJet *> jetCollection, const vector<const OfflineJet *> & bTaggedJetCollection, const OfflineMEt * offlineMEt );
+  vector<double> fill( vector<const OfflineJet *> jetCollection, const vector<const OfflineJet *> & bTaggedJetCollection, const OfflineMEt * offlineMEt );
 
 private:
 
@@ -42,13 +42,17 @@ private:
    */
   void fillProbabilityMatrices(const string & probabilityFileName, unsigned int * binNum, double * binSize, unsigned int ***& trueArray, unsigned int ***& falseArray);
   /// Used to evaluate a vector of the first N jets in the event
-  Particle<const OfflineJet> firstNjetsParticle( const vector<const OfflineJet *> & jetCollection, const int N ) const;
+  Particle<const OfflineJet> firstNjetsParticle( const vector<const OfflineJet *> & jetCollection, const int N );
   /// Used to evaluate variables on all the selected jets (Ht, SumEt, ...)
   void allGoodJetsVariables( const vector<const OfflineJet *> & offlineJets, const OfflineMEt * offlineMEt );
   /// Used to evaluate the ratios and select the combinations of jets for the Higgs candidates
   double evalHiggsPairProbability(const Particle<const OfflineJet> & higgsCandidate) const;
   /// Used to evaluate the ratios and select the combinations of jets for the hadronic top candidates
   double evalTopTripletProbability(const Particle<const OfflineJet> & hadronicTopCandidate, const Particle<const OfflineJet> & selectedHiggs) const;
+  /// Used to evaluate the hadronic W from the selected Hadronic Top
+  Particle<const OfflineJet> getWfromHadronicTop(const Particle<const OfflineJet> & selectedHadronicTop ) const;
+
+  bool fillHistograms_;
 
   // This will be the multidimensional array
   unsigned int *** trueH_;
@@ -65,9 +69,18 @@ private:
   unsigned int qcdBinNum_[3];
   double qcdBinSize_[3];
 
+  // Reference masses for Higgs, Top and W
+  double referenceHiggsMass_;
+  double referenceTopMass_;
+  double referenceWmass_;
+
+  vector<double> eventVariablesVector_;
+
   // Histograms
   TH1D * higgsMass_;
   TH1D * hadronicTopMass_;
+  TH1D * hadronicWmass_;
+  TH1D * chi2ofMasses_;
   TH1D * firstNjetsMass_[2];
   TH1D * firstNjetsCentrality_[2];
   TH1D * hadronicTopProjectionAlongHiggsDirection_;
@@ -76,6 +89,11 @@ private:
   TH1D * mEtSig_;
   TH1D * deltaPhiMEtNthLeadingJet_[3];
   TH1D * hadronicTopPlusHiggsMass_;
+  TH1D * sumHighEffDiscriminantFirst4Jets_;
+  TH1D * sumHighEffDiscriminantFirst6Jets_;
+  TH1D * remainingJetsMass_;
+  TH1D * sixthJetEt_;
+  TH1D * bTagTkInvMass_;
 
   TFile * outputFile_;
   TDirectory * outputDir_;

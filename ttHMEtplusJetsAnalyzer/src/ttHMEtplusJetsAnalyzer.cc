@@ -194,7 +194,16 @@ void ttHMEtplusJetsAnalyzer::analyze(const edm::Event& iEvent, const edm::EventS
   // Require at least two b-tags
   if ( goodbTaggedJets.size() >= 2 ) {
 
+//    vector<double> eventVariablesVector(
     eventVariables2Tags_->fill( goodJets, goodbTaggedJets, &(*offlineMEt) );
+//    );
+
+//     for ( vector<double>::const_iterator varIter = eventVariablesVector.begin(); varIter != eventVariablesVector.end(); ++varIter ) {
+//     }
+
+
+
+
 
 //     // Create pairs of b-jets and evaluate their probability to come from the Higgs decay
 //     //  vector<pair<true/false ratio, candidate> >
