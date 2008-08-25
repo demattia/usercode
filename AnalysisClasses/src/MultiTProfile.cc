@@ -29,9 +29,9 @@ MultiTProfile::MultiTProfile ( const char* NAME, const char* TITLE,
   Directory_->cd();
 
   // THStackLegend histogram
-  StackLegend_ = new THStackLegend( Stack + Name );
+  StackLegend_ = new THStackLegend<TProfile>( Stack + Name );
   // Sparse THStackLegend histogram
-  SparseStackLegend_ = new THStackLegend( SparseStack + Name );
+  SparseStackLegend_ = new THStackLegend<TProfile>( SparseStack + Name );
 
   // Mean histogram
   //   HistoMean_ = new TH1F( Mean + Name, Mean + Title, BINPAR, FIRSTPAR, LASTPAR );

@@ -65,8 +65,8 @@ class MultiTProfile {
  private:
   TDirectory * Directory_;
   //  TH1F * HistoMean_;
-  THStackLegend * StackLegend_;
-  THStackLegend * SparseStackLegend_;
+  THStackLegend<TProfile> * StackLegend_;
+  THStackLegend<TProfile> * SparseStackLegend_;
   std::vector<TProfile*> vec_MultiHisto_;
   std::ostringstream snum_;
   double firstpar_;

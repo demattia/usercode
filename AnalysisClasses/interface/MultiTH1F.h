@@ -38,7 +38,10 @@
  * histograms. It has the name = Mean_"name".
  * It also creates a THStackLegend with all the multiple histograms superimposed, rescaled and not
  * stacked. It has the name = Stack_"name".
- * 
+ *
+ * Author M. De Mattia
+ *
+ * Updated to use the templated THStackLegend - 28/5/2008
  */
 
 class MultiTH1F {
@@ -62,8 +65,8 @@ class MultiTH1F {
  private:
   TDirectory * Directory_;
   TH1F * HistoMean_;
-  THStackLegend * StackLegend_;
-  THStackLegend * SparseStackLegend_;
+  THStackLegend<TH1F> * StackLegend_;
+  THStackLegend<TH1F> * SparseStackLegend_;
   std::vector<TH1F*> vec_MultiHisto_;
   std::ostringstream snum_;
   double firstpar_;
