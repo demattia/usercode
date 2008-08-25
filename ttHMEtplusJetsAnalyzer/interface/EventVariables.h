@@ -78,8 +78,24 @@ private:
   vector<double> eventVariablesVector_;
 
   // TTree and needed variables
-  TTree * tmvaTree_;
+  // TTree * tmvaTree_;
   double higgsMassVar_;
+  double hadronicTopMassVar_;
+  double hadronicWmassVar_;
+  double chi2ofMassesVar_;
+  double firstNjetsMassVar_[2];
+  double firstNjetsCentralityVar_[2];
+  double hadronicTopProjectionAlongHiggsDirectionVar_;
+  double deltaEtaHadronicTopHiggsVar_;
+  double goodHtVar_;
+  double mEtSigVar_;
+  double deltaPhiMEtNthLeadingJetVar_[3];
+  double hadronicTopPlusHiggsMassVar_;
+  double sumHighEffDiscriminantFirst4JetsVar_;
+  double sumHighEffDiscriminantFirst6JetsVar_;
+  double remainingJetsMassVar_;
+  double sixthJetEtVar_;
+  double bTagTkInvMassVar_;
 
   // Histograms
   TH1D * higgsMass_;
