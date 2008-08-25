@@ -18,6 +18,7 @@
 #include "TString.h"
 #include "TH1D.h"
 #include "TFile.h"
+#include "TTree.h"
 #include "TDirectory.h"
 #include <vector>
 #include <string>
@@ -75,6 +76,10 @@ private:
   double referenceWmass_;
 
   vector<double> eventVariablesVector_;
+
+  // TTree and needed variables
+  TTree * tmvaTree_;
+  double higgsMassVar_;
 
   // Histograms
   TH1D * higgsMass_;
