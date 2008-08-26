@@ -227,11 +227,12 @@ void RelativeLikelihood::analyze(const edm::Event& iEvent, const edm::EventSetup
       if ( binIndexSignal >= 0 && binIndexSignal <= binNumberSignal ) signalVar = histogramVariableSignal_[varCounter]->GetBinContent( binIndexSignal );
       if ( binIndexBackground > 0 && binIndexBackground < binNumberBackground ) backgroundVar = histogramVariableBackground_[varCounter]->GetBinContent( binIndexBackground );
 
-      if ( backgroundVar != 0 ) {
+      if ( backgroundVar == 0 ) {
         if ( signalVar == 0 ) ratiosProduct *= 1.;
         // ATTENTION: this is arbitrarily put to 10, consider a more appropriate value
         else ratiosProduct *= 10.;
       }
+      else ratiosProduct *= signalVar/backgroundVar;
 
       cout << "ratiosProduct = " << ratiosProduct << endl;
     }
