@@ -4,42 +4,28 @@
 #include <vector>
 #include <algorithm>
 
-#include "AnalysisExamples/L1PixelAnalyzer/interface/WAverager.h"
-#include "AnalysisExamples/L1PixelAnalyzer/interface/RejectionAlg.h"
 #include "AnalysisExamples/AnalysisObjects/interface/SimpleTrack.h"
+#include "AnalysisExamples/AnalysisClasses/interface/SortingDef.h"
+#include "AnalysisExamples/AnalysisClasses/interface/WAverager.h"
 
 using namespace std;  
 using namespace anaobj;
 
 /**
  *
- *Used to reject tracks from a SimpleTrackCollection.
- *Tracks that are far from the value of weighted 
- *average more than i * Weighted Average Error are
- *rejected and the Weighted Average recalculated.
+ * Used to reject tracks from a SimpleTrackCollection.
+ * Tracks that are far from the value of weighted 
+ * average more than i * Weighted Average Error are
+ * rejected and the Weighted Average recalculated.
  *
- *Define a crescent sort for vector<SimpleTrack>.
+ * Define a crescent sort for vector<SimpleTrack>.
  *
- *Uses function wAverager, class SimpleTrack.
+ * Uses function wAverager, class SimpleTrack.
  *
  *
- *Authors M.De Mattia - R. Casagrande - 16/04/2008
+ * Authors M.De Mattia - R. Casagrande - 16/04/2008
  *
  */
-
-
-
-
-
-
-
-
-
-  //definizione dell'operatore minore per il sort di una SimpleTrackCollection 
-  bool simpleTkCollSort(const SimpleTrack & a, const SimpleTrack & b) {
-    return fabs(a.z()) < fabs(b.z());
-  }
-
 
   class RejectionAlg {
   private:
@@ -48,7 +34,7 @@ using namespace anaobj;
     double wAvgRecoTkValue_;
     double left_;
     double right_;
-
+    
   public:
     RejectionAlg(const SimpleTrackCollection & recoTk) {
       temp_.insert( temp_.end(), recoTk.begin(), recoTk.end() );
@@ -58,9 +44,9 @@ using namespace anaobj;
       left_ = 0.;
       right_ = 0.;
     }
-
+    
     SimpleTrackCollection eval(int i){
-
+      
       if(temp_.size()>2){
       
 	pair< int, pair< double, double > > wAvgRecoTk( wAverager(temp_));
