@@ -1,0 +1,33 @@
+module AlgValidatorModule = AlgValidator {
+
+  untracked string OutputName                   = "AlgValidator.root"
+  untracked string HiVarName                    = "HiVariables"
+  untracked bool QCD = false
+  untracked bool SIM = false
+	
+  // Labels for the objects to be opened
+  
+  untracked InputTag OfflineJets                = offlineProd:offlineJets
+  untracked InputTag OfflineMEt                 = offlineProd:offlineMEt
+  untracked InputTag MCParticles                = offlineProd:MCParticles
+  
+ //=====ROBERTO================================ 
+ 
+  untracked InputTag SimVtx 			= famosSimHits
+  untracked InputTag SimTk 			= famosSimHits
+
+ // Label for RecoVertexs
+  untracked InputTag vtxSample 			= offlinePrimaryVerticesFromCTFTracks
+ 
+  untracked InputTag SimPUVtx                   = famosPileUp:PileUpEvents
+
+//  untracked InputTag genJets                = iterativeCone5GenJets
+
+ //=====ROBERTO=================================
+
+  untracked string impactParameterTagInfos      = "impactParameterTagInfos"
+
+  untracked uint32 TracksMinimumNum_in_PixelJet = 3
+  untracked string OutputEffFileName            = "Efficiency_file.txt"
+
+}

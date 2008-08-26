@@ -1,0 +1,32 @@
+module EfficencyEvalModule = EfficencyEval {
+
+  untracked string OutputName                   = "EfficencyEval.root"
+  untracked string HiVarName                    = "HiVariables"
+  untracked bool QCD = false
+  untracked bool SIM = false
+	
+  // Labels for the objects to be opened
+  
+  untracked InputTag OfflineJets                = offlineProd:offlineJets
+  untracked InputTag OfflineMEt                 = offlineProd:offlineMEt
+  untracked InputTag MCParticles                = offlineProd:MCParticles
+  
+ //=====ROBERTO================================ 
+ 
+//  untracked InputTag SimVtx 			= famosSimHits
+//  untracked InputTag SimTk 			= famosSimHits
+
+ // Label for RecoVertexs
+  untracked InputTag vtxSample 			= offlineProd:offlineVertices
+ 
+//  untracked InputTag SimPUVtx                   = famosPileUp:PileUpEvents
+
+//  untracked string impactParameterTagInfos      = "impactParameterTagInfos"
+//  untracked InputTag simpleTracks                 = offlineProd:simpleTracks
+
+ //=====ROBERTO=================================
+
+  untracked uint32 TracksMinimumNum_in_PixelJet = 3
+  untracked string OutputEffFileName            = "Efficiency_file.txt"
+
+}
