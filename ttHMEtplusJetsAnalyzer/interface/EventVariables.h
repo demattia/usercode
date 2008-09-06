@@ -25,6 +25,9 @@
 #include <fstream>
 #include <sstream>
 #include <algorithm>
+#include <memory>
+
+#include "AnalysisExamples/ttHMEtplusJetsAnalyzer/interface/TMVAtreeWriter.h"
 
 using namespace std;
 using namespace anaobj;
@@ -76,9 +79,11 @@ private:
   double referenceWmass_;
 
   vector<double> eventVariablesVector_;
+  vector<TString> eventVariablesNames_;
 
   // TTree and needed variables
-  // TTree * tmvaTree_;
+  auto_ptr<TMVAtreeWriter> tmvaTreeWriterPtr_;
+
   double higgsMassVar_;
   double hadronicTopMassVar_;
   double hadronicWmassVar_;

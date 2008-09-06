@@ -190,55 +190,14 @@ void ttHMEtplusJetsAnalyzer::analyze(const edm::Event& iEvent, const edm::EventS
     }
   }
 
-
   // Require at least two b-tags
   if ( goodbTaggedJets.size() >= 2 ) {
 
-//    vector<double> eventVariablesVector(
+    //    vector<double> eventVariablesVector(
     eventVariables2Tags_->fill( goodJets, goodbTaggedJets, &(*offlineMEt) );
-//    );
-
-//     for ( vector<double>::const_iterator varIter = eventVariablesVector.begin(); varIter != eventVariablesVector.end(); ++varIter ) {
-//     }
-
-
-
-
-
-//     // Create pairs of b-jets and evaluate their probability to come from the Higgs decay
-//     //  vector<pair<true/false ratio, candidate> >
-//     vector<pair<double, Particle<const OfflineJet> > > bTaggedPairs;
-//     vector<const OfflineJet *>::const_iterator bTaggedJetIt = goodbTaggedJets.begin();
-//     for ( ; bTaggedJetIt != goodbTaggedJets.end(); ++bTaggedJetIt ) {
-//       vector<const OfflineJet *>::const_iterator subbTaggedJetIt = bTaggedJetIt+1;
-//       for ( ; subbTaggedJetIt != goodbTaggedJets.end(); ++subbTaggedJetIt ) {
-//         // bTaggedPairs.push_back(pairStruct( *bTaggedJetIt, *subbTaggedJetIt ));
-//         Particle<const OfflineJet> higgsCandidate( *bTaggedJetIt );
-//         higgsCandidate.add( *subbTaggedJetIt );
-//         bTaggedPairs.push_back( make_pair( evalHiggsPairProbability(higgsCandidate), higgsCandidate ) ); 
-//         cout << "true/false ratio = " << bTaggedPairs.back().first << endl;
-//       }
-//     }
-
-
-
-
-
+    //    );
 
   } // end if at least two b-tags
-
-
-
-
-  // Associate partons to offlineJets only for H->bb/cc and tt->leptons+4jets decays
-//  int higgsDecayType = decayType.first;
-//  int ttDecayType = decayType.second;
-//  if ( (higgsDecayType == 0 || higgsDecayType == 1) && (ttDecayType == 11 || ttDecayType == 101 || ttDecayType == 1001) ) {
-//    cout << "ttH->MEt+4Jets decay" << endl;
-//  }
-
-  // Select the Higgs using the true/falseHiggs matrices
-
 }
 
 //       method called once each job just before starting event loop  

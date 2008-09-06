@@ -100,7 +100,6 @@ private:
   int l1Eff_;
 
   TFile * outputFile_;
-  TFile * tmvaFile_;
 
   ttHdecaysCounter * countTTHdecays_;
 

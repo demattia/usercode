@@ -47,16 +47,39 @@ EventVariables::EventVariables( const string & higgsFileName, const string & had
   outputDir_ = outputFile_->mkdir(dirName);
   outputDir_->cd();
 
+  // Vector with the variables names
+  eventVariablesNames_.push_back( "higgsMass" );
+  eventVariablesNames_.push_back( "hadronicTopMass" );
+  eventVariablesNames_.push_back( "hadronicWmass" );
+  eventVariablesNames_.push_back( "chi2ofMasses" );
+  eventVariablesNames_.push_back( "hadronicTopProjectionAlongHiggsDirection" );
+  eventVariablesNames_.push_back( "deltaEtaHadronicTopHiggs" );
+  eventVariablesNames_.push_back( "hadronicTopPlusHiggsMass" );
+  eventVariablesNames_.push_back( "remainingJetsMass" );
+    TString num;
+    stringstream numConvert;
+  for ( int i=0; i<2; ++i ) {
+    numConvert << i+1;
+    num = numConvert.str();
+    eventVariablesNames_.push_back( "firstNjetsMass_"+num );
+    eventVariablesNames_.push_back( "firstNjetsCentrality_"+num );
+    numConvert.str("");
+  }
+  for ( int i=0; i<3; ++i ) {
+    numConvert << i+1;
+    num = numConvert.str();
+    eventVariablesNames_.push_back( "deltaPhiMEtNthLeadingJet_"+num );
+    numConvert.str("");
+  }
+  eventVariablesNames_.push_back( "sixthJetEt" );
+  eventVariablesNames_.push_back( "goodHt" );
+  eventVariablesNames_.push_back( "mEtSig" );
+  eventVariablesNames_.push_back( "sumHighEffDiscriminantFirst4Jets" );
+  eventVariablesNames_.push_back( "sumHighEffDiscriminantFirst6Jets" );
+  eventVariablesNames_.push_back( "bTagTkInvMass" );
+
   // Create the TTree for the TMVA
-//  tmvaTree_ = new TTree("T","An example of a ROOT tree");
-
-//  tmvaTree_->Branch("higgsMass", &higgsMassVar_, "D");
-
-
-
-
-
-
+  tmvaTreeWriterPtr_.reset(new TMVAtreeWriter(eventVariablesNames_));
 
   if ( fillHistograms_ ) {
 
@@ -209,9 +232,6 @@ vector<double> EventVariables::fill( vector<const OfflineJet *> jetCollection, c
 
   } // end if jetCollection.size() >= 3
 
-  // Fill the TTree with the variables values
-//  tmvaTree_->Fill();
-
   eventVariablesVector_.push_back( higgsMassVar_ );
   eventVariablesVector_.push_back( hadronicTopMassVar_ );
   eventVariablesVector_.push_back( hadronicWmassVar_ );
@@ -231,6 +251,9 @@ vector<double> EventVariables::fill( vector<const OfflineJet *> jetCollection, c
   eventVariablesVector_.push_back( sumHighEffDiscriminantFirst4JetsVar_ );
   eventVariablesVector_.push_back( sumHighEffDiscriminantFirst6JetsVar_ );
   eventVariablesVector_.push_back( bTagTkInvMassVar_ );
+
+  // Fill the tree for the TMVA
+  tmvaTreeWriterPtr_->fill(eventVariablesVector_);
 
   // If asked for, fill all the histograms
   if ( fillHistograms_ ) {
@@ -262,8 +285,6 @@ vector<double> EventVariables::fill( vector<const OfflineJet *> jetCollection, c
 EventVariables::~EventVariables() {
 
   outputDir_->cd();
-
-//  tmvaTree_->Write();
 
   if( fillHistograms_ ) {
     higgsMass_->Write();
@@ -480,7 +501,7 @@ double EventVariables::evalTopTripletProbability(const Particle<const OfflineJet
     cout << "Error: hadronicTopCandidate does not have 3 component jets" << endl;
     exit(1);
   }
-  if ( etId < 0 || etaId < 0 || dPhiHiggsHadronicTop < 0 ) cout << "Error: index < 0, will crash..." << endl;
+  if ( etId < 0 || etaId < 0 || dPhiHiggsHadronicTopId < 0 ) cout << "Error: index < 0, will crash..." << endl;
   if ( etId>int(hadronicTopBinNum_[0]-1) ) etId = hadronicTopBinNum_[0]-1;
   if ( etaId>int(hadronicTopBinNum_[1]-1) ) etaId = hadronicTopBinNum_[1]-1;
   if ( dPhiHiggsHadronicTopId>int(hadronicTopBinNum_[2]-1) ) dPhiHiggsHadronicTopId = dPhiHiggsHadronicTopId-1;
