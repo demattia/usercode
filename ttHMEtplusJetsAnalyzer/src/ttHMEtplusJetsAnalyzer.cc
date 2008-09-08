@@ -59,22 +59,29 @@ ttHMEtplusJetsAnalyzer::ttHMEtplusJetsAnalyzer(const edm::ParameterSet& iConfig)
   simpleElectronLabel_( iConfig.getUntrackedParameter<edm::InputTag>( "SimpleElectrons" ) ),
   simpleTauLabel_( iConfig.getUntrackedParameter<edm::InputTag>( "SimpleTaus" ) ),
   summaryLabel_( iConfig.getUntrackedParameter<edm::InputTag>( "Summary" ) ),
+  vtxLabel_( iConfig.getUntrackedParameter<edm::InputTag>( "vtxLabel" ) ),
   withL1ForwardJets_( iConfig.getUntrackedParameter<bool>("withL1ForwardJets") ),
+  vtxAssoc_( iConfig.getUntrackedParameter<bool>("VtxAssoc") ),
   higgsFileName_(iConfig.getUntrackedParameter<string>("HiggsFileName") ),
   hadronicTopFileName_(iConfig.getUntrackedParameter<string>("HadronicTopFileName") ),
   qcdFileName_(iConfig.getUntrackedParameter<string>("QCDfileName") ),
   jetEtCut_(iConfig.getUntrackedParameter<double>("JetEtCut") ),
   jetEtaCut_(iConfig.getUntrackedParameter<double>("JetEtaCut") ),
+
+  countTTHdecaysFileName_(iConfig.getUntrackedParameter<string>("CountTTHdecaysFileName") ),
+  countTTHdecays2tagsFileName_(iConfig.getUntrackedParameter<string>("CountTTHdecays2tagsFileName") ),
+ 
   outputFileName_(iConfig.getUntrackedParameter<string>("OutputFileName") ),
   eventCounter_(0),
   l1Eff_(0)
 {
-  countTTHdecays_ = new ttHdecaysCounter("ttHdecays.txt");
+
+  countTTHdecays_ = new ttHdecaysCounter(countTTHdecaysFileName_);
+  countTTHdecays2tags_ = new ttHdecaysCounter(countTTHdecays2tagsFileName_);
 
   outputFile_ = new TFile(outputFileName_.c_str(), "RECREATE");
-
-  eventVariablesPresel_ = new EventVariables(higgsFileName_, hadronicTopFileName_, qcdFileName_, "presel", outputFile_);
   eventVariables2Tags_ = new EventVariables(higgsFileName_, hadronicTopFileName_, qcdFileName_, "2tags", outputFile_);
+  jetVertexAssociator_ = new JetVertexAssociator(jetEtCut_,jetEtaCut_);
 
 }
 
@@ -173,13 +180,31 @@ void ttHMEtplusJetsAnalyzer::analyze(const edm::Event& iEvent, const edm::EventS
   //  bool goodMuonFound = goodMuon( *globalMuons, *caloJets);
   // ------------------------------------------------ //
 
+  //--------------------------
+  // Reco vertex collection
+  //--------------------------
+  Handle<BaseVertexCollection> recVtxs;
+  BaseVertexCollection recoVertexes;
+  try {
+    iEvent.getByLabel( vtxLabel_ , recVtxs);
+  } 
+  catch (...) {
+    std::cerr << "Could not find the recovertex collection" << std::endl;
+    return;
+  } 
+  recoVertexes = *(recVtxs.product());
+
   // Select only jets with Et>(JetEtCut_)GeV and Eta<(JetEtaCut_) and write them in the goodJets collection
   vector<const OfflineJet *> goodJets;
   vector<const OfflineJet *> goodbTaggedJets;
-  for ( OfflineJetCollection::const_iterator allJetIt = caloJets->begin(); allJetIt != caloJets->end(); ++allJetIt ) {
-    if ( allJetIt->et() >= jetEtCut_ && fabs(allJetIt->eta())< jetEtaCut_ ) {
-      goodJets.push_back(&(*allJetIt));
 
+  // Jet-Vertex Algorithm
+  if(vtxAssoc_){
+    OfflineJetCollection associatedJet(jetVertexAssociator_->associate(*(caloJets.product()),recoVertexes));
+    for ( OfflineJetCollection::const_iterator assocJetIt = associatedJet.begin(); assocJetIt != associatedJet.end(); ++assocJetIt ) {
+      //non metto i tagli in et ed eta sono  fatti internamente dall'algoritmo di associazione
+      goodJets.push_back(&(*assocJetIt));
+      
       // -------------------------------------------------------------- //
       // -- THIS IS TEMPORARY, A MORE ACCURATE TAGGER SHOULD BE USED -- //
       // -------------------------------------------------------------- //
@@ -187,24 +212,75 @@ void ttHMEtplusJetsAnalyzer::analyze(const edm::Event& iEvent, const edm::EventS
       // high eff -> 50.30% b / 10.77% c / 0.92% uds /  0.98% g / 0.96% udsg // P.Schilling 23/10/07
       // Set the b-tag cut value
       float medium = 5.3;
-      if ( allJetIt->discriminatorHighEff()>medium ) goodbTaggedJets.push_back(&(*allJetIt));
+	if ( assocJetIt->discriminatorHighEff()>medium ) goodbTaggedJets.push_back(&(*assocJetIt));
+    }
+  }else{
+    for ( OfflineJetCollection::const_iterator allJetIt = caloJets->begin(); allJetIt != caloJets->end(); ++allJetIt ) {
+      if ( allJetIt->et() >= jetEtCut_ && fabs(allJetIt->eta())< jetEtaCut_ ) {
+	goodJets.push_back(&(*allJetIt));
+      	
+	// -------------------------------------------------------------- //
+	// -- THIS IS TEMPORARY, A MORE ACCURATE TAGGER SHOULD BE USED -- //
+	// -------------------------------------------------------------- //
+	// Consider as tagged those jets with highEff > 5.3.
+	// high eff -> 50.30% b / 10.77% c / 0.92% uds /  0.98% g / 0.96% udsg // P.Schilling 23/10/07
+	// Set the b-tag cut value
+	float medium = 5.3;
+	if ( allJetIt->discriminatorHighEff()>medium ) goodbTaggedJets.push_back(&(*allJetIt));
+      }
     }
   }
-
-  // Preselection
-  if ( goodJets.size() >= 5 && offlineMEt->corrL3mEtSig() > 3.0 ) {
-    // Fill variables after the preselection
-    eventVariablesPresel_->fill( goodJets, goodbTaggedJets, &(*offlineMEt) );
-
+  
     // Require at least two b-tags
-    if ( goodbTaggedJets.size() >= 2 ) {
+    if ( goodJets.size() >= 5 && offlineMEt->corrL3mEtSig() > 3. ) { // && goodbTaggedJets.size() >= 2 ) {
 
-      //    vector<double> eventVariablesVector(
-      eventVariables2Tags_->fill( goodJets, goodbTaggedJets, &(*offlineMEt) );
-      //    );
+    pair<int,int> decayType2tags(countTTHdecays2tags_->countDecays(*MCpartons));
 
-    } // end if at least two b-tags
-  } // end preselection cuts
+//    vector<double> eventVariablesVector(
+    eventVariables2Tags_->fill( goodJets, goodbTaggedJets, &(*offlineMEt) );
+//    );
+
+//     for ( vector<double>::const_iterator varIter = eventVariablesVector.begin(); varIter != eventVariablesVector.end(); ++varIter ) {
+//     }
+
+
+
+
+
+//     // Create pairs of b-jets and evaluate their probability to come from the Higgs decay
+//     //  vector<pair<true/false ratio, candidate> >
+//     vector<pair<double, Particle<const OfflineJet> > > bTaggedPairs;
+//     vector<const OfflineJet *>::const_iterator bTaggedJetIt = goodbTaggedJets.begin();
+//     for ( ; bTaggedJetIt != goodbTaggedJets.end(); ++bTaggedJetIt ) {
+//       vector<const OfflineJet *>::const_iterator subbTaggedJetIt = bTaggedJetIt+1;
+//       for ( ; subbTaggedJetIt != goodbTaggedJets.end(); ++subbTaggedJetIt ) {
+//         // bTaggedPairs.push_back(pairStruct( *bTaggedJetIt, *subbTaggedJetIt ));
+//         Particle<const OfflineJet> higgsCandidate( *bTaggedJetIt );
+//         higgsCandidate.add( *subbTaggedJetIt );
+//         bTaggedPairs.push_back( make_pair( evalHiggsPairProbability(higgsCandidate), higgsCandidate ) ); 
+//         cout << "true/false ratio = " << bTaggedPairs.back().first << endl;
+//       }
+//     }
+
+
+
+
+
+
+  } // end if at least two b-tags
+
+
+
+
+  // Associate partons to offlineJets only for H->bb/cc and tt->leptons+4jets decays
+//  int higgsDecayType = decayType.first;
+//  int ttDecayType = decayType.second;
+//  if ( (higgsDecayType == 0 || higgsDecayType == 1) && (ttDecayType == 11 || ttDecayType == 101 || ttDecayType == 1001) ) {
+//    cout << "ttH->MEt+4Jets decay" << endl;
+//  }
+
+  // Select the Higgs using the true/falseHiggs matrices
+
 }
 
 //       method called once each job just before starting event loop  
@@ -218,9 +294,11 @@ void ttHMEtplusJetsAnalyzer::beginJob(const edm::EventSetup&) {
 void ttHMEtplusJetsAnalyzer::endJob() {
 
   countTTHdecays_->writeDecays();
+  countTTHdecays2tags_->writeDecays();
   delete countTTHdecays_;
-  delete eventVariablesPresel_;
+  delete countTTHdecays2tags_;
   delete eventVariables2Tags_;
+  delete jetVertexAssociator_;
   outputFile_->Write();
 }
 
