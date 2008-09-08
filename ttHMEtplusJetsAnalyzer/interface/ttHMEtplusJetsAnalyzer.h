@@ -45,6 +45,8 @@
 #include "AnalysisExamples/AnalysisClasses/interface/SimpleJet.h"
 #include "AnalysisExamples/AnalysisObjects/interface/Particle.h"
 
+#include "AnalysisExamples/AnalysisClasses/interface/JetVertexAssociator.h"
+
 #include "TFile.h"
 
 #include <string>
@@ -82,12 +84,16 @@ private:
   edm::InputTag simpleElectronLabel_;
   edm::InputTag simpleTauLabel_;
   edm::InputTag summaryLabel_;
+  edm::InputTag vtxLabel_;
   bool withL1ForwardJets_;
+  bool vtxAssoc_;
   string higgsFileName_;
   string hadronicTopFileName_;
   string qcdFileName_;
   double jetEtCut_;
   double jetEtaCut_;
+  string countTTHdecaysFileName_;
+  string countTTHdecays2tagsFileName_;
   string outputFileName_;
 
   int eventCounter_;
@@ -102,11 +108,14 @@ private:
   TFile * outputFile_;
 
   ttHdecaysCounter * countTTHdecays_;
+  ttHdecaysCounter * countTTHdecays2tags_;
 
   // Class to fill histograms on event variables
   EventVariables * eventVariablesPresel_;
   EventVariables * eventVariables2Tags_;
   
+  JetVertexAssociator * jetVertexAssociator_;
+
 };
 
 

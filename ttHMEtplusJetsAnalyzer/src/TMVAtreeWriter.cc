@@ -3,12 +3,14 @@
 
 #include "AnalysisExamples/ttHMEtplusJetsAnalyzer/interface/TMVAtreeWriter.h"
 
-TMVAtreeWriter::TMVAtreeWriter(const vector<TString> & variablesNames) {
+TMVAtreeWriter::TMVAtreeWriter(const vector<TString> & variablesNames, const TString & suffix) {
 
-  tmvaRootFile_ = new TFile("tmva.root", "RECREATE");
+  tmvaRootFile_ = new TFile("tmva"+suffix+".root", "RECREATE");
   tmvaRootFile_->cd();
 
-  rootTree_ = new TTree("tree", "tmva tree");
+  TString tempSuffix = "_";
+  tempSuffix += suffix;
+  rootTree_ = new TTree("tree"+tempSuffix, "tmva tree"+suffix);
 
   // This is used to store the per-event weights
   rootTree_->Branch("__WEIGHT__", &weight_, "__WEIGHT__/D");

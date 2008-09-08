@@ -73,6 +73,7 @@ ttHMEtplusJetsAnalyzer::ttHMEtplusJetsAnalyzer(const edm::ParameterSet& iConfig)
 
   outputFile_ = new TFile(outputFileName_.c_str(), "RECREATE");
 
+  eventVariablesPresel_ = new EventVariables(higgsFileName_, hadronicTopFileName_, qcdFileName_, "presel", outputFile_);
   eventVariables2Tags_ = new EventVariables(higgsFileName_, hadronicTopFileName_, qcdFileName_, "2tags", outputFile_);
 
 }
@@ -190,14 +191,20 @@ void ttHMEtplusJetsAnalyzer::analyze(const edm::Event& iEvent, const edm::EventS
     }
   }
 
-  // Require at least two b-tags
-  if ( goodbTaggedJets.size() >= 2 ) {
+  // Preselection
+  if ( goodJets.size() >= 5 && offlineMEt->corrL3mEtSig() > 3.0 ) {
+    // Fill variables after the preselection
+    eventVariablesPresel_->fill( goodJets, goodbTaggedJets, &(*offlineMEt) );
 
-    //    vector<double> eventVariablesVector(
-    eventVariables2Tags_->fill( goodJets, goodbTaggedJets, &(*offlineMEt) );
-    //    );
+    // Require at least two b-tags
+    if ( goodbTaggedJets.size() >= 2 ) {
 
-  } // end if at least two b-tags
+      //    vector<double> eventVariablesVector(
+      eventVariables2Tags_->fill( goodJets, goodbTaggedJets, &(*offlineMEt) );
+      //    );
+
+    } // end if at least two b-tags
+  } // end preselection cuts
 }
 
 //       method called once each job just before starting event loop  
@@ -212,6 +219,7 @@ void ttHMEtplusJetsAnalyzer::endJob() {
 
   countTTHdecays_->writeDecays();
   delete countTTHdecays_;
+  delete eventVariablesPresel_;
   delete eventVariables2Tags_;
   outputFile_->Write();
 }

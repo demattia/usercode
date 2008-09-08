@@ -1,5 +1,5 @@
-#ifndef TTHMETPLUSJETSANALYZER_H
-#define TTHMETPLUSJETSANALYZER_H
+#ifndef RELATIVELIKELIHOOD_H
+#define RELATIVELIKELIHOOD_H
 
 /**
  * class RelativeLikelihood RelativeLikelihood.cc AnalysisExamples/tHMEtplusJetsAnalyzer/src/RelativeLikelihood.cc
@@ -45,6 +45,8 @@
 #include "AnalysisExamples/AnalysisClasses/interface/SimpleJet.h"
 #include "AnalysisExamples/AnalysisObjects/interface/Particle.h"
 
+#include "AnalysisExamples/AnalysisClasses/interface/JetVertexAssociator.h"
+
 #include "TFile.h"
 #include "TH1D.h"
 
@@ -83,13 +85,18 @@ private:
   edm::InputTag simpleElectronLabel_;
   edm::InputTag simpleTauLabel_;
   edm::InputTag summaryLabel_;
+  edm::InputTag vtxLabel_;
   bool withL1ForwardJets_;
+  bool vtxAssoc_;
   string higgsFileName_;
   string hadronicTopFileName_;
   string qcdFileName_;
   double jetEtCut_;
   double jetEtaCut_;
-  string inputFileName_;
+  string countTTHdecaysFileName_;
+  string countTTHdecays2tagsFileName_;
+  string inputFileNameSignal_;
+  string inputFileNameBackground_;
   string outputFileName_;
 
   int eventCounter_;
@@ -101,22 +108,26 @@ private:
 
   int l1Eff_;
 
-  TFile * inputFile_;
+  TFile * inputFileSignal_;
+  TFile * inputFileBackground_;
   TFile * outputFile_;
   TDirectory * outputDir_;
 
   // Histograms: the number depends on those written by ttHMEtplusJetsAnalyzer
-  vector<TH1D *> histogramVariableSignal_;
-  vector<TH1D *> histogramVariableBackground_;
+  vector<TH1D> histogramVariableSignal_;
+  vector<TH1D> histogramVariableBackground_;
 
   TH1D * relativeLikelihood_;
 
   ttHdecaysCounter * countTTHdecays_;
+  ttHdecaysCounter * countTTHdecays2tags_;
 
   // Class to fill histograms on event variables
   EventVariables * eventVariables2Tags_;
+ 
+  JetVertexAssociator * jetVertexAssociator_;
 
 };
 
 
-#endif // TTHMETPLUSJETSANALYZER_H
+#endif // RELATIVELIKELIHOOD_CC
