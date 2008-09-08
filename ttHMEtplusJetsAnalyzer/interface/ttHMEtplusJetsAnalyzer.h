@@ -104,6 +104,7 @@ private:
   ttHdecaysCounter * countTTHdecays_;
 
   // Class to fill histograms on event variables
+  EventVariables * eventVariablesPresel_;
   EventVariables * eventVariables2Tags_;
   
 };

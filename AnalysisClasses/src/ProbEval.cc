@@ -101,7 +101,7 @@ map<int, int> ProbEval::evalProb(SimpleCaloJetCollection vec_CaloJet, int jetNum
     
     SimpleCaloJetCollection::reverse_iterator  rItCaloJet = vec_CaloJet.rbegin();
     int tempId = maxProbId_;
-    if(maxProbId_ == 0) cout<<"All best"<<endl;
+    //    if(maxProbId_ == 0) cout<<"All best"<<endl;
     //    cout<<"maxProb: "<<maxProb_<<endl;
     for(; rItCaloJet != vec_CaloJet.rend(); ++rItCaloJet ){
       //If it is even it is the best vtx

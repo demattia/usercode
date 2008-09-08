@@ -4,7 +4,8 @@
 /**
  * Class used to write the variables in a root tree for TMVA.
  * The constructor requires a vector<TString> with the names of the variables. The size of this vector is used
- * to create an array for the variables, which are all double.
+ * to create an array for the variables, which are all double. It optionally can get a suffix which it appends to
+ * as tmva_suffix.root for the output file name.
  * The fill method gets a vector<double> for the variables to store. It fills the array and then fills the TTree.
  * This too vectors must be ordered accordingly to maintain correspondence name-variable.
  * The size of the vectors is not checked. The loop is made on the variables, a shorter vector of names
@@ -28,7 +29,7 @@ using namespace std;
 class TMVAtreeWriter {
 
 public:
-  TMVAtreeWriter(const vector<TString> & variablesNames);
+  TMVAtreeWriter(const vector<TString> & variablesNames, const TString & suffix = "");
   ~TMVAtreeWriter();
 
   void fill(const vector<double> & variables, const double & weight = 1.);

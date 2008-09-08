@@ -79,7 +79,7 @@ EventVariables::EventVariables( const string & higgsFileName, const string & had
   eventVariablesNames_.push_back( "bTagTkInvMass" );
 
   // Create the TTree for the TMVA
-  tmvaTreeWriterPtr_.reset(new TMVAtreeWriter(eventVariablesNames_));
+  tmvaTreeWriterPtr_.reset(new TMVAtreeWriter(eventVariablesNames_, suffix));
 
   if ( fillHistograms_ ) {
 
@@ -150,87 +150,91 @@ vector<double> EventVariables::fill( vector<const OfflineJet *> jetCollection, c
   // Evaluates variables on all "good" jets and fills corresponding histograms
   allGoodJetsVariables( jetCollection, offlineMEt);
 
-  // Higgs, hadronic Top and W determination
-  // ---------------------------------------
+  // Proceed in identifying the particles only if there are at least 2 b-jets
+  if( bTaggedJetCollection.size() >= 2 ) {
 
-  // Create pairs of b-jets and evaluate their probability to come from the Higgs decay
-  //  vector<pair<true/false ratio, candidate> >
-  vector<pair<double, Particle<const OfflineJet> > > bTaggedPairs;
-  vector<const OfflineJet *>::const_iterator bTaggedJetIt = bTaggedJetCollection.begin();
-  for ( ; bTaggedJetIt != bTaggedJetCollection.end(); ++bTaggedJetIt ) {
-    vector<const OfflineJet *>::const_iterator subbTaggedJetIt = bTaggedJetIt+1;
-    for ( ; subbTaggedJetIt != bTaggedJetCollection.end(); ++subbTaggedJetIt ) {
-      // bTaggedPairs.push_back(pairStruct( *bTaggedJetIt, *subbTaggedJetIt ));
-      Particle<const OfflineJet> higgsCandidate( *bTaggedJetIt );
-      higgsCandidate.add( *subbTaggedJetIt );
-      bTaggedPairs.push_back( make_pair( evalHiggsPairProbability(higgsCandidate), higgsCandidate ) ); 
-      // cout << "higgsCandidate true/false ratio = " << bTaggedPairs.back().first << endl;
-    }
-  }
-  sort( bTaggedPairs.rbegin(), bTaggedPairs.rend(), sortParticlesByProbability );
-  Particle<const OfflineJet> * selectedHiggs = &(bTaggedPairs.front().second);
+    // Higgs, hadronic Top and W determination
+    // ---------------------------------------
 
-  higgsMassVar_ = selectedHiggs->mass();
-
-  // Remove the Higgs associated jets
-  jetCollection.erase( find(jetCollection.begin(), jetCollection.end(), (selectedHiggs->components())[0]) );
-  jetCollection.erase( find(jetCollection.begin(), jetCollection.end(), (selectedHiggs->components())[1]) );
-
-  // If there are at least 3 jets, once those from the selected Higgs have been removed, search for hadronic top candidates
-  if ( jetCollection.size() >= 3 ) {
-    // Once the Higgs is selected use the remaining jets to select the hadronic top triplet
-    vector<pair<double, Particle<const OfflineJet> > > hadronicTopTriplet;
-    vector<const OfflineJet *>::const_iterator jetIt = jetCollection.begin();
-    for ( ; jetIt != jetCollection.end(); ++jetIt ) {
-      vector<const OfflineJet *>::const_iterator subJetIt = jetIt+1;
-      for ( ; subJetIt != jetCollection.end(); ++subJetIt ) {
-        vector<const OfflineJet *>::const_iterator subSubJetIt = subJetIt+1;
-        for ( ; subSubJetIt != jetCollection.end(); ++subSubJetIt ) {
-          Particle<const OfflineJet> hadronicTopCandidate( *jetIt );
-          hadronicTopCandidate.add( *subJetIt );
-          hadronicTopCandidate.add( *subSubJetIt );
-          hadronicTopTriplet.push_back( make_pair( evalTopTripletProbability(hadronicTopCandidate, *selectedHiggs), hadronicTopCandidate ) ); 
-          // cout << "hadronicTopCandidate true/false ratio = " << hadronicTopTriplet.back().first << endl;
-        }
+    // Create pairs of b-jets and evaluate their probability to come from the Higgs decay
+    //  vector<pair<true/false ratio, candidate> >
+    vector<pair<double, Particle<const OfflineJet> > > bTaggedPairs;
+    vector<const OfflineJet *>::const_iterator bTaggedJetIt = bTaggedJetCollection.begin();
+    for ( ; bTaggedJetIt != bTaggedJetCollection.end(); ++bTaggedJetIt ) {
+      vector<const OfflineJet *>::const_iterator subbTaggedJetIt = bTaggedJetIt+1;
+      for ( ; subbTaggedJetIt != bTaggedJetCollection.end(); ++subbTaggedJetIt ) {
+        // bTaggedPairs.push_back(pairStruct( *bTaggedJetIt, *subbTaggedJetIt ));
+        Particle<const OfflineJet> higgsCandidate( *bTaggedJetIt );
+        higgsCandidate.add( *subbTaggedJetIt );
+        bTaggedPairs.push_back( make_pair( evalHiggsPairProbability(higgsCandidate), higgsCandidate ) ); 
+        // cout << "higgsCandidate true/false ratio = " << bTaggedPairs.back().first << endl;
       }
     }
-    sort( hadronicTopTriplet.rbegin(), hadronicTopTriplet.rend(), sortParticlesByProbability );
-    Particle<const OfflineJet> * selectedHadronicTop = &(hadronicTopTriplet.front().second);
-    hadronicTopMassVar_ = selectedHadronicTop->mass();
+    sort( bTaggedPairs.rbegin(), bTaggedPairs.rend(), sortParticlesByProbability );
+    Particle<const OfflineJet> * selectedHiggs = &(bTaggedPairs.front().second);
 
-    // Determine the hadronic W in the reconstructed hadronic top
-    Particle<const OfflineJet> selectedHadronicW( getWfromHadronicTop(*selectedHadronicTop) );
-    hadronicWmassVar_ = selectedHadronicW.mass();
+    higgsMassVar_ = selectedHiggs->mass();
 
-    chi2ofMassesVar_ = pow((selectedHiggs->mass() - referenceHiggsMass_)/15.,2) +
-      pow((selectedHadronicTop->mass() - referenceTopMass_)/25.,2) +
-      pow((selectedHadronicW.mass() - referenceWmass_)/15.,2);
+    // Remove the Higgs associated jets
+    jetCollection.erase( find(jetCollection.begin(), jetCollection.end(), (selectedHiggs->components())[0]) );
+    jetCollection.erase( find(jetCollection.begin(), jetCollection.end(), (selectedHiggs->components())[1]) );
 
-    // Selected hadronic Top momentum projection along Higgs direction.
-    // Note that the object has the operator* overloaded and that this operator requires a pointer to a BaseParticle.
-    hadronicTopProjectionAlongHiggsDirectionVar_ = (*selectedHadronicTop*selectedHiggs)/sqrt(*selectedHiggs*selectedHiggs);
-    deltaEtaHadronicTopHiggsVar_ = selectedHadronicTop->eta() - selectedHiggs->eta();
+    // If there are at least 3 jets, once those from the selected Higgs have been removed, search for hadronic top candidates
+    if ( jetCollection.size() >= 3 ) {
+      // Once the Higgs is selected use the remaining jets to select the hadronic top triplet
+      vector<pair<double, Particle<const OfflineJet> > > hadronicTopTriplet;
+      vector<const OfflineJet *>::const_iterator jetIt = jetCollection.begin();
+      for ( ; jetIt != jetCollection.end(); ++jetIt ) {
+        vector<const OfflineJet *>::const_iterator subJetIt = jetIt+1;
+        for ( ; subJetIt != jetCollection.end(); ++subJetIt ) {
+          vector<const OfflineJet *>::const_iterator subSubJetIt = subJetIt+1;
+          for ( ; subSubJetIt != jetCollection.end(); ++subSubJetIt ) {
+            Particle<const OfflineJet> hadronicTopCandidate( *jetIt );
+            hadronicTopCandidate.add( *subJetIt );
+            hadronicTopCandidate.add( *subSubJetIt );
+            hadronicTopTriplet.push_back( make_pair( evalTopTripletProbability(hadronicTopCandidate, *selectedHiggs), hadronicTopCandidate ) ); 
+            // cout << "hadronicTopCandidate true/false ratio = " << hadronicTopTriplet.back().first << endl;
+          }
+        }
+      }
+      sort( hadronicTopTriplet.rbegin(), hadronicTopTriplet.rend(), sortParticlesByProbability );
+      Particle<const OfflineJet> * selectedHadronicTop = &(hadronicTopTriplet.front().second);
+      hadronicTopMassVar_ = selectedHadronicTop->mass();
 
-    // Mass reconstructed with the 5 total jets from Higgs and hadronicTop
-    Particle<const OfflineJet> hadronicTopPlusHiggs;
-    hadronicTopPlusHiggs.add(selectedHiggs);
-    hadronicTopPlusHiggs.add(selectedHadronicTop);
-    hadronicTopPlusHiggsMassVar_ = hadronicTopPlusHiggs.mass();
+      // Determine the hadronic W in the reconstructed hadronic top
+      Particle<const OfflineJet> selectedHadronicW( getWfromHadronicTop(*selectedHadronicTop) );
+      hadronicWmassVar_ = selectedHadronicW.mass();
 
-    // Now remove also the hadronic Top associated jets
-    jetCollection.erase( find(jetCollection.begin(), jetCollection.end(), (selectedHadronicTop->components())[0]) );
-    jetCollection.erase( find(jetCollection.begin(), jetCollection.end(), (selectedHadronicTop->components())[1]) );
-    jetCollection.erase( find(jetCollection.begin(), jetCollection.end(), (selectedHadronicTop->components())[2]) );
+      chi2ofMassesVar_ = pow((selectedHiggs->mass() - referenceHiggsMass_)/15.,2) +
+        pow((selectedHadronicTop->mass() - referenceTopMass_)/25.,2) +
+        pow((selectedHadronicW.mass() - referenceWmass_)/15.,2);
 
-    // Compute the mass of the remaining jets
-    Particle<const OfflineJet> remainingJetsParticle;
-    vector<const OfflineJet *>::const_iterator remainingJetsIter = jetCollection.begin();
-    for( ; remainingJetsIter != jetCollection.end(); ++remainingJetsIter ) {
-      remainingJetsParticle.add(*remainingJetsIter);
-    }
-    remainingJetsMassVar_ = remainingJetsParticle.mass();
+      // Selected hadronic Top momentum projection along Higgs direction.
+      // Note that the object has the operator* overloaded and that this operator requires a pointer to a BaseParticle.
+      hadronicTopProjectionAlongHiggsDirectionVar_ = (*selectedHadronicTop*selectedHiggs)/sqrt(*selectedHiggs*selectedHiggs);
+      deltaEtaHadronicTopHiggsVar_ = selectedHadronicTop->eta() - selectedHiggs->eta();
 
-  } // end if jetCollection.size() >= 3
+      // Mass reconstructed with the 5 total jets from Higgs and hadronicTop
+      Particle<const OfflineJet> hadronicTopPlusHiggs;
+      hadronicTopPlusHiggs.add(selectedHiggs);
+      hadronicTopPlusHiggs.add(selectedHadronicTop);
+      hadronicTopPlusHiggsMassVar_ = hadronicTopPlusHiggs.mass();
+
+      // Now remove also the hadronic Top associated jets
+      jetCollection.erase( find(jetCollection.begin(), jetCollection.end(), (selectedHadronicTop->components())[0]) );
+      jetCollection.erase( find(jetCollection.begin(), jetCollection.end(), (selectedHadronicTop->components())[1]) );
+      jetCollection.erase( find(jetCollection.begin(), jetCollection.end(), (selectedHadronicTop->components())[2]) );
+
+      // Compute the mass of the remaining jets
+      Particle<const OfflineJet> remainingJetsParticle;
+      vector<const OfflineJet *>::const_iterator remainingJetsIter = jetCollection.begin();
+      for( ; remainingJetsIter != jetCollection.end(); ++remainingJetsIter ) {
+        remainingJetsParticle.add(*remainingJetsIter);
+      }
+      remainingJetsMassVar_ = remainingJetsParticle.mass();
+
+    } // end if jetCollection.size() >= 3
+  } // end if bTaggedJetCollection.size() >= 2
 
   eventVariablesVector_.push_back( higgsMassVar_ );
   eventVariablesVector_.push_back( hadronicTopMassVar_ );
