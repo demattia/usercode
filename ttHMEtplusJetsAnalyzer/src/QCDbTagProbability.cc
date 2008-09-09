@@ -160,19 +160,21 @@ void QCDbTagProbability::analyze(const edm::Event& iEvent, const edm::EventSetup
                       << " etaBinNum = " << etaBinNum_ << " etaBinSize = " << etaBinSize_
                       << " s1BinNum = "  << s1BinNum_  << " s1BinSize = "  << s1BinSize_ << endl;
 
-  double taggedCount = 0.;
-  double notTaggedCount = 0.;
-  double norm = 0.;
+  // double taggedCount = 0.;
+  // double notTaggedCount = 0.;
+  // double norm = 0.;
   // The following lines have the counts for b-tagged and non b-tagged jets
   for(unsigned int i=0; i != etBinNum_; ++i) {
     for(unsigned int j=0; j != etaBinNum_; ++j) {
       for(unsigned int k=0; k != s1BinNum_; ++k) {
         // Evaluate the probability: tagged/(tagged+notTagged) and notTagged/(tagged+notTagged)
-        taggedCount = taggedJet_[i][j][k];
-        notTaggedCount = notTaggedJet_[i][j][k];
-        norm = taggedCount + notTaggedCount;
-        bTagProbabilityFile <<  "taggedJet["<<i<<"]["<<j<<"]["<<k<<"] = "  << taggedCount/norm
-                            << " notTaggedJet["<<i<<"]["<<j<<"]["<<k<<"] = " << notTaggedCount/norm << endl;
+        // taggedCount = taggedJet_[i][j][k];
+        // notTaggedCount = notTaggedJet_[i][j][k];
+        // norm = taggedCount + notTaggedCount;
+        bTagProbabilityFile << " taggedJet["<<i<<"]["<<j<<"]["<<k<<"] count = " << taggedJet_[i][j][k]
+                            << " notTaggedJet["<<i<<"]["<<j<<"]["<<k<<"] count = " << notTaggedJet_[i][j][k] << endl;
+        //                  <<  "taggedJet["<<i<<"]["<<j<<"]["<<k<<"] = "  << taggedCount/norm
+        //                  << " notTaggedJet["<<i<<"]["<<j<<"]["<<k<<"] = " << notTaggedCount/norm
       }
     }
   }
