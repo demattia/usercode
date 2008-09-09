@@ -20,33 +20,6 @@ L1Trig RelativeLikelihood::L1Trigger;
 // Constructors and destructor
 // ---------------------------
 RelativeLikelihood::RelativeLikelihood(const edm::ParameterSet& iConfig) :
-//   conf_( iConfig ),
-//   cenJetLabel_( iConfig.getUntrackedParameter<edm::InputTag>( "CenJets" ) ),
-//   forJetLabel_( iConfig.getUntrackedParameter<edm::InputTag>( "ForJets" ) ),
-//   tauJetLabel_( iConfig.getUntrackedParameter<edm::InputTag>( "TauJets" ) ),
-//   l1MEtLabel_( iConfig.getUntrackedParameter<edm::InputTag>( "L1MEt" ) ),
-//   offlineJetLabel_( iConfig.getUntrackedParameter<edm::InputTag>( "OfflineJets" ) ),
-//   offlineMEtLabel_( iConfig.getUntrackedParameter<edm::InputTag>( "OfflineMEt" ) ),
-//   MCParticleLabel_( iConfig.getUntrackedParameter<edm::InputTag>( "MCParticles" ) ),
-//   globalMuonLabel_( iConfig.getUntrackedParameter<edm::InputTag>( "GlobalMuons" ) ),
-//   simpleElectronLabel_( iConfig.getUntrackedParameter<edm::InputTag>( "SimpleElectrons" ) ),
-//   simpleTauLabel_( iConfig.getUntrackedParameter<edm::InputTag>( "SimpleTaus" ) ),
-//   summaryLabel_( iConfig.getUntrackedParameter<edm::InputTag>( "Summary" ) ),
-//   withL1ForwardJets_( iConfig.getUntrackedParameter<bool>("withL1ForwardJets") ),
-//   higgsFileName_(iConfig.getUntrackedParameter<string>("HiggsFileName") ),
-//   hadronicTopFileName_(iConfig.getUntrackedParameter<string>("HadronicTopFileName") ),
-//   qcdFileName_(iConfig.getUntrackedParameter<string>("QCDfileName") ),
-//   jetEtCut_(iConfig.getUntrackedParameter<double>("JetEtCut") ),
-//   jetEtaCut_(iConfig.getUntrackedParameter<double>("JetEtaCut") ),
-
-//   countTTHdecaysFileName_(iConfig.getUntrackedParameter<string>("CountTTHdecaysFileName") ),
-//   countTTHdecays2tagsFileName_(iConfig.getUntrackedParameter<string>("CountTTHdecays2tagsFileName") ),
-  
-//   inputFileNameSignal_(iConfig.getUntrackedParameter<string>("InputFileNameSignal") ),
-//   inputFileNameBackground_(iConfig.getUntrackedParameter<string>("InputFileNameBackground") ),
-//   outputFileName_(iConfig.getUntrackedParameter<string>("OutputFileName") ),
-//   eventCounter_(0),
-//   l1Eff_(0)
   conf_( iConfig ),
   cenJetLabel_( iConfig.getUntrackedParameter<edm::InputTag>( "CenJets" ) ),
   forJetLabel_( iConfig.getUntrackedParameter<edm::InputTag>( "ForJets" ) ),

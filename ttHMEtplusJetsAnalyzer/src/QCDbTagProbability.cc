@@ -37,9 +37,11 @@ QCDbTagProbability::QCDbTagProbability(const ParameterSet & iConfig) :
   taggedJetEt_ = new TH1F("taggedJetEt", "Et of b-tagged jets", 100, 0, 200);
   taggedJetEta_ = new TH1F("taggedJetEta", "Eta of b-tagged jets", 100, -3, 3);
   taggedJetS1_ = new TH1F("taggedJetS1", "Number of tracks with significance above 1 for b-tagged jets", 20, 0, 20);
+  taggedJetTagMass_ = new TH1F("taggedJetTagMass", "Mass evaluated using the associated tracks for b-tagged jets", 100, 0, 100);
   notTaggedJetEt_ = new TH1F("notTaggedJetEt", "Et of non b-tagged jets", 100, 0, 200);
   notTaggedJetEta_ = new TH1F("notTaggedJetEta", "Eta of non b-tagged jets", 100, -3, 3);
   notTaggedJetS1_ = new TH1F("notTaggedJetS1", "Number of tracks with significance above 1 for non b-tagged jets", 20, 0, 20);
+  notTaggedJetTagMass_ = new TH1F("notTaggedJetTagMass", "Mass evaluated using the associated tracks for non b-tagged jets", 100, 0, 100);
 
   // Initialized to 1, not 0, since they are used to evaluate fractions
   // ------------------------------------------------------------------
@@ -137,6 +139,7 @@ void QCDbTagProbability::analyze(const edm::Event& iEvent, const edm::EventSetup
       taggedJetEt_->Fill(jetEt);
       taggedJetEta_->Fill(jetEta);
       taggedJetS1_->Fill(numTkS1);
+      taggedJetTagMass_->Fill( (*goodJetIt)->bTagTkInvMass() );
       (taggedJet_[etId][etaId][numTkS1Id])++;
     }
     // else fill HcombFalse.txt
@@ -144,6 +147,7 @@ void QCDbTagProbability::analyze(const edm::Event& iEvent, const edm::EventSetup
       notTaggedJetEt_->Fill(jetEt);
       notTaggedJetEta_->Fill(jetEta);
       notTaggedJetS1_->Fill(numTkS1);
+      notTaggedJetTagMass_->Fill( (*goodJetIt)->bTagTkInvMass() );
       (notTaggedJet_[etId][etaId][numTkS1Id])++;
     }
   }
@@ -155,12 +159,20 @@ void QCDbTagProbability::analyze(const edm::Event& iEvent, const edm::EventSetup
   bTagProbabilityFile <<  "etBinNum = "  << etBinNum_  << " etBinSize = "  << etBinSize_
                       << " etaBinNum = " << etaBinNum_ << " etaBinSize = " << etaBinSize_
                       << " s1BinNum = "  << s1BinNum_  << " s1BinSize = "  << s1BinSize_ << endl;
+
+  double taggedCount = 0.;
+  double notTaggedCount = 0.;
+  double norm = 0.;
   // The following lines have the counts for b-tagged and non b-tagged jets
   for(unsigned int i=0; i != etBinNum_; ++i) {
     for(unsigned int j=0; j != etaBinNum_; ++j) {
       for(unsigned int k=0; k != s1BinNum_; ++k) {
-        bTagProbabilityFile <<  "taggedJet["<<i<<"]["<<j<<"]["<<k<<"] = "  << taggedJet_[i][j][k]
-                            << " notTaggedJet["<<i<<"]["<<j<<"]["<<k<<"] = " << notTaggedJet_[i][j][k] << endl;
+        // Evaluate the probability: tagged/(tagged+notTagged) and notTagged/(tagged+notTagged)
+        taggedCount = taggedJet_[i][j][k];
+        notTaggedCount = notTaggedJet_[i][j][k];
+        norm = taggedCount + notTaggedCount;
+        bTagProbabilityFile <<  "taggedJet["<<i<<"]["<<j<<"]["<<k<<"] = "  << taggedCount/norm
+                            << " notTaggedJet["<<i<<"]["<<j<<"]["<<k<<"] = " << notTaggedCount/norm << endl;
       }
     }
   }

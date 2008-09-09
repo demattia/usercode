@@ -12,6 +12,12 @@
  *
  * This class builds the tag-matrix for QCD.
  * It only considers at most 8 good-jets.
+ * ATTENTION:
+ * it also draws the histograms that can be
+ * used for the QCD 'multiplication', but
+ * they should be produced separately on
+ * each qcd bin and then merged rescaling them
+ * with the appropriate cross sections.
  *
  */
 
@@ -66,9 +72,11 @@ private:
   TH1F * taggedJetEt_;
   TH1F * taggedJetEta_;
   TH1F * taggedJetS1_;
+  TH1F * taggedJetTagMass_;
   TH1F * notTaggedJetEt_;
   TH1F * notTaggedJetEta_;
   TH1F * notTaggedJetS1_;
+  TH1F * notTaggedJetTagMass_;
 
   // Bins for the probability matrix
   unsigned int etBinNum_;
