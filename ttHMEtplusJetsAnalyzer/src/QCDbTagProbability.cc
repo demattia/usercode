@@ -23,6 +23,10 @@ QCDbTagProbability::QCDbTagProbability(const ParameterSet & iConfig) :
 {
   eventCounter_ = 0;
 
+  // Name of the file for the probability counts
+  // -------------------------------------------
+  outputProbabilityFileName_ = conf_.getUntrackedParameter<std::string>("OutputProbabilityFileName");
+
   // File for output histograms
   // --------------------------
   outputFile_ = new TFile((conf_.getUntrackedParameter<std::string>("OutputName")).c_str(), "RECREATE");
@@ -154,11 +158,12 @@ void QCDbTagProbability::analyze(const edm::Event& iEvent, const edm::EventSetup
 
   // Write the trueH_ and falseH_ to a txt file
   // ------------------------------------------
-  ofstream bTagProbabilityFile("QCDbTagProbability.txt");
+  ofstream bTagProbabilityFile(outputProbabilityFileName_.c_str());
   // The first line has informations on bin numbers and sizes
   bTagProbabilityFile <<  "etBinNum = "  << etBinNum_  << " etBinSize = "  << etBinSize_
                       << " etaBinNum = " << etaBinNum_ << " etaBinSize = " << etaBinSize_
-                      << " s1BinNum = "  << s1BinNum_  << " s1BinSize = "  << s1BinSize_ << endl;
+                      << " s1BinNum = "  << s1BinNum_  << " s1BinSize = "  << s1BinSize_ 
+                      << " totEvents = " << eventCounter_ << endl;
 
   // double taggedCount = 0.;
   // double notTaggedCount = 0.;
@@ -171,8 +176,10 @@ void QCDbTagProbability::analyze(const edm::Event& iEvent, const edm::EventSetup
         // taggedCount = taggedJet_[i][j][k];
         // notTaggedCount = notTaggedJet_[i][j][k];
         // norm = taggedCount + notTaggedCount;
-        bTagProbabilityFile << " taggedJet["<<i<<"]["<<j<<"]["<<k<<"] count = " << taggedJet_[i][j][k]
-                            << " notTaggedJet["<<i<<"]["<<j<<"]["<<k<<"] count = " << notTaggedJet_[i][j][k] << endl;
+
+        // ATTENTION: the first line must not have space, while the second one must have it.
+        bTagProbabilityFile << "taggedJet["<<i<<"]["<<j<<"]["<<k<<"] = " << taggedJet_[i][j][k]
+                            << " notTaggedJet["<<i<<"]["<<j<<"]["<<k<<"] = " << notTaggedJet_[i][j][k] << endl;
         //                  <<  "taggedJet["<<i<<"]["<<j<<"]["<<k<<"] = "  << taggedCount/norm
         //                  << " notTaggedJet["<<i<<"]["<<j<<"]["<<k<<"] = " << notTaggedCount/norm
       }
