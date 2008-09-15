@@ -28,6 +28,7 @@
 
 #include "AnalysisExamples/ttHMEtplusJetsAnalyzer/interface/ttHdecaysCounter.h"
 #include "AnalysisExamples/ttHMEtplusJetsAnalyzer/interface/EventVariables.h"
+#include "AnalysisExamples/ttHMEtplusJetsAnalyzer/interface/QCDbTagMatrix.h"
 
 // Classes to be accessed
 // ----------------------
@@ -90,11 +91,14 @@ private:
   string higgsFileName_;
   string hadronicTopFileName_;
   string qcdFileName_;
+  string qcdHistoFileName_;
   double jetEtCut_;
   double jetEtaCut_;
   string countTTHdecaysFileName_;
   string countTTHdecays2tagsFileName_;
   string outputFileName_;
+
+  bool useTagMatrixForQCD_;
 
   int eventCounter_;
 
@@ -113,6 +117,7 @@ private:
   // Class to fill histograms on event variables
   EventVariables * eventVariablesPresel_;
   EventVariables * eventVariables2Tags_;
+  QCDbTagMatrix * qcdbTagMatrixMultiplier_;
   
   JetVertexAssociator * jetVertexAssociator_;
 

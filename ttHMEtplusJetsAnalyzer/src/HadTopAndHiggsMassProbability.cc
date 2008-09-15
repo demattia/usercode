@@ -275,6 +275,17 @@ void HadTopAndHiggsMassProbability::analyze(const edm::Event& iEvent, const edm:
       }
     } // end if (true Higgs b-jet pair was found)
   } // end if( (H->cc || H->bb) && 4j )
+}
+
+//       method called once each job just before starting event loop  
+// -------------------------------------------------------------------------
+void HadTopAndHiggsMassProbability::beginJob(const edm::EventSetup&) {
+}
+
+
+//       method called once each job just after ending the event loop 
+// -------------------------------------------------------------------------
+void HadTopAndHiggsMassProbability::endJob() {
 
   // Write the trueH_ and falseH_ to a txt file
   // ------------------------------------------
@@ -311,17 +322,7 @@ void HadTopAndHiggsMassProbability::analyze(const edm::Event& iEvent, const edm:
     }
   }
   hadronicTopFile.close();
-}
 
-//       method called once each job just before starting event loop  
-// -------------------------------------------------------------------------
-void HadTopAndHiggsMassProbability::beginJob(const edm::EventSetup&) {
-}
-
-
-//       method called once each job just after ending the event loop 
-// -------------------------------------------------------------------------
-void HadTopAndHiggsMassProbability::endJob() {
   countTTHdecays_->writeDecays();
   delete countTTHdecays_;
 

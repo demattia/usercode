@@ -66,6 +66,8 @@ private:
   double jetEtaCut_;
   unsigned int maxConsideredJets_;
 
+  string outputProbabilityFileName_;
+
   TFile * outputFile_;
 
   TProfile * jetVsMCpEt_;
@@ -73,10 +75,12 @@ private:
   TH1F * taggedJetEta_;
   TH1F * taggedJetS1_;
   TH1F * taggedJetTagMass_;
+  TH1F * taggedJetDiscriminatorHighEff_;
   TH1F * notTaggedJetEt_;
   TH1F * notTaggedJetEta_;
   TH1F * notTaggedJetS1_;
   TH1F * notTaggedJetTagMass_;
+  TH1F * notTaggedJetDiscriminatorHighEff_;
 
   // Bins for the probability matrix
   unsigned int etBinNum_;
@@ -85,6 +89,8 @@ private:
   double etaBinSize_;
   unsigned int s1BinNum_;
   double s1BinSize_;
+
+  unsigned int totEvents_;
 
   // This will be the multidimensional array
   unsigned int *** taggedJet_;

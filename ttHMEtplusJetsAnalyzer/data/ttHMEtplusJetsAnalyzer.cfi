@@ -20,10 +20,11 @@ module ttHMEtplusJetsAnalyzerModule = ttHMEtplusJetsAnalyzer {
   untracked string   HiggsFileName               = "HiggsPairProbability.txt"
   untracked string   HadronicTopFileName         = "HadronicTopTripletProbability.txt"
   untracked string   QCDfileName                 = "QCDbTagProbability.txt"
+  untracked string   QCDhistoFileName            = "QCDbTagProbability.root"
   untracked double   JetEtCut                    = 25.
   untracked double   JetEtaCut                   = 3.0
   untracked string   CountTTHdecaysFileName      = "ttHdecays.txt"
   untracked string   CountTTHdecays2tagsFileName = "ttHdecays_2tags.txt"
   untracked string   OutputFileName              = "ttHMEtplusJetsAnalyzer.root"
-
+  untracked bool     UseTagMatrixForQCD          = false
 }

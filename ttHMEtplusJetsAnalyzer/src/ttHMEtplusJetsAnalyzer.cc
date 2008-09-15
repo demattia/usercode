@@ -65,6 +65,7 @@ ttHMEtplusJetsAnalyzer::ttHMEtplusJetsAnalyzer(const edm::ParameterSet& iConfig)
   higgsFileName_(iConfig.getUntrackedParameter<string>("HiggsFileName") ),
   hadronicTopFileName_(iConfig.getUntrackedParameter<string>("HadronicTopFileName") ),
   qcdFileName_(iConfig.getUntrackedParameter<string>("QCDfileName") ),
+  qcdHistoFileName_(iConfig.getUntrackedParameter<string>("QCDhistoFileName") ),
   jetEtCut_(iConfig.getUntrackedParameter<double>("JetEtCut") ),
   jetEtaCut_(iConfig.getUntrackedParameter<double>("JetEtaCut") ),
 
@@ -72,6 +73,7 @@ ttHMEtplusJetsAnalyzer::ttHMEtplusJetsAnalyzer(const edm::ParameterSet& iConfig)
   countTTHdecays2tagsFileName_(iConfig.getUntrackedParameter<string>("CountTTHdecays2tagsFileName") ),
  
   outputFileName_(iConfig.getUntrackedParameter<string>("OutputFileName") ),
+  useTagMatrixForQCD_(iConfig.getUntrackedParameter<bool>("UseTagMatrixForQCD") ),
   eventCounter_(0),
   l1Eff_(0)
 {
@@ -82,6 +84,10 @@ ttHMEtplusJetsAnalyzer::ttHMEtplusJetsAnalyzer(const edm::ParameterSet& iConfig)
   outputFile_ = new TFile(outputFileName_.c_str(), "RECREATE");
   eventVariablesPresel_ = new EventVariables(higgsFileName_, hadronicTopFileName_, qcdFileName_, "presel", outputFile_);
   eventVariables2Tags_ = new EventVariables(higgsFileName_, hadronicTopFileName_, qcdFileName_, "2tags", outputFile_);
+
+  // Production of pseudo-events for qcd with 2 b-tags.
+  qcdbTagMatrixMultiplier_ = new QCDbTagMatrix(higgsFileName_, hadronicTopFileName_, qcdFileName_, "2tags", outputFile_, true, qcdHistoFileName_, 2);
+
   jetVertexAssociator_ = new JetVertexAssociator(jetEtCut_,jetEtaCut_);
 
 }
@@ -199,13 +205,18 @@ void ttHMEtplusJetsAnalyzer::analyze(const edm::Event& iEvent, const edm::EventS
   vector<const OfflineJet *> goodJets;
   vector<const OfflineJet *> goodbTaggedJets;
 
+  // Consider only the first 8 most energetic (Et) jets
+  // --------------------------------------------------
+  int numGoodJets = 0;
+
   // Jet-Vertex Algorithm
   if(vtxAssoc_){
     OfflineJetCollection associatedJet(jetVertexAssociator_->associate(*(caloJets.product()),recoVertexes));
-    for ( OfflineJetCollection::const_iterator assocJetIt = associatedJet.begin(); assocJetIt != associatedJet.end(); ++assocJetIt ) {
+    for ( OfflineJetCollection::const_iterator assocJetIt = associatedJet.begin(); assocJetIt != associatedJet.end() && numGoodJets < 8; ++assocJetIt) {
       //non metto i tagli in et ed eta sono  fatti internamente dall'algoritmo di associazione
       goodJets.push_back(&(*assocJetIt));
-      
+      ++numGoodJets ;
+
       // -------------------------------------------------------------- //
       // -- THIS IS TEMPORARY, A MORE ACCURATE TAGGER SHOULD BE USED -- //
       // -------------------------------------------------------------- //
@@ -213,12 +224,13 @@ void ttHMEtplusJetsAnalyzer::analyze(const edm::Event& iEvent, const edm::EventS
       // high eff -> 50.30% b / 10.77% c / 0.92% uds /  0.98% g / 0.96% udsg // P.Schilling 23/10/07
       // Set the b-tag cut value
       float medium = 5.3;
-	if ( assocJetIt->discriminatorHighEff()>medium ) goodbTaggedJets.push_back(&(*assocJetIt));
+      if ( assocJetIt->discriminatorHighEff()>medium ) goodbTaggedJets.push_back(&(*assocJetIt));
     }
   }else{
-    for ( OfflineJetCollection::const_iterator allJetIt = caloJets->begin(); allJetIt != caloJets->end(); ++allJetIt ) {
+    for ( OfflineJetCollection::const_iterator allJetIt = caloJets->begin(); allJetIt != caloJets->end() && numGoodJets < 8; ++allJetIt ) {
       if ( allJetIt->et() >= jetEtCut_ && fabs(allJetIt->eta())< jetEtaCut_ ) {
 	goodJets.push_back(&(*allJetIt));
+        ++numGoodJets;
       	
 	// -------------------------------------------------------------- //
 	// -- THIS IS TEMPORARY, A MORE ACCURATE TAGGER SHOULD BE USED -- //
@@ -238,21 +250,21 @@ void ttHMEtplusJetsAnalyzer::analyze(const edm::Event& iEvent, const edm::EventS
     eventVariablesPresel_->fill( goodJets, goodbTaggedJets, &(*offlineMEt) );
 
     // If it is QCD, do not cut on the b-tags, but loop on all the combinations of jets
+    if ( useTagMatrixForQCD_ ) {
+      cout << "calling multiply for event = " << eventCounter_ << endl;
+      qcdbTagMatrixMultiplier_->multiply( goodJets, &(*offlineMEt) );
+    }
+    else {
 
+      // Require at least two b-tags
+      if ( goodbTaggedJets.size() >= 2 ) {
 
+        //    vector<double> eventVariablesVector(
+        eventVariables2Tags_->fill( goodJets, goodbTaggedJets, &(*offlineMEt) );
+        //    );
 
-
-
-
-
-    // Require at least two b-tags
-    if ( goodbTaggedJets.size() >= 2 ) {
-
-      //    vector<double> eventVariablesVector(
-      eventVariables2Tags_->fill( goodJets, goodbTaggedJets, &(*offlineMEt) );
-      //    );
-
-    } // end if at least two b-tags
+      } // end if at least two b-tags
+    }
   } // end preselection cuts
 }
 
@@ -270,6 +282,7 @@ void ttHMEtplusJetsAnalyzer::endJob() {
   delete countTTHdecays_;
   delete eventVariablesPresel_;
   delete eventVariables2Tags_;
+  delete qcdbTagMatrixMultiplier_;
   outputFile_->Write();
 }
 

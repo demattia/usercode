@@ -37,14 +37,14 @@ public:
   EventVariables( const string & higgsFileName, const string & hadronicTopFileName, const string & qcdFileName, TString suffix, TFile * outputFile, bool fillHistograms = true );
   ~EventVariables();
   /// Used to pass the collections. Takes the jetCollection by value since it modifies it removing the jets associated to the Higgs.
-  vector<double> fill( vector<const OfflineJet *> jetCollection, const vector<const OfflineJet *> & bTaggedJetCollection, const OfflineMEt * offlineMEt );
+  vector<double> fill( vector<const OfflineJet *> jetCollection, const vector<const OfflineJet *> & bTaggedJetCollection, const OfflineMEt * offlineMEt, const double & weight = 1 );
 
-private:
+protected:
 
   /** Used to fill the matrices for the probability of Higgs jet pairs, top jet triplets and also the b-tag probability matrix for qcd
    * takes by reference the *** because it creates them with new inside and assign the pointers to new values
    */
-  void fillProbabilityMatrices(const string & probabilityFileName, unsigned int * binNum, double * binSize, unsigned int ***& trueArray, unsigned int ***& falseArray);
+  void fillProbabilityMatrices(const string & probabilityFileName, unsigned int * binNum, double * binSize, double ***& trueArray, double ***& falseArray);
   /// Used to evaluate a vector of the first N jets in the event
   Particle<const OfflineJet> firstNjetsParticle( const vector<const OfflineJet *> & jetCollection, const int N );
   /// Used to evaluate variables on all the selected jets (Ht, SumEt, ...)
@@ -59,12 +59,12 @@ private:
   bool fillHistograms_;
 
   // This will be the multidimensional array
-  unsigned int *** trueH_;
-  unsigned int *** falseH_;
-  unsigned int *** trueHadronicTop_;
-  unsigned int *** falseHadronicTop_;
-  unsigned int *** taggedJet_;
-  unsigned int *** notTaggedJet_;
+  double *** trueH_;
+  double *** falseH_;
+  double *** trueHadronicTop_;
+  double *** falseHadronicTop_;
+  double *** taggedJet_;
+  double *** notTaggedJet_;
 
   unsigned int higgsBinNum_[3];
   double higgsBinSize_[3];

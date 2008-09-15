@@ -4,6 +4,7 @@ module QCDbTagProbabilityModule = QCDbTagProbability {
   untracked InputTag OfflineJets                = offlineProd:offlineJets
   untracked InputTag MCParticles                = offlineProd:MCParticles
   untracked string OutputName                   = "QCDbTagProbability.root"
+  untracked string OutputProbabilityFileName    = "QCDbTagProbability.txt"
   // Bins and respective size for the trueH and falseH matrices
   untracked uint32 EtBinNum                     = 10
   untracked double EtBinSize                    = 50.

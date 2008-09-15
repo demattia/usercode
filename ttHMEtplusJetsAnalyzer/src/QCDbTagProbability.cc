@@ -42,10 +42,12 @@ QCDbTagProbability::QCDbTagProbability(const ParameterSet & iConfig) :
   taggedJetEta_ = new TH1F("taggedJetEta", "Eta of b-tagged jets", 100, -3, 3);
   taggedJetS1_ = new TH1F("taggedJetS1", "Number of tracks with significance above 1 for b-tagged jets", 20, 0, 20);
   taggedJetTagMass_ = new TH1F("taggedJetTagMass", "Mass evaluated using the associated tracks for b-tagged jets", 100, 0, 100);
+  taggedJetDiscriminatorHighEff_ = new TH1F("taggedJetDiscriminatorHighEff", "Discriminator value for b-tagged jets", 100, 0, 100);
   notTaggedJetEt_ = new TH1F("notTaggedJetEt", "Et of non b-tagged jets", 100, 0, 200);
   notTaggedJetEta_ = new TH1F("notTaggedJetEta", "Eta of non b-tagged jets", 100, -3, 3);
   notTaggedJetS1_ = new TH1F("notTaggedJetS1", "Number of tracks with significance above 1 for non b-tagged jets", 20, 0, 20);
   notTaggedJetTagMass_ = new TH1F("notTaggedJetTagMass", "Mass evaluated using the associated tracks for non b-tagged jets", 100, 0, 100);
+  notTaggedJetDiscriminatorHighEff_ = new TH1F("notTaggedJetDiscriminatorHighEff", "Discriminator value for non b-tagged jets", 100, 0, 100);
 
   // Initialized to 1, not 0, since they are used to evaluate fractions
   // ------------------------------------------------------------------
@@ -138,12 +140,14 @@ void QCDbTagProbability::analyze(const edm::Event& iEvent, const edm::EventSetup
     // high eff -> 50.30% b / 10.77% c / 0.92% uds /  0.98% g / 0.96% udsg // P.Schilling 23/10/07
     // Set the b-tag cut value
     float medium = 5.3;
-    if ( (*goodJetIt)->discriminatorHighEff()>medium ) {
+    float discriminator = (*goodJetIt)->discriminatorHighEff();
+    if ( discriminator>medium ) {
 
       taggedJetEt_->Fill(jetEt);
       taggedJetEta_->Fill(jetEta);
       taggedJetS1_->Fill(numTkS1);
       taggedJetTagMass_->Fill( (*goodJetIt)->bTagTkInvMass() );
+      taggedJetDiscriminatorHighEff_->Fill(discriminator);
       (taggedJet_[etId][etaId][numTkS1Id])++;
     }
     // else fill HcombFalse.txt
@@ -152,9 +156,21 @@ void QCDbTagProbability::analyze(const edm::Event& iEvent, const edm::EventSetup
       notTaggedJetEta_->Fill(jetEta);
       notTaggedJetS1_->Fill(numTkS1);
       notTaggedJetTagMass_->Fill( (*goodJetIt)->bTagTkInvMass() );
+      notTaggedJetDiscriminatorHighEff_->Fill(discriminator);
       (notTaggedJet_[etId][etaId][numTkS1Id])++;
     }
   }
+}
+
+//       method called once each job just before starting event loop  
+// -------------------------------------------------------------------------
+void QCDbTagProbability::beginJob(const edm::EventSetup&) {
+}
+
+
+//       method called once each job just after ending the event loop 
+// -------------------------------------------------------------------------
+void QCDbTagProbability::endJob() {
 
   // Write the trueH_ and falseH_ to a txt file
   // ------------------------------------------
@@ -186,17 +202,6 @@ void QCDbTagProbability::analyze(const edm::Event& iEvent, const edm::EventSetup
     }
   }
   bTagProbabilityFile.close();
-}
-
-//       method called once each job just before starting event loop  
-// -------------------------------------------------------------------------
-void QCDbTagProbability::beginJob(const edm::EventSetup&) {
-}
-
-
-//       method called once each job just after ending the event loop 
-// -------------------------------------------------------------------------
-void QCDbTagProbability::endJob() {
 
   // delete the multidimensional arrays
   for(unsigned int i=0; i != etBinNum_; ++i) {
@@ -214,9 +219,13 @@ void QCDbTagProbability::endJob() {
   taggedJetEt_->Write();
   taggedJetEta_->Write();
   taggedJetS1_->Write();
+  taggedJetTagMass_->Write();
+  taggedJetDiscriminatorHighEff_->Write();
   notTaggedJetEt_->Write();
   notTaggedJetEta_->Write();
   notTaggedJetS1_->Write();
+  notTaggedJetTagMass_->Write();
+  notTaggedJetDiscriminatorHighEff_->Write();
 
   outputFile_->Write();
 }

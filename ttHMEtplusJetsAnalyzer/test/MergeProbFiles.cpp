@@ -144,7 +144,7 @@ int main() {
 
       for( int i=0; i<3; ++i ) {
         totQcdBinNum[i] = qcdBinNum[i];
-        totQcdBinSize[i] = qcdBinNum[i];
+        totQcdBinSize[i] = qcdBinSize[i];
       }
       mergedTaggedJet = new double**[qcdBinNum[0]];
       mergedNotTaggedJet = new double**[qcdBinNum[0]];
@@ -231,6 +231,21 @@ int main() {
   double totNotTaggedCount = 0.;
   double normTot = 0.;
 
+
+  // Write the trueH_ and falseH_ to a txt file
+  // ------------------------------------------
+  ofstream bTagProbabilityFile("QCDbTagProbability.txt");
+  // The first line has informations on bin numbers and sizes
+
+  int totEvents = 0;
+  for( int i=0; i<qcdBins; ++i ) totEvents += eventsNumber[i];
+
+  bTagProbabilityFile <<  "etBinNum = "  << totQcdBinNum[0]  << " etBinSize = "  << totQcdBinSize[0]
+                      << " etaBinNum = " << totQcdBinNum[1] << " etaBinSize = " << totQcdBinSize[1]
+                      << " s1BinNum = "  << totQcdBinNum[2]  << " s1BinSize = "  << totQcdBinSize[2]
+                      << " totEvents = " << totEvents << endl;
+
+
   // Loop one last time on the merged arrays and put to 0.5 all the 0 bins (needed to avoid problems when computing the ratio)
   for(unsigned int i=0; i < totQcdBinNum[0]; ++i) {
     for(unsigned int j=0; j < totQcdBinNum[1]; ++j) {
@@ -259,12 +274,13 @@ int main() {
           mergedNotTaggedJet[i][j][k] = 0.5;
         }
 
-        cout << "mergedTaggedJet["<<i<<"]["<<j<<"]["<<k<<"] = " << mergedTaggedJet[i][j][k];
-        cout << " mergedNotTaggedJet["<<i<<"]["<<j<<"]["<<k<<"] = " << mergedNotTaggedJet[i][j][k] << endl;
+        bTagProbabilityFile << "mergedTaggedJet["<<i<<"]["<<j<<"]["<<k<<"] = " << mergedTaggedJet[i][j][k]
+                            << " mergedNotTaggedJet["<<i<<"]["<<j<<"]["<<k<<"] = " << mergedNotTaggedJet[i][j][k] << endl;
 
       }
     }
   }
+  bTagProbabilityFile.close();
 
 
 }
