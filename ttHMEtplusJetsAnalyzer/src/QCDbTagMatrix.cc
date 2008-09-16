@@ -3,7 +3,7 @@
 
 #include "AnalysisExamples/ttHMEtplusJetsAnalyzer/interface/QCDbTagMatrix.h"
 
-QCDbTagMatrix::QCDbTagMatrix( const string & higgsFileName, const string & hadronicTopFileName, const string & qcdFileName, TString suffix, TFile * outputFile, bool fillHistograms, const string & qcdHistoFileName, const int bJetNumCut ) : EventVariables( higgsFileName, hadronicTopFileName, qcdFileName, suffix+"_tagMatrix", outputFile, fillHistograms ) {
+QCDbTagMatrix::QCDbTagMatrix( const string & higgsFileName, const string & hadronicTopFileName, const string & qcdFileName, TString suffix, TFile * outputFile, bool fillHistograms, const string & qcdHistoFileName, const int bJetNumCut, const string & tmvaSuffix ) : EventVariables( higgsFileName, hadronicTopFileName, qcdFileName, suffix+"_tagMatrix", outputFile, fillHistograms, tmvaSuffix ) {
   bJetNumCut_ = bJetNumCut;
 
   inputFileSignal_ = new TFile(qcdHistoFileName.c_str());
@@ -28,7 +28,10 @@ QCDbTagMatrix::~QCDbTagMatrix() {
   inputFileSignal_->Close();
 }
 
-void QCDbTagMatrix::multiply( const vector<const OfflineJet *> jetCollection, const OfflineMEt * offlineMEt ) {
+vector<vector<double> > QCDbTagMatrix::multiply( const vector<const OfflineJet *> jetCollection, const OfflineMEt * offlineMEt ) {
+
+  // Stores the events generated. They are needed to evaluate the likelihood ratio.
+  vector<vector<double> > eventVariablesVectors;
 
   double jetsNumber = jetCollection.size();
 
@@ -134,13 +137,14 @@ void QCDbTagMatrix::multiply( const vector<const OfflineJet *> jetCollection, co
     // Only fill events that pass the cut on the number of b-jets.
     cout << "bJetNum["<<comb<<"] = " << bJetNum << " with probability = " << prob << endl;
     if ( bJetNum >= bJetNumCut_ ) {
-      fill( goodJets, goodbJets, offlineMEt, prob );
+      eventVariablesVectors.push_back( fill( goodJets, goodbJets, offlineMEt, prob ) );
     }
   }
 
-
   delete[] probTagged;
   delete[] probNotTagged;
+
+  return eventVariablesVectors;
 
 }
 

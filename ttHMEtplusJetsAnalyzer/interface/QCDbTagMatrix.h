@@ -21,9 +21,9 @@
 class QCDbTagMatrix : public EventVariables {
 public:
   /// This constructor calls the EventVariables constructor
-  QCDbTagMatrix( const string & higgsFileName, const string & hadronicTopFileName, const string & qcdFileName, TString suffix, TFile * outputFile, bool fillHistograms, const string & qcdHistoFileName, int bJetNumCut );
+  QCDbTagMatrix( const string & higgsFileName, const string & hadronicTopFileName, const string & qcdFileName, TString suffix, TFile * outputFile, bool fillHistograms, const string & qcdHistoFileName, int bJetNumCut, const string & tmvaSuffix = "" );
   ~QCDbTagMatrix();
-  void multiply( const vector<const OfflineJet *> jetCollection, const OfflineMEt * offlineMEt );
+  vector<vector<double> > multiply( const vector<const OfflineJet *> jetCollection, const OfflineMEt * offlineMEt );
 protected:
   int bJetNumCut_;
   TFile * inputFileSignal_;

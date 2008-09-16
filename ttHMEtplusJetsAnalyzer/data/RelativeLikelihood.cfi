@@ -14,12 +14,16 @@ module RelativeLikelihoodModule = RelativeLikelihood {
   untracked InputTag SimpleElectrons            = offlineProd:simpleElectrons
   untracked InputTag SimpleTaus                 = offlineProd:simpleTaus
   untracked InputTag Summary                    = offlineProd:summary
+  untracked InputTag vtxLabel 			 = offlineProd:offlineVertices
   untracked bool     withL1ForwardJets          = true
+  untracked bool     VtxAssoc                   = false
   untracked string   HiggsFileName              = "HiggsPairProbability.txt"
   untracked string   HadronicTopFileName        = "HadronicTopTripletProbability.txt"
   untracked string   QCDfileName                = "QCDbTagProbability.txt"
+  untracked string   QCDhistoFileName           = "QCDbTagProbability.root"
   untracked double   JetEtCut                   = 25.
   untracked double   JetEtaCut                  = 3.0
-  untracked string   InputFileName              = "ttHMEtplusJetsAnalyzer.root"
+  untracked string   InputFileNameSignal        = "ttHMEtplusJetsAnalyzer_TTH_120.root"
+  untracked string   InputFileNameBackground    = "ttHMEtplusJetsAnalyzer_background.root"
   untracked string   OutputFileName             = "RelativeLikelihood.root"
 }

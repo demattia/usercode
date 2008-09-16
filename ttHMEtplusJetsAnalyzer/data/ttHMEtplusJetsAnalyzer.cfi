@@ -26,5 +26,6 @@ module ttHMEtplusJetsAnalyzerModule = ttHMEtplusJetsAnalyzer {
   untracked string   CountTTHdecaysFileName      = "ttHdecays.txt"
   untracked string   CountTTHdecays2tagsFileName = "ttHdecays_2tags.txt"
   untracked string   OutputFileName              = "ttHMEtplusJetsAnalyzer.root"
+  untracked string   TMVAsuffix                  = ""
   untracked bool     UseTagMatrixForQCD          = false
 }

@@ -28,6 +28,7 @@
 
 #include "AnalysisExamples/ttHMEtplusJetsAnalyzer/interface/ttHdecaysCounter.h"
 #include "AnalysisExamples/ttHMEtplusJetsAnalyzer/interface/EventVariables.h"
+#include "AnalysisExamples/ttHMEtplusJetsAnalyzer/interface/QCDbTagMatrix.h"
 
 // Classes to be accessed
 // ----------------------
@@ -67,7 +68,9 @@ public:
   /// To check if a good electron is found in the event
   bool goodElectron( const SimpleElectronCollection & simpleElectrons, const OfflineJetCollection & caloJets );
 
-private:
+protected:
+  /// fills the histogram with the likelihood value for this event
+  void evaluateLikelihood( const vector<double> & eventVariablesVector );
   virtual void beginJob(const edm::EventSetup&);
   virtual void analyze(const edm::Event&, const edm::EventSetup&);
   virtual void endJob() ;
@@ -91,6 +94,7 @@ private:
   string higgsFileName_;
   string hadronicTopFileName_;
   string qcdFileName_;
+  string qcdHistoFileName_;
   double jetEtCut_;
   double jetEtaCut_;
   string countTTHdecaysFileName_;
@@ -98,6 +102,9 @@ private:
   string inputFileNameSignal_;
   string inputFileNameBackground_;
   string outputFileName_;
+  string tmvaSuffix_;
+
+  bool useTagMatrixForQCD_;
 
   int eventCounter_;
 
@@ -124,6 +131,7 @@ private:
 
   // Class to fill histograms on event variables
   EventVariables * eventVariables2Tags_;
+  QCDbTagMatrix * qcdbTagMatrixMultiplier_;
  
   JetVertexAssociator * jetVertexAssociator_;
 

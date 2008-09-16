@@ -34,7 +34,7 @@ using namespace anaobj;
 
 class EventVariables {
 public:
-  EventVariables( const string & higgsFileName, const string & hadronicTopFileName, const string & qcdFileName, TString suffix, TFile * outputFile, bool fillHistograms = true );
+  EventVariables( const string & higgsFileName, const string & hadronicTopFileName, const string & qcdFileName, TString suffix, TFile * outputFile, bool fillHistograms = true, const string & tmvaSuffix = "" );
   ~EventVariables();
   /// Used to pass the collections. Takes the jetCollection by value since it modifies it removing the jets associated to the Higgs.
   vector<double> fill( vector<const OfflineJet *> jetCollection, const vector<const OfflineJet *> & bTaggedJetCollection, const OfflineMEt * offlineMEt, const double & weight = 1 );

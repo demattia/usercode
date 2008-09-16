@@ -97,6 +97,7 @@ private:
   string countTTHdecaysFileName_;
   string countTTHdecays2tagsFileName_;
   string outputFileName_;
+  string tmvaSuffix_;
 
   bool useTagMatrixForQCD_;
 

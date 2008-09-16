@@ -38,6 +38,7 @@ RelativeLikelihood::RelativeLikelihood(const edm::ParameterSet& iConfig) :
   higgsFileName_(iConfig.getUntrackedParameter<string>("HiggsFileName") ),
   hadronicTopFileName_(iConfig.getUntrackedParameter<string>("HadronicTopFileName") ),
   qcdFileName_(iConfig.getUntrackedParameter<string>("QCDfileName") ),
+  qcdHistoFileName_(iConfig.getUntrackedParameter<string>("QCDhistoFileName") ),
   jetEtCut_(iConfig.getUntrackedParameter<double>("JetEtCut") ),
   jetEtaCut_(iConfig.getUntrackedParameter<double>("JetEtaCut") ),
 
@@ -47,6 +48,8 @@ RelativeLikelihood::RelativeLikelihood(const edm::ParameterSet& iConfig) :
   inputFileNameSignal_(iConfig.getUntrackedParameter<string>("InputFileNameSignal") ),
   inputFileNameBackground_(iConfig.getUntrackedParameter<string>("InputFileNameBackground") ),
   outputFileName_(iConfig.getUntrackedParameter<string>("OutputFileName") ),
+  tmvaSuffix_(iConfig.getUntrackedParameter<string>("TMVAsuffix") ),
+  useTagMatrixForQCD_(iConfig.getUntrackedParameter<bool>("UseTagMatrixForQCD") ),
   eventCounter_(0),
   l1Eff_(0)
 {
@@ -58,10 +61,15 @@ RelativeLikelihood::RelativeLikelihood(const edm::ParameterSet& iConfig) :
 
   outputFile_ = new TFile(outputFileName_.c_str(), "RECREATE");
   eventVariables2Tags_ = new EventVariables(higgsFileName_, hadronicTopFileName_, qcdFileName_, "2tags", outputFile_, false);
+
+  // Production of pseudo-events for qcd with 2 b-tags.
+  qcdbTagMatrixMultiplier_ = new QCDbTagMatrix(higgsFileName_, hadronicTopFileName_, qcdFileName_, "2tags", outputFile_, true, qcdHistoFileName_, 2, tmvaSuffix_);
+
   jetVertexAssociator_ = new JetVertexAssociator(jetEtCut_,jetEtaCut_);
 
   // Load selected histograms from the input file
   TString suffix = "2tags";
+  if ( useTagMatrixForQCD_ ) suffix += "_tagMatrix";
   TString dirName = "EventVariables";
   if ( suffix != "" ) {
     suffix.Prepend("_");
@@ -210,12 +218,10 @@ void RelativeLikelihood::analyze(const edm::Event& iEvent, const edm::EventSetup
   recoVertexes = *(recVtxs.product());
 
   // Select only jets with Et>(JetEtCut_)GeV and Eta<(JetEtaCut_) and write them in the goodJets collection
-
-
   vector<const OfflineJet *> goodJets;
   vector<const OfflineJet *> goodbTaggedJets;
 
- // Jet-Vertex Algorithm
+  // Jet-Vertex Algorithm
   if(vtxAssoc_){
     OfflineJetCollection associatedJet(jetVertexAssociator_->associate(*(caloJets.product()),recoVertexes));
     for ( OfflineJetCollection::const_iterator assocJetIt = associatedJet.begin(); assocJetIt != associatedJet.end(); ++assocJetIt ) {
@@ -266,70 +272,95 @@ void RelativeLikelihood::analyze(const edm::Event& iEvent, const edm::EventSetup
   // Require at least two b-tags
   if ( goodJets.size() >= 5 && offlineMEt->corrL3mEtSig() > 3. ){ // && goodbTaggedJets.size() >= 2 ) {
 
+    // If it is QCD, do not cut on the b-tags, but loop on all the combinations of jets
+    if ( useTagMatrixForQCD_ ) {
+      cout << "calling multiply for event = " << eventCounter_ << endl;
+      qcdbTagMatrixMultiplier_->multiply( goodJets, &(*offlineMEt) );
+
+    }
+    else {
+
+      // Require at least two b-tags
+      if ( goodbTaggedJets.size() >= 2 ) {
+
+        //    vector<double> eventVariablesVector(
+        eventVariables2Tags_->fill( goodJets, goodbTaggedJets, &(*offlineMEt) );
+        //    );
+
+      } // end if at least two b-tags
+    }
+
+
     pair<int,int> decayType2tags(countTTHdecays2tags_->countDecays(*MCpartons));
 
     vector<double> eventVariablesVector( eventVariables2Tags_->fill( goodJets, goodbTaggedJets, &(*offlineMEt) ) );
+
+
     if (histogramVariableSignal_.size() != eventVariablesVector.size() || histogramVariableBackground_.size() != eventVariablesVector.size()) cout << "ATTENTION: number of variables does not match number of loaded histograms." << endl;
-
-    double ratiosProduct = 1.;
-    int varCounter = 0;
-    for ( vector<double>::const_iterator varIter = eventVariablesVector.begin(); varIter != eventVariablesVector.end(); ++varIter, ++varCounter ) {
-
-      // cout << "varIter["<<varCounter<<"] = " << *varIter << endl;
-      // cout << "BinWidth["<<varCounter<<"] = " << histogramVariableSignal_[varCounter]->GetBinWidth(1) << endl;
-      // cout << "BinLowEdge["<<varCounter<<"] = " << histogramVariableSignal_[varCounter]->GetBinLowEdge(1) << endl;
-
-      double binWidthSignal = histogramVariableSignal_[varCounter].GetBinWidth(1);
-      double binWidthBackground = histogramVariableBackground_[varCounter].GetBinWidth(1);
-
-      int binNumberSignal = histogramVariableSignal_[varCounter].GetNbinsX();
-      int binNumberBackground = histogramVariableBackground_[varCounter].GetNbinsX();
-
-      // double upperEdge = histogramVariableSignal_[varCounter]->GetBinLowEdge(binNumber) + binWidthSignal << endl;
-      // cout << "UpperEdge["<<varCounter<<"] = " << lastBin << endl;
-
-      // Determine the bin index
-      // First translate the variable of the negative edge of the histogram: (-3, 3) -> translate the variable by 3.
-      double shiftedVar = *varIter + histogramVariableSignal_[varCounter].GetBinLowEdge(1);
-      // Now divide by the bin width
-      int binIndexSignal = int(shiftedVar/binWidthSignal)+1;
-      int binIndexBackground = int(shiftedVar/binWidthBackground)+1;
-      cout << "binIndexSignal = " << binIndexSignal << endl;
-      cout << "binIndexBackground = " << binIndexBackground << endl;
-      double signalVar = 1.;
-      double backgroundVar = 1.;
-      if ( binIndexSignal >= 0 && binIndexSignal <= binNumberSignal ) signalVar = histogramVariableSignal_[varCounter].GetBinContent( binIndexSignal );
-      if ( binIndexBackground > 0 && binIndexBackground < binNumberBackground ) backgroundVar = histogramVariableBackground_[varCounter].GetBinContent( binIndexBackground );
-
-      if ( backgroundVar == 0 ) {
-        if ( signalVar == 0 ) ratiosProduct *= 1.;
-        // ATTENTION: this is arbitrarily put to 10, consider a more appropriate value
-        else ratiosProduct *= 100.;
-      }
-      else if ( signalVar == 0 ) ratiosProduct *= 0.01;
-      else ratiosProduct *= signalVar/backgroundVar;
-
-      cout << "signalVar = " << signalVar << endl;
-      cout << "backgroundVar = " << backgroundVar << endl;
-
-      cout << "ratiosProduct = " << ratiosProduct << endl;
-    }
-
-    double relativeLikelihood = 0.;
-
-    if ( ratiosProduct >= 0. ) relativeLikelihood = log(ratiosProduct);
-    else relativeLikelihood = -9.99;
-    if ( relativeLikelihood < -10. ) relativeLikelihood = -9.99;
-    if ( relativeLikelihood > 10. ) relativeLikelihood = 9.99;
-
-    cout << "relativeLikelihood = ";
-
-    relativeLikelihood_->Fill(relativeLikelihood);
-
-    cout << relativeLikelihood << endl;
+    evaluateLikelihood( eventVariablesVector );
 
   } // end if at least two b-tags
 
+}
+
+void RelativeLikelihood::evaluateLikelihood( const vector<double> & eventVariablesVector ) {
+
+  double ratiosProduct = 1.;
+  int varCounter = 0;
+  for ( vector<double>::const_iterator varIter = eventVariablesVector.begin(); varIter != eventVariablesVector.end(); ++varIter, ++varCounter ) {
+
+    // cout << "varIter["<<varCounter<<"] = " << *varIter << endl;
+    // cout << "BinWidth["<<varCounter<<"] = " << histogramVariableSignal_[varCounter]->GetBinWidth(1) << endl;
+    // cout << "BinLowEdge["<<varCounter<<"] = " << histogramVariableSignal_[varCounter]->GetBinLowEdge(1) << endl;
+
+    double binWidthSignal = histogramVariableSignal_[varCounter].GetBinWidth(1);
+    double binWidthBackground = histogramVariableBackground_[varCounter].GetBinWidth(1);
+
+    int binNumberSignal = histogramVariableSignal_[varCounter].GetNbinsX();
+    int binNumberBackground = histogramVariableBackground_[varCounter].GetNbinsX();
+
+    // double upperEdge = histogramVariableSignal_[varCounter]->GetBinLowEdge(binNumber) + binWidthSignal << endl;
+    // cout << "UpperEdge["<<varCounter<<"] = " << lastBin << endl;
+
+    // Determine the bin index
+    // First translate the variable of the negative edge of the histogram: (-3, 3) -> translate the variable by 3.
+    double shiftedVar = *varIter + histogramVariableSignal_[varCounter].GetBinLowEdge(1);
+    // Now divide by the bin width
+    int binIndexSignal = int(shiftedVar/binWidthSignal)+1;
+    int binIndexBackground = int(shiftedVar/binWidthBackground)+1;
+    cout << "binIndexSignal = " << binIndexSignal << endl;
+    cout << "binIndexBackground = " << binIndexBackground << endl;
+    double signalVar = 1.;
+    double backgroundVar = 1.;
+    if ( binIndexSignal >= 0 && binIndexSignal <= binNumberSignal ) signalVar = histogramVariableSignal_[varCounter].GetBinContent( binIndexSignal );
+    if ( binIndexBackground > 0 && binIndexBackground < binNumberBackground ) backgroundVar = histogramVariableBackground_[varCounter].GetBinContent( binIndexBackground );
+
+    if ( backgroundVar == 0 ) {
+      if ( signalVar == 0 ) ratiosProduct *= 1.;
+      // ATTENTION: this is arbitrarily put to 10, consider a more appropriate value
+      else ratiosProduct *= 100.;
+    }
+    else if ( signalVar == 0 ) ratiosProduct *= 0.01;
+    else ratiosProduct *= signalVar/backgroundVar;
+
+    cout << "signalVar = " << signalVar << endl;
+    cout << "backgroundVar = " << backgroundVar << endl;
+
+    cout << "ratiosProduct = " << ratiosProduct << endl;
+  }
+
+  double relativeLikelihood = 0.;
+
+  if ( ratiosProduct >= 0. ) relativeLikelihood = log(ratiosProduct);
+  else relativeLikelihood = -9.99;
+  if ( relativeLikelihood < -10. ) relativeLikelihood = -9.99;
+  if ( relativeLikelihood > 10. ) relativeLikelihood = 9.99;
+
+  cout << "relativeLikelihood = ";
+
+  relativeLikelihood_->Fill(relativeLikelihood);
+
+  cout << relativeLikelihood << endl;
 }
 
 //       method called once each job just before starting event loop  

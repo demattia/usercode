@@ -22,7 +22,7 @@ namespace {
   };
 }
 
-EventVariables::EventVariables( const string & higgsFileName, const string & hadronicTopFileName, const string & qcdFileName, TString suffix, TFile * outputFile, bool fillHistograms ) {
+EventVariables::EventVariables( const string & higgsFileName, const string & hadronicTopFileName, const string & qcdFileName, TString suffix, TFile * outputFile, bool fillHistograms, const string & tmvaSuffix ) {
 
   fillHistograms_ = fillHistograms;
 
@@ -79,7 +79,7 @@ EventVariables::EventVariables( const string & higgsFileName, const string & had
   eventVariablesNames_.push_back( "bTagTkInvMass" );
 
   // Create the TTree for the TMVA
-  tmvaTreeWriterPtr_.reset(new TMVAtreeWriter(eventVariablesNames_, suffix));
+  tmvaTreeWriterPtr_.reset(new TMVAtreeWriter(eventVariablesNames_, suffix + tmvaSuffix));
 
   if ( fillHistograms_ ) {
 
