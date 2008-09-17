@@ -158,7 +158,7 @@ for type in range(typeNum):
             else:
                 outFile.write(s)
 
-        if skipEventsFound == False and useSkipEvents == True:
+        if skipEventsFound == False and useSkipEventsType == True:
             print 'No skipEvents field found in the cfg file, please add it to the source module'
             exit()
 
