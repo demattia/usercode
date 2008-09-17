@@ -211,8 +211,11 @@ void ttHMEtplusJetsAnalyzer::analyze(const edm::Event& iEvent, const edm::EventS
   int numGoodJets = 0;
 
   // Jet-Vertex Algorithm
+  // Need to define this outside the if clause, otherwise the objects will not survive it and the
+  // pointers stored in goodJets will be invalid.
+  OfflineJetCollection associatedJet;
   if(vtxAssoc_){
-    OfflineJetCollection associatedJet(jetVertexAssociator_->associate(*(caloJets.product()),recoVertexes));
+    associatedJet = jetVertexAssociator_->associate(*(caloJets.product()),recoVertexes);
     for ( OfflineJetCollection::const_iterator assocJetIt = associatedJet.begin(); assocJetIt != associatedJet.end() && numGoodJets < 8; ++assocJetIt) {
       //non metto i tagli in et ed eta sono  fatti internamente dall'algoritmo di associazione
       goodJets.push_back(&(*assocJetIt));

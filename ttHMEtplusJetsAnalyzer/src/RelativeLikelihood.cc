@@ -68,43 +68,49 @@ RelativeLikelihood::RelativeLikelihood(const edm::ParameterSet& iConfig) :
   jetVertexAssociator_ = new JetVertexAssociator(jetEtCut_,jetEtaCut_);
 
   // Load selected histograms from the input file
-  TString suffix = "2tags";
-  if ( useTagMatrixForQCD_ ) suffix += "_tagMatrix";
-  TString dirName = "EventVariables";
-  if ( suffix != "" ) {
-    suffix.Prepend("_");
-    dirName.Append(suffix);
+  TString suffixSignal = "2tags";
+  TString suffixBackground = "2tags";
+  if ( useTagMatrixForQCD_ ) suffixBackground += "_tagMatrix";
+  TString dirNameSignal = "EventVariables";
+  TString dirNameBackground = "EventVariables";
+  if ( suffixSignal != "" ) {
+    suffixSignal.Prepend("_");
+    dirNameSignal.Append(suffixSignal);
   }
-  TDirectory * dirSignal = dynamic_cast<TDirectory*>(inputFileSignal_->Get(dirName));
-  TDirectory * dirBackground = dynamic_cast<TDirectory*>(inputFileBackground_->Get(dirName));
+  if ( suffixBackground != "" ) {
+    suffixBackground.Prepend("_");
+    dirNameBackground.Append(suffixBackground);
+  }
+  TDirectory * dirSignal = dynamic_cast<TDirectory*>(inputFileSignal_->Get(dirNameSignal));
+  TDirectory * dirBackground = dynamic_cast<TDirectory*>(inputFileBackground_->Get(dirNameBackground));
   
-  const int totHistogramNum = 18;
+  const int totHistogramNum = 21;
   // Variables names: ATTENTION, they must be ordered as those returned by EventVariables
 
   TString histogramNames[totHistogramNum] = { "higgsMass","hadronicTopMass", "hadronicWmass", "chi2ofMasses",
                                               "hadronicTopProjectionAlongHiggsDirection", "deltaEtaHadronicTopHiggs", "hadronicTopPlusHiggsMass", "remainingJetsMass",
-                                              //"first6jetsMass",
+                                              "first6jetsMass",
 					      "first6jetsCentrality", "first8jetsMass", "first8jetsCentrality",
-                                              //"deltaPhiMEt1stLeadingJet",
+                                              "deltaPhiMEt1stLeadingJet",
 					      "deltaPhiMEt2ndLeadingJet",
-					      //"deltaPhiMEt3rdLeadingJet",
+					      "deltaPhiMEt3rdLeadingJet",
 					      "sixthJetEt",
                                               "goodHt", "mEtSig", "sumHighEffDiscriminantFirst4Jets", "sumHighEffDiscriminantFirst6Jets",
                                               "bTagTkInvMass" };
 
   for ( int histogramNum = 0; histogramNum < totHistogramNum; ++histogramNum ) {
-    histogramVariableSignal_.push_back(*(dynamic_cast<TH1D*>(dirSignal->Get(histogramNames[histogramNum] + suffix))));
+    histogramVariableSignal_.push_back(*(dynamic_cast<TH1D*>(dirSignal->Get(histogramNames[histogramNum] + suffixSignal))));
     TH1D * tempHistoPtr = &(histogramVariableSignal_.back());
     tempHistoPtr->Scale(1./(tempHistoPtr->Integral()));
-    histogramVariableBackground_.push_back(*(dynamic_cast<TH1D*>(dirBackground->Get(histogramNames[histogramNum] + suffix))));
+    histogramVariableBackground_.push_back(*(dynamic_cast<TH1D*>(dirBackground->Get(histogramNames[histogramNum] + suffixBackground))));
     tempHistoPtr = &(histogramVariableBackground_.back());
     tempHistoPtr->Scale(1./(tempHistoPtr->Integral()));
   }
 
   // This directory is created by the eventVariables2Tags class
-  outputDir_ = dynamic_cast<TDirectory*>(outputFile_->Get(dirName));
+  outputDir_ = dynamic_cast<TDirectory*>(outputFile_->Get(dirNameSignal));
   outputDir_->cd();
-  relativeLikelihood_ = new TH1D( "relativeLikelihood" + suffix, "relative likelihood " + suffix, 50, -10., 10. );
+  relativeLikelihood_ = new TH1D( "relativeLikelihood" + suffixSignal, "relative likelihood " + suffixSignal, 50, -10., 10. );
 
 }
 
@@ -221,13 +227,20 @@ void RelativeLikelihood::analyze(const edm::Event& iEvent, const edm::EventSetup
   vector<const OfflineJet *> goodJets;
   vector<const OfflineJet *> goodbTaggedJets;
 
+  // Consider only the first 8 most energetic (Et) jets
+  // --------------------------------------------------
+  int numGoodJets = 0;
+
   // Jet-Vertex Algorithm
+  // Need to define this outside the if clause, otherwise the objects will not survive it and the
+  // pointers stored in goodJets will be invalid.
+  OfflineJetCollection associatedJet;
   if(vtxAssoc_){
-    OfflineJetCollection associatedJet(jetVertexAssociator_->associate(*(caloJets.product()),recoVertexes));
-    for ( OfflineJetCollection::const_iterator assocJetIt = associatedJet.begin(); assocJetIt != associatedJet.end(); ++assocJetIt ) {
+    associatedJet = jetVertexAssociator_->associate(*(caloJets.product()),recoVertexes);
+    for ( OfflineJetCollection::const_iterator assocJetIt = associatedJet.begin(); assocJetIt != associatedJet.end() && numGoodJets < 8; ++assocJetIt) {
       //non metto i tagli in et ed eta sono  fatti internamente dall'algoritmo di associazione
       goodJets.push_back(&(*assocJetIt));
-      
+      ++numGoodJets;
       // -------------------------------------------------------------- //
       // -- THIS IS TEMPORARY, A MORE ACCURATE TAGGER SHOULD BE USED -- //
       // -------------------------------------------------------------- //
@@ -238,10 +251,11 @@ void RelativeLikelihood::analyze(const edm::Event& iEvent, const edm::EventSetup
 	if ( assocJetIt->discriminatorHighEff()>medium ) goodbTaggedJets.push_back(&(*assocJetIt));
     }
   } else {
-    for ( OfflineJetCollection::const_iterator allJetIt = caloJets->begin(); allJetIt != caloJets->end(); ++allJetIt ) {
+    for ( OfflineJetCollection::const_iterator allJetIt = caloJets->begin(); allJetIt != caloJets->end() && numGoodJets < 8; ++allJetIt ) {
       if ( allJetIt->et() >= jetEtCut_ && fabs(allJetIt->eta())< jetEtaCut_ ) {
 	goodJets.push_back(&(*allJetIt));
-      	
+        ++numGoodJets;
+        
 	// -------------------------------------------------------------- //
 	// -- THIS IS TEMPORARY, A MORE ACCURATE TAGGER SHOULD BE USED -- //
 	// -------------------------------------------------------------- //
@@ -263,8 +277,12 @@ void RelativeLikelihood::analyze(const edm::Event& iEvent, const edm::EventSetup
     if ( useTagMatrixForQCD_ ) {
       cout << "calling multiply for event = " << eventCounter_ << endl;
       vector<vector<double> > eventVariablesVectors( qcdbTagMatrixMultiplier_->multiply( goodJets, &(*offlineMEt) ) );
+      cout << "number of vectors = " << eventVariablesVectors.size() << endl;
       vector<vector<double> >::const_iterator eventVariablesVec = eventVariablesVectors.begin();
       for( ; eventVariablesVec != eventVariablesVectors.end(); ++eventVariablesVec ) {
+        cout << "number of variable histograms for signal = " << histogramVariableSignal_.size() << endl;
+        cout << "number of variable histograms for background = " << histogramVariableBackground_.size() << endl;
+        cout << "number of variables in vector = " << eventVariablesVec->size() << endl;
         if (histogramVariableSignal_.size() != eventVariablesVec->size() || histogramVariableBackground_.size() != eventVariablesVec->size()) cout << "ATTENTION: number of variables does not match number of loaded histograms." << endl;
         evaluateLikelihood( *eventVariablesVec );
       }
@@ -286,10 +304,19 @@ void RelativeLikelihood::analyze(const edm::Event& iEvent, const edm::EventSetup
 
 void RelativeLikelihood::evaluateLikelihood( const vector<double> & eventVariablesVector ) {
 
+  // ATTENTION: the exclusion is done by hand here, to skip the variables we do not want to use in the likelihood.
+
   double ratiosProduct = 1.;
   int varCounter = 0;
   for ( vector<double>::const_iterator varIter = eventVariablesVector.begin(); varIter != eventVariablesVector.end(); ++varIter, ++varCounter ) {
 
+    // Skip this variable if it is in the blacklist
+    TString histoName = histogramVariableSignal_[varCounter].GetName();
+    if( histoName == "first6jetsMass" ||
+        histoName == "deltaPhiMEt1stLeadingJet" ||
+        histoName == "deltaPhiMEt3rdLeadingJet" ) continue;
+
+    cout << "histoName["<<varCounter<<"] = " << histogramVariableSignal_[varCounter].GetName() << endl;
     // cout << "varIter["<<varCounter<<"] = " << *varIter << endl;
     // cout << "BinWidth["<<varCounter<<"] = " << histogramVariableSignal_[varCounter]->GetBinWidth(1) << endl;
     // cout << "BinLowEdge["<<varCounter<<"] = " << histogramVariableSignal_[varCounter]->GetBinLowEdge(1) << endl;

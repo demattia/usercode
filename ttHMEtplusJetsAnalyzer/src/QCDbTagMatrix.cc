@@ -50,9 +50,12 @@ vector<vector<double> > QCDbTagMatrix::multiply( const vector<const OfflineJet *
     probNotTagged[i] = 0;
   }
 
+  cout << "jetCollection.size() = " << jetCollection.size() << endl;
+
   vector<const OfflineJet *>::const_iterator goodJetIt = jetCollection.begin();
   unsigned int goodJetNum = 0;
   for ( ; goodJetIt != jetCollection.end(); ++goodJetIt, ++goodJetNum ) {
+
     int numTkS1 = 0;
     edm::RefVector<std::vector<SimpleTrack> > tkRefVec((*goodJetIt)->tkRefVec());
     edm::RefVector<std::vector<SimpleTrack> >::const_iterator tkRefIt = tkRefVec.begin();
@@ -73,9 +76,9 @@ vector<vector<double> > QCDbTagMatrix::multiply( const vector<const OfflineJet *
 
     probTagged[goodJetNum] = taggedJet_[etId][etaId][numTkS1Id];
     probNotTagged[goodJetNum] = notTaggedJet_[etId][etaId][numTkS1Id];
-    cout << "goodJetNum = " << goodJetNum << endl;
-    cout << "taggedJet_["<<etId<<"]["<<etaId<<"]["<<numTkS1Id<<"] = " << taggedJet_[etId][etaId][numTkS1Id] << endl;
-    cout << "notTaggedJet_["<<etId<<"]["<<etaId<<"]["<<numTkS1Id<<"] = " << notTaggedJet_[etId][etaId][numTkS1Id] << endl;
+    // cout << "goodJetNum = " << goodJetNum << endl;
+    // cout << "taggedJet_["<<etId<<"]["<<etaId<<"]["<<numTkS1Id<<"] = " << taggedJet_[etId][etaId][numTkS1Id] << endl;
+    // cout << "notTaggedJet_["<<etId<<"]["<<etaId<<"]["<<numTkS1Id<<"] = " << notTaggedJet_[etId][etaId][numTkS1Id] << endl;
   }
 
   // Copy the collection of jets in a modifiable one
