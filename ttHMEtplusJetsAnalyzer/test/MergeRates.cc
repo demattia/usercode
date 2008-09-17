@@ -47,20 +47,30 @@ void hadd() {
   // root > .L hadd.C
   // root > hadd()
 
-  Target = TFile::Open( "QCDbTagProbability.root", "RECREATE" );
+  // Target = TFile::Open( "QCDbTagProbability.root", "RECREATE" );
+  Target = TFile::Open( "ttHMEtplusJetsAnalyzer.root", "RECREATE" );
 
   FileList = new TList();
 
   // ************************************************************
   // List of Files
-  FileList->Add( TFile::Open("QCDbTagProbability_QCD_30-50.root") );    // 1
-  FileList->Add( TFile::Open("QCDbTagProbability_QCD_50-80.root") );    // 2
-  FileList->Add( TFile::Open("QCDbTagProbability_QCD_80-120.root") );   // 3
-  FileList->Add( TFile::Open("QCDbTagProbability_QCD_120-170.root") );  // 4
-  FileList->Add( TFile::Open("QCDbTagProbability_QCD_170-230.root") );  // 5
-  FileList->Add( TFile::Open("QCDbTagProbability_QCD_230-300.root") );  // 6
-  FileList->Add( TFile::Open("QCDbTagProbability_QCD_300-380.root") );  // 7
-  FileList->Add( TFile::Open("QCDbTagProbability_QCD_380-incl.root") ); // 8
+  // FileList->Add( TFile::Open("QCDbTagProbability_QCD_30-50.root") );    // 1
+  // FileList->Add( TFile::Open("QCDbTagProbability_QCD_50-80.root") );    // 2
+  // FileList->Add( TFile::Open("QCDbTagProbability_QCD_80-120.root") );   // 3
+  // FileList->Add( TFile::Open("QCDbTagProbability_QCD_120-170.root") );  // 4
+  // FileList->Add( TFile::Open("QCDbTagProbability_QCD_170-230.root") );  // 5
+  // FileList->Add( TFile::Open("QCDbTagProbability_QCD_230-300.root") );  // 6
+  // FileList->Add( TFile::Open("QCDbTagProbability_QCD_300-380.root") );  // 7
+  // FileList->Add( TFile::Open("QCDbTagProbability_QCD_380-incl.root") ); // 8
+
+  FileList->Add( TFile::Open("ttHMEtplusJetsAnalyzer_QCD_30-50.root") );    // 1
+  FileList->Add( TFile::Open("ttHMEtplusJetsAnalyzer_QCD_50-80.root") );    // 2
+  FileList->Add( TFile::Open("ttHMEtplusJetsAnalyzer_QCD_80-120.root") );   // 3
+  FileList->Add( TFile::Open("ttHMEtplusJetsAnalyzer_QCD_120-170.root") );  // 4
+  FileList->Add( TFile::Open("ttHMEtplusJetsAnalyzer_QCD_170-230.root") );  // 5
+  FileList->Add( TFile::Open("ttHMEtplusJetsAnalyzer_QCD_230-300.root") );  // 6
+  FileList->Add( TFile::Open("ttHMEtplusJetsAnalyzer_QCD_300-380.root") );  // 7
+  FileList->Add( TFile::Open("ttHMEtplusJetsAnalyzer_QCD_380-incl.root") ); // 8
 
   // List of Cross-sections (in pb) multiplied by the high luminosity factor
   double crossSections[] = { 163000000.*0.01,

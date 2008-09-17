@@ -25,5 +25,9 @@ module RelativeLikelihoodModule = RelativeLikelihood {
   untracked double   JetEtaCut                  = 3.0
   untracked string   InputFileNameSignal        = "ttHMEtplusJetsAnalyzer_TTH_120.root"
   untracked string   InputFileNameBackground    = "ttHMEtplusJetsAnalyzer_background.root"
-  untracked string   OutputFileName             = "RelativeLikelihood.root"
+  untracked string   CountTTHdecaysFileName      = "ttHdecays.txt"
+  untracked string   CountTTHdecays2tagsFileName = "ttHdecays_2tags.txt"
+  untracked string   OutputFileName              = "RelativeLikelihood.root"
+  untracked string   TMVAsuffix                  = ""
+  untracked bool     UseTagMatrixForQCD          = false
 }

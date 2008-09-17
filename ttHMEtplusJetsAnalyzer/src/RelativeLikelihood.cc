@@ -237,7 +237,7 @@ void RelativeLikelihood::analyze(const edm::Event& iEvent, const edm::EventSetup
       float medium = 5.3;
 	if ( assocJetIt->discriminatorHighEff()>medium ) goodbTaggedJets.push_back(&(*assocJetIt));
     }
-  }else{
+  } else {
     for ( OfflineJetCollection::const_iterator allJetIt = caloJets->begin(); allJetIt != caloJets->end(); ++allJetIt ) {
       if ( allJetIt->et() >= jetEtCut_ && fabs(allJetIt->eta())< jetEtaCut_ ) {
 	goodJets.push_back(&(*allJetIt));
@@ -254,52 +254,33 @@ void RelativeLikelihood::analyze(const edm::Event& iEvent, const edm::EventSetup
     }
   }
 
-//   for ( OfflineJetCollection::const_iterator allJetIt = caloJets->begin(); allJetIt != caloJets->end(); ++allJetIt ) {
-//     if ( allJetIt->et() >= jetEtCut_ && fabs(allJetIt->eta())< jetEtaCut_ ) {
-//       goodJets.push_back(&(*allJetIt));
-
-//       // -------------------------------------------------------------- //
-//       // -- THIS IS TEMPORARY, A MORE ACCURATE TAGGER SHOULD BE USED -- //
-//       // -------------------------------------------------------------- //
-//       // Consider as tagged those jets with highEff > 5.3.
-//       // high eff -> 50.30% b / 10.77% c / 0.92% uds /  0.98% g / 0.96% udsg // P.Schilling 23/10/07
-//       // Set the b-tag cut value
-//       float medium = 5.3;
-//       if ( allJetIt->discriminatorHighEff()>medium ) goodbTaggedJets.push_back(&(*allJetIt));
-//     }
-//   }
-
-  // Require at least two b-tags
+  // Preliminary cuts
+  // ----------------
   if ( goodJets.size() >= 5 && offlineMEt->corrL3mEtSig() > 3. ){ // && goodbTaggedJets.size() >= 2 ) {
 
     // If it is QCD, do not cut on the b-tags, but loop on all the combinations of jets
+    // --------------------------------------------------------------------------------
     if ( useTagMatrixForQCD_ ) {
       cout << "calling multiply for event = " << eventCounter_ << endl;
-      qcdbTagMatrixMultiplier_->multiply( goodJets, &(*offlineMEt) );
-
+      vector<vector<double> > eventVariablesVectors( qcdbTagMatrixMultiplier_->multiply( goodJets, &(*offlineMEt) ) );
+      vector<vector<double> >::const_iterator eventVariablesVec = eventVariablesVectors.begin();
+      for( ; eventVariablesVec != eventVariablesVectors.end(); ++eventVariablesVec ) {
+        if (histogramVariableSignal_.size() != eventVariablesVec->size() || histogramVariableBackground_.size() != eventVariablesVec->size()) cout << "ATTENTION: number of variables does not match number of loaded histograms." << endl;
+        evaluateLikelihood( *eventVariablesVec );
+      }
     }
+    // For normal events evaluate likelihood
+    // -------------------------------------
     else {
-
       // Require at least two b-tags
       if ( goodbTaggedJets.size() >= 2 ) {
-
-        //    vector<double> eventVariablesVector(
-        eventVariables2Tags_->fill( goodJets, goodbTaggedJets, &(*offlineMEt) );
-        //    );
-
+        pair<int,int> decayType2tags(countTTHdecays2tags_->countDecays(*MCpartons));
+        vector<double> eventVariablesVector( eventVariables2Tags_->fill( goodJets, goodbTaggedJets, &(*offlineMEt) ) );
+        if (histogramVariableSignal_.size() != eventVariablesVector.size() || histogramVariableBackground_.size() != eventVariablesVector.size()) cout << "ATTENTION: number of variables does not match number of loaded histograms." << endl;
+        evaluateLikelihood( eventVariablesVector );
       } // end if at least two b-tags
     }
-
-
-    pair<int,int> decayType2tags(countTTHdecays2tags_->countDecays(*MCpartons));
-
-    vector<double> eventVariablesVector( eventVariables2Tags_->fill( goodJets, goodbTaggedJets, &(*offlineMEt) ) );
-
-
-    if (histogramVariableSignal_.size() != eventVariablesVector.size() || histogramVariableBackground_.size() != eventVariablesVector.size()) cout << "ATTENTION: number of variables does not match number of loaded histograms." << endl;
-    evaluateLikelihood( eventVariablesVector );
-
-  } // end if at least two b-tags
+  } // end preliminary cuts
 
 }
 
