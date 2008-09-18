@@ -84,10 +84,14 @@ ttHMEtplusJetsAnalyzer::ttHMEtplusJetsAnalyzer(const edm::ParameterSet& iConfig)
 
   outputFile_ = new TFile(outputFileName_.c_str(), "RECREATE");
   eventVariablesPresel_ = new EventVariables(higgsFileName_, hadronicTopFileName_, qcdFileName_, "presel", outputFile_, true, tmvaSuffix_);
-  eventVariables2Tags_ = new EventVariables(higgsFileName_, hadronicTopFileName_, qcdFileName_, "2tags", outputFile_, true, tmvaSuffix_);
 
   // Production of pseudo-events for qcd with 2 b-tags.
-  qcdbTagMatrixMultiplier_ = new QCDbTagMatrix(higgsFileName_, hadronicTopFileName_, qcdFileName_, "2tags", outputFile_, true, qcdHistoFileName_, 2, tmvaSuffix_);
+  if ( useTagMatrixForQCD_ ) {
+    qcdbTagMatrixMultiplier_ = new QCDbTagMatrix(higgsFileName_, hadronicTopFileName_, qcdFileName_, "2tags", outputFile_, true, qcdHistoFileName_, 2, tmvaSuffix_);
+  }
+  else {
+    eventVariables2Tags_ = new EventVariables(higgsFileName_, hadronicTopFileName_, qcdFileName_, "2tags_tagMatrix", outputFile_, true, tmvaSuffix_);
+  }
 
   jetVertexAssociator_ = new JetVertexAssociator(jetEtCut_,jetEtaCut_);
 
@@ -285,8 +289,8 @@ void ttHMEtplusJetsAnalyzer::endJob() {
   countTTHdecays_->writeDecays();
   delete countTTHdecays_;
   delete eventVariablesPresel_;
-  delete eventVariables2Tags_;
-  delete qcdbTagMatrixMultiplier_;
+  if ( useTagMatrixForQCD_ ) { delete qcdbTagMatrixMultiplier_; }
+  else { delete eventVariables2Tags_; }
   outputFile_->Write();
 }
 

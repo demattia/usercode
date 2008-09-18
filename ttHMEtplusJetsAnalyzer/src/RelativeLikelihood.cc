@@ -60,10 +60,14 @@ RelativeLikelihood::RelativeLikelihood(const edm::ParameterSet& iConfig) :
   inputFileBackground_  = new TFile(inputFileNameBackground_.c_str());
 
   outputFile_ = new TFile(outputFileName_.c_str(), "RECREATE");
-  eventVariables2Tags_ = new EventVariables(higgsFileName_, hadronicTopFileName_, qcdFileName_, "2tags", outputFile_, false);
 
   // Production of pseudo-events for qcd with 2 b-tags.
-  qcdbTagMatrixMultiplier_ = new QCDbTagMatrix(higgsFileName_, hadronicTopFileName_, qcdFileName_, "2tags", outputFile_, true, qcdHistoFileName_, 2, tmvaSuffix_);
+  if ( useTagMatrixForQCD_ ) {
+    qcdbTagMatrixMultiplier_ = new QCDbTagMatrix(higgsFileName_, hadronicTopFileName_, qcdFileName_, "2tags", outputFile_, true, qcdHistoFileName_, 2, tmvaSuffix_);
+  }
+  else {
+    eventVariables2Tags_ = new EventVariables(higgsFileName_, hadronicTopFileName_, qcdFileName_, "2tags", outputFile_, false);
+  }
 
   jetVertexAssociator_ = new JetVertexAssociator(jetEtCut_,jetEtaCut_);
 
@@ -385,7 +389,8 @@ void RelativeLikelihood::endJob() {
   countTTHdecays2tags_->writeDecays();
   delete countTTHdecays_;
   delete countTTHdecays2tags_;
-  delete eventVariables2Tags_;
+  if ( useTagMatrixForQCD_ ) { delete qcdbTagMatrixMultiplier_; }
+  else { delete eventVariables2Tags_; }
   outputDir_->cd();
   relativeLikelihood_->Write();
   outputFile_->Write();
