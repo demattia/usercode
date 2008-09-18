@@ -1,0 +1,13 @@
+source = PoolSource {
+  untracked vstring fileNames = {
+    "castor:/castor/cern.ch/user/d/demattia/FastSim/PUHL/VertexAlgoNew/TT_0JETS/Fast_TT_0JETS_0.root",
+    "castor:/castor/cern.ch/user/d/demattia/FastSim/PUHL/VertexAlgoNew/TT_0JETS/Fast_TT_0JETS_15.root",
+    "castor:/castor/cern.ch/user/d/demattia/FastSim/PUHL/VertexAlgoNew/TT_0JETS/Fast_TT_0JETS_16.root",
+    "castor:/castor/cern.ch/user/d/demattia/FastSim/PUHL/VertexAlgoNew/TT_0JETS/Fast_TT_0JETS_19.root",
+    "castor:/castor/cern.ch/user/d/demattia/FastSim/PUHL/VertexAlgoNew/TT_0JETS/Fast_TT_0JETS_21.root",
+    "castor:/castor/cern.ch/user/d/demattia/FastSim/PUHL/VertexAlgoNew/TT_0JETS/Fast_TT_0JETS_22.root",
+    "castor:/castor/cern.ch/user/d/demattia/FastSim/PUHL/VertexAlgoNew/TT_0JETS/Fast_TT_0JETS_27.root",
+    "castor:/castor/cern.ch/user/d/demattia/FastSim/PUHL/VertexAlgoNew/TT_0JETS/Fast_TT_0JETS_33.root",
+    "castor:/castor/cern.ch/user/d/demattia/FastSim/PUHL/VertexAlgoNew/TT_0JETS/Fast_TT_0JETS_35.root"
+  }
+}
