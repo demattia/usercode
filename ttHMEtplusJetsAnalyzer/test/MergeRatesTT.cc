@@ -48,43 +48,25 @@ void hadd() {
   // root > hadd()
 
   // Target = TFile::Open( "QCDbTagProbability.root", "RECREATE" );
-  Target = TFile::Open( "ttHMEtplusJetsAnalyzer_background.root", "RECREATE" );
+  Target = TFile::Open( "ttHMEtplusJetsAnalyzer_TT_background.root", "RECREATE" );
 
   FileList = new TList();
 
   // ************************************************************
   // List of Files
-  // FileList->Add( TFile::Open("QCDbTagProbability_QCD_30-50.root") );    // 1
-  // FileList->Add( TFile::Open("QCDbTagProbability_QCD_50-80.root") );    // 2
-  // FileList->Add( TFile::Open("QCDbTagProbability_QCD_80-120.root") );   // 3
-  // FileList->Add( TFile::Open("QCDbTagProbability_QCD_120-170.root") );  // 4
-  // FileList->Add( TFile::Open("QCDbTagProbability_QCD_170-230.root") );  // 5
-  // FileList->Add( TFile::Open("QCDbTagProbability_QCD_230-300.root") );  // 6
-  // FileList->Add( TFile::Open("QCDbTagProbability_QCD_300-380.root") );  // 7
-  // FileList->Add( TFile::Open("QCDbTagProbability_QCD_380-incl.root") ); // 8
-
-  // FileList->Add( TFile::Open("ttHMEtplusJetsAnalyzer_QCD_30-50.root") );    // 1
-  // FileList->Add( TFile::Open("ttHMEtplusJetsAnalyzer_QCD_50-80.root") );    // 2
-  // FileList->Add( TFile::Open("ttHMEtplusJetsAnalyzer_QCD_80-120.root") );   // 3
-  // FileList->Add( TFile::Open("ttHMEtplusJetsAnalyzer_QCD_120-170.root") );  // 4
-  // FileList->Add( TFile::Open("ttHMEtplusJetsAnalyzer_QCD_170-230.root") );  // 5
-  // FileList->Add( TFile::Open("ttHMEtplusJetsAnalyzer_QCD_230-300.root") );  // 6
-  // FileList->Add( TFile::Open("ttHMEtplusJetsAnalyzer_QCD_300-380.root") );  // 7
-  // FileList->Add( TFile::Open("ttHMEtplusJetsAnalyzer_QCD_380-incl.root") ); // 8
-
   // TT_NJETS
-  //   FileList->Add( TFile::Open("ttHMEtplusJetsAnalyzer_TT_0JETS.root") );     // 9
-  //   FileList->Add( TFile::Open("ttHMEtplusJetsAnalyzer_TT_1JETS.root") );     // 10
-  //   FileList->Add( TFile::Open("ttHMEtplusJetsAnalyzer_TT_2JETS.root") );     // 11
-  //   FileList->Add( TFile::Open("ttHMEtplusJetsAnalyzer_TT_3JETS.root") );     // 12
-  //   FileList->Add( TFile::Open("ttHMEtplusJetsAnalyzer_TT_4JETS.root") );     // 13
+  FileList->Add( TFile::Open("ttHMEtplusJetsAnalyzer_TT_0JETS.root") );     // 9
+  FileList->Add( TFile::Open("ttHMEtplusJetsAnalyzer_TT_1JETS.root") );     // 10
+  FileList->Add( TFile::Open("ttHMEtplusJetsAnalyzer_TT_2JETS.root") );     // 11
+  FileList->Add( TFile::Open("ttHMEtplusJetsAnalyzer_TT_3JETS.root") );     // 12
+  FileList->Add( TFile::Open("ttHMEtplusJetsAnalyzer_TT_4JETS.root") );     // 13
 
-  FileList->Add( TFile::Open("ttHMEtplusJetsAnalyzer_QCD_background.root") );    // 1
-  FileList->Add( TFile::Open("ttHMEtplusJetsAnalyzer_TT_background.root") );     // 2
-
-  // Do not scale them, they are already scaled.
-  double crossSections[] = { 1,
-                             1 };
+  // List of Cross-sections (in pb) multiplied by the high luminosity factor
+  double crossSections[] = { 619.*0.01 / 7388,
+                             176.*0.01 / 18171,
+                             34.*0.01 / 2000,
+                             6.*0.01 / 3000,
+                             1.5*0.01 / 535 };
 
   // ************************************************************
 
@@ -153,9 +135,10 @@ void MergeRootfile( TDirectory *target, TList *sourcelist, double crossArray[] )
         nextsource = (TFile*)sourcelist->After( nextsource );
       }
 
-      // After they have been merged, normalize them
-      h1->Scale(1/h1->Integral());
-
+      // Now the histograms are merged, normalize the final histogram and scale it so that the 
+      h1->Scale(1/(h1->Integral()));
+      // cout << h1->GetName() << " has x-bins = " << h1->GetNbinsX() << endl;
+      h1->Scale(1.199*1000000);
     }
     else if ( obj->IsA()->InheritsFrom( "TTree" ) ) {
 
