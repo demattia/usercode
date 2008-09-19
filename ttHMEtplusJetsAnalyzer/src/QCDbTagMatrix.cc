@@ -3,7 +3,8 @@
 
 #include "AnalysisExamples/ttHMEtplusJetsAnalyzer/interface/QCDbTagMatrix.h"
 
-QCDbTagMatrix::QCDbTagMatrix( const string & higgsFileName, const string & hadronicTopFileName, const string & qcdFileName, TString suffix, TFile * outputFile, bool fillHistograms, const string & qcdHistoFileName, const int bJetNumCut, const string & tmvaSuffix ) : EventVariables( higgsFileName, hadronicTopFileName, qcdFileName, suffix+"_tagMatrix", outputFile, fillHistograms, tmvaSuffix ) {
+// QCDbTagMatrix::QCDbTagMatrix( const string & higgsFileName, const string & hadronicTopFileName, const string & qcdFileName, TString suffix, TFile * outputFile, bool fillHistograms, const string & qcdHistoFileName, const int bJetNumCut, const string & tmvaSuffix ) : EventVariables( higgsFileName, hadronicTopFileName, qcdFileName, suffix+"_tagMatrix", outputFile, fillHistograms, tmvaSuffix ) {
+QCDbTagMatrix::QCDbTagMatrix( const string & higgsFileName, const string & hadronicTopFileName, const string & qcdFileName, TString suffix, TFile * outputFile, bool fillHistograms, const string & qcdHistoFileName, const int bJetNumCut, const string & tmvaSuffix ) : EventVariables( higgsFileName, hadronicTopFileName, qcdFileName, suffix, outputFile, fillHistograms, tmvaSuffix ) {
   bJetNumCut_ = bJetNumCut;
 
   inputFileSignal_ = new TFile(qcdHistoFileName.c_str());

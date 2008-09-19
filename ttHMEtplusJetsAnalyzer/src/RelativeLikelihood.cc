@@ -63,7 +63,7 @@ RelativeLikelihood::RelativeLikelihood(const edm::ParameterSet& iConfig) :
 
   // Production of pseudo-events for qcd with 2 b-tags.
   if ( useTagMatrixForQCD_ ) {
-    qcdbTagMatrixMultiplier_ = new QCDbTagMatrix(higgsFileName_, hadronicTopFileName_, qcdFileName_, "2tags", outputFile_, true, qcdHistoFileName_, 2, tmvaSuffix_);
+    qcdbTagMatrixMultiplier_ = new QCDbTagMatrix(higgsFileName_, hadronicTopFileName_, qcdFileName_, "2tags", outputFile_, false, qcdHistoFileName_, 2, tmvaSuffix_);
   }
   else {
     eventVariables2Tags_ = new EventVariables(higgsFileName_, hadronicTopFileName_, qcdFileName_, "2tags", outputFile_, false);
@@ -73,8 +73,8 @@ RelativeLikelihood::RelativeLikelihood(const edm::ParameterSet& iConfig) :
 
   // Load selected histograms from the input file
   TString suffixSignal = "2tags";
-  TString suffixBackground = "2tags";
-  if ( useTagMatrixForQCD_ ) suffixBackground += "_tagMatrix";
+  TString suffixBackground = "2tags_tagMatrix";
+  // if ( useTagMatrixForQCD_ ) suffixBackground += "_tagMatrix";
   TString dirNameSignal = "EventVariables";
   TString dirNameBackground = "EventVariables";
   if ( suffixSignal != "" ) {
@@ -115,7 +115,6 @@ RelativeLikelihood::RelativeLikelihood(const edm::ParameterSet& iConfig) :
   outputDir_ = dynamic_cast<TDirectory*>(outputFile_->Get(dirNameSignal));
   outputDir_->cd();
   relativeLikelihood_ = new TH1D( "relativeLikelihood" + suffixSignal, "relative likelihood " + suffixSignal, 50, -10., 10. );
-
 }
 
 RelativeLikelihood::~RelativeLikelihood()
