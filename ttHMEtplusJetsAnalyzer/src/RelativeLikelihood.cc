@@ -61,17 +61,7 @@ RelativeLikelihood::RelativeLikelihood(const edm::ParameterSet& iConfig) :
 
   outputFile_ = new TFile(outputFileName_.c_str(), "RECREATE");
 
-  // Production of pseudo-events for qcd with 2 b-tags.
-  if ( useTagMatrixForQCD_ ) {
-    qcdbTagMatrixMultiplier_ = new QCDbTagMatrix(higgsFileName_, hadronicTopFileName_, qcdFileName_, "2tags", outputFile_, false, qcdHistoFileName_, 2, tmvaSuffix_);
-  }
-  else {
-    eventVariables2Tags_ = new EventVariables(higgsFileName_, hadronicTopFileName_, qcdFileName_, "2tags", outputFile_, false);
-  }
-
-  jetVertexAssociator_ = new JetVertexAssociator(jetEtCut_,jetEtaCut_);
-
-  // Load selected histograms from the input file
+  // Directory names and suffixes
   TString suffixSignal = "2tags";
   TString suffixBackground = "2tags_tagMatrix";
   // if ( useTagMatrixForQCD_ ) suffixBackground += "_tagMatrix";
@@ -85,6 +75,18 @@ RelativeLikelihood::RelativeLikelihood(const edm::ParameterSet& iConfig) :
     suffixBackground.Prepend("_");
     dirNameBackground.Append(suffixBackground);
   }
+
+  // Production of pseudo-events for qcd with 2 b-tags.
+  if ( useTagMatrixForQCD_ ) {
+    qcdbTagMatrixMultiplier_ = new QCDbTagMatrix(higgsFileName_, hadronicTopFileName_, qcdFileName_, suffixSignal, outputFile_, false, qcdHistoFileName_, 2, tmvaSuffix_);
+  }
+  else {
+    eventVariables2Tags_ = new EventVariables(higgsFileName_, hadronicTopFileName_, qcdFileName_, suffixSignal, outputFile_, false);
+  }
+
+  jetVertexAssociator_ = new JetVertexAssociator(jetEtCut_,jetEtaCut_);
+
+  // Load selected histograms from the input file
   TDirectory * dirSignal = dynamic_cast<TDirectory*>(inputFileSignal_->Get(dirNameSignal));
   TDirectory * dirBackground = dynamic_cast<TDirectory*>(inputFileBackground_->Get(dirNameBackground));
   
