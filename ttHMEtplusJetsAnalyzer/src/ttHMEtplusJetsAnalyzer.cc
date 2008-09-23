@@ -252,28 +252,31 @@ void ttHMEtplusJetsAnalyzer::analyze(const edm::Event& iEvent, const edm::EventS
     }
   }
 
-  // Preselection
-  if ( goodJets.size() >= 5 && offlineMEt->corrL3mEtSig() > 3.0 ) {
-    // Fill variables after the preselection
-    eventVariablesPresel_->fill( goodJets, goodbTaggedJets, &(*offlineMEt) );
+  if (responsePair.first) {
 
-    // If it is QCD, do not cut on the b-tags, but loop on all the combinations of jets
-    if ( useTagMatrixForQCD_ ) {
-      cout << "calling multiply for event = " << eventCounter_ << endl;
-      qcdbTagMatrixMultiplier_->multiply( goodJets, &(*offlineMEt) );
-    }
-    else {
+    // Preselection
+    if ( goodJets.size() >= 5 && offlineMEt->corrL3mEtSig() > 3.0 ) {
+      // Fill variables after the preselection
+      eventVariablesPresel_->fill( goodJets, goodbTaggedJets, &(*offlineMEt) );
 
-      // Require at least two b-tags
-      if ( goodbTaggedJets.size() >= 2 ) {
+      // If it is QCD, do not cut on the b-tags, but loop on all the combinations of jets
+      if ( useTagMatrixForQCD_ ) {
+        cout << "calling multiply for event = " << eventCounter_ << endl;
+        qcdbTagMatrixMultiplier_->multiply( goodJets, &(*offlineMEt) );
+      }
+      else {
 
-        //    vector<double> eventVariablesVector(
-        eventVariables2Tags_->fill( goodJets, goodbTaggedJets, &(*offlineMEt) );
-        //    );
+        // Require at least two b-tags
+        if ( goodbTaggedJets.size() >= 2 ) {
 
-      } // end if at least two b-tags
-    }
-  } // end preselection cuts
+          //    vector<double> eventVariablesVector(
+          eventVariables2Tags_->fill( goodJets, goodbTaggedJets, &(*offlineMEt) );
+          //    );
+
+        } // end if at least two b-tags
+      }
+    } // end preselection cuts
+  }
 }
 
 //       method called once each job just before starting event loop  
