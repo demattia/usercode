@@ -51,7 +51,7 @@ vector<vector<double> > QCDbTagMatrix::multiply( const vector<const OfflineJet *
     probNotTagged[i] = 0;
   }
 
-  cout << "jetCollection.size() = " << jetCollection.size() << endl;
+  // cout << "jetCollection.size() = " << jetCollection.size() << endl;
 
   vector<const OfflineJet *>::const_iterator goodJetIt = jetCollection.begin();
   unsigned int goodJetNum = 0;
@@ -118,8 +118,8 @@ vector<vector<double> > QCDbTagMatrix::multiply( const vector<const OfflineJet *
       // others are all 0.
       if ( comb & check ) {
         // this jet is b-tagged
-//         cout << "value match for: comb = " << comb
-//              << "; and check = " << check << endl; 
+        // cout << "value match for: comb = " << comb
+        //      << "; and check = " << check << endl; 
         // Extract new discriminant value from the b-tagged histogram
         jet->setDiscriminatorHighEff(taggedJetDiscriminatorHighEff_->GetRandom());
         jet->setbTagTkInvMass(taggedJetTagMass_->GetRandom());
@@ -130,6 +130,8 @@ vector<vector<double> > QCDbTagMatrix::multiply( const vector<const OfflineJet *
       }
       else {
         // Extract new discriminant value from the nob-tagged histogram
+        // cout << "value no-match for: comb = " << comb
+        //      << "; and check = " << check << endl; 
         jet->setDiscriminatorHighEff(notTaggedJetDiscriminatorHighEff_->GetRandom());
         jet->setbTagTkInvMass(notTaggedJetTagMass_->GetRandom());
         goodJets.push_back(&(*jet));

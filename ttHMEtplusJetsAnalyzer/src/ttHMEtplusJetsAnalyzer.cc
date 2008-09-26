@@ -70,27 +70,35 @@ ttHMEtplusJetsAnalyzer::ttHMEtplusJetsAnalyzer(const edm::ParameterSet& iConfig)
   jetEtaCut_(iConfig.getUntrackedParameter<double>("JetEtaCut") ),
 
   countTTHdecaysFileName_(iConfig.getUntrackedParameter<string>("CountTTHdecaysFileName") ),
-  countTTHdecays2tagsFileName_(iConfig.getUntrackedParameter<string>("CountTTHdecays2tagsFileName") ),
- 
+  countTTHdecaysNtagsFileName_(iConfig.getUntrackedParameter<string>("CountTTHdecaysNtagsFileName") ),
+
+  tagsNumber_(iConfig.getUntrackedParameter<unsigned int>("TagsNumber") ),
+
   outputFileName_(iConfig.getUntrackedParameter<string>("OutputFileName") ),
   tmvaSuffix_(iConfig.getUntrackedParameter<string>("TMVAsuffix") ),
   useTagMatrixForQCD_(iConfig.getUntrackedParameter<bool>("UseTagMatrixForQCD") ),
+
   eventCounter_(0),
   l1Eff_(0)
 {
 
   countTTHdecays_ = new ttHdecaysCounter(countTTHdecaysFileName_);
-  countTTHdecays2tags_ = new ttHdecaysCounter(countTTHdecays2tagsFileName_);
+  countTTHdecaysNtags_ = new ttHdecaysCounter(countTTHdecaysNtagsFileName_);
 
   outputFile_ = new TFile(outputFileName_.c_str(), "RECREATE");
   eventVariablesPresel_ = new EventVariables(higgsFileName_, hadronicTopFileName_, qcdFileName_, "presel", outputFile_, true, tmvaSuffix_);
 
+  TString tagsNumName = "tags";
+  stringstream tagNumString;
+  tagNumString << tagsNumber_;
+  tagsNumName.Prepend(tagNumString.str());
+
   // Production of pseudo-events for qcd with 2 b-tags.
   if ( useTagMatrixForQCD_ ) {
-    qcdbTagMatrixMultiplier_ = new QCDbTagMatrix(higgsFileName_, hadronicTopFileName_, qcdFileName_, "2tags", outputFile_, true, qcdHistoFileName_, 2, tmvaSuffix_);
+    qcdbTagMatrixMultiplier_ = new QCDbTagMatrix(higgsFileName_, hadronicTopFileName_, qcdFileName_, tagsNumName, outputFile_, true, qcdHistoFileName_, tagsNumber_, tmvaSuffix_);
   }
   else {
-    eventVariables2Tags_ = new EventVariables(higgsFileName_, hadronicTopFileName_, qcdFileName_, "2tags_tagMatrix", outputFile_, true, tmvaSuffix_);
+    eventVariablesNTags_ = new EventVariables(higgsFileName_, hadronicTopFileName_, qcdFileName_, tagsNumName, outputFile_, true, tmvaSuffix_);
   }
 
   jetVertexAssociator_ = new JetVertexAssociator(jetEtCut_,jetEtaCut_);
@@ -267,10 +275,11 @@ void ttHMEtplusJetsAnalyzer::analyze(const edm::Event& iEvent, const edm::EventS
       else {
 
         // Require at least two b-tags
-        if ( goodbTaggedJets.size() >= 2 ) {
+        cout << "requested tagsNumber = " << tagsNumber_ << endl;
+        if ( goodbTaggedJets.size() >= tagsNumber_ ) {
 
           //    vector<double> eventVariablesVector(
-          eventVariables2Tags_->fill( goodJets, goodbTaggedJets, &(*offlineMEt) );
+          eventVariablesNTags_->fill( goodJets, goodbTaggedJets, &(*offlineMEt) );
           //    );
 
         } // end if at least two b-tags
@@ -293,7 +302,7 @@ void ttHMEtplusJetsAnalyzer::endJob() {
   delete countTTHdecays_;
   delete eventVariablesPresel_;
   if ( useTagMatrixForQCD_ ) { delete qcdbTagMatrixMultiplier_; }
-  else { delete eventVariables2Tags_; }
+  else { delete eventVariablesNTags_; }
   outputFile_->Write();
 }
 

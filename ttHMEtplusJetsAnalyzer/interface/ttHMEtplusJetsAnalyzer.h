@@ -95,7 +95,10 @@ private:
   double jetEtCut_;
   double jetEtaCut_;
   string countTTHdecaysFileName_;
-  string countTTHdecays2tagsFileName_;
+  string countTTHdecaysNtagsFileName_;
+
+  unsigned int tagsNumber_;
+
   string outputFileName_;
   string tmvaSuffix_;
 
@@ -113,11 +116,11 @@ private:
   TFile * outputFile_;
 
   ttHdecaysCounter * countTTHdecays_;
-  ttHdecaysCounter * countTTHdecays2tags_;
+  ttHdecaysCounter * countTTHdecaysNtags_;
 
   // Class to fill histograms on event variables
   EventVariables * eventVariablesPresel_;
-  EventVariables * eventVariables2Tags_;
+  EventVariables * eventVariablesNTags_;
   QCDbTagMatrix * qcdbTagMatrixMultiplier_;
   
   JetVertexAssociator * jetVertexAssociator_;

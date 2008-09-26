@@ -47,6 +47,8 @@ EventVariables::EventVariables( const string & higgsFileName, const string & had
   outputDir_ = outputFile_->mkdir(dirName);
   outputDir_->cd();
 
+  cout << "created the dir: " << dirName << endl;
+
   // Vector with the variables names
   eventVariablesNames_.push_back( "higgsMass" );
   eventVariablesNames_.push_back( "hadronicTopMass" );

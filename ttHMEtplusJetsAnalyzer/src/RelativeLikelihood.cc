@@ -63,18 +63,18 @@ RelativeLikelihood::RelativeLikelihood(const edm::ParameterSet& iConfig) :
 
   // Directory names and suffixes
   TString suffixSignal = "2tags";
-  TString suffixBackground = "2tags_tagMatrix";
+  TString suffixBackground = "2tags";
   // if ( useTagMatrixForQCD_ ) suffixBackground += "_tagMatrix";
-  TString dirNameSignal = "EventVariables";
-  TString dirNameBackground = "EventVariables";
-  if ( suffixSignal != "" ) {
-    suffixSignal.Prepend("_");
-    dirNameSignal.Append(suffixSignal);
-  }
-  if ( suffixBackground != "" ) {
-    suffixBackground.Prepend("_");
-    dirNameBackground.Append(suffixBackground);
-  }
+  TString dirNameSignal = "EventVariables_2tags";
+  TString dirNameBackground = "EventVariables_2tags";
+//   if ( suffixSignal != "" ) {
+//     suffixSignal.Prepend("_");
+//     dirNameSignal.Append(suffixSignal);
+//   }
+//   if ( suffixBackground != "" ) {
+//     suffixBackground.Prepend("_");
+//     dirNameBackground.Append(suffixBackground);
+//   }
 
   // Production of pseudo-events for qcd with 2 b-tags.
   if ( useTagMatrixForQCD_ ) {
@@ -89,7 +89,7 @@ RelativeLikelihood::RelativeLikelihood(const edm::ParameterSet& iConfig) :
   // Load selected histograms from the input file
   TDirectory * dirSignal = dynamic_cast<TDirectory*>(inputFileSignal_->Get(dirNameSignal));
   TDirectory * dirBackground = dynamic_cast<TDirectory*>(inputFileBackground_->Get(dirNameBackground));
-  
+
   const int totHistogramNum = 21;
   // Variables names: ATTENTION, they must be ordered as those returned by EventVariables
 
@@ -105,10 +105,10 @@ RelativeLikelihood::RelativeLikelihood(const edm::ParameterSet& iConfig) :
                                               "bTagTkInvMass" };
 
   for ( int histogramNum = 0; histogramNum < totHistogramNum; ++histogramNum ) {
-    histogramVariableSignal_.push_back(*(dynamic_cast<TH1D*>(dirSignal->Get(histogramNames[histogramNum] + suffixSignal))));
+    histogramVariableSignal_.push_back(*(dynamic_cast<TH1D*>(dirSignal->Get(histogramNames[histogramNum] + "_" + suffixSignal))));
     TH1D * tempHistoPtr = &(histogramVariableSignal_.back());
     tempHistoPtr->Scale(1./(tempHistoPtr->Integral()));
-    histogramVariableBackground_.push_back(*(dynamic_cast<TH1D*>(dirBackground->Get(histogramNames[histogramNum] + suffixBackground))));
+    histogramVariableBackground_.push_back(*(dynamic_cast<TH1D*>(dirBackground->Get(histogramNames[histogramNum] + "_" + suffixBackground))));
     tempHistoPtr = &(histogramVariableBackground_.back());
     tempHistoPtr->Scale(1./(tempHistoPtr->Integral()));
   }
@@ -116,7 +116,7 @@ RelativeLikelihood::RelativeLikelihood(const edm::ParameterSet& iConfig) :
   // This directory is created by the eventVariables2Tags class
   outputDir_ = dynamic_cast<TDirectory*>(outputFile_->Get(dirNameSignal));
   outputDir_->cd();
-  relativeLikelihood_ = new TH1D( "relativeLikelihood" + suffixSignal, "relative likelihood " + suffixSignal, 50, -10., 10. );
+  relativeLikelihood_ = new TH1D( "relativeLikelihood" + suffixSignal, "relative likelihood " + suffixSignal, 50, -30., 30. );
 }
 
 RelativeLikelihood::~RelativeLikelihood()
@@ -191,120 +191,123 @@ void RelativeLikelihood::analyze(const edm::Event& iEvent, const edm::EventSetup
   // Evaluate level 1 efficiency for multijet and met+jet
   if (responsePair.first || responsePair.second) ++l1Eff_;
 
-  // Take the offlineMEt
-  edm::Handle<OfflineMEt> offlineMEt;
-  iEvent.getByLabel( offlineMEtLabel_, offlineMEt );
+  // Continue only if the event passes the L1 trigger
+  if (responsePair.first) {
 
-  // ----------------------------------- //
-  // Determine the type of event from MC //
-  // ----------------------------------- //
-  edm::Handle < MCParticleCollection > MCpartons;
-  iEvent.getByLabel( MCParticleLabel_, MCpartons );
-  // The first index is for the Higgs decay, the second for the ttbar.
-  // Check ttHdecaysCounter for the decay codes.
-  pair<int,int> decayType(countTTHdecays_->countDecays(*MCpartons));
-  // ----------------------------------- //
+    // Take the offlineMEt
+    edm::Handle<OfflineMEt> offlineMEt;
+    iEvent.getByLabel( offlineMEtLabel_, offlineMEt );
 
-  // ------------------------------------------------ //
-  // Check if a good electron or muon is in the event //
-  // ------------------------------------------------ //
-  edm::Handle<OfflineJetCollection> caloJets;
-  iEvent.getByLabel( offlineJetLabel_, caloJets );
-  //  bool goodElectronFound = goodElectron( *simpleElectrons, *caloJets);
-  //  bool goodMuonFound = goodMuon( *globalMuons, *caloJets);
-  // ------------------------------------------------ //
+    // ----------------------------------- //
+    // Determine the type of event from MC //
+    // ----------------------------------- //
+    edm::Handle < MCParticleCollection > MCpartons;
+    iEvent.getByLabel( MCParticleLabel_, MCpartons );
+    // The first index is for the Higgs decay, the second for the ttbar.
+    // Check ttHdecaysCounter for the decay codes.
+    pair<int,int> decayType(countTTHdecays_->countDecays(*MCpartons));
+    // ----------------------------------- //
 
-  //--------------------------
-  // Reco vertex collection
-  //--------------------------
-  Handle<BaseVertexCollection> recVtxs;
-  BaseVertexCollection recoVertexes;
-  try {
-    iEvent.getByLabel( vtxLabel_ , recVtxs);
-  } 
-  catch (...) {
-    std::cerr << "Could not find the recovertex collection" << std::endl;
-    return;
-  } 
-  recoVertexes = *(recVtxs.product());
+    // ------------------------------------------------ //
+    // Check if a good electron or muon is in the event //
+    // ------------------------------------------------ //
+    edm::Handle<OfflineJetCollection> caloJets;
+    iEvent.getByLabel( offlineJetLabel_, caloJets );
+    //  bool goodElectronFound = goodElectron( *simpleElectrons, *caloJets);
+    //  bool goodMuonFound = goodMuon( *globalMuons, *caloJets);
+    // ------------------------------------------------ //
 
-  // Select only jets with Et>(JetEtCut_)GeV and Eta<(JetEtaCut_) and write them in the goodJets collection
-  vector<const OfflineJet *> goodJets;
-  vector<const OfflineJet *> goodbTaggedJets;
-
-  // Consider only the first 8 most energetic (Et) jets
-  // --------------------------------------------------
-  int numGoodJets = 0;
-
-  // Jet-Vertex Algorithm
-  // Need to define this outside the if clause, otherwise the objects will not survive it and the
-  // pointers stored in goodJets will be invalid.
-  OfflineJetCollection associatedJet;
-  if(vtxAssoc_){
-    associatedJet = jetVertexAssociator_->associate(*(caloJets.product()),recoVertexes);
-    for ( OfflineJetCollection::const_iterator assocJetIt = associatedJet.begin(); assocJetIt != associatedJet.end() && numGoodJets < 8; ++assocJetIt) {
-      //non metto i tagli in et ed eta sono  fatti internamente dall'algoritmo di associazione
-      goodJets.push_back(&(*assocJetIt));
-      ++numGoodJets;
-      // -------------------------------------------------------------- //
-      // -- THIS IS TEMPORARY, A MORE ACCURATE TAGGER SHOULD BE USED -- //
-      // -------------------------------------------------------------- //
-      // Consider as tagged those jets with highEff > 5.3.
-      // high eff -> 50.30% b / 10.77% c / 0.92% uds /  0.98% g / 0.96% udsg // P.Schilling 23/10/07
-      // Set the b-tag cut value
-      float medium = 5.3;
-	if ( assocJetIt->discriminatorHighEff()>medium ) goodbTaggedJets.push_back(&(*assocJetIt));
+    //--------------------------
+    // Reco vertex collection
+    //--------------------------
+    Handle<BaseVertexCollection> recVtxs;
+    BaseVertexCollection recoVertexes;
+    try {
+      iEvent.getByLabel( vtxLabel_ , recVtxs);
     }
-  } else {
-    for ( OfflineJetCollection::const_iterator allJetIt = caloJets->begin(); allJetIt != caloJets->end() && numGoodJets < 8; ++allJetIt ) {
-      if ( allJetIt->et() >= jetEtCut_ && fabs(allJetIt->eta())< jetEtaCut_ ) {
-	goodJets.push_back(&(*allJetIt));
+    catch (...) {
+      std::cerr << "Could not find the recovertex collection" << std::endl;
+      return;
+    }
+    recoVertexes = *(recVtxs.product());
+
+    // Select only jets with Et>(JetEtCut_)GeV and Eta<(JetEtaCut_) and write them in the goodJets collection
+    vector<const OfflineJet *> goodJets;
+    vector<const OfflineJet *> goodbTaggedJets;
+
+    // Consider only the first 8 most energetic (Et) jets
+    // --------------------------------------------------
+    int numGoodJets = 0;
+
+    // Jet-Vertex Algorithm
+    // Need to define this outside the if clause, otherwise the objects will not survive it and the
+    // pointers stored in goodJets will be invalid.
+    OfflineJetCollection associatedJet;
+    if(vtxAssoc_){
+      associatedJet = jetVertexAssociator_->associate(*(caloJets.product()),recoVertexes);
+      for ( OfflineJetCollection::const_iterator assocJetIt = associatedJet.begin(); assocJetIt != associatedJet.end() && numGoodJets < 8; ++assocJetIt) {
+        //non metto i tagli in et ed eta sono  fatti internamente dall'algoritmo di associazione
+        goodJets.push_back(&(*assocJetIt));
         ++numGoodJets;
-        
-	// -------------------------------------------------------------- //
-	// -- THIS IS TEMPORARY, A MORE ACCURATE TAGGER SHOULD BE USED -- //
-	// -------------------------------------------------------------- //
-	// Consider as tagged those jets with highEff > 5.3.
-	// high eff -> 50.30% b / 10.77% c / 0.92% uds /  0.98% g / 0.96% udsg // P.Schilling 23/10/07
-	// Set the b-tag cut value
-	float medium = 5.3;
-	if ( allJetIt->discriminatorHighEff()>medium ) goodbTaggedJets.push_back(&(*allJetIt));
+        // -------------------------------------------------------------- //
+        // -- THIS IS TEMPORARY, A MORE ACCURATE TAGGER SHOULD BE USED -- //
+        // -------------------------------------------------------------- //
+        // Consider as tagged those jets with highEff > 5.3.
+        // high eff -> 50.30% b / 10.77% c / 0.92% uds /  0.98% g / 0.96% udsg // P.Schilling 23/10/07
+        // Set the b-tag cut value
+        float medium = 5.3;
+	if ( assocJetIt->discriminatorHighEff()>medium ) goodbTaggedJets.push_back(&(*assocJetIt));
+      }
+    } else {
+      for ( OfflineJetCollection::const_iterator allJetIt = caloJets->begin(); allJetIt != caloJets->end() && numGoodJets < 8; ++allJetIt ) {
+        if ( allJetIt->et() >= jetEtCut_ && fabs(allJetIt->eta())< jetEtaCut_ ) {
+          goodJets.push_back(&(*allJetIt));
+          ++numGoodJets;
+
+          // -------------------------------------------------------------- //
+          // -- THIS IS TEMPORARY, A MORE ACCURATE TAGGER SHOULD BE USED -- //
+          // -------------------------------------------------------------- //
+          // Consider as tagged those jets with highEff > 5.3.
+          // high eff -> 50.30% b / 10.77% c / 0.92% uds /  0.98% g / 0.96% udsg // P.Schilling 23/10/07
+          // Set the b-tag cut value
+          float medium = 5.3;
+          if ( allJetIt->discriminatorHighEff()>medium ) goodbTaggedJets.push_back(&(*allJetIt));
+        }
       }
     }
+
+    // Preliminary cuts
+    // ----------------
+    if ( goodJets.size() >= 5 && offlineMEt->corrL3mEtSig() > 3. ){ // && goodbTaggedJets.size() >= 2 ) {
+
+      // If it is QCD, do not cut on the b-tags, but loop on all the combinations of jets
+      // --------------------------------------------------------------------------------
+      if ( useTagMatrixForQCD_ ) {
+        cout << "calling multiply for event = " << eventCounter_ << endl;
+        vector<vector<double> > eventVariablesVectors( qcdbTagMatrixMultiplier_->multiply( goodJets, &(*offlineMEt) ) );
+        cout << "number of vectors = " << eventVariablesVectors.size() << endl;
+        vector<vector<double> >::const_iterator eventVariablesVec = eventVariablesVectors.begin();
+        for( ; eventVariablesVec != eventVariablesVectors.end(); ++eventVariablesVec ) {
+          cout << "number of variable histograms for signal = " << histogramVariableSignal_.size() << endl;
+          cout << "number of variable histograms for background = " << histogramVariableBackground_.size() << endl;
+          cout << "number of variables in vector = " << eventVariablesVec->size() << endl;
+          if (histogramVariableSignal_.size() != eventVariablesVec->size() || histogramVariableBackground_.size() != eventVariablesVec->size()) cout << "ATTENTION: number of variables does not match number of loaded histograms." << endl;
+          evaluateLikelihood( *eventVariablesVec );
+        }
+      }
+      // For normal events evaluate likelihood
+      // -------------------------------------
+      else {
+        // Require at least two b-tags
+        if ( goodbTaggedJets.size() >= 2 ) {
+          pair<int,int> decayType2tags(countTTHdecays2tags_->countDecays(*MCpartons));
+          vector<double> eventVariablesVector( eventVariables2Tags_->fill( goodJets, goodbTaggedJets, &(*offlineMEt) ) );
+          if (histogramVariableSignal_.size() != eventVariablesVector.size() || histogramVariableBackground_.size() != eventVariablesVector.size()) cout << "ATTENTION: number of variables does not match number of loaded histograms." << endl;
+          evaluateLikelihood( eventVariablesVector );
+        } // end if at least two b-tags
+      }
+    } // end preliminary cuts
   }
-
-  // Preliminary cuts
-  // ----------------
-  if ( goodJets.size() >= 5 && offlineMEt->corrL3mEtSig() > 3. ){ // && goodbTaggedJets.size() >= 2 ) {
-
-    // If it is QCD, do not cut on the b-tags, but loop on all the combinations of jets
-    // --------------------------------------------------------------------------------
-    if ( useTagMatrixForQCD_ ) {
-      cout << "calling multiply for event = " << eventCounter_ << endl;
-      vector<vector<double> > eventVariablesVectors( qcdbTagMatrixMultiplier_->multiply( goodJets, &(*offlineMEt) ) );
-      cout << "number of vectors = " << eventVariablesVectors.size() << endl;
-      vector<vector<double> >::const_iterator eventVariablesVec = eventVariablesVectors.begin();
-      for( ; eventVariablesVec != eventVariablesVectors.end(); ++eventVariablesVec ) {
-        cout << "number of variable histograms for signal = " << histogramVariableSignal_.size() << endl;
-        cout << "number of variable histograms for background = " << histogramVariableBackground_.size() << endl;
-        cout << "number of variables in vector = " << eventVariablesVec->size() << endl;
-        if (histogramVariableSignal_.size() != eventVariablesVec->size() || histogramVariableBackground_.size() != eventVariablesVec->size()) cout << "ATTENTION: number of variables does not match number of loaded histograms." << endl;
-        evaluateLikelihood( *eventVariablesVec );
-      }
-    }
-    // For normal events evaluate likelihood
-    // -------------------------------------
-    else {
-      // Require at least two b-tags
-      if ( goodbTaggedJets.size() >= 2 ) {
-        pair<int,int> decayType2tags(countTTHdecays2tags_->countDecays(*MCpartons));
-        vector<double> eventVariablesVector( eventVariables2Tags_->fill( goodJets, goodbTaggedJets, &(*offlineMEt) ) );
-        if (histogramVariableSignal_.size() != eventVariablesVector.size() || histogramVariableBackground_.size() != eventVariablesVector.size()) cout << "ATTENTION: number of variables does not match number of loaded histograms." << endl;
-        evaluateLikelihood( eventVariablesVector );
-      } // end if at least two b-tags
-    }
-  } // end preliminary cuts
-
 }
 
 void RelativeLikelihood::evaluateLikelihood( const vector<double> & eventVariablesVector ) {
@@ -365,9 +368,9 @@ void RelativeLikelihood::evaluateLikelihood( const vector<double> & eventVariabl
   double relativeLikelihood = 0.;
 
   if ( ratiosProduct >= 0. ) relativeLikelihood = log(ratiosProduct);
-  else relativeLikelihood = -9.99;
-  if ( relativeLikelihood < -10. ) relativeLikelihood = -9.99;
-  if ( relativeLikelihood > 10. ) relativeLikelihood = 9.99;
+  else relativeLikelihood = -29.99;
+  if ( relativeLikelihood < -30. ) relativeLikelihood = -29.99;
+  if ( relativeLikelihood > 30. ) relativeLikelihood = 29.99;
 
   cout << "relativeLikelihood = ";
 
