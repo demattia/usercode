@@ -1,0 +1,5 @@
+To create the cfg files needed, go in a subdirectory and use the "CreateCfgs.sh" script.
+It will start from the cfg already there and generate new ones.
+
+To launch the jobs on the batch queues first modify the batch.cfg configuration file accordingly (in particular all the paths) and then use the "LaunchBatch.py" script.
+Using the batch queues is only possible from the lxplus machines.
