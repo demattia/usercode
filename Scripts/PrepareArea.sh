@@ -21,9 +21,16 @@ mv UserCode/DeMattia/PixelJet CMSSW_1_8_4/src/AnalysisExamples
 # Copy PixelJetFinder
 cvs co UserCode/DeMattia/PixelJetFinder
 mv UserCode/DeMattia/PixelJetFinder CMSSW_1_8_4/src/AnalysisExamples
+# Copy ttHMEtplusJetsAnalyzer
+cvs co UserCode/DeMattia/ttHMEtplusJetsAnalyzer
+mv UserCode/DeMattia/ttHMEtplusJetsAnalyzer CMSSW_1_8_4/src/AnalysisExamples
 
 # Remove UserCode dir
 rm -r UserCode
+
+# Comment the TDAna as it is not working now
+mv CMSSW_1_8_4/src/AnalysisExamples/L1PixelAnalyzer/src/TDAna.cc CMSSW_1_8_4/src/AnalysisExamples/L1PixelAnalyzer/src/TDAna.cc_backup
+mv CMSSW_1_8_4/src/AnalysisExamples/L1PixelAnalyzer/src/TDAna.h CMSSW_1_8_4/src/AnalysisExamples/L1PixelAnalyzer/src/TDAna.h_backup
 
 # Not sure this works, better to do it outside
 #echo Compiling the area
