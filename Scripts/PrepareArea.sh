@@ -30,7 +30,7 @@ rm -r UserCode
 
 # Comment the TDAna as it is not working now
 mv CMSSW_1_8_4/src/AnalysisExamples/L1PixelAnalyzer/src/TDAna.cc CMSSW_1_8_4/src/AnalysisExamples/L1PixelAnalyzer/src/TDAna.cc_backup
-mv CMSSW_1_8_4/src/AnalysisExamples/L1PixelAnalyzer/src/TDAna.h CMSSW_1_8_4/src/AnalysisExamples/L1PixelAnalyzer/src/TDAna.h_backup
+mv CMSSW_1_8_4/src/AnalysisExamples/L1PixelAnalyzer/interface/TDAna.h CMSSW_1_8_4/src/AnalysisExamples/L1PixelAnalyzer/interface/TDAna.h_backup
 
 # Not sure this works, better to do it outside
 #echo Compiling the area
