@@ -18,6 +18,8 @@ else:
     print
     f=open(sys.argv[1])
 
+randomSeeds = ""
+
 for line in f:
     # Process only lines that do not start with # and are not empty
     if not(line.startswith("#")) and line != "\n":
@@ -136,23 +138,26 @@ for type in range(typeNum):
                     # Loop on all the random seeds and change them
                     seedFound = False
                     for seed in randomSeeds:
-                        #if (s.find(seed) != -1 and (s.find(seed+str('.')) == -1 ) and (s.find("replace") == -1 )):
-                        if (s.find(seed) != -1):
-                            temp = s.split("=")
-                            try:
-                                seedValue = int(temp[1].strip())
-                            # If the name of the seed matches another name there could be two cases:
-                            # 1) There is no value beyond the "=" (or no equal at all) -> IndexError is thrown
-                            # 2) The value past the "=" is not convertible to an integer -> ValueError is thrown
-                            # In both cases the unchanged line is written.
-                            # ATTENTION: this script cannot distinguish between real seeds and no seeds. If the
-                            # expression seedName = seedValue is matched it will change the second number.
-                            except (ValueError, IndexError):
-                                break
-                            # Otherwise the seed value is changed
-                            else:
-                                outFile.write(s.replace( str(seedValue), str(seedValue + i) ))
-                                seedFound = True
+                        # Check if the seed is defined and not empty
+                        # (otherwise it would match all the lines and start changeing all the values).
+                        if (seed != ""):
+                            #if (s.find(seed) != -1 and (s.find(seed+str('.')) == -1 ) and (s.find("replace") == -1 )):
+                            if (s.find(seed) != -1):
+                                temp = s.split("=")
+                                try:
+                                    seedValue = int(temp[1].strip())
+                                # If the name of the seed matches another name there could be two cases:
+                                # 1) There is no value beyond the "=" (or no equal at all) -> IndexError is thrown
+                                # 2) The value past the "=" is not convertible to an integer -> ValueError is thrown
+                                # In both cases the unchanged line is written.
+                                # ATTENTION: this script cannot distinguish between real seeds and no seeds. If the
+                                # expression seedName = seedValue is matched it will change the second number.
+                                except (ValueError, IndexError):
+                                    break
+                                # Otherwise the seed value is changed
+                                else:
+                                    outFile.write(s.replace( str(seedValue), str(seedValue + i) ))
+                                    seedFound = True
                     if (not(seedFound)):
                         outFile.write(s)
             else:
@@ -186,8 +191,8 @@ for type in range(typeNum):
         skipEvents += int(eventsPerJob[type])
 
         # Make the batch script executable and run it
-        os.system("chmod 777 " + batchFileName)
-        os.system("bsub -R \"pool>40\" -q 8nh -J " + tempCfgFileName + "<" + batchFileName)
+        #os.system("chmod 777 " + batchFileName)
+        #os.system("bsub -R \"pool>40\" -q 8nh -J " + tempCfgFileName + "<" + batchFileName)
 
     # end of loop on jobs
 
