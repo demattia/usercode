@@ -17,7 +17,6 @@ else
     # -l counts the newlines
     totlines=`cat temp_filelist.txt | wc -l`
 
-    echo "  untracked vstring fileNames = {" >> local_cff.py
     echo "import FWCore.ParameterSet.Config as cms" >> local_cff.py
     echo "">> local_cff.py
     echo "source = cms.Source(\"PoolSource\"," >> local_cff.py
