@@ -1,5 +1,7 @@
 #!/bin/sh
 
+# Argument is the directory with full path, including the / at the end
+
 if [ "$1" == "" ]; then
     echo Please provide a directory, full path
     exit
@@ -25,10 +27,10 @@ else
 
     for line in `cat temp_filelist.txt`; do
         if [ "$i" != "$totlines" ]; then
-            echo "    \""file:$1/$line"\"," >> local_cff.py
+            echo "    \""file:$1$line"\"," >> local_cff.py
         else
             # Do not put the "," at the end of the last file
-            echo "    \""file:$1/$line"\"" >> local_cff.py
+            echo "    \""file:$1$line"\"" >> local_cff.py
         fi
         i=$[$i+1]
     done
