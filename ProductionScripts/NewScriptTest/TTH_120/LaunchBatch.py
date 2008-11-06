@@ -205,8 +205,8 @@ for type in range(typeNum):
         skipEvents += int(eventsPerJob[type])
 
         # Make the batch script executable and run it
-        # os.system("chmod 777 " + batchFileName)
-        # os.system("bsub -R \"pool>40\" -q 8nh -J " + tempCfgFileName + "<" + batchFileName)
+        os.system("chmod 777 " + batchFileName)
+        os.system("bsub -R \"pool>40\" -q 8nh -J " + tempCfgFileName + "<" + batchFileName)
 
     # end of loop on jobs
 
