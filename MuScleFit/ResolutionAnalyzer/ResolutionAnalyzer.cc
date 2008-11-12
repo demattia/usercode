@@ -2,6 +2,7 @@
 #define RESOLUTIONANALYZER_CC
 
 #include "ResolutionAnalyzer.h"
+#include "Functions.h"
 
 //
 // constants, enums and typedefs
@@ -21,6 +22,16 @@ ResolutionAnalyzer::ResolutionAnalyzer(const edm::ParameterSet& iConfig) :
   debug_( iConfig.getUntrackedParameter<bool>( "Debug" ) )
 {
   //now do what ever initialization is needed
+
+  // Initial parameters values
+  // -------------------------
+  int resolFitType = iConfig.getParameter<int>("ResolFitType");
+  MuScleFitUtils::ResolFitType = resolFitType;
+  MuScleFitUtils::resolutionFunction = resolutionFunctionArray[resolFitType];
+  MuScleFitUtils::resolutionFunctionForVec = resolutionFunctionArrayForVec[resolFitType];
+
+  MuScleFitUtils::parResol = iConfig.getParameter<vector<double> >("parResol");
+
   MuScleFitUtils::resfind = iConfig.getParameter<vector<int> >("ResFind");
 
   outputFile_ = new TFile(theRootFileName_.c_str(), "RECREATE");
@@ -28,6 +39,7 @@ ResolutionAnalyzer::ResolutionAnalyzer(const edm::ParameterSet& iConfig) :
   fillHistoMap();
 
   eventCounter_ = 0;
+  resonance_ = iConfig.getUntrackedParameter<bool>( "Resonance" );
 }
 
 
@@ -36,6 +48,7 @@ ResolutionAnalyzer::~ResolutionAnalyzer()
   outputFile_->cd();
   writeHistoMap();
   outputFile_->Close();
+  cout << "Total analyzed events = " << eventCounter_ << endl;
 }
 
 
@@ -70,8 +83,8 @@ void ResolutionAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup
   Handle<SimTrackContainer> simTracks;
   try {
     iEvent.getByLabel ("g4SimHits",simTracks);
-  } catch (...) { 
-    cout << "SimTracks not existent" << endl;
+  } catch (...) {
+    cout << "SimTracks not existent, not using them" << endl;
   }
 
   // Take the reco-muons, depending on the type selected in the cfg
@@ -95,104 +108,202 @@ void ResolutionAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup
     muons = fillMuonCollection(*tracks);
   }
 
-  // Find the best reconstructed resonance
-  // -------------------------------------
+  if ( resonance_ ) {
 
-  reco::Particle::LorentzVector recMu1 = reco::Particle::LorentzVector(0,0,0,0);
-  reco::Particle::LorentzVector recMu2 = reco::Particle::LorentzVector(0,0,0,0);
-  pair<lorentzVector,lorentzVector> recoRes = MuScleFitUtils::findBestRecoRes(muons);
-  if (MuScleFitUtils::ResFound) {
-    if (debug_>0) {
-      cout <<setprecision(9)<< "Pt after findbestrecores: " << (recoRes.first).Pt() << " " 
-           << (recoRes.second).Pt() << endl;
-      cout << "recMu1 = " << recMu1 << endl;
-      cout << "recMu2 = " << recMu2 << endl;
+    // Find the best reconstructed resonance
+    // -------------------------------------
+    reco::Particle::LorentzVector recMu1 = reco::Particle::LorentzVector(0,0,0,0);
+    reco::Particle::LorentzVector recMu2 = reco::Particle::LorentzVector(0,0,0,0);
+    pair<lorentzVector,lorentzVector> recoRes = MuScleFitUtils::findBestRecoRes(muons);
+    if (MuScleFitUtils::ResFound) {
+      if (debug_>0) {
+        cout <<setprecision(9)<< "Pt after findbestrecores: " << (recoRes.first).Pt() << " " 
+             << (recoRes.second).Pt() << endl;
+        cout << "recMu1 = " << recMu1 << endl;
+        cout << "recMu2 = " << recMu2 << endl;
+      }
+      recMu1 = recoRes.first;
+      recMu2 = recoRes.second;
+      if (debug_>0) {
+        cout << "after recMu1 = " << recMu1 << endl;
+        cout << "after recMu2 = " << recMu2 << endl;
+        cout << "mu1.pt = " << recMu1.Pt() << endl;
+        cout << "mu2.pt = " << recMu2.Pt() << endl;
+      }
     }
-    recMu1 = recoRes.first;
-    recMu2 = recoRes.second;
-    if (debug_>0) {
-      cout << "after recMu1 = " << recMu1 << endl;
-      cout << "after recMu2 = " << recMu2 << endl;
-      cout << "mu1.pt = " << recMu1.Pt() << endl;
-      cout << "mu2.pt = " << recMu2.Pt() << endl;
+
+    // Histograms with genParticles characteristics
+    // --------------------------------------------
+
+    //first is always mu-, second is always mu+
+    pair <reco::Particle::LorentzVector, reco::Particle::LorentzVector> genMu = MuScleFitUtils::findGenMuFromRes(evtMC);
+
+    reco::Particle::LorentzVector genMother( genMu.first + genMu.second );
+
+    mapHisto_["GenMother"]->Fill( genMother );
+
+    // Match the reco muons with the gen and sim tracks
+    // ------------------------------------------------
+    if(checkDeltaR(genMu.first,recMu1)){
+      mapHisto_["PtResolutionGenVSMu"]->Fill(recMu1,(-genMu.first.Pt()+recMu1.Pt())/genMu.first.Pt(),-1);
+      mapHisto_["ThetaResolutionGenVSMu"]->Fill(recMu1,(-genMu.first.Theta()+recMu1.Theta()),-1);
+      mapHisto_["CotgThetaResolutionGenVSMu"]->Fill(recMu1,(-cos(genMu.first.Theta())/sin(genMu.first.Theta())
+                                                                 +cos(recMu1.Theta())/sin(recMu1.Theta())),-1);
+      mapHisto_["EtaResolutionGenVSMu"]->Fill(recMu1,(-genMu.first.Eta()+recMu1.Eta()),-1);
+      mapHisto_["PhiResolutionGenVSMu"]->Fill(recMu1,(-genMu.first.Phi()+recMu1.Phi()),-1);
+    }
+    if(checkDeltaR(genMu.second,recMu2)){
+      mapHisto_["PtResolutionGenVSMu"]->Fill(recMu2,(-genMu.second.Pt()+recMu2.Pt())/genMu.second.Pt(),+1);
+      mapHisto_["ThetaResolutionGenVSMu"]->Fill(recMu2,(-genMu.second.Theta()+recMu2.Theta()),+1);
+      mapHisto_["CotgThetaResolutionGenVSMu"]->Fill(recMu2,(-cos(genMu.second.Theta())/sin(genMu.second.Theta())
+                                                                  +cos(recMu2.Theta())/sin(recMu2.Theta())),+1);
+      mapHisto_["EtaResolutionGenVSMu"]->Fill(recMu2,(-genMu.second.Eta()+recMu2.Eta()),+1);
+      mapHisto_["PhiResolutionGenVSMu"]->Fill(recMu2,(-genMu.second.Phi()+recMu2.Phi()),+1);
+    }
+
+    if( simTracks.isValid() ) {
+      pair <reco::Particle::LorentzVector, reco::Particle::LorentzVector> simMu = MuScleFitUtils::findSimMuFromRes(evtMC,simTracks);
+      reco::Particle::LorentzVector simResonance( simMu.first+simMu.second );
+      mapHisto_["SimResonance"]->Fill( simResonance );
+
+      //first is always mu-, second is always mu+
+      if(checkDeltaR(simMu.first,recMu1)){
+        mapHisto_["PtResolutionSimVSMu"]->Fill(recMu1,(-simMu.first.Pt()+recMu1.Pt())/simMu.first.Pt(),-1);
+        mapHisto_["ThetaResolutionSimVSMu"]->Fill(recMu1,(-simMu.first.Theta()+recMu1.Theta()),-1);
+        mapHisto_["CotgThetaResolutionSimVSMu"]->Fill(recMu1,(-cos(simMu.first.Theta())/sin(simMu.first.Theta())
+                                                                   +cos(recMu1.Theta())/sin(recMu1.Theta())),-1);
+        mapHisto_["EtaResolutionSimVSMu"]->Fill(recMu1,(-simMu.first.Eta()+recMu1.Eta()),-1);
+        mapHisto_["PhiResolutionSimVSMu"]->Fill(recMu1,(-simMu.first.Phi()+recMu1.Phi()),-1);
+      }
+      if(checkDeltaR(simMu.second,recMu2)){
+        mapHisto_["PtResolutionSimVSMu"]->Fill(recMu2,(-simMu.second.Pt()+recMu2.Pt())/simMu.first.Pt(),+1);
+        mapHisto_["ThetaResolutionSimVSMu"]->Fill(recMu2,(-simMu.second.Theta()+recMu2.Theta()),+1);
+        mapHisto_["CotgThetaResolutionSimVSMu"]->Fill(recMu2,(-cos(simMu.second.Theta())/sin(simMu.second.Theta())
+                                                                    +cos(recMu2.Theta())/sin(recMu2.Theta())),+1);
+        mapHisto_["EtaResolutionSimVSMu"]->Fill(recMu2,(-simMu.second.Eta()+recMu2.Eta()),+1);
+        mapHisto_["PhiResolutionSimVSMu"]->Fill(recMu2,(-simMu.second.Phi()+recMu2.Phi()),+1);
+      }
+    }
+
+    // Fill the mass resolution histograms
+    // -----------------------------------
+    // check if the recoMuons match the genMuons
+    // if( MuScleFitUtils::ResFound && checkDeltaR(simMu.first,recMu1) && checkDeltaR(simMu.second,recMu2) ) {
+    if( MuScleFitUtils::ResFound && checkDeltaR(genMu.first,recMu1) && checkDeltaR(genMu.second,recMu2) ) {
+      double resMass = (recMu1+recMu2).mass();
+      double genMass = (genMu.first + genMu.second).mass();
+      // first is always mu-, second is always mu+
+      mapHisto_["MassResolution"]->Fill(recMu1, -1, genMu.first, recMu2, +1, genMu.second, resMass, genMass);
+
+      // Fill the reconstructed resonance
+      reco::Particle::LorentzVector recoResonance( recMu1+recMu2 );
+      mapHisto_["RecoResonance"]->Fill( recoResonance );
+    }
+  } // end if resonance
+  else {
+
+    // Loop on the recMuons
+    vector<reco::LeafCandidate>::const_iterator recMuon = muons.begin();
+    for ( ; recMuon!=muons.end(); ++recMuon ) {  
+      int charge = recMuon->charge();
+
+      lorentzVector recMu(recMuon->p4());
+
+      // Find the matching MC muon
+      const HepMC::GenEvent* Evt = evtMC->GetEvent();
+      //Loop on generated particles
+      map<double, lorentzVector> genAssocMap;
+      HepMC::GenEvent::particle_const_iterator part = Evt->particles_begin();
+      for( ; part!=Evt->particles_end(); ++part ) {
+        if (fabs((*part)->pdg_id())==13 && (*part)->status()==1) {
+          lorentzVector genMu = (lorentzVector((*part)->momentum().px(),(*part)->momentum().py(),
+                                 (*part)->momentum().pz(),(*part)->momentum().e()));
+
+          double deltaR = sqrt(MuScleFitUtils::deltaPhi(recMu.Phi(),genMu.Phi()) * MuScleFitUtils::deltaPhi(recMu.Phi(),genMu.Phi()) +
+                               ((recMu.Eta()-genMu.Eta()) * (recMu.Eta()-genMu.Eta())));
+
+          // 13 for the muon (-1) and -13 for the antimuon (+1), thus pdg*charge = -13.
+          // Only in this case we consider it matching.
+          if( ((*part)->pdg_id())*charge == -13 ) genAssocMap.insert(make_pair(deltaR, genMu));
+        }
+      }
+      // Take the closest in deltaR
+      lorentzVector genMu(genAssocMap.begin()->second);
+
+      // Histograms with genParticles characteristics
+      // --------------------------------------------
+
+      if(checkDeltaR(genMu,recMu)){
+        mapHisto_["PtResolutionGenVSMu"]->Fill(genMu,(-genMu.Pt()+recMu.Pt())/genMu.Pt(),charge);
+        mapHisto_["ThetaResolutionGenVSMu"]->Fill(genMu,(-genMu.Theta()+recMu.Theta()),charge);
+        mapHisto_["CotgThetaResolutionGenVSMu"]->Fill(genMu,(-cos(genMu.Theta())/sin(genMu.Theta())
+                                                             +cos(recMu.Theta())/sin(recMu.Theta())),charge);
+        mapHisto_["EtaResolutionGenVSMu"]->Fill(genMu,(-genMu.Eta()+recMu.Eta()),charge);
+        mapHisto_["PhiResolutionGenVSMu"]->Fill(genMu,(-genMu.Phi()+recMu.Phi()),charge);
+      }
+
+      // Find the matching simMu
+      if( simTracks.isValid() ) {
+        map<double, lorentzVector> simAssocMap;
+        for ( vector<SimTrack>::const_iterator simMuon=simTracks->begin(); simMuon!=simTracks->end(); ++simMuon ) {
+          lorentzVector simMu = lorentzVector(simMuon->momentum().px(),simMuon->momentum().py(),
+                                              simMuon->momentum().pz(),simMuon->momentum().e());
+
+          double deltaR = sqrt(MuScleFitUtils::deltaPhi(recMu.Phi(),simMu.Phi()) * MuScleFitUtils::deltaPhi(recMu.Phi(),simMu.Phi()) +
+                               ((recMu.Eta()-simMu.Eta()) * (recMu.Eta()-simMu.Eta())));
+
+          if( simMuon->charge()*charge == 1 ) simAssocMap.insert(make_pair(deltaR, simMu));
+        }
+        lorentzVector simMu(genAssocMap.begin()->second);
+
+        //first is always mu-, second is always mu+
+        if(checkDeltaR(simMu,recMu)) {
+          mapHisto_["PtResolutionSimVSMu"]->Fill(simMu,(-simMu.Pt()+recMu.Pt())/simMu.Pt(),charge);
+          mapHisto_["ThetaResolutionSimVSMu"]->Fill(simMu,(-simMu.Theta()+recMu.Theta()),charge);
+          mapHisto_["CotgThetaResolutionSimVSMu"]->Fill(simMu,(-cos(simMu.Theta())/sin(simMu.Theta())
+                                                               +cos(recMu.Theta())/sin(recMu.Theta())),charge);
+          mapHisto_["EtaResolutionSimVSMu"]->Fill(simMu,(-simMu.Eta()+recMu.Eta()),charge);
+          mapHisto_["PhiResolutionSimVSMu"]->Fill(simMu,(-simMu.Phi()+recMu.Phi()),charge);
+        }
+      }
     }
   }
 
-  // Match the reco muons with the gen and sim tracks
-  // ------------------------------------------------
-
-  pair <reco::Particle::LorentzVector, reco::Particle::LorentzVector> genMu = MuScleFitUtils::findGenMuFromRes(evtMC);
-  //first is always mu-, second is always mu+
-  if(checkDeltaR(genMu.first,recMu1)){
-    mapHisto_["hResolPtGenVSMu"]->Fill(genMu.first,(-genMu.first.Pt()+recMu1.Pt())/genMu.first.Pt(),-1);
-    mapHisto_["hResolThetaGenVSMu"]->Fill(genMu.first,(-genMu.first.Theta()+recMu1.Theta()),-1);
-    mapHisto_["hResolCotgThetaGenVSMu"]->Fill(genMu.first,(-cos(genMu.first.Theta())/sin(genMu.first.Theta())
-                                                          +cos(recMu1.Theta())/sin(recMu1.Theta())),-1);
-    mapHisto_["hResolEtaGenVSMu"]->Fill(genMu.first,(-genMu.first.Eta()+recMu1.Eta()),-1);
-    mapHisto_["hResolPhiGenVSMu"]->Fill(genMu.first,(-genMu.first.Phi()+recMu1.Phi()),-1);
-  }
-  if(checkDeltaR(genMu.second,recMu2)){
-    mapHisto_["hResolPtGenVSMu"]->Fill(genMu.second,(-genMu.second.Pt()+recMu2.Pt())/genMu.second.Pt(),+1);
-    mapHisto_["hResolThetaGenVSMu"]->Fill(genMu.second,(-genMu.second.Theta()+recMu2.Theta()),+1);
-    mapHisto_["hResolCotgThetaGenVSMu"]->Fill(genMu.second,(-cos(genMu.second.Theta())/sin(genMu.second.Theta())
-                                                           +cos(recMu2.Theta())/sin(recMu2.Theta())),+1);
-    mapHisto_["hResolEtaGenVSMu"]->Fill(genMu.second,(-genMu.second.Eta()+recMu2.Eta()),+1);
-    mapHisto_["hResolPhiGenVSMu"]->Fill(genMu.second,(-genMu.second.Phi()+recMu2.Phi()),+1);
-  }
-  pair <reco::Particle::LorentzVector, reco::Particle::LorentzVector> simMu = MuScleFitUtils::findSimMuFromRes(evtMC,simTracks);
-  //first is always mu-, second is always mu+
-  if(checkDeltaR(simMu.first,recMu1)){
-    mapHisto_["hResolPtSimVSMu"]->Fill(simMu.first,(-simMu.first.Pt()+recMu1.Pt())/simMu.first.Pt(),-1);
-    mapHisto_["hResolThetaSimVSMu"]->Fill(simMu.first,(-simMu.first.Theta()+recMu1.Theta()),-1);
-    mapHisto_["hResolCotgThetaSimVSMu"]->Fill(simMu.first,(-cos(simMu.first.Theta())/sin(simMu.first.Theta())
-                                                          +cos(recMu1.Theta())/sin(recMu1.Theta())),-1);
-    mapHisto_["hResolEtaSimVSMu"]->Fill(simMu.first,(-simMu.first.Eta()+recMu1.Eta()),-1);
-    mapHisto_["hResolPhiSimVSMu"]->Fill(simMu.first,(-simMu.first.Phi()+recMu1.Phi()),-1);
-  }
-  if(checkDeltaR(simMu.second,recMu2)){
-    mapHisto_["hResolPtSimVSMu"]->Fill(simMu.second,(-simMu.second.Pt()+recMu2.Pt())/simMu.first.Pt(),+1);
-    mapHisto_["hResolThetaSimVSMu"]->Fill(simMu.second,(-simMu.second.Theta()+recMu2.Theta()),+1);
-    mapHisto_["hResolCotgThetaSimVSMu"]->Fill(simMu.second,(-cos(simMu.second.Theta())/sin(simMu.second.Theta())
-                                                           +cos(recMu2.Theta())/sin(recMu2.Theta())),+1);
-    mapHisto_["hResolEtaSimVSMu"]->Fill(simMu.second,(-simMu.second.Eta()+recMu2.Eta()),+1);
-    mapHisto_["hResolPhiSimVSMu"]->Fill(simMu.second,(-simMu.second.Phi()+recMu2.Phi()),+1);
-  }
-
-  // Fill the mass resolution histograms
-  // -----------------------------------
-  // check if the recoMuons match the genMuons
-  if( MuScleFitUtils::ResFound && checkDeltaR(simMu.first,recMu1) && checkDeltaR(simMu.second,recMu2) ) {
-    double resMass = (recMu1+recMu2).mass();
-    double genMass = (genMu.first + genMu.second).mass();
-    // first is always mu-, second is always mu+
-    mapHisto_["hResolMassVSMu"]->Fill(recMu1, -1, recMu2, +1, resMass, genMass);
-  }
 }
 
 void ResolutionAnalyzer::fillHistoMap() {
-  //Reconstructed muon kinematics
-  //-----------------------------
-  mapHisto_["hRecBestMu"]             = new HParticle         ("hRecBestMu");
-  mapHisto_["hRecBestMu_Acc"]         = new HParticle         ("hRecBestMu_Acc"); 
-  mapHisto_["hDeltaRecBestMu"]        = new HDelta            ("hDeltaRecBestMu");
 
-  mapHisto_["hRecBestRes"]            = new HParticle         ("hRecBestRes");
-  mapHisto_["hRecBestRes_Acc"]        = new HParticle         ("hRecBestRes_Acc"); 
-  mapHisto_["hRecBestResVSMu"]        = new HMassVSPart       ("hRecBestResVSMu");
+  outputFile_->cd();
+  mapHisto_["GenMother"] = new HParticle(outputFile_, "GenMother");
+  mapHisto_["SimResonance"] = new HParticle(outputFile_, "SimResonance");
+  mapHisto_["RecoResonance"] = new HParticle(outputFile_, "RecoResonance");
+
+  //   //Reconstructed muon kinematics
+  //   //-----------------------------
+  //   mapHisto_["hRecBestMu"]             = new HParticle         ("hRecBestMu");
+  //   mapHisto_["hRecBestMu_Acc"]         = new HParticle         ("hRecBestMu_Acc"); 
+  //   mapHisto_["hDeltaRecBestMu"]        = new HDelta            ("hDeltaRecBestMu");
+
+  //   mapHisto_["hRecBestRes"]            = new HParticle         ("hRecBestRes");
+  //   mapHisto_["hRecBestRes_Acc"]        = new HParticle         ("hRecBestRes_Acc"); 
+  //   mapHisto_["hRecBestResVSMu"]        = new HMassVSPart       ("hRecBestResVSMu");
 
   //Resolution VS muon kinematic
   //----------------------------
-  mapHisto_["hResolMassVSMu"]         = new HMassResolutionVSPart ("hResolMassVSMu");
-  mapHisto_["hResolPtGenVSMu"]        = new HMassResolutionVSPart ("hResolPtGenVSMu");
-  mapHisto_["hResolPtSimVSMu"]        = new HMassResolutionVSPart ("hResolPtSimVSMu");
-  mapHisto_["hResolEtaGenVSMu"]       = new HMassResolutionVSPart ("hResolEtaGenVSMu");
-  mapHisto_["hResolEtaSimVSMu"]       = new HMassResolutionVSPart ("hResolEtaSimVSMu");
-  mapHisto_["hResolThetaGenVSMu"]     = new HMassResolutionVSPart ("hResolThetaGenVSMu");
-  mapHisto_["hResolThetaSimVSMu"]     = new HMassResolutionVSPart ("hResolThetaSimVSMu");
-  mapHisto_["hResolCotgThetaGenVSMu"] = new HMassResolutionVSPart ("hResolCotgThetaGenVSMu");
-  mapHisto_["hResolCotgThetaSimVSMu"] = new HMassResolutionVSPart ("hResolCotgThetaSimVSMu");
-  mapHisto_["hResolPhiGenVSMu"]       = new HMassResolutionVSPart ("hResolPhiGenVSMu");
-  mapHisto_["hResolPhiSimVSMu"]       = new HMassResolutionVSPart ("hResolPhiSimVSMu");
+  mapHisto_["PtResolutionGenVSMu"]        =  new HResolutionVSPart (outputFile_, "PtResolutionGenVSMu");
+  mapHisto_["PtResolutionSimVSMu"]        =  new HResolutionVSPart (outputFile_, "PtResolutionSimVSMu");
+  mapHisto_["EtaResolutionGenVSMu"]       =  new HResolutionVSPart (outputFile_, "EtaResolutionGenVSMu");
+  mapHisto_["EtaResolutionSimVSMu"]       =  new HResolutionVSPart (outputFile_, "EtaResolutionSimVSMu");
+  mapHisto_["ThetaResolutionGenVSMu"]     =  new HResolutionVSPart (outputFile_, "ThetaResolutionGenVSMu");
+  mapHisto_["ThetaResolutionSimVSMu"]     =  new HResolutionVSPart (outputFile_, "ThetaResolutionSimVSMu");
+  mapHisto_["CotgThetaResolutionGenVSMu"] =  new HResolutionVSPart (outputFile_, "CotgThetaResolutionGenVSMu");
+  mapHisto_["CotgThetaResolutionSimVSMu"] =  new HResolutionVSPart (outputFile_, "CotgThetaResolutionSimVSMu");
+  mapHisto_["PhiResolutionGenVSMu"]       =  new HResolutionVSPart (outputFile_, "PhiResolutionGenVSMu", -0.05, 0.05);
+  mapHisto_["PhiResolutionSimVSMu"]       =  new HResolutionVSPart (outputFile_, "PhiResolutionSimVSMu");
+
+  // Mass resolution
+  // ---------------
+  mapHisto_["MassResolution"] = new HMassResolutionVSPart (outputFile_,"MassResolution");
 
   //  mapHisto_["hResolRecoMassVSGenMassVSPt"] = new HResolutionVSPart
 }
@@ -204,7 +315,7 @@ void ResolutionAnalyzer::writeHistoMap() {
   }
 }
 
-bool ResolutionAnalyzer::checkDeltaR(reco::Particle::LorentzVector& genMu, reco::Particle::LorentzVector& recMu){
+bool ResolutionAnalyzer::checkDeltaR(const reco::Particle::LorentzVector & genMu, const reco::Particle::LorentzVector & recMu){
   //first is always mu-, second is always mu+
   double deltaR = sqrt(MuScleFitUtils::deltaPhi(recMu.Phi(),genMu.Phi()) * MuScleFitUtils::deltaPhi(recMu.Phi(),genMu.Phi()) +
 			 ((recMu.Eta()-genMu.Eta()) * (recMu.Eta()-genMu.Eta())));

@@ -99,7 +99,7 @@ private:
   /// Writes the histograms in the map
   void writeHistoMap();
   /// Returns true if the two particles have DeltaR < cut
-  bool checkDeltaR(reco::Particle::LorentzVector& genMu, reco::Particle::LorentzVector& recMu);
+  bool checkDeltaR(const reco::Particle::LorentzVector & genMu, const reco::Particle::LorentzVector & recMu);
 
   // ----------member data ---------------------------
 
@@ -114,6 +114,7 @@ private:
   TFile * outputFile_;
 
   int eventCounter_;
+  bool resonance_;
 };
 
 #endif // RESOLUTIONANALYZER_HH
