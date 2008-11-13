@@ -5,33 +5,36 @@
  * needs a cast to use it outside), if not returns
  * a null pointer and also does a cout saying it did not find it.
  * ATTENTION: if the same name matches more than one histogram in different
- * subdirectories, only the last match will be returned.
+ * subdirectories, only the last match will be returned and a warning will be
+ * given. In this case, the directory name can be passed to select the correct match.
  */
 
 // If you need to compile this macro, uncomment the following includes:
 // --------------------------------------------------------------------
 // Needed to use gROOT in a compiled macro
-// #include "TROOT.h"
-// #include <string.h>
-// #include "TH1.h"
-// #include "TChain.h"
-// #include "TFile.h"
-// #include "TTree.h"
-// #include "TKey.h"
-// #include "Riostream.h"
-// #include "TCanvas.h"
+#include "TROOT.h"
+#include <string.h>
+#include "TH1.h"
+#include "TChain.h"
+#include "TFile.h"
+#include "TTree.h"
+#include "TKey.h"
+#include "Riostream.h"
+#include "TCanvas.h"
 
 class HistoFinder {
  public:
   HistoFinder() { histoFound_ = 0; }
-  TObject * operator()( const TString & name, TDirectory * input ) {
+  TObject * operator()( const TString & name, TDirectory * input, const TString & dirName = "" ) {
     histoFound_ = 0;
-    findHisto_( name, input );
+    histoFoundNum_ = 0;
+    findHisto_( name, input, dirName );
     if( histoFound_ == 0 ) cout << "WARNING: histogram " << name << " not found" << endl;
+    if( histoFoundNum_ > 1 ) cout << "WARNING: more than one match found. Please specify the directory" << endl;
     return histoFound_;
   }
  protected:
-  void findHisto_( const TString & name, TDirectory * input ) {
+  void findHisto_( const TString & name, TDirectory * input, const TString & dirName = "" ) {
 
     TIter nextkey( input->GetListOfKeys() );
     TKey *key, *oldkey=0;
@@ -45,12 +48,17 @@ class HistoFinder {
 
       if ( obj->IsA()->InheritsFrom( "TH1" ) ) {
         // If it matches the name, return it
-        if( name == obj->GetName() ) histoFound_ = obj;
+        if( dirName == "" || dirName == input->GetName() ) {
+          if( name == obj->GetName() ) {
+            histoFound_ = obj;
+            ++histoFoundNum_;
+          }
+        }
       }
       else if ( obj->IsA()->InheritsFrom( "TDirectory" ) ) {
         // it's a subdirectory
         // cout << "Found subdirectory " << obj->GetName() << endl;
-        findHisto_( name, (TDirectory*)obj );
+        findHisto_( name, (TDirectory*)obj, dirName );
       }
       else {
         // object is of no type that we know or can handle
@@ -60,4 +68,5 @@ class HistoFinder {
     }
   }
   TObject * histoFound_;
+  int histoFoundNum_;
 };
