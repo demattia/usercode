@@ -117,7 +117,7 @@ for type in range(typeNum):
         skipEventsFound = False
 
         # To find maxEvents value, even if on different lines
-        maxEventsFound = False
+        insideMaxEvents = False
 
         # print cfgFile[type].strip()
         for s in open(cfgFile[type].strip()):
@@ -131,20 +131,22 @@ for type in range(typeNum):
                     outFile.write(s.replace( temp, str(eventsPerJob[type]) ))
 
                 # Set the maxEvents variable for the job
-                if( (s.find("maxEvents") != -1 or not maxEventsFound) and pythonCfg ):
+                elif( (s.find("maxEvents") != -1 or insideMaxEvents) and pythonCfg ):
                     if( s.find("input") != -1 ):
                         temp = s.split("(")
+                        insideMaxEvents = False
                         temp = temp[1].split(")")[0].strip()
-                        maxEventsFound = True
                         # print "temp = " + temp
                         outFile.write(s.replace( temp, str(eventsPerJob[type]) ))
                     else:
+                        insideMaxEvents = True
                         outFile.write(s);
                 # Set the skipEvents variable
                 elif( s.find("skipEvents") != -1 and useSkipEventsType == True ):
                     temp = s.split("=")
                     temp = temp[1].strip()
-                    # print temp
+                    if( pythonCfg ):
+                        temp = (temp.split("(")[1]).split(")")[0]
                     outFile.write(s.replace( temp, str(skipEvents) ))
                     skipEventsFound = True
                 # Change the output file name
@@ -177,7 +179,7 @@ for type in range(typeNum):
             else:
                 outFile.write(s)
 
-        if skipEventsFound == False and useSkipEvents == True:
+        if skipEventsFound == False and useSkipEventsType == True:
             print 'No skipEvents field found in the cfg file, please add it to the source module'
             exit()
 

@@ -52,6 +52,8 @@ for line in f:
             randomSeeds = varValue.split(',')
         if varName == 'useSkipEvents':
             useSkipEvents = varValue.split(',')
+        if varName == 'pythonCfg':
+            pythonCfg = varValue.split(',')
 
 # print "totalNumberOfEvents = " + str(totalNumberOfEvents)
 # print "eventsPerJob = " + str(int(eventsPerJob[0]))
@@ -107,25 +109,44 @@ for type in range(typeNum):
         outFile = str((cfgFile[type].strip())).split('.')
         outFile = outFile[len(outFile)-2].split('/')
         outFile = outFile[len(outFile)-1]
-        outFile = open(workingDir[type].strip()+"/"+outFile+"_"+str(i)+".cfg", 'w')
+        if( not pythonCfg ):
+            outFile = open(workingDir[type].strip()+"/"+outFile+"_"+str(i)+".cfg", 'w')
+        else:
+            outFile = open(workingDir[type].strip()+"/"+outFile+"_"+str(i)+"_cfg.py", 'w')
 
         skipEventsFound = False
+
+        # To find maxEvents value, even if on different lines
+        insideMaxEvents = False
 
         # print cfgFile[type].strip()
         for s in open(cfgFile[type].strip()):
 
             if( not(s.startswith("#")) ):
                 # Set the maxEvents variable for the job
-                if( s.find("maxEvents") != -1 ):
+                if( s.find("maxEvents") != -1 and not pythonCfg ):
                     temp = s.split("=")
                     temp = temp[2].split("}")[0].strip()
                     # print "temp = " + temp
                     outFile.write(s.replace( temp, str(eventsPerJob[type]) ))
+
+                # Set the maxEvents variable for the job
+                elif( (s.find("maxEvents") != -1 or insideMaxEvents) and pythonCfg ):
+                    if( s.find("input") != -1 ):
+                        temp = s.split("(")
+                        insideMaxEvents = False
+                        temp = temp[1].split(")")[0].strip()
+                        # print "temp = " + temp
+                        outFile.write(s.replace( temp, str(eventsPerJob[type]) ))
+                    else:
+                        insideMaxEvents = True
+                        outFile.write(s);
                 # Set the skipEvents variable
                 elif( s.find("skipEvents") != -1 and useSkipEventsType == True ):
                     temp = s.split("=")
                     temp = temp[1].strip()
-                    # print temp
+                    if( pythonCfg ):
+                        temp = (temp.split("(")[1]).split(")")[0]
                     outFile.write(s.replace( temp, str(skipEvents) ))
                     skipEventsFound = True
                 # Change the output file name
@@ -158,7 +179,7 @@ for type in range(typeNum):
             else:
                 outFile.write(s)
 
-        if skipEventsFound == False and useSkipEvents == True:
+        if skipEventsFound == False and useSkipEventsType == True:
             print 'No skipEvents field found in the cfg file, please add it to the source module'
             exit()
 
