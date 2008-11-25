@@ -141,6 +141,9 @@ void ResolutionAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup
     reco::Particle::LorentzVector genMother( genMu.first + genMu.second );
 
     mapHisto_["GenMother"]->Fill( genMother );
+    mapHisto_["DeltaGenMotherMuons"]->Fill( genMu.first, genMu.second );
+    mapHisto_["GenMotherMuons"]->Fill( genMu.first );
+    mapHisto_["GenMotherMuons"]->Fill( genMu.second );
 
     // Match the reco muons with the gen and sim tracks
     // ------------------------------------------------
@@ -148,7 +151,7 @@ void ResolutionAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup
       mapHisto_["PtResolutionGenVSMu"]->Fill(recMu1,(-genMu.first.Pt()+recMu1.Pt())/genMu.first.Pt(),-1);
       mapHisto_["ThetaResolutionGenVSMu"]->Fill(recMu1,(-genMu.first.Theta()+recMu1.Theta()),-1);
       mapHisto_["CotgThetaResolutionGenVSMu"]->Fill(recMu1,(-cos(genMu.first.Theta())/sin(genMu.first.Theta())
-                                                                 +cos(recMu1.Theta())/sin(recMu1.Theta())),-1);
+                                                            +cos(recMu1.Theta())/sin(recMu1.Theta())),-1);
       mapHisto_["EtaResolutionGenVSMu"]->Fill(recMu1,(-genMu.first.Eta()+recMu1.Eta()),-1);
       mapHisto_["PhiResolutionGenVSMu"]->Fill(recMu1,(-genMu.first.Phi()+recMu1.Phi()),-1);
     }
@@ -156,7 +159,7 @@ void ResolutionAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup
       mapHisto_["PtResolutionGenVSMu"]->Fill(recMu2,(-genMu.second.Pt()+recMu2.Pt())/genMu.second.Pt(),+1);
       mapHisto_["ThetaResolutionGenVSMu"]->Fill(recMu2,(-genMu.second.Theta()+recMu2.Theta()),+1);
       mapHisto_["CotgThetaResolutionGenVSMu"]->Fill(recMu2,(-cos(genMu.second.Theta())/sin(genMu.second.Theta())
-                                                                  +cos(recMu2.Theta())/sin(recMu2.Theta())),+1);
+                                                            +cos(recMu2.Theta())/sin(recMu2.Theta())),+1);
       mapHisto_["EtaResolutionGenVSMu"]->Fill(recMu2,(-genMu.second.Eta()+recMu2.Eta()),+1);
       mapHisto_["PhiResolutionGenVSMu"]->Fill(recMu2,(-genMu.second.Phi()+recMu2.Phi()),+1);
     }
@@ -165,6 +168,9 @@ void ResolutionAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup
       pair <reco::Particle::LorentzVector, reco::Particle::LorentzVector> simMu = MuScleFitUtils::findSimMuFromRes(evtMC,simTracks);
       reco::Particle::LorentzVector simResonance( simMu.first+simMu.second );
       mapHisto_["SimResonance"]->Fill( simResonance );
+      mapHisto_["DeltaSimResonanceMuons"]->Fill( simMu.first, simMu.second );
+      mapHisto_["SimResonanceMuons"]->Fill( simMu.first );
+      mapHisto_["SimResonanceMuons"]->Fill( simMu.second );
 
       //first is always mu-, second is always mu+
       if(checkDeltaR(simMu.first,recMu1)){
@@ -198,6 +204,9 @@ void ResolutionAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup
       // Fill the reconstructed resonance
       reco::Particle::LorentzVector recoResonance( recMu1+recMu2 );
       mapHisto_["RecoResonance"]->Fill( recoResonance );
+      mapHisto_["DeltaRecoResonanceMuons"]->Fill( recMu1, recMu2 );
+      mapHisto_["RecoResonanceMuons"]->Fill( recMu1 );
+      mapHisto_["RecoResonanceMuons"]->Fill( recMu2 );
     }
   } // end if resonance
   else {
@@ -274,9 +283,26 @@ void ResolutionAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup
 void ResolutionAnalyzer::fillHistoMap() {
 
   outputFile_->cd();
-  mapHisto_["GenMother"] = new HParticle(outputFile_, "GenMother");
-  mapHisto_["SimResonance"] = new HParticle(outputFile_, "SimResonance");
-  mapHisto_["RecoResonance"] = new HParticle(outputFile_, "RecoResonance");
+  // Resonances
+  // If no Z is required, use a smaller mass range.
+  double minMass = 0.;
+  double maxMass = 200.;
+  if( MuScleFitUtils::resfind[0] != 1 ) {
+    maxMass = 30.;
+  }
+  mapHisto_["GenMother"]               = new HParticle(outputFile_, "GenMother", minMass, maxMass);
+  mapHisto_["SimResonance"]            = new HParticle(outputFile_, "SimResonance", minMass, maxMass);
+  mapHisto_["RecoResonance"]           = new HParticle(outputFile_, "RecoResonance", minMass, maxMass);
+
+  // Resonance muons
+  mapHisto_["GenMotherMuons"]          = new HParticle(outputFile_, "GenMotherMuons", minMass, 1.);
+  mapHisto_["SimResonanceMuons"]       = new HParticle(outputFile_, "SimResonanceMuons", minMass, 1.);
+  mapHisto_["RecoResonanceMuons"]      = new HParticle(outputFile_, "RecoResonanceMuons", minMass, 1.);
+
+  // Deltas between resonance muons
+  mapHisto_["DeltaGenMotherMuons"]     = new HDelta (outputFile_, "DeltaGenMotherMuons");
+  mapHisto_["DeltaSimResonanceMuons"]  = new HDelta (outputFile_, "DeltaSimResonanceMuons");
+  mapHisto_["DeltaRecoResonanceMuons"] = new HDelta (outputFile_, "DeltaRecoResonanceMuons");
 
   //   //Reconstructed muon kinematics
   //   //-----------------------------
