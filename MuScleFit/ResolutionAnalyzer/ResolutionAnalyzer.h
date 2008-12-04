@@ -115,6 +115,9 @@ private:
 
   int eventCounter_;
   bool resonance_;
+
+  HCovarianceVSxy * massResolutionVsPtEta_;
+  TH2D * massResolutionFromFunction_;
 };
 
 #endif // RESOLUTIONANALYZER_HH

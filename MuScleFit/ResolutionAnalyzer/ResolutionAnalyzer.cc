@@ -207,6 +207,35 @@ void ResolutionAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup
       mapHisto_["DeltaRecoResonanceMuons"]->Fill( recMu1, recMu2 );
       mapHisto_["RecoResonanceMuons"]->Fill( recMu1 );
       mapHisto_["RecoResonanceMuons"]->Fill( recMu2 );
+
+      // Fill the covariances histograms
+      mapHisto_["Covariances"]->Fill(recMu1, genMu.first, recMu2, genMu.second);
+
+      // Fill the mass resolution (computed from MC), we use the covariance class to compute the variance
+      if( genMass != 0 ) {
+        double diffMass = (resMass - genMass)/genMass;
+        // Fill if for both muons
+        double pt1 = recMu1.pt();
+        double eta1 = recMu1.eta();
+        double pt2 = recMu2.pt();
+        double eta2 = recMu2.eta();
+        massResolutionVsPtEta_->Fill(pt1, eta1, diffMass, diffMass);
+        massResolutionVsPtEta_->Fill(pt2, eta2, diffMass, diffMass);
+        // Fill with mass resolution from resolution function
+        double massRes = MuScleFitUtils::massResolution(recMu1, recMu2, MuScleFitUtils::parResol);
+        // The value given by massRes is already divided by the mass, since the derivative functions have mass at the denominator.
+        // We alos take the squared value, since var = sigma^2.
+        massResolutionFromFunction_->Fill(pt1, eta1, pow(massRes,2));
+        massResolutionFromFunction_->Fill(pt2, eta2, pow(massRes,2));
+      }
+
+      // Fill resolution functions for the muons (fill the squared value to make it comparable with the variance)
+      mapHisto_["hFunctionResolPt"]->Fill( recMu1, pow(MuScleFitUtils::resolutionFunctionForVec->sigmaPt(recMu1.Pt(), recMu1.Eta(), MuScleFitUtils::parResol ),2), -1 );
+      mapHisto_["hFunctionResolCotgTheta"]->Fill( recMu1, pow(MuScleFitUtils::resolutionFunctionForVec->sigmaCotgTh(recMu1.Pt(), recMu1.Eta(), MuScleFitUtils::parResol ),2), -1 );
+      mapHisto_["hFunctionResolPhi"]->Fill( recMu1, pow(MuScleFitUtils::resolutionFunctionForVec->sigmaPhi(recMu1.Pt(), recMu1.Eta(), MuScleFitUtils::parResol ),2), -1 );
+      mapHisto_["hFunctionResolPt"]->Fill( recMu2, pow(MuScleFitUtils::resolutionFunctionForVec->sigmaPt(recMu2.Pt(), recMu2.Eta(), MuScleFitUtils::parResol ),2), +1 );
+      mapHisto_["hFunctionResolCotgTheta"]->Fill( recMu2, pow(MuScleFitUtils::resolutionFunctionForVec->sigmaCotgTh(recMu2.Pt(), recMu2.Eta(), MuScleFitUtils::parResol ),2), +1 );
+      mapHisto_["hFunctionResolPhi"]->Fill( recMu2, pow(MuScleFitUtils::resolutionFunctionForVec->sigmaPhi(recMu2.Pt(), recMu2.Eta(), MuScleFitUtils::parResol ),2), +1 );
     }
   } // end if resonance
   else {
@@ -316,22 +345,39 @@ void ResolutionAnalyzer::fillHistoMap() {
 
   //Resolution VS muon kinematic
   //----------------------------
-  mapHisto_["PtResolutionGenVSMu"]        =  new HResolutionVSPart (outputFile_, "PtResolutionGenVSMu");
-  mapHisto_["PtResolutionSimVSMu"]        =  new HResolutionVSPart (outputFile_, "PtResolutionSimVSMu");
-  mapHisto_["EtaResolutionGenVSMu"]       =  new HResolutionVSPart (outputFile_, "EtaResolutionGenVSMu");
-  mapHisto_["EtaResolutionSimVSMu"]       =  new HResolutionVSPart (outputFile_, "EtaResolutionSimVSMu");
-  mapHisto_["ThetaResolutionGenVSMu"]     =  new HResolutionVSPart (outputFile_, "ThetaResolutionGenVSMu");
-  mapHisto_["ThetaResolutionSimVSMu"]     =  new HResolutionVSPart (outputFile_, "ThetaResolutionSimVSMu");
-  mapHisto_["CotgThetaResolutionGenVSMu"] =  new HResolutionVSPart (outputFile_, "CotgThetaResolutionGenVSMu");
-  mapHisto_["CotgThetaResolutionSimVSMu"] =  new HResolutionVSPart (outputFile_, "CotgThetaResolutionSimVSMu");
-  mapHisto_["PhiResolutionGenVSMu"]       =  new HResolutionVSPart (outputFile_, "PhiResolutionGenVSMu", -0.05, 0.05);
-  mapHisto_["PhiResolutionSimVSMu"]       =  new HResolutionVSPart (outputFile_, "PhiResolutionSimVSMu");
+  mapHisto_["PtResolutionGenVSMu"]        = new HResolutionVSPart (outputFile_, "PtResolutionGenVSMu");
+  mapHisto_["PtResolutionSimVSMu"]        = new HResolutionVSPart (outputFile_, "PtResolutionSimVSMu");
+  mapHisto_["EtaResolutionGenVSMu"]       = new HResolutionVSPart (outputFile_, "EtaResolutionGenVSMu");
+  mapHisto_["EtaResolutionSimVSMu"]       = new HResolutionVSPart (outputFile_, "EtaResolutionSimVSMu");
+  mapHisto_["ThetaResolutionGenVSMu"]     = new HResolutionVSPart (outputFile_, "ThetaResolutionGenVSMu");
+  mapHisto_["ThetaResolutionSimVSMu"]     = new HResolutionVSPart (outputFile_, "ThetaResolutionSimVSMu");
+  mapHisto_["CotgThetaResolutionGenVSMu"] = new HResolutionVSPart (outputFile_, "CotgThetaResolutionGenVSMu");
+  mapHisto_["CotgThetaResolutionSimVSMu"] = new HResolutionVSPart (outputFile_, "CotgThetaResolutionSimVSMu");
+  mapHisto_["PhiResolutionGenVSMu"]       = new HResolutionVSPart (outputFile_, "PhiResolutionGenVSMu", -0.05, 0.05);
+  mapHisto_["PhiResolutionSimVSMu"]       = new HResolutionVSPart (outputFile_, "PhiResolutionSimVSMu");
+
+  // Covariances between muons kinematic quantities
+  // ----------------------------------------------
+  double ptMax = 200.;
+  if (TString(outputFile_->GetName()).Contains("Y")) ptMax = 40.;
+  mapHisto_["Covariances"] = new HCovarianceVSParts ( outputFile_, "Covariance", ptMax );
 
   // Mass resolution
   // ---------------
   mapHisto_["MassResolution"] = new HMassResolutionVSPart (outputFile_,"MassResolution");
 
   //  mapHisto_["hResolRecoMassVSGenMassVSPt"] = new HResolutionVSPart
+
+  // Mass resolution vs (pt, eta) of the muons from MC
+  massResolutionVsPtEta_ = new HCovarianceVSxy ( "Mass", "Mass", 20, 0., ptMax, 20, -3, 3 );
+  // Mass resolution vs (pt, eta) of the muons from function
+  massResolutionFromFunction_ = new TH2D("massResolutionFromFunction", "mass resolution from function", 40, 0, ptMax, 40, -3, 3);
+
+  // Muons resolutions from resolution functions
+  // -------------------------------------------
+  mapHisto_["hFunctionResolPt"]        = new HFunctionResolution (outputFile_, "hFunctionResolPt");
+  mapHisto_["hFunctionResolCotgTheta"] = new HFunctionResolution (outputFile_, "hFunctionResolCotgTheta");
+  mapHisto_["hFunctionResolPhi"]       = new HFunctionResolution (outputFile_, "hFunctionResolPhi");
 }
 
 void ResolutionAnalyzer::writeHistoMap() {
@@ -339,6 +385,9 @@ void ResolutionAnalyzer::writeHistoMap() {
        histo!=mapHisto_.end(); histo++) {
     (*histo).second->Write();
   }
+  outputFile_->cd();
+  massResolutionVsPtEta_->Write();
+  massResolutionFromFunction_->Write();
 }
 
 bool ResolutionAnalyzer::checkDeltaR(const reco::Particle::LorentzVector & genMu, const reco::Particle::LorentzVector & recMu){
