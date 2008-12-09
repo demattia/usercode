@@ -81,7 +81,7 @@ EventVariables::EventVariables( const string & higgsFileName, const string & had
   eventVariablesNames_.push_back( "bTagTkInvMass" );
 
   // Create the TTree for the TMVA
-  tmvaTreeWriterPtr_.reset(new TMVAtreeWriter(eventVariablesNames_, suffix + tmvaSuffix));
+  tmvaTreeWriterPtr_.reset(new TMVAtreeWriter<double>(eventVariablesNames_, suffix + tmvaSuffix));
 
   if ( fillHistograms_ ) {
 
