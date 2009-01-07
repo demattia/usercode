@@ -1,0 +1,13 @@
+<use name=CondFormats/DataRecord>
+<use name=CondCore/DBCommon>
+<use name=FWCore/PluginManager>
+<use name=CondCore/PluginSystem>
+<flags EDM_PLUGIN=1>
+<export>
+   <lib name=MuonAnalysisMomentumScaleCalibrationObjectsPlugins>
+   <use name=MuonAnalysis/MomentumScaleCalibrationObjects>
+   <use name=CondFormats/DataRecord>
+   <use name=CondCore/DBCommon>
+   <use name=FWCore/PluginManager>
+   <use name=CondCore/PluginSystem>
+</export>
