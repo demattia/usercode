@@ -1,3 +1,4 @@
 <lcgdict>
         <class name="MuScleFitLikelihoodPdf"/>
+        <class name="MuScleFitScale"/>
 </lcgdict>   
