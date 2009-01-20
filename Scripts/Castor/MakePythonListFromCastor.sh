@@ -7,6 +7,8 @@ if [ "$1" == "" ]; then
     exit
 else
 
+    echo Reminder: the path must be provided with the "/" at the end.
+
     rfdir $1 | awk '{print $9}'> temp_filelist.txt
 
     if [ -e castor.cff ]; then
@@ -24,12 +26,14 @@ else
 
     i=1
 
+    #dir=`echo $1 | sed s-/castor/cern.ch--g`
+
     for line in `cat temp_filelist.txt`; do
         if [ "$i" != "$totlines" ]; then
-            echo "    \""file:$1$line"\"," >> castor_cff.py
+            echo "    \""rfio:$1$line"\"," >> castor_cff.py
         else
             # Do not put the "," at the end of the last file
-            echo "    \""file:$1$line"\"" >> castor_cff.py
+            echo "    \""rfio:$1$line"\"" >> castor_cff.py
         fi
         i=$[$i+1]
     done
