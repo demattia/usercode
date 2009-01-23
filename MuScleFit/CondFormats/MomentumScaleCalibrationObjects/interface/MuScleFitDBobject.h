@@ -6,7 +6,8 @@
 struct MuScleFitDBobject
 {
   std::vector<int> identifiers;
-  std::vector<std::vector<double> > parameters;
+  std::vector<double> parameters;
+  std::vector<double> fitQuality;
 };
 
 #endif // MuScleFitDBobject
