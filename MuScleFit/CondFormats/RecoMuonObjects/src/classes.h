@@ -4,6 +4,5 @@ namespace {
   // std::vector<PhysicsTools::Calibration::HistogramD2D> a;
   // std::vector<std::string> b;
   // std::vector<int> c;
-  MuScleFitLikelihoodPdf d;
   MuScleFitDBobject e;
 }
