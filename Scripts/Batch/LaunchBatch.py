@@ -18,8 +18,6 @@ else:
     print
     f=open(sys.argv[1])
 
-randomSeeds = ""
-
 for line in f:
     # Process only lines that do not start with # and are not empty
     if not(line.startswith("#")) and line != "\n":
@@ -54,6 +52,8 @@ for line in f:
             randomSeeds = varValue.split(',')
         if varName == 'useSkipEvents':
             useSkipEvents = varValue.split(',')
+        if varName == 'pythonCfg':
+            pythonCfg = varValue.split(',')
 
 # print "totalNumberOfEvents = " + str(totalNumberOfEvents)
 # print "eventsPerJob = " + str(int(eventsPerJob[0]))
@@ -109,20 +109,37 @@ for type in range(typeNum):
         outFile = str((cfgFile[type].strip())).split('.')
         outFile = outFile[len(outFile)-2].split('/')
         outFile = outFile[len(outFile)-1]
-        outFile = open(workingDir[type].strip()+"/"+outFile+"_"+str(i)+".cfg", 'w')
+        if( not pythonCfg ):
+            outFile = open(workingDir[type].strip()+"/"+outFile+"_"+str(i)+".cfg", 'w')
+        else:
+            outFile = open(workingDir[type].strip()+"/"+outFile+"_"+str(i)+"_cfg.py", 'w')
 
         skipEventsFound = False
+
+        # To find maxEvents value, even if on different lines
+        maxEventsFound = False
 
         # print cfgFile[type].strip()
         for s in open(cfgFile[type].strip()):
 
             if( not(s.startswith("#")) ):
                 # Set the maxEvents variable for the job
-                if( s.find("maxEvents") != -1 ):
+                if( s.find("maxEvents") != -1 and not pythonCfg ):
                     temp = s.split("=")
                     temp = temp[2].split("}")[0].strip()
                     # print "temp = " + temp
                     outFile.write(s.replace( temp, str(eventsPerJob[type]) ))
+
+                # Set the maxEvents variable for the job
+                if( (s.find("maxEvents") != -1 or not maxEventsFound) and pythonCfg ):
+                    if( s.find("input") != -1 ):
+                        temp = s.split("(")
+                        temp = temp[1].split(")")[0].strip()
+                        maxEventsFound = True
+                        # print "temp = " + temp
+                        outFile.write(s.replace( temp, str(eventsPerJob[type]) ))
+                    else:
+                        outFile.write(s);
                 # Set the skipEvents variable
                 elif( s.find("skipEvents") != -1 and useSkipEventsType == True ):
                     temp = s.split("=")
@@ -138,32 +155,29 @@ for type in range(typeNum):
                     # Loop on all the random seeds and change them
                     seedFound = False
                     for seed in randomSeeds:
-                        # Check if the seed is defined and not empty
-                        # (otherwise it would match all the lines and start changeing all the values).
-                        if (seed != ""):
-                            #if (s.find(seed) != -1 and (s.find(seed+str('.')) == -1 ) and (s.find("replace") == -1 )):
-                            if (s.find(seed) != -1):
-                                temp = s.split("=")
-                                try:
-                                    seedValue = int(temp[1].strip())
-                                # If the name of the seed matches another name there could be two cases:
-                                # 1) There is no value beyond the "=" (or no equal at all) -> IndexError is thrown
-                                # 2) The value past the "=" is not convertible to an integer -> ValueError is thrown
-                                # In both cases the unchanged line is written.
-                                # ATTENTION: this script cannot distinguish between real seeds and no seeds. If the
-                                # expression seedName = seedValue is matched it will change the second number.
-                                except (ValueError, IndexError):
-                                    break
-                                # Otherwise the seed value is changed
-                                else:
-                                    outFile.write(s.replace( str(seedValue), str(seedValue + i) ))
-                                    seedFound = True
+                        #if (s.find(seed) != -1 and (s.find(seed+str('.')) == -1 ) and (s.find("replace") == -1 )):
+                        if (s.find(seed) != -1):
+                            temp = s.split("=")
+                            try:
+                                seedValue = int(temp[1].strip())
+                            # If the name of the seed matches another name there could be two cases:
+                            # 1) There is no value beyond the "=" (or no equal at all) -> IndexError is thrown
+                            # 2) The value past the "=" is not convertible to an integer -> ValueError is thrown
+                            # In both cases the unchanged line is written.
+                            # ATTENTION: this script cannot distinguish between real seeds and no seeds. If the
+                            # expression seedName = seedValue is matched it will change the second number.
+                            except (ValueError, IndexError):
+                                break
+                            # Otherwise the seed value is changed
+                            else:
+                                outFile.write(s.replace( str(seedValue), str(seedValue + i) ))
+                                seedFound = True
                     if (not(seedFound)):
                         outFile.write(s)
             else:
                 outFile.write(s)
 
-        if skipEventsFound == False and useSkipEventsType == True:
+        if skipEventsFound == False and useSkipEvents == True:
             print 'No skipEvents field found in the cfg file, please add it to the source module'
             exit()
 
@@ -177,7 +191,10 @@ for type in range(typeNum):
                 tempCfgFileName = cfgFile[type].split('/')
                 tempCfgFileName = (tempCfgFileName[len(tempCfgFileName)-1].split('.')[0]).strip()
                 currentDir = os.getcwd()
-                batchFile.write(s.replace('cfgFile', currentDir.strip() + "/" + workingDir[type].strip() + "/"+ tempCfgFileName+'_'+str(i)+'.cfg'))
+                if( not pythonCfg ):
+                    batchFile.write(s.replace('cfgFile', currentDir.strip() + "/" + workingDir[type].strip() + "/"+ tempCfgFileName+'_'+str(i)+'.cfg'))
+                else:
+                    batchFile.write(s.replace('cfgFile', currentDir.strip() + "/" + workingDir[type].strip() + "/"+ tempCfgFileName+'_'+str(i)+'_cfg.py'))
                 # Get the current working dir
             elif( s.find("outFileName") != -1 ):
                 temp = outFileName[type].split('.')
@@ -191,8 +208,8 @@ for type in range(typeNum):
         skipEvents += int(eventsPerJob[type])
 
         # Make the batch script executable and run it
-        #os.system("chmod 777 " + batchFileName)
-        #os.system("bsub -R \"pool>40\" -q 8nh -J " + tempCfgFileName + "<" + batchFileName)
+        os.system("chmod 777 " + batchFileName)
+        os.system("bsub -R \"pool>40\" -q 8nh -J " + tempCfgFileName + "<" + batchFileName)
 
     # end of loop on jobs
 
