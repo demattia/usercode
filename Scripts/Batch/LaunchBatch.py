@@ -159,7 +159,10 @@ for type in range(typeNum):
                         if (s.find(seed) != -1):
                             temp = s.split("=")
                             try:
-                                seedValue = int(temp[1].strip())
+                                if( not pythonCfg ):
+                                    seedValue = int(temp[1].strip())
+                                if( pythonCfg ):
+                                    seedValue = int(temp[1].split("(")[1].split(")")[0].strip())
                             # If the name of the seed matches another name there could be two cases:
                             # 1) There is no value beyond the "=" (or no equal at all) -> IndexError is thrown
                             # 2) The value past the "=" is not convertible to an integer -> ValueError is thrown
@@ -209,7 +212,7 @@ for type in range(typeNum):
 
         # Make the batch script executable and run it
         os.system("chmod 777 " + batchFileName)
-        os.system("bsub -R \"pool>40\" -q 8nh -J " + tempCfgFileName + "<" + batchFileName)
+        #os.system("bsub -R \"pool>40\" -q 8nh -J " + tempCfgFileName + "<" + batchFileName)
 
     # end of loop on jobs
 
