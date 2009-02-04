@@ -112,7 +112,7 @@ for type in range(typeNum):
         if( not pythonCfg ):
             outFile = open(workingDir[type].strip()+"/"+outFile+"_"+str(i)+".cfg", 'w')
         else:
-            outFile = open(workingDir[type].strip()+"/"+outFile+"_"+str(i)+"_cfg.py", 'w')
+            outFile = open(workingDir[type].strip()+"/"+outFile+"_"+str(i)+".py", 'w')
 
         skipEventsFound = False
 
@@ -134,7 +134,7 @@ for type in range(typeNum):
                 if( (s.find("maxEvents") != -1 or not maxEventsFound) and pythonCfg ):
                     if( s.find("input") != -1 ):
                         temp = s.split("(")
-                        temp = temp[1].split(")")[0].strip()
+                        temp = temp[2].split(")")[0].strip()
                         maxEventsFound = True
                         # print "temp = " + temp
                         outFile.write(s.replace( temp, str(eventsPerJob[type]) ))
@@ -194,7 +194,7 @@ for type in range(typeNum):
                 if( not pythonCfg ):
                     batchFile.write(s.replace('cfgFile', currentDir.strip() + "/" + workingDir[type].strip() + "/"+ tempCfgFileName+'_'+str(i)+'.cfg'))
                 else:
-                    batchFile.write(s.replace('cfgFile', currentDir.strip() + "/" + workingDir[type].strip() + "/"+ tempCfgFileName+'_'+str(i)+'_cfg.py'))
+                    batchFile.write(s.replace('cfgFile', currentDir.strip() + "/" + workingDir[type].strip() + "/"+ tempCfgFileName+'_'+str(i)+'.py'))
                 # Get the current working dir
             elif( s.find("outFileName") != -1 ):
                 temp = outFileName[type].split('.')
