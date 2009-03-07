@@ -7,6 +7,8 @@ if [ "$1" == "" ]; then
     exit
 else
 
+    echo "Reminder: the path must be provided including the / at the end"
+
     ls $1/ > temp_filelist.txt
 
     if [ -e local_cff.py ]; then
