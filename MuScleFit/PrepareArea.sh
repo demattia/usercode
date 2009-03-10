@@ -6,7 +6,7 @@ scramv1 project CMSSW CMSSW_2_2_5
 
 echo CMSSW area created
 
-cd CMSSW_2_2_5
+cd CMSSW_2_2_5/src
 # eval `scramv1 r -sh`
 
 cvs co -R MuonAnalysis/MomentumScaleCalibration
