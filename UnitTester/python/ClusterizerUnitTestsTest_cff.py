@@ -24,6 +24,13 @@ def BuildTestElement(label, parameters) :
         Parameters = parameters
         )
 
+def BuildFixture(label, fixtureName, parameters) :
+    return cms.PSet(
+        Label = cms.string(label),
+        FixtureName = cms.string(fixtureName),
+        Parameters = parameters
+        )
+
 # ----------------------------------------------------- #
 # End of fixed functions to be moved to a separate file #
 # ----------------------------------------------------- #
@@ -40,33 +47,118 @@ def BuildCluster(firstStrip, amplitudes) :
         Amplitudes = cms.vuint32(amplitudes),
         )
 
-def BuildAlgo(label, firstStrip, amplitudes) :
+def BuildOldAlgo(algorithm, channelThreshold, seedThreshold, clusterThreshold, maxSequentialHoles, qualityLabel) :
+    #return cms.PSet(
+    return cms.PSet( Algorithm = cms.string(algorithm),
+                     ChannelThreshold = cms.double(channelThreshold),
+                     SeedThreshold    = cms.double(seedThreshold),
+                     ClusterThreshold = cms.double(clusterThreshold),
+                     MaxSequentialHoles = cms.uint32(maxSequentialHoles),
+                     QualityLabel = cms.string(qualityLabel)
+                     # ),
+                     )
+
+def BuildNewAlgo(algorithm, channelThreshold, seedThreshold,
+                 clusterThreshold, maxSequentialHoles, maxSequentialBad,
+                 maxAdjacentBad, qualityLabel) :
+    return cms.PSet( Algorithm = cms.string(algorithm),
+                     ChannelThreshold = cms.double(channelThreshold),
+                     SeedThreshold = cms.double(seedThreshold),
+                     ClusterThreshold = cms.double(clusterThreshold),
+                     MaxSequentialHoles = cms.uint32(maxSequentialHoles),
+                     MaxSequentialBad = cms.uint32(maxSequentialBad),
+                     MaxAdjacentBad = cms.uint32(maxAdjacentBad),
+                     QualityLabel = cms.string(qualityLabel)
+                     )
+
+def BuildDigiSet(detId, digi) :
     return cms.PSet(
-        Label = cms.string(label),
-        Parameters = cms.PSet(),
+        DetId = cms.uint32(detId),
+        DigiSet = cms.VPSet() + digi
         )
 
-Tests = [
-    BuildTest( "First Test",
-               "", BuildTestElement("Cluster", BuildClusterSet(0, [BuildCluster(0, [0])])),
-               "", BuildTestElement("Cluster", BuildClusterSet(0, [BuildCluster(0, [0])])),
-               "Require"
-               ),
-    BuildTest( "Second Test",
-               "", BuildTestElement("Cluster", BuildClusterSet(0, [BuildCluster(0, [0])])),
-               "", BuildTestElement("Cluster", BuildClusterSet(1, [BuildCluster(0, [0])])),
-               "Require"
-               ),
+def BuildDigi(strip, adc, noise, gain, quality) :
+    return cms.PSet( Strip = cms.uint32(strip),
+                     ADC   = cms.uint32(adc),
+                     Noise = cms.uint32(noise),
+                     Gain  = cms.uint32(gain),
+                     Quality = cms.uint32(quality)
+                     )
+
+# Tests are made of: Label, InputFixture, InputParameters, ExpectedOutputFixture, ExpectedOutputParameters, TestType
+# The parameters should be built with the BuildTestElement which requires a Label and a PSet.
+def BuildAllTests(fixtureName) :
+    return [
+        BuildTest( "(sanity check) : Cluster = Cluster",
+                   "", BuildTestElement("Cluster", BuildClusterSet(0, [BuildCluster(0, [0])])),
+                   "", BuildTestElement("Cluster", BuildClusterSet(0, [BuildCluster(0, [0])])),
+                   "Require"
+                   ),
+        BuildTest( "[] = []",
+                   fixtureName, BuildDigiSet(0, []),
+                   "", BuildTestElement("Cluster", BuildClusterSet(0,[])),
+                   "Require"
+                   ),
+        BuildTest( "(4/1) = []",
+                   # In this case the label is specified as the fixture label, so it is sufficient to create a PSet.
+                   fixtureName, BuildDigiSet(0, [BuildDigi(10, 4, 1, 1, True)]),
+                   "", BuildTestElement("Cluster", BuildClusterSet(0, [])),
+                   "Require"
+                   ),
+        BuildTest( "(5/1) = [5]",
+                   fixtureName, BuildDigiSet(0, [BuildDigi(10, 5, 1, 1, True)]),
+                   "", BuildTestElement("Cluster", BuildClusterSet(0, [BuildCluster(10, [5])])),
+                   "Check"
+                   ),
+        BuildTest( "(110/1) = [110]",
+                   fixtureName, BuildDigiSet(0, [BuildDigi(10, 110, 1, 1, True)]),
+                   "", BuildTestElement("Cluster", BuildClusterSet(0, [BuildCluster(10, [110])])),
+                   "Require"
+                   ),
+        BuildTest( "(24/5) = []",
+                   fixtureName, BuildDigiSet(0, [BuildDigi(10, 24, 5, 1, True)]),
+                   "", BuildTestElement("Cluster", BuildClusterSet(0, [])),
+                   "Require"
+                   ),
+        BuildTest( "(24/5) = [5]",
+                   fixtureName, BuildDigiSet(0, [BuildDigi(10, 24, 5, 1, True)]),
+                   "", BuildTestElement("Cluster", BuildClusterSet(0, [BuildCluster(10, [24])])),
+                   "Require"
+                   ),
+        BuildTest( "(25/5) = [5]",
+                   fixtureName, BuildDigiSet(0, [BuildDigi(10, 25, 5, 1, True)]),
+                   "", BuildTestElement("Cluster", BuildClusterSet(0, [BuildCluster(10, [25])])),
+                   "Require"
+                   ),
+        BuildTest( "(111/5) = [111]",
+                   fixtureName, BuildDigiSet(0, [BuildDigi(10, 111, 5, 1, True)]),
+                   "", BuildTestElement("Cluster", BuildClusterSet(0, [BuildCluster(10, [111])])),
+                   "Require"
+                   ),
+        ]
+
+# Fixtures are made of a testElement. They should be built with the BuildTestElement function which requires a Label
+# and a PSet.
+OldAlgoFixtures = [
+    BuildFixture("Algo", "OldThreeThresholdAlgorithm", BuildOldAlgo( "OldThreeThresholdAlgorithm", 2, 3, 5, 0, "" ) ),
     ]
 
+NewAlgoFixtures = [
+    BuildFixture("Algo", "ThreeThresholdAlgorithm", BuildNewAlgo( "ThreeThresholdAlgorithm", 2, 3, 5, 0, 0, 1, "" ) )
+    ]
 
-AllFixtures = []
-#AllFixtures = [
-#    BuildTestElement("Cluster", BuildClusterSet(0, [BuildCluster(0, [0])]))
-#    ]
+OldAlgoTests = BuildAllTests( "OldThreeThresholdAlgorithm" )
+NewAlgoTests = BuildAllTests( "ThreeThresholdAlgorithm" )
 
-TestGroup = BuildTestGroup( "First Group of Test",
+
+OldAlgoTestGroup = BuildTestGroup( "Old Algo group of Test",
                             "test1",
-                            Tests,
-                            AllFixtures
+                            OldAlgoTests,
+                            OldAlgoFixtures
+                            )
+
+NewAlgoTestGroup = BuildTestGroup( "New Algo group of Test",
+                            "test2",
+                            NewAlgoTests,
+                            NewAlgoFixtures
                             )
