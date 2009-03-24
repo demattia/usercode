@@ -23,16 +23,16 @@ class UnitTester : public edm::EDAnalyzer {
   
   virtual void analyze(const edm::Event&, const edm::EventSetup&);
   
-  baseObjectWrapper * baseObjectFactory(const PSet & test, const edm::EventSetup & es ) {
+  BaseObjectWrapper * BaseObjectFactory(const PSet & test, const edm::EventSetup & es ) {
     try {
       return objectFactory(test, es);
     }
     catch( const string & a ) {
       if( a == "unidentifiedType" ) {
         string type = test.getParameter<string>("Type");
-//         if( type == "int" ) return new objectWrapper<int>( test.getParameter<uint32_t>("Value") );
-//         else if( type == "double" ) return new objectWrapper<double>( test.getParameter<double>("Value") );
-//         else if( type == "string" ) return new objectWrapper<string>( test.getParameter<string>("Value") );
+//         if( type == "int" ) return new ObjectWrapper<int>( test.getParameter<uint32_t>("Value") );
+//         else if( type == "double" ) return new ObjectWrapper<double>( test.getParameter<double>("Value") );
+//         else if( type == "string" ) return new ObjectWrapper<string>( test.getParameter<string>("Value") );
 //         else {
           cout << "Error: unrecognized type = " << type << endl;
           abort();
@@ -44,10 +44,10 @@ class UnitTester : public edm::EDAnalyzer {
   }
 
   /**
-   * This method reads the parameters and creates the objectWrappers. </br>
+   * This method reads the parameters and creates the ObjectWrappers. </br>
    * It needs to be implemented in the derived class.
    */
-  virtual baseObjectWrapper * objectFactory(const PSet& test, const edm::EventSetup& es) = 0;
+  virtual BaseObjectWrapper * objectFactory(const PSet& test, const edm::EventSetup& es) = 0;
 
   void initializeTheGroup(const PSet &, const edm::EventSetup &);
   void testTheGroup(const PSet &, const edm::EventSetup &);
@@ -58,11 +58,11 @@ class UnitTester : public edm::EDAnalyzer {
   // Test methods
   // ------------
   /// Continues on error
-  void check(const boost::shared_ptr<baseObjectWrapper> & inputObject, const boost::shared_ptr<baseObjectWrapper> expectedOutputObject);
+  void check(const boost::shared_ptr<BaseObjectWrapper> & inputObject, const boost::shared_ptr<BaseObjectWrapper> expectedOutputObject);
   /// throws on error
-  void require(const boost::shared_ptr<baseObjectWrapper> & inputObject, const boost::shared_ptr<baseObjectWrapper> expectedOutputObject);
+  void require(const boost::shared_ptr<BaseObjectWrapper> & inputObject, const boost::shared_ptr<BaseObjectWrapper> expectedOutputObject);
 
-  map<string, baseObjectWrapper * > map_;
+  map<string, BaseObjectWrapper * > map_;
 };
 
 #endif

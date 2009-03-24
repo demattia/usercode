@@ -22,7 +22,9 @@ void UnitTester::initializeTheGroup(const PSet& group, const edm::EventSetup& es
   // Create any fixtures
   VPSet fixtures = group.getParameter<VPSet>("Fixtures");
   for(iter_t fixture = fixtures.begin();  fixture < fixtures.end(); ++fixture) {
-    map_.insert( make_pair(fixture->getParameter<string>("Label"), objectFactory(*fixture, es)) );
+    // Use the internal label as name of the fixture as the external one is the type of the object.
+    // cout << "fixture->getParameter<string>(\"Label\") = " << fixture->getParameter<string>("FixtureName") << endl;
+    map_.insert( make_pair(fixture->getParameter<string>("FixtureName"), objectFactory(*fixture, es)) );
   }
 }
 
@@ -43,8 +45,8 @@ void UnitTester::runTheTest(const PSet& test, const edm::EventSetup & es)
 {
   std::string label =  test.getParameter<std::string>("Label");
 
-  boost::shared_ptr<baseObjectWrapper> inputObject;
-  boost::shared_ptr<baseObjectWrapper> expectedOutputObject;
+  boost::shared_ptr<BaseObjectWrapper> inputObject;
+  boost::shared_ptr<BaseObjectWrapper> expectedOutputObject;
 
   // Get it from a map of fixtures
   string inputFixture = test.getParameter<string>("InputFixture");
@@ -56,12 +58,17 @@ void UnitTester::runTheTest(const PSet& test, const edm::EventSetup & es)
 
   string expectedOutputFixture = test.getParameter<string>("ExpectedOutputFixture");
   PSet expectedOutputParameters = test.getParameter<PSet>("ExpectedOutputParameters");
+  // cout << "test.getParameter<string>(\"ExpectedOutputFixture\") = " << test.getParameter<string>("ExpectedOutputFixture") << endl;
   if( test.getParameter<string>("ExpectedOutputFixture") != "" ) {
+    // cout << "before expectedOutput: inside if" << endl;
     expectedOutputObject.reset(map_.find(expectedOutputFixture)->second->eval(expectedOutputParameters));
   }
-  else expectedOutputObject.reset(objectFactory(expectedOutputParameters, es));
-
-  std::cout << "Testing: \"" << label << "\"\n";
+  else {
+    // cout << "before expectedOutput: inside else" << endl;
+    expectedOutputObject.reset(objectFactory(expectedOutputParameters, es));
+  }
+  // std::cout << "Testing: \"" << label << "\"\n";
+  std::cout << "Testing: \"" << label << "\"\t\t ";
 
   // Select the type of tests based on input parameters
   string testType = test.getParameter<string>("TestType");
@@ -81,17 +88,17 @@ void UnitTester::runTheTest(const PSet& test, const edm::EventSetup & es)
   }
 }
 
-void UnitTester::check(const boost::shared_ptr<baseObjectWrapper> & inputObject, const boost::shared_ptr<baseObjectWrapper> expectedOutputObject)
+void UnitTester::check(const boost::shared_ptr<BaseObjectWrapper> & inputObject, const boost::shared_ptr<BaseObjectWrapper> expectedOutputObject)
 {
-  if( inputObject == expectedOutputObject ) cout << "check successful" << endl;
-  else cout << "Error: check failed" << endl;
+  if( *inputObject != *expectedOutputObject ) cout << "Error: check failed" << endl;
+  else cout << endl;
 }
 
-void UnitTester::require(const boost::shared_ptr<baseObjectWrapper> & inputObject, const boost::shared_ptr<baseObjectWrapper> expectedOutputObject)
+void UnitTester::require(const boost::shared_ptr<BaseObjectWrapper> & inputObject, const boost::shared_ptr<BaseObjectWrapper> expectedOutputObject)
 {
-  if( *inputObject == *expectedOutputObject ) cout << "check successful" << endl;
-  else {
+  if( *inputObject != *expectedOutputObject ) {
     cout << "Error: check failed" << endl;
     throw(string("Error"));
   }
+  else cout << endl;
 }

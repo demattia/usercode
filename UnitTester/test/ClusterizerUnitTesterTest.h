@@ -27,7 +27,7 @@ class ClusterizerUnitTesterTest : public UnitTester {
 
  protected:
 
-  virtual baseObjectWrapper * objectFactory(const PSet& test, const edm::EventSetup& es);
+  virtual BaseObjectWrapper * objectFactory(const PSet& test, const edm::EventSetup& es);
 };
 
 #endif
