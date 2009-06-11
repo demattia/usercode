@@ -133,10 +133,11 @@ for type in range(typeNum):
                 # Set the maxEvents variable for the job
                 if( (s.find("maxEvents") != -1 or not maxEventsFound) and pythonCfg ):
                     if( s.find("input") != -1 ):
-                        temp = s.split("(")
-                        temp = temp[2].split(")")[0].strip()
+                        temp = s.split("int32(")
+                        #print temp
+                        temp = temp[1].split(")")[0].strip()
                         maxEventsFound = True
-                        # print "temp = " + temp
+                        #print "temp = " + temp
                         outFile.write(s.replace( temp, str(eventsPerJob[type]) ))
                     else:
                         outFile.write(s);
@@ -145,7 +146,10 @@ for type in range(typeNum):
                     temp = s.split("=")
                     temp = temp[1].strip()
                     # print temp
-                    outFile.write(s.replace( temp, str(skipEvents) ))
+                    if( not pythonCfg ):
+                        outFile.write(s.replace( temp, str(skipEvents) ))
+                    else:
+                        outFile.write(s.replace( temp, "cms.untracked.uint32("+str(skipEvents)+"),"))
                     skipEventsFound = True
                 # Change the output file name
                 elif( s.find(outFileName[type].strip()) != -1 ):
