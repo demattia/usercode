@@ -149,7 +149,8 @@ for type in range(typeNum):
                     if( not pythonCfg ):
                         outFile.write(s.replace( temp, str(skipEvents) ))
                     else:
-                        outFile.write(s.replace( temp, "cms.untracked.uint32("+str(skipEvents)+"),"))
+                        temp.strip(',')
+                        outFile.write(s.replace( temp, "cms.untracked.uint32("+str(skipEvents)+")"))
                     skipEventsFound = True
                 # Change the output file name
                 elif( s.find(outFileName[type].strip()) != -1 ):
@@ -188,9 +189,10 @@ for type in range(typeNum):
             print 'No skipEvents field found in the cfg file, please add it to the source module'
             exit()
 
-        batchFileName = workingDir[type].strip() + "/" + "batch_" + str(i) + ".csh"
+        batchFileName = workingDir[type].strip() + "/" + "batch_" + str(i) + ".sh"
+        batchFileNamePart = "batch_" + str(i) + ".sh"
         batchFile = open(batchFileName, 'w')
-        for s in open('batch_test.csh'):
+        for s in open('batch_test.sh'):
             # Set the cmssw dir where to do eval scram
             if( s.find("cmsswDir") != -1 ):
                 batchFile.write(s.replace('cmsswDir', cmsswDir.strip()))
@@ -214,9 +216,13 @@ for type in range(typeNum):
 
         skipEvents += int(eventsPerJob[type])
 
+
         # Make the batch script executable and run it
+        currentRunDir = os.getcwd()
         os.system("chmod 777 " + batchFileName)
-        os.system("bsub -R \"pool>40\" -q 8nh -J " + tempCfgFileName + "<" + batchFileName)
+        os.system("cd " + workingDir[type].strip())
+        # print "bsub -q cmsexpress "+ batchFileNamePart
+        os.system("bsub -q cmsexpress < "+ batchFileName)
 
     # end of loop on jobs
 
@@ -225,5 +231,8 @@ for type in range(typeNum):
 print
 print "The batch jobs will fill your home dir with LSF* directories containing stdout and stderr files."
 print "You can use this command \"find . -name \"LSF*\" -exec rm -rf {} \;\" to remove all of them"
+print
+print "WARNING: Please make sure that the maxEvents part is put before anything else in the cfg."
+print "Also make sure that if skipEvents is required there is such a field in the cfg."
 print
 
