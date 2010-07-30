@@ -193,7 +193,10 @@ for type in range(typeNum):
                 tempCfgFileName = cfgFile[type].split('/')
                 tempCfgFileName = (tempCfgFileName[len(tempCfgFileName)-1].split('.')[0]).strip()
                 currentDir = os.getcwd()
-                batchFile.write(s.replace('cfgFile', currentDir.strip() + "/" + workingDir[type].strip() + "/"+ tempCfgFileName+'_'+str(i)+'.cfg'))
+                if( not pythonCfg ):
+                    batchFile.write(s.replace('cfgFile', currentDir.strip() + "/" + workingDir[type].strip() + "/"+ tempCfgFileName+'_'+str(i)+'.cfg'))
+                else:
+                    batchFile.write(s.replace('cfgFile', currentDir.strip() + "/" + workingDir[type].strip() + "/"+ tempCfgFileName+'_'+str(i)+'_cfg.py'))
                 # Get the current working dir
             elif( s.find("outFileName") != -1 ):
                 temp = outFileName[type].split('.')
@@ -208,7 +211,8 @@ for type in range(typeNum):
 
         # Make the batch script executable and run it
         os.system("chmod 777 " + batchFileName)
-        os.system("bsub -R \"pool>40\" -q 8nh -J " + tempCfgFileName + "<" + batchFileName)
+        print "bsub -R \"pool>40\" -q 8nh -J " + tempCfgFileName + "<" + batchFileName
+        # os.system("bsub -R \"pool>40\" -q 8nh -J " + tempCfgFileName + "<" + batchFileName)
 
     # end of loop on jobs
 
