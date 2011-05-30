@@ -13,7 +13,7 @@
 //
 // Original Author:  Marco De Mattia,40 3-B32,+41227671551,
 //         Created:  Wed May 25 16:44:02 CEST 2011
-// $Id$
+// $Id: TrackingEfficiencyFromCosmics.cc,v 1.1 2011/05/26 10:50:27 demattia Exp $
 //
 //
 
@@ -98,8 +98,16 @@ TrackingEfficiencyFromCosmics::analyze(const edm::Event& iEvent, const edm::Even
 
   Handle<reco::TrackCollection> tracks;
   iEvent.getByLabel("generalTracks", tracks);
+
   if( tracks->size() > 0 ) {
     LogInfo("Demo") << "number of tracks "<<tracks->size();
+
+    unsigned int trackNumber = 0;
+    std::vector<reco::Track>::const_iterator ittrk = tracks->begin();
+    for( ; ittrk != tracks->end(); ++ittrk, ++trackNumber ) {
+      LogInfo("Demo") << "track["<<trackNumber<<"] eta = " << ittrk->eta();
+      LogInfo("Demo") << "track["<<trackNumber<<"] number of hits = " << ittrk->recHitsSize() << std::endl;
+    }
   }
 
 #ifdef THIS_IS_AN_EVENT_EXAMPLE
