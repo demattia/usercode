@@ -510,12 +510,14 @@ TrackerTrackHitFilterMod::produce(edm::Event &iEvent, const edm::EventSetup &iSe
         for( std::vector<TrackingRecHit *>::iterator ithit=begin;ithit!=end;++ithit){
           if( (*ithit)->isValid())nvalidhits++;
         }
+        std::cout << "nvalidhits = " << nvalidhits << " >= " << minimumHits_ << std::endl;
         if(nvalidhits >= int(minimumHits_)){
           output->push_back( makeCandidate ( *ittrk, begin, end ) );
         }
 
       }
       else{//all invalid hits have been already kicked out
+        std::cout << "(end - begin) = " << (end - begin) << " >= " << int(minimumHits_) << std::endl;
         if ((end - begin) >= int(minimumHits_)) {
           output->push_back( makeCandidate ( *ittrk, begin, end ) );
         }

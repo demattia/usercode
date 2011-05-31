@@ -13,7 +13,7 @@
 //
 // Original Author:  Marco De Mattia,40 3-B32,+41227671551,
 //         Created:  Wed May 25 16:44:02 CEST 2011
-// $Id: TrackingEfficiencyFromCosmics.cc,v 1.1 2011/05/26 10:50:27 demattia Exp $
+// $Id: TrackingEfficiencyFromCosmics.cc,v 1.2 2011/05/30 14:47:33 demattia Exp $
 //
 //
 
@@ -102,11 +102,40 @@ TrackingEfficiencyFromCosmics::analyze(const edm::Event& iEvent, const edm::Even
   if( tracks->size() > 0 ) {
     LogInfo("Demo") << "number of tracks "<<tracks->size();
 
+    reco::Track::TrackQuality quality;
+
     unsigned int trackNumber = 0;
     std::vector<reco::Track>::const_iterator ittrk = tracks->begin();
     for( ; ittrk != tracks->end(); ++ittrk, ++trackNumber ) {
-      LogInfo("Demo") << "track["<<trackNumber<<"] eta = " << ittrk->eta();
-      LogInfo("Demo") << "track["<<trackNumber<<"] number of hits = " << ittrk->recHitsSize() << std::endl;
+      ittrk->quality(quality);
+      std::stringstream ss;
+      ss << "track["<<trackNumber<<"]" << std::endl <<
+            "pt = " << ittrk->pt() << std::endl <<
+            "eta = " << ittrk->eta() << std::endl <<
+            "phi = " << ittrk->phi() << std::endl <<
+            "number of hits = " << ittrk->recHitsSize() << std::endl <<
+            "number of valid hits = " << ittrk->found() << std::endl <<
+            "number of invalid hits = " << ittrk->lost() << std::endl <<
+            "quality = " << ittrk->qualityName(quality) << std::endl <<
+            "d0 = " << ittrk->d0() << std::endl <<
+            "d0/d0Error = " << ittrk->d0Error() << std::endl <<
+            "dz = " << ittrk->dz() << std::endl <<
+            "dz/dzError = " << ittrk->dzError() << std::endl <<
+            "chi^2/ndof = " << ittrk->normalizedChi2() << std::endl;
+      LogInfo("Demo") << ss.str();
+
+//      LogInfo("Demo") << "track["<<trackNumber<<"] pt = " << ittrk->pt() << std::endl;
+//      LogInfo("Demo") << "track["<<trackNumber<<"] eta = " << ittrk->eta() << std::endl;
+//      LogInfo("Demo") << "track["<<trackNumber<<"] phi = " << ittrk->phi() << std::endl;
+//      LogInfo("Demo") << "track["<<trackNumber<<"] number of hits = " << ittrk->recHitsSize() << std::endl;
+//      LogInfo("Demo") << "track["<<trackNumber<<"] number of valid hits = " << ittrk->found() << std::endl;
+//      LogInfo("Demo") << "track["<<trackNumber<<"] number of invalid hits = " << ittrk->lost() << std::endl;
+//      LogInfo("Demo") << "track["<<trackNumber<<"] quality = " << ittrk->qualityName(quality) << std::endl;
+//      LogInfo("Demo") << "track["<<trackNumber<<"] d0 = " << ittrk->d0() << std::endl;
+//      LogInfo("Demo") << "track["<<trackNumber<<"] d0/d0Error = " << ittrk->d0Error() << std::endl;
+//      LogInfo("Demo") << "track["<<trackNumber<<"] dz = " << ittrk->dz() << std::endl;
+//      LogInfo("Demo") << "track["<<trackNumber<<"] dz/dzError = " << ittrk->dzError() << std::endl;
+//      LogInfo("Demo") << "track["<<trackNumber<<"] chi^2/ndof = " << ittrk->normalizedChi2() << std::endl;
     }
   }
 
