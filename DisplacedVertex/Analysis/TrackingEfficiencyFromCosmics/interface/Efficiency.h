@@ -27,7 +27,7 @@ public:
     Parameters(const unsigned int inputBins, const double & inputMin, const double & inputMax) :
       min(inputMin),
       max(inputMax),
-      bins(inputBins),
+      bins(inputBins)
     {}
     double min;
     double max;
@@ -86,10 +86,49 @@ public:
     }
     boost::shared_ptr<Efficiency> newEff(new Efficiency(newPars));
     // Loop on all the values and fill them in the new Efficiency object.
-    for( int i=0; i<S_; ++i ) {
-      newEff.fill();
+    for( unsigned int i=0; i<S_; ++i ) {
+      newEff->fill(getIndexes(i, vKeep, newPars.size()), values_[i]);
     }
     return newEff;
+  }
+
+  /**
+    * Method to compute the indexes starting from the linearIndex. It is used when reducing the matrix dimensions by projecting.
+    * The computation stops when the last variable needed is reached.
+    * It takes:
+    * - the value of the linearIndex
+    * - the array with the selection of variables to keep (see project method)
+    * - the number of variables to keep
+    */
+  boost::shared_array<unsigned int> getIndexes(const unsigned int linearIndex, const boost::shared_array<int> & vKeep, const unsigned int newN)
+  {
+    boost::shared_array<unsigned int> vNewIndexes(new unsigned int[newN]);
+    unsigned int tempS = S_;
+    unsigned int newCounter = 0;
+    unsigned int counter = 0;
+    computeIndexes(linearIndex, tempS, vKeep, newN, vNewIndexes, counter, newCounter);
+    return vNewIndexes;
+  }
+
+  /**
+    * Compute the indexes only for the variables to be kept and save them in the vNewIndexes.
+    * It is used when reducing the matrix dimensions by projecting.
+    */
+  void computeIndexes(const unsigned int L, unsigned int & S, const boost::shared_array<int> & vKeep,
+                      const unsigned int newN, boost::shared_array<unsigned int> & vNewIndexes,
+                      unsigned int & counter, unsigned int & newCounter)
+  {
+    if( newCounter == newN ) return;
+
+    S /= vSizes_[counter];
+
+    if( vKeep[counter] != -1 ) {
+      // std::cout << "getIndexes for counter = " << counter << ", newCounter = " << newCounter << ", S = " << S << std::endl;
+      vNewIndexes[newCounter] = (unsigned int)(L/S);
+      ++newCounter;
+    }
+    ++counter;
+    computeIndexes(L%S, S, vKeep, newN, vNewIndexes, counter, newCounter);
   }
 
   /**
@@ -99,40 +138,28 @@ public:
     */
   void fill(const boost::shared_array<double> & variables, const bool accept)
   {
-    // Compute the index for the given variable
+    // Compute the indexes for the given values
     for( unsigned int i=0; i<N_; ++i ) {
       if( variables[i] >= vMax_[i] ) {
-        values_[i].first += vSizes_[i]-1;
-        if( accept ) values_[i].second += vSizes_[i]-1;
+        vIndexes_[i] = vSizes_[i];
       }
       else {
         unsigned int index = (unsigned int)((variables[i] - vMin_[i])/vBinSizes_[i]);
-        values_[i].first += index;
-        if( accept ) values_[i].second += index;
+        vIndexes_[i] = index;
       }
     }
+    values_[getLinearIndex(vIndexes_)].first += 1;
+    if( accept ) values_[getLinearIndex(vIndexes_)].second += 1;
   }
 
   /**
     * Alternate method taking an array of indexes and the values to add.
     * Used when reducing the matrix size by projecting.
     */
-  void fill(const boost::shared_array<unsigned int> & variables, const std::pair<unsigned int, unsigned int> & values)
+  inline void fill(const boost::shared_array<unsigned int> & indexes, const std::pair<unsigned int, unsigned int> & values)
   {
-    // Compute the index for the given variable
-    for( unsigned int i=0; i<N_; ++i ) {
-      if( variables[i] >= vMax_[i] ) {
-        vIndexes_[i] = vSizes_[i];
-        // values_[i].first += vSizes_[i]-1;
-        // if( accept ) values_[i].second += vSizes_[i]-1;
-      }
-      else {
-        unsigned int index = (unsigned int)((variables[i] - vMin_[i])/vBinSizes_[i]);
-        vIndexes_[i] = index;
-        // values_[i].first += index;
-        // if( accept ) values_[i].second += index;
-      }
-    }
+    values_[getLinearIndex(indexes)].first += values.first;
+    values_[getLinearIndex(indexes)].second += values.second;
   }
 
   inline unsigned int linearSize() const {return S_;}
