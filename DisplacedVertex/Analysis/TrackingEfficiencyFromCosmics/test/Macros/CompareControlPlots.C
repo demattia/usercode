@@ -56,6 +56,7 @@ void CompareControlPlots(const TString & inputFileName = "/home/demattia/Trackin
       canvas->cd(index);
       (*it)->Draw();
     }
+    canvas->Print(vit->first+".pdf");
   }
 }
 
