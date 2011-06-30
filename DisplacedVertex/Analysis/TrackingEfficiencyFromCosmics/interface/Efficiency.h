@@ -48,6 +48,7 @@ public:
     vBinSizes_.reset(new double[N_]);
     vMin_.reset(new double[N_]);
     vMax_.reset(new double[N_]);
+    vIndexes_.reset(new unsigned int[N_]);
     std::vector<Parameters>::const_iterator it = vPars.begin();
     unsigned int i = 0;
     for( ; it != vPars.end(); ++it, ++i ) {
@@ -67,7 +68,7 @@ public:
   unsigned int getLinearIndex(const boost::shared_array<unsigned int> & vIndexes)
   {
     vIndexesTempPtr_ = vIndexes.get();
-    return linearIndex(0, 0);
+    return computeLinearIndex(0, 0);
   }
 
   /**
@@ -87,6 +88,12 @@ public:
     boost::shared_ptr<Efficiency> newEff(new Efficiency(newPars));
     // Loop on all the values and fill them in the new Efficiency object.
     for( unsigned int i=0; i<S_; ++i ) {
+      // if( values_[i].first != 0 ) {
+      //   std::cout << "Filling i = " << i << " with (" << values_[i].first << ", " << values_[i].second << ")" << std::endl;
+      //   for( unsigned int i=0; i<newPars.size(); ++i) {
+      //     std::cout << "newIndex("<<i<<") = " << getIndexes(i, vKeep, newPars.size()) << std::endl;
+      //   }
+      // }
       newEff->fill(getIndexes(i, vKeep, newPars.size()), values_[i]);
     }
     return newEff;
@@ -123,7 +130,6 @@ public:
     S /= vSizes_[counter];
 
     if( vKeep[counter] != -1 ) {
-      // std::cout << "getIndexes for counter = " << counter << ", newCounter = " << newCounter << ", S = " << S << std::endl;
       vNewIndexes[newCounter] = (unsigned int)(L/S);
       ++newCounter;
     }
@@ -141,11 +147,12 @@ public:
     // Compute the indexes for the given values
     for( unsigned int i=0; i<N_; ++i ) {
       if( variables[i] >= vMax_[i] ) {
-        vIndexes_[i] = vSizes_[i];
+        vIndexes_[i] = vSizes_[i] - 1;
+        // std::cout << "vIndexes_["<<i<<"] = " << vIndexes_[i] << std::endl;
       }
       else {
-        unsigned int index = (unsigned int)((variables[i] - vMin_[i])/vBinSizes_[i]);
-        vIndexes_[i] = index;
+        vIndexes_[i] = (unsigned int)((variables[i] - vMin_[i])/vBinSizes_[i]);
+        // std::cout << "vIndexes_["<<i<<"] = " << vIndexes_[i] << std::endl;
       }
     }
     values_[getLinearIndex(vIndexes_)].first += 1;
@@ -162,6 +169,20 @@ public:
     values_[getLinearIndex(indexes)].second += values.second;
   }
 
+  double getEff(const boost::shared_array<unsigned int> & vIndexes)
+  {
+    unsigned int linearIndex = getLinearIndex(vIndexes);
+    if( (values_[linearIndex].first) == 0 ) return -1;
+    return( double(values_[linearIndex].second)/double(values_[linearIndex].first) );
+  }
+
+  /// Overloaded for the case of a single variable. No check is performed and the index is assumed == linearIndex.
+  double getEff(unsigned int index)
+  {
+    if( (values_[index].first) == 0 ) return -1;
+    return( double(values_[index].second)/double(values_[index].first) );
+  }
+
   inline unsigned int linearSize() const {return S_;}
   inline unsigned int bins(unsigned int i) const {return vSizes_[i];}
   inline double binsSize(unsigned int i) const {return vBinSizes_[i];}
@@ -170,9 +191,9 @@ public:
 
 protected:
   /// Compute the linearIndex for a given vector of indexes
-  unsigned int linearIndex(unsigned int i, unsigned int previous) const
+  unsigned int computeLinearIndex(unsigned int i, unsigned int previous) const
   {
-    if( i < Nminus1_ ) return( linearIndex(i+1, vIndexesTempPtr_[i] + vSizes_[i]*previous) );
+    if( i < Nminus1_ ) return( computeLinearIndex(i+1, vIndexesTempPtr_[i] + vSizes_[i]*previous) );
     return (vIndexesTempPtr_[i] + vSizes_[i]*previous);
   }
 
