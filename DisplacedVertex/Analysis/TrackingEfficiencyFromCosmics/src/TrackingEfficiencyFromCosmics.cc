@@ -105,9 +105,10 @@ TrackingEfficiencyFromCosmics::TrackingEfficiencyFromCosmics(const edm::Paramete
   // Build the object to compute the efficiency
   std::vector<Efficiency::Parameters> pars;
   pars.push_back(Efficiency::Parameters(nBins_, 0, 100));
+  pars.push_back(Efficiency::Parameters(nBins_, 0, 100));
   genEfficiency_.reset(new Efficiency(pars));
   efficiency_.reset(new Efficiency(pars));
-  variables_.reset(new double[1]);
+  variables_.reset(new double[2]);
 
   // maxDeltaR_ = iConfig.getParameter<double>("MaxDeltaR");
 }
@@ -174,6 +175,7 @@ void TrackingEfficiencyFromCosmics::analyze(const edm::Event& iEvent, const edm:
         std::cout << "and dxy = " << fabs(it->first->dxy()) << std::endl;
       }
       variables_[0] = fabs(it->first->dxy());
+      variables_[1] = fabs(it->first->dz());
       efficiency_->fill(variables_, found);
     }
   }
@@ -228,8 +230,13 @@ void TrackingEfficiencyFromCosmics::endJob()
   }
 
   EfficiencyTree tree;
-  tree.writeTree(effOutputFileName_, &*efficiency_);
 
+  boost::shared_array<int> vKeep(new int[2]);
+  vKeep[0] = 0;
+  vKeep[1] = -1;
+  boost::shared_ptr<Efficiency> newEff(efficiency_->project(vKeep));
+
+  tree.writeTree(effOutputFileName_, &*newEff);
 }
 
 // ------------ method called when starting to processes a run  ------------
