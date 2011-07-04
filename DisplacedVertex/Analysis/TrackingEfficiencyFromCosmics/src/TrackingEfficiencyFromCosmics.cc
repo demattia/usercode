@@ -13,7 +13,7 @@
 //
 // Original Author:  Marco De Mattia,40 3-B32,+41227671551,
 //         Created:  Wed May 25 16:44:02 CEST 2011
-// $Id: TrackingEfficiencyFromCosmics.cc,v 1.2 2011/05/30 14:47:33 demattia Exp $
+// $Id: TrackingEfficiencyFromCosmics.cc,v 1.4 2011/06/30 08:36:48 demattia Exp $
 //
 //
 
@@ -41,10 +41,11 @@
 #include "DataFormats/HepMCCandidate/interface/GenParticle.h"
 #include "DataFormats/HepMCCandidate/interface/GenParticleFwd.h"
 
-// #include "SimDataFormats/Track/interface/SimTrackContainer.h"
+#include "SimDataFormats/Track/interface/SimTrackContainer.h"
 
 #include "Analysis/TrackingEfficiencyFromCosmics/interface/AssociatorByDeltaR.h"
 #include "Analysis/TrackingEfficiencyFromCosmics/interface/ControlPlots.h"
+#include "Analysis/TrackingEfficiencyFromCosmics/interface/Efficiency.h"
 
 #include <boost/foreach.hpp>
 
@@ -60,9 +61,9 @@ public:
   static void fillDescriptions(edm::ConfigurationDescriptions& descriptions);
 
 private:
-  virtual void beginJob() ;
+  virtual void beginJob();
   virtual void analyze(const edm::Event&, const edm::EventSetup&);
-  virtual void endJob() ;
+  virtual void endJob();
 
   virtual void beginRun(edm::Run const&, edm::EventSetup const&);
   virtual void endRun(edm::Run const&, edm::EventSetup const&);
@@ -76,19 +77,35 @@ private:
 
   // ----------member data ---------------------------
   // double maxDeltaR_;
-  TH1F * hMinDeltaR_, * hMinTrackToGenDeltaR_, * hMinStaMuonToGenDeltaR_;
+  TH1F * hMinDeltaR_, * hSimMinDeltaR_, * hMinTrackToGenDeltaR_, * hMinStaMuonToGenDeltaR_;
   reco::Track::TrackQuality quality_;
   bool useMCtruth_;
 
   std::auto_ptr<AssociatorByDeltaR> associatorByDeltaR_;
+  std::auto_ptr<AssociatorByDeltaR> simAssociatorByDeltaR_;
   std::auto_ptr<ControlPlots> controlPlotsGeneralTracks_;
   std::auto_ptr<ControlPlots> controlPlotsStandAloneMuons_;
+  std::auto_ptr<Efficiency> genEfficiency_;
+  std::auto_ptr<Efficiency> efficiency_;
+  boost::shared_array<double> variables_;
+  unsigned int nBins_;
 };
 
 TrackingEfficiencyFromCosmics::TrackingEfficiencyFromCosmics(const edm::ParameterSet& iConfig) :
   useMCtruth_(iConfig.getParameter<bool>("UseMCtruth"))
 {
   associatorByDeltaR_.reset(new AssociatorByDeltaR(iConfig.getParameter<double>("MaxDeltaR")));
+  simAssociatorByDeltaR_.reset(new AssociatorByDeltaR(iConfig.getParameter<double>("SimMaxDeltaR")));
+
+  nBins_ = 20;
+
+  // Build the object to compute the efficiency
+  std::vector<Efficiency::Parameters> pars;
+  pars.push_back(Efficiency::Parameters(nBins_, 0, 100));
+  genEfficiency_.reset(new Efficiency(pars));
+  efficiency_.reset(new Efficiency(pars));
+  variables_.reset(new double[1]);
+
   // maxDeltaR_ = iConfig.getParameter<double>("MaxDeltaR");
 }
 
@@ -112,6 +129,21 @@ void TrackingEfficiencyFromCosmics::analyze(const edm::Event& iEvent, const edm:
     BOOST_FOREACH( const reco::Track & staMuon, *staMuons ) {
       hMinStaMuonToGenDeltaR_->Fill(reco::deltaR(*stableMuon, staMuon));
     }
+
+    // Find the simTracks (for IP)
+    edm::Handle<edm::SimTrackContainer> simTracks;
+    iEvent.getByLabel("g4SimHits", simTracks);
+    std::map<const math::XYZTLorentzVectorD *, const reco::Track *> simMatchesMap;
+    simAssociatorByDeltaR_->fillAssociationMap(*simTracks, *tracks, simMatchesMap, hSimMinDeltaR_);
+
+    // Compute efficiency from MC truth
+    std::map<const math::XYZTLorentzVectorD *, const reco::Track *>::const_iterator it = simMatchesMap.begin();
+    for( ; it != simMatchesMap.end(); ++it ) {
+      variables_[0] = it->first->pt();
+      bool found = false;
+      if( it->second != 0 ) found = true;
+      genEfficiency_->fill(variables_, found);
+    }
   }
 
   // Fill all control plots
@@ -122,19 +154,29 @@ void TrackingEfficiencyFromCosmics::analyze(const edm::Event& iEvent, const edm:
   std::map<const reco::Track *, const reco::Track *> matchesMap;
 
   if( staMuons->size() > 0 ) {
-    associatorByDeltaR_->fillAssociationMap(tracks, staMuons, matchesMap, hMinDeltaR_);
+    // associatorByDeltaR_->fillAssociationMap(tracks, staMuons, matchesMap, hMinDeltaR_);
+    associatorByDeltaR_->fillAssociationMap(*tracks, *staMuons, matchesMap, hMinDeltaR_);
 
+    bool found = false;
     std::map<const reco::Track *, const reco::Track *>::const_iterator it = matchesMap.begin();
     for( ; it != matchesMap.end(); ++it ) {
+      found = false;
       if( it->second == 0 ) {
-        std::cout << "no match found for standAlone with = " << it->first->pt() << std::endl;
+        std::cout << "NO match found for standAlone with pt = " << it->first->pt() << std::endl;
+        std::cout << "and dxy = " << fabs(it->first->dxy()) << std::endl;
       }
       else {
-        std::cout << "standAlone with pt = " << it->first->pt() << ", matches with track of pt = " << it->second->pt() << std::endl;
+        found = true;
+        std::cout << "MATCH FOUND for standAlone with pt = " << it->first->pt() << ", matches with track of pt = " << it->second->pt() << std::endl;
+        std::cout << "and dxy = " << fabs(it->first->dxy()) << std::endl;
       }
+      variables_[0] = fabs(it->first->dxy());
+      efficiency_->fill(variables_, found);
     }
   }
 
+  // Compute efficiency as number of times a track matching the standalone is found vs number of standalone.
+  // Do this as a function of several variables.
 
 
 #ifdef THIS_IS_AN_EVENT_EXAMPLE
@@ -163,6 +205,7 @@ void TrackingEfficiencyFromCosmics::beginJob()
 {
   edm::Service<TFileService> fileService;
   hMinDeltaR_ = fileService->make<TH1F>("minDeltaR","#Delta R between standalone muon and closest track",500,0,5);
+  hSimMinDeltaR_ = fileService->make<TH1F>("simMinDeltaR","#Delta R between simTrack and closest track",500,0,5);
   hMinTrackToGenDeltaR_ = fileService->make<TH1F>("minTrackGenDeltaR","#Delta R between gen muon and closest track",500,0,5);
   hMinStaMuonToGenDeltaR_ = fileService->make<TH1F>("minStaMunoGenDeltaR","#Delta R between gen muon and closest standAloneMuon",500,0,5);
   controlPlotsGeneralTracks_.reset(new ControlPlots(fileService, "generalTracks"));
@@ -172,6 +215,14 @@ void TrackingEfficiencyFromCosmics::beginJob()
 // ------------ method called once each job just after ending the event loop  ------------
 void TrackingEfficiencyFromCosmics::endJob() 
 {
+  if( useMCtruth_ ) {
+    for( unsigned int i=0; i<nBins_; ++i ) {
+      std::cout << "genEfficiency["<<i<<"] (vs pt) = " << genEfficiency_->getEff(i) << " +/- " << genEfficiency_->getEffError(i) << std::endl;
+    }
+  }
+  for( unsigned int i=0; i<nBins_; ++i ) {
+    std::cout << "reco eff["<<i<<"] = " << efficiency_->getEff(i) << " +/- " << efficiency_->getEffError(i) << std::endl;
+  }
 }
 
 // ------------ method called when starting to processes a run  ------------

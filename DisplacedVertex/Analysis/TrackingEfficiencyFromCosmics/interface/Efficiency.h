@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <memory>
+#include <cmath>
 #include "boost/shared_array.hpp"
 #include "boost/shared_ptr.hpp"
 
@@ -150,6 +151,9 @@ public:
         vIndexes_[i] = vSizes_[i] - 1;
         // std::cout << "vIndexes_["<<i<<"] = " << vIndexes_[i] << std::endl;
       }
+      else if( variables[i] < vMin_[i] ) {
+        vIndexes_[i] = 0;
+      }
       else {
         vIndexes_[i] = (unsigned int)((variables[i] - vMin_[i])/vBinSizes_[i]);
         // std::cout << "vIndexes_["<<i<<"] = " << vIndexes_[i] << std::endl;
@@ -176,11 +180,27 @@ public:
     return( double(values_[linearIndex].second)/double(values_[linearIndex].first) );
   }
 
+  double getEffError(const boost::shared_array<unsigned int> & vIndexes)
+  {
+    unsigned int linearIndex = getLinearIndex(vIndexes);
+    if( (values_[linearIndex].first) == 0 ) return 0;
+    double p = double(values_[linearIndex].second)/double(values_[linearIndex].first);
+    return( sqrt(p*(1-p)/(double(values_[linearIndex].first))) );
+  }
+
   /// Overloaded for the case of a single variable. No check is performed and the index is assumed == linearIndex.
   double getEff(unsigned int index)
   {
     if( (values_[index].first) == 0 ) return -1;
     return( double(values_[index].second)/double(values_[index].first) );
+  }
+
+  /// Overloaded for the case of a single variable. No check is performed and the index is assumed == linearIndex.
+  double getEffError(unsigned int index)
+  {
+    if( (values_[index].first) == 0 ) return 0;
+    double p = (values_[index].second)/double(values_[index].first);
+    return( sqrt(p*(1-p)/(double(values_[index].first))) );
   }
 
   inline unsigned int linearSize() const {return S_;}

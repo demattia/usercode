@@ -1,0 +1,4 @@
+<bin name="TestAnalysisTrackingEfficiencyFromCosmics" file="UnitTests/TestEfficiency.cc,UnitTests/MasterTestAnalysisTrackingEfficiencyFromCosmics.cpp">
+  <use name="cppunit"/>
+  <use name="boost"/>
+</bin>

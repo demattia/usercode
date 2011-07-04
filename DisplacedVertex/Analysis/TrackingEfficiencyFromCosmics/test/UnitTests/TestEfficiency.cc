@@ -123,6 +123,17 @@ class TestEfficiency : public CppUnit::TestFixture
 
     fillBinIndex(variables, binIndex);
     CPPUNIT_ASSERT(float(eff->getEff(binIndex)) == float(0.5));
+
+    // Test filling with the negative value, it will go in the first bin (if not protected it will go in a UINT_MAX number for the bin...)
+    variables[0] = -40.;
+    variables[1] = 0.3;
+    variables[2] = 5.;
+    variables[3] = 45.;
+    eff->fill(variables, false);
+    eff->fill(variables, true);
+
+    fillBinIndex(variables, binIndex);
+    CPPUNIT_ASSERT(float(eff->getEff(binIndex)) == float(0.5));
   }
 
   void testEfficiency()
@@ -144,6 +155,31 @@ class TestEfficiency : public CppUnit::TestFixture
     eff->fill(variables, true);
     fillBinIndex(variables, binIndex);
     CPPUNIT_ASSERT( eff->getEff(binIndex) == 1. );
+  }
+
+  void testEffError()
+  {
+    variables[0] = 3.8;
+    variables[1] = 0.3;
+    variables[2] = 5.;
+    variables[3] = 45.;
+    eff->fill(variables, false);
+    eff->fill(variables, false);
+    eff->fill(variables, true);
+    eff->fill(variables, true);
+    fillBinIndex(variables, binIndex);
+    float error = sqrt(1./2.*(1. - 1./2.)/4.);
+    CPPUNIT_ASSERT( float(eff->getEffError(binIndex)) == error );
+
+    // Compute errors after a projection
+    vKeep[0] = -1;
+    vKeep[1] = 0;
+    vKeep[2] = -1;
+    vKeep[3] = -1;
+
+    boost::shared_ptr<Efficiency> newEff(eff->project(vKeep));
+    unsigned int bin = (0.3 - vPars_[1].min)*vPars_[1].bins/(vPars_[1].max - vPars_[1].min);
+    CPPUNIT_ASSERT( float(newEff->getEffError(bin)) == error );
   }
 
   void testProjection()
@@ -202,8 +238,9 @@ class TestEfficiency : public CppUnit::TestFixture
                      boost::shared_array<unsigned int> & binIndex )
   {
     for( unsigned int i=0; i<4; ++i ) {
-      binIndex[i] = (variables[i]-vPars_[i].min)*vPars_[i].bins/(vPars_[i].max - vPars_[i].min);
-      if( binIndex[i] > vPars_[i].bins ) binIndex[i] = vPars_[i].bins - 1;
+      if( variables[i] < vPars_[i].min ) binIndex[i] = 0;
+      else if( variables[i] >= vPars_[i].max ) binIndex[i] = vPars_[i].bins - 1;
+      else binIndex[i] = (variables[i]-vPars_[i].min)*vPars_[i].bins/(vPars_[i].max - vPars_[i].min);
     }
   }
 
@@ -214,6 +251,7 @@ class TestEfficiency : public CppUnit::TestFixture
   CPPUNIT_TEST( testGetIndexes );
   CPPUNIT_TEST( testFill );
   CPPUNIT_TEST( testEfficiency );
+  CPPUNIT_TEST( testEffError );
   CPPUNIT_TEST( testProjection );
   CPPUNIT_TEST_SUITE_END();
 
