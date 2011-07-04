@@ -23,7 +23,10 @@ process.source = cms.Source("PoolSource",
     )
 )
 
-process.demo = cms.EDAnalyzer('TrackingEfficiencyFromCosmics'
+process.demo = cms.EDAnalyzer('TrackingEfficiencyFromCosmics',
+                              MaxDeltaR = cms.double(1000),
+                              SimMaxDeltaR = cms.double(1000),
+                              UseMCtruth = cms.bool(False)
 )
 
 
