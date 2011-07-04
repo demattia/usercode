@@ -13,7 +13,7 @@
 //
 // Original Author:  Marco De Mattia,40 3-B32,+41227671551,
 //         Created:  Wed May 25 16:44:02 CEST 2011
-// $Id: TrackingEfficiencyFromCosmics.cc,v 1.4 2011/06/30 08:36:48 demattia Exp $
+// $Id: TrackingEfficiencyFromCosmics.cc,v 1.5 2011/07/04 10:22:56 demattia Exp $
 //
 //
 
@@ -46,6 +46,7 @@
 #include "Analysis/TrackingEfficiencyFromCosmics/interface/AssociatorByDeltaR.h"
 #include "Analysis/TrackingEfficiencyFromCosmics/interface/ControlPlots.h"
 #include "Analysis/TrackingEfficiencyFromCosmics/interface/Efficiency.h"
+#include "Analysis/TrackingEfficiencyFromCosmics/interface/EfficiencyTree.h"
 
 #include <boost/foreach.hpp>
 
@@ -89,10 +90,12 @@ private:
   std::auto_ptr<Efficiency> efficiency_;
   boost::shared_array<double> variables_;
   unsigned int nBins_;
+  std::string effOutputFileName_;
 };
 
 TrackingEfficiencyFromCosmics::TrackingEfficiencyFromCosmics(const edm::ParameterSet& iConfig) :
-  useMCtruth_(iConfig.getParameter<bool>("UseMCtruth"))
+  useMCtruth_(iConfig.getParameter<bool>("UseMCtruth")),
+  effOutputFileName_(iConfig.getParameter<std::string>("EffOutputFileName"))
 {
   associatorByDeltaR_.reset(new AssociatorByDeltaR(iConfig.getParameter<double>("MaxDeltaR")));
   simAssociatorByDeltaR_.reset(new AssociatorByDeltaR(iConfig.getParameter<double>("SimMaxDeltaR")));
@@ -223,6 +226,10 @@ void TrackingEfficiencyFromCosmics::endJob()
   for( unsigned int i=0; i<nBins_; ++i ) {
     std::cout << "reco eff["<<i<<"] = " << efficiency_->getEff(i) << " +/- " << efficiency_->getEffError(i) << std::endl;
   }
+
+  EfficiencyTree tree;
+  tree.writeTree(effOutputFileName_, &*efficiency_);
+
 }
 
 // ------------ method called when starting to processes a run  ------------

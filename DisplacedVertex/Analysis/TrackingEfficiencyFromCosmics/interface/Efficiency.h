@@ -35,6 +35,9 @@ public:
     unsigned int bins;
   };
 
+  /// This is used only when building from a SerializedEfficiency
+  Efficiency() {}
+
   /**
     * The constructor receives a vector with the sizes of all the variables.
     * The order of these variables must be preserved when they are filled later on.
@@ -203,11 +206,24 @@ public:
     return( sqrt(p*(1-p)/(double(values_[index].first))) );
   }
 
-  inline unsigned int linearSize() const {return S_;}
-  inline unsigned int bins(unsigned int i) const {return vSizes_[i];}
-  inline double binsSize(unsigned int i) const {return vBinSizes_[i];}
-  inline double min(unsigned int i) const {return vMin_[i];}
-  inline double max(unsigned int i) const {return vMax_[i];}
+  inline unsigned int getLinearSize() const {return S_;}
+  inline unsigned int getN() const {return N_;}
+  inline unsigned int getVIndexes(const unsigned int i) const {return vIndexes_[i];}
+  inline std::pair<unsigned int, unsigned int> getValues(const unsigned int i) const {return values_[i];}
+  inline unsigned int bins(const unsigned int i) const {return vSizes_[i];}
+  inline double binsSize(const unsigned int i) const {return vBinSizes_[i];}
+  inline double min(const unsigned int i) const {return vMin_[i];}
+  inline double max(const unsigned int i) const {return vMax_[i];}
+
+  // Setter methods for building from serialized objects
+  inline void setLinearSize(const unsigned int S) {S_ = S;}
+  inline void setN(const unsigned int N) {N_ = N;}
+  inline void setVIndexes(boost::shared_array<unsigned int> & vIndexes) {vIndexes_ = vIndexes;}
+  inline void setVSizes(boost::shared_array<unsigned int> & vSizes) {vSizes_ = vSizes;}
+  inline void setVMin(boost::shared_array<double> & vMin) {vMin_ = vMin;}
+  inline void setVMax(boost::shared_array<double> & vMax) {vMax_ = vMax;}
+  inline void setVBinSizes(boost::shared_array<double> & vBinSizes) {vBinSizes_ = vBinSizes;}
+  inline void setValues(boost::shared_array< std::pair<unsigned int, unsigned int> > & values) {values_ = values;}
 
 protected:
   /// Compute the linearIndex for a given vector of indexes

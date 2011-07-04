@@ -12,7 +12,7 @@ process.MessageLogger.cerr.INFO = cms.untracked.PSet(
 )
 process.options   = cms.untracked.PSet( wantSummary = cms.untracked.bool(True) )
 
-process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )
+process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(1) )
 
 process.TFileService=cms.Service('TFileService',
                                  fileName=cms.string('TrackingEfficiencyFromCosmics.root')
@@ -27,12 +27,8 @@ process.source = cms.Source("PoolSource",
     )
 )
 
-process.demo = cms.EDAnalyzer('TrackingEfficiencyFromCosmics',
-                              MaxDeltaR = cms.double(1000),
-                              SimMaxDeltaR = cms.double(1000),
-                              UseMCtruth = cms.bool(False),
-                              EffOutputFileName = cms.string("Efficiency.root")
-)
-
+process.demo = cms.EDAnalyzer('EfficiencyReader',
+                              InputFileName = cms.string("Efficiency.root")
+                              )
 
 process.p = cms.Path(process.demo)

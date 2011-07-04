@@ -22,7 +22,6 @@ class TestEfficiency : public CppUnit::TestFixture
 
   void setUp()
   {
-
     vPars_.push_back(Efficiency::Parameters(20, 0, 10));
     vPars_.push_back(Efficiency::Parameters(10, -3, 3));
     vPars_.push_back(Efficiency::Parameters(10, -3.2, 3.2));
@@ -58,7 +57,7 @@ class TestEfficiency : public CppUnit::TestFixture
 
   void testLinearRepresentation()
   {
-    CPPUNIT_ASSERT( eff->linearSize() == (vPars_[0].bins)*(vPars_[1].bins)*(vPars_[2].bins)*(vPars_[3].bins) );
+    CPPUNIT_ASSERT( eff->getLinearSize() == (vPars_[0].bins)*(vPars_[1].bins)*(vPars_[2].bins)*(vPars_[3].bins) );
   }
 
   void testParameters()
@@ -200,7 +199,7 @@ class TestEfficiency : public CppUnit::TestFixture
 
     boost::shared_ptr<Efficiency> newEff(eff->project(vKeep));
     unsigned int bin = (3.8 - vPars_[0].min)*vPars_[0].bins/(vPars_[0].max - vPars_[0].min);
-    // std::cout << "newSize = " << newEff->linearSize() << std::endl;
+    // std::cout << "newSize = " << newEff->getLinearSize() << std::endl;
     // std::cout << "newEff("<<bin<<") = " << newEff->getEff(bin) << std::endl;
     CPPUNIT_ASSERT( newEff->getEff(bin) == 1./3. );
 
