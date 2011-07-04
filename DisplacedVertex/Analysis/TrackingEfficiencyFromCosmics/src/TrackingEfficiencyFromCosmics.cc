@@ -225,9 +225,6 @@ void TrackingEfficiencyFromCosmics::endJob()
       std::cout << "genEfficiency["<<i<<"] (vs pt) = " << genEfficiency_->getEff(i) << " +/- " << genEfficiency_->getEffError(i) << std::endl;
     }
   }
-  for( unsigned int i=0; i<nBins_; ++i ) {
-    std::cout << "reco eff["<<i<<"] = " << efficiency_->getEff(i) << " +/- " << efficiency_->getEffError(i) << std::endl;
-  }
 
   EfficiencyTree tree;
 
@@ -235,6 +232,10 @@ void TrackingEfficiencyFromCosmics::endJob()
   vKeep[0] = 0;
   vKeep[1] = -1;
   boost::shared_ptr<Efficiency> newEff(efficiency_->project(vKeep));
+
+  for( unsigned int i=0; i<nBins_; ++i ) {
+    std::cout << "reco eff["<<i<<"] = " << newEff->getEff(i) << " +/- " << newEff->getEffError(i) << std::endl;
+  }
 
   tree.writeTree(effOutputFileName_, &*newEff);
 }
