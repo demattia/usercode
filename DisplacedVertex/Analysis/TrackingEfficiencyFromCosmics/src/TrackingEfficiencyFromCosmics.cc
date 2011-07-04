@@ -226,18 +226,21 @@ void TrackingEfficiencyFromCosmics::endJob()
     }
   }
 
-  EfficiencyTree tree;
-
-  boost::shared_array<int> vKeep(new int[2]);
-  vKeep[0] = 0;
-  vKeep[1] = -1;
-  boost::shared_ptr<Efficiency> newEff(efficiency_->project(vKeep));
+//  boost::shared_array<int> vKeep(new int[2]);
+//  vKeep[0] = 0;
+//  vKeep[1] = -1;
+//  boost::shared_ptr<Efficiency> newEff(efficiency_->project(vKeep));
+//  for( unsigned int i=0; i<nBins_; ++i ) {
+//    std::cout << "reco eff["<<i<<"] = " << newEff->getEff(i) << " +/- " << newEff->getEffError(i) << std::endl;
+//  }
 
   for( unsigned int i=0; i<nBins_; ++i ) {
-    std::cout << "reco eff["<<i<<"] = " << newEff->getEff(i) << " +/- " << newEff->getEffError(i) << std::endl;
+    std::cout << "reco eff["<<i<<"] = " << efficiency_->getEff(i) << " +/- " << efficiency_->getEffError(i) << std::endl;
   }
 
-  tree.writeTree(effOutputFileName_, &*newEff);
+  EfficiencyTree tree;
+  tree.writeTree(effOutputFileName_, &*efficiency_);
+  // tree.writeTree(effOutputFileName_, &*newEff);
 }
 
 // ------------ method called when starting to processes a run  ------------
