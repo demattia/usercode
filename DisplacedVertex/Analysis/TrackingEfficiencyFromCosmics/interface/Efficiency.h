@@ -80,17 +80,21 @@ public:
   }
 
   /**
-    * Projects the values over a subset of the dimensions (reduces matrix size).
-    * Accepts an array where the int is -1 for a variable to drop.
+    * Projects the values over a subset of the dimensions (reduces matrix size) and rebins the dimensions.
+    * Accepts an array where the int is 0 for a variable to drop.
+    * If the value is not 0 the variable dimension is rebinned by dividing the number of bins by the value passed.
+    * Therefore, passing 1 means no rebin, passing 2 means half the bins and so on. The value is integer and the
+    * division is integer.
     * This method builds a new Efficiency object with the new sizes and values and returns a shared_ptr to it.
     */
-  boost::shared_ptr<Efficiency> project(const boost::shared_array<int> & vKeep)
+  boost::shared_ptr<Efficiency> projectAndRebin(const boost::shared_array<unsigned int> & vKeep)
   {
     // Find the sizes to be kept
     std::vector<Parameters> newPars;
     for( unsigned int i=0; i<N_; ++i ) {
-      if( vKeep[i] != -1 ) {
-        newPars.push_back(Parameters(names_[i], vSizes_[i], vMin_[i], vMax_[i]));
+      if( vKeep[i] != 0 ) {
+        // Note the vSizes_[i] is divided by vKeep for rebinning
+        newPars.push_back(Parameters(names_[i], vSizes_[i]/vKeep[i], vMin_[i], vMax_[i]));
       }
     }
     boost::shared_ptr<Efficiency> newEff(new Efficiency(newPars));
@@ -115,7 +119,7 @@ public:
     * - the array with the selection of variables to keep (see project method)
     * - the number of variables to keep
     */
-  boost::shared_array<unsigned int> getIndexes(const unsigned int linearIndex, const boost::shared_array<int> & vKeep, const unsigned int newN)
+  boost::shared_array<unsigned int> getIndexes(const unsigned int linearIndex, const boost::shared_array<unsigned int> & vKeep, const unsigned int newN)
   {
     boost::shared_array<unsigned int> vNewIndexes(new unsigned int[newN]);
     unsigned int tempS = S_;
@@ -128,8 +132,9 @@ public:
   /**
     * Compute the indexes only for the variables to be kept and save them in the vNewIndexes.
     * It is used when reducing the matrix dimensions by projecting.
+    * Note that S is passed by reference so that the value is modified.
     */
-  void computeIndexes(const unsigned int L, unsigned int & S, const boost::shared_array<int> & vKeep,
+  void computeIndexes(const unsigned int L, unsigned int & S, const boost::shared_array<unsigned int> & vKeep,
                       const unsigned int newN, boost::shared_array<unsigned int> & vNewIndexes,
                       unsigned int & counter, unsigned int & newCounter)
   {
@@ -137,8 +142,8 @@ public:
 
     S /= vSizes_[counter];
 
-    if( vKeep[counter] != -1 ) {
-      vNewIndexes[newCounter] = (unsigned int)(L/S);
+    if( vKeep[counter] != 0 ) {
+      vNewIndexes[newCounter] = (L/S)/vKeep[counter];
       ++newCounter;
     }
     ++counter;

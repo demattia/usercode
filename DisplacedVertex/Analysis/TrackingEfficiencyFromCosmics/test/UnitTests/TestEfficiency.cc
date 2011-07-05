@@ -30,7 +30,7 @@ class TestEfficiency : public CppUnit::TestFixture
 
     variables.reset(new double[4]);
     binIndex.reset(new unsigned int[4]);
-    vKeep.reset(new int[4]);
+    vKeep.reset(new unsigned int[4]);
   }
 
   void tearDown() {}
@@ -72,11 +72,11 @@ class TestEfficiency : public CppUnit::TestFixture
 
   void testGetIndexes()
   {
-    boost::shared_array<int> vKeep(new int[4]);
-    vKeep[0] = 0;
-    vKeep[1] = -1;
-    vKeep[2] = -1;
-    vKeep[3] = 0;
+    boost::shared_array<unsigned int> vKeep(new unsigned int[4]);
+    vKeep[0] = 1;
+    vKeep[1] = 0;
+    vKeep[2] = 0;
+    vKeep[3] = 1;
 
     boost::shared_array<unsigned int> indexArray(eff->getIndexes(0, vKeep, 2));
     CPPUNIT_ASSERT( indexArray[0] == 0 );
@@ -95,18 +95,18 @@ class TestEfficiency : public CppUnit::TestFixture
     CPPUNIT_ASSERT( indexArray[1] == 15 );
 
     // Case of projection on a single variable
-    vKeep[0] = -1;
-    vKeep[1] = -1;
-    vKeep[2] = 0;
-    vKeep[3] = -1;
+    vKeep[0] = 0;
+    vKeep[1] = 0;
+    vKeep[2] = 1;
+    vKeep[3] = 0;
     indexArray = eff->getIndexes(eff->getLinearIndex(vIndexes), vKeep, 1);
     CPPUNIT_ASSERT( indexArray[0] == 6 );
 
     // Case of projection on another single variable
-    vKeep[0] = -1;
-    vKeep[1] = 0;
-    vKeep[2] = -1;
-    vKeep[3] = -1;
+    vKeep[0] = 0;
+    vKeep[1] = 1;
+    vKeep[2] = 0;
+    vKeep[3] = 0;
     indexArray = eff->getIndexes(eff->getLinearIndex(vIndexes), vKeep, 1);
     CPPUNIT_ASSERT( indexArray[0] == 3 );
   }
@@ -171,23 +171,23 @@ class TestEfficiency : public CppUnit::TestFixture
     CPPUNIT_ASSERT( float(eff->getEffError(binIndex)) == error );
 
     // Compute errors after a projection
-    vKeep[0] = -1;
-    vKeep[1] = 0;
-    vKeep[2] = -1;
-    vKeep[3] = -1;
+    vKeep[0] = 0;
+    vKeep[1] = 1;
+    vKeep[2] = 0;
+    vKeep[3] = 0;
 
-    boost::shared_ptr<Efficiency> newEff(eff->project(vKeep));
+    boost::shared_ptr<Efficiency> newEff(eff->projectAndRebin(vKeep));
     unsigned int bin = (0.3 - vPars_[1].min)*vPars_[1].bins/(vPars_[1].max - vPars_[1].min);
     CPPUNIT_ASSERT( float(newEff->getEffError(bin)) == error );
   }
 
-  void testProjection()
-  {
+  void testProjectAndRebin()
+  {    
     // Project on a single variable
-    vKeep[0] = 0;
-    vKeep[1] = -1;
-    vKeep[2] = -1;
-    vKeep[3] = -1;
+    vKeep[0] = 1;
+    vKeep[1] = 0;
+    vKeep[2] = 0;
+    vKeep[3] = 0;
 
     variables[0] = 3.8;
     variables[1] = 0.3;
@@ -197,7 +197,7 @@ class TestEfficiency : public CppUnit::TestFixture
     eff->fill(variables, false);
     eff->fill(variables, true);
 
-    boost::shared_ptr<Efficiency> newEff(eff->project(vKeep));
+    boost::shared_ptr<Efficiency> newEff(eff->projectAndRebin(vKeep));
     unsigned int bin = (3.8 - vPars_[0].min)*vPars_[0].bins/(vPars_[0].max - vPars_[0].min);
     // std::cout << "newSize = " << newEff->getLinearSize() << std::endl;
     // std::cout << "newEff("<<bin<<") = " << newEff->getEff(bin) << std::endl;
@@ -218,21 +218,45 @@ class TestEfficiency : public CppUnit::TestFixture
     // Project on another variable, see that the values in the first variable (that are in three different bins)
     // are collapsed in the correct way.
     // Expected value for the efficiency is 2/5
-    vKeep[0] = -1;
-    vKeep[1] = 0;
-    vKeep[2] = -1;
-    vKeep[3] = -1;
-    newEff = eff->project(vKeep);
-    // bin = (0.3 - vPars_[1].min)*vPars_[1].bins/(vPars_[1].max - vPars_[1].min);
+    vKeep[0] = 0;
+    vKeep[1] = 1;
+    vKeep[2] = 0;
+    vKeep[3] = 0;
+    newEff = eff->projectAndRebin(vKeep);
     double binSize = (vPars_[1].max - vPars_[1].min)/vPars_[1].bins;
-    // std::cout << "binSize = " << binSize << std::endl;
     bin = (unsigned int)((0.3 - vPars_[1].min)/binSize);
-    // std::cout << "newEff("<<bin<<") = " << newEff->getEff(bin) << std::endl;
-    // for( unsigned int i=0; i<vPars_[1].bins; ++i ) {
-    //   std::cout << "newEff("<<i<<") = " << newEff->getEff(i) << std::endl;
-    // }
     CPPUNIT_ASSERT( newEff->getEff(bin) == 2./5. );
     CPPUNIT_ASSERT( newEff->getName(0) == "par2" );
+
+    // Rebin a single variable keeping only one variable
+    vKeep[0] = 2;
+    vKeep[1] = 1;
+    vKeep[2] = 1;
+    vKeep[3] = 1;
+    newEff = eff->projectAndRebin(vKeep);
+    // The first variable has now 10 bins
+    CPPUNIT_ASSERT( newEff->bins(0) == vPars_[0].bins/vKeep[0] );
+    boost::shared_array<unsigned int> indexes(new unsigned int[4]);
+    indexes[0] = (unsigned int)((3.8 - vPars_[0].min)/((vPars_[0].max - vPars_[0].min)/(vPars_[0].bins/vKeep[0])));
+    indexes[1] = (unsigned int)((0.3 - vPars_[1].min)/((vPars_[1].max - vPars_[1].min)/(vPars_[1].bins/vKeep[1])));
+    indexes[2] = (vPars_[2].bins/vKeep[2]-1);
+    indexes[3] = (unsigned int)((45. - vPars_[3].min)/((vPars_[3].max - vPars_[3].min)/(vPars_[3].bins/vKeep[3])));
+    CPPUNIT_ASSERT( newEff->getEff(indexes) == 1./2. );
+
+    // Rebin two variables keeping them only
+    // Rebin a single variable keeping only one variable
+    vKeep[0] = 2;
+    vKeep[1] = 3;
+    vKeep[2] = 0;
+    vKeep[3] = 0;
+    newEff = eff->projectAndRebin(vKeep);
+    binSize = (vPars_[0].max - vPars_[0].min)/(vPars_[0].bins/vKeep[0]);
+    CPPUNIT_ASSERT( newEff->bins(0) == vPars_[0].bins/vKeep[0] );
+    binSize = (vPars_[1].max - vPars_[1].min)/(vPars_[1].bins/vKeep[1]);
+    CPPUNIT_ASSERT( newEff->bins(1) == vPars_[1].bins/vKeep[1] );
+    indexes[0] = (unsigned int)((3.8 - vPars_[0].min)/((vPars_[0].max - vPars_[0].min)/(vPars_[0].bins/vKeep[0])));
+    indexes[1] = (unsigned int)((0.3 - vPars_[1].min)/((vPars_[1].max - vPars_[1].min)/(vPars_[1].bins/vKeep[1])));
+    CPPUNIT_ASSERT( newEff->getEff(indexes) == 1./2. );
   }
 
   void fillBinIndex( boost::shared_array<double> variables,
@@ -253,14 +277,14 @@ class TestEfficiency : public CppUnit::TestFixture
   CPPUNIT_TEST( testFill );
   CPPUNIT_TEST( testEfficiency );
   CPPUNIT_TEST( testEffError );
-  CPPUNIT_TEST( testProjection );
+  CPPUNIT_TEST( testProjectAndRebin );
   CPPUNIT_TEST_SUITE_END();
 
   std::auto_ptr<Efficiency> eff;
   std::vector<Efficiency::Parameters> vPars_;
   boost::shared_array<double> variables;
   boost::shared_array<unsigned int> binIndex;
-  boost::shared_array<int> vKeep;
+  boost::shared_array<unsigned int> vKeep;
 };
 
 CPPUNIT_TEST_SUITE_REGISTRATION( TestEfficiency );

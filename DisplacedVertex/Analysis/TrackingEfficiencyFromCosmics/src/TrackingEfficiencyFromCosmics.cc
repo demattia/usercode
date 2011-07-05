@@ -226,7 +226,7 @@ void TrackingEfficiencyFromCosmics::endJob()
     }
   }
 
-//  boost::shared_array<int> vKeep(new int[2]);
+//  boost::shared_array<unsigned int> vKeep(new int[2]);
 //  vKeep[0] = 0;
 //  vKeep[1] = -1;
 //  boost::shared_ptr<Efficiency> newEff(efficiency_->project(vKeep));
