@@ -18,6 +18,7 @@ struct SerializableEfficiency : public TObject
   std::vector<unsigned int> vIndexes;
   // Linear representation of the N-dimensional matrix
   std::vector<std::pair<unsigned int, unsigned int> > values;
+  std::vector<std::string> names;
 
   ClassDef(SerializableEfficiency, 1)
 };

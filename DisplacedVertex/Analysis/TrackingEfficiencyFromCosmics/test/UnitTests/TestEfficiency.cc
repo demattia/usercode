@@ -22,10 +22,10 @@ class TestEfficiency : public CppUnit::TestFixture
 
   void setUp()
   {
-    vPars_.push_back(Efficiency::Parameters(20, 0, 10));
-    vPars_.push_back(Efficiency::Parameters(10, -3, 3));
-    vPars_.push_back(Efficiency::Parameters(10, -3.2, 3.2));
-    vPars_.push_back(Efficiency::Parameters(30, 0, 100));
+    vPars_.push_back(Efficiency::Parameters("par1", 20, 0, 10));
+    vPars_.push_back(Efficiency::Parameters("par2", 10, -3, 3));
+    vPars_.push_back(Efficiency::Parameters("par3", 10, -3.2, 3.2));
+    vPars_.push_back(Efficiency::Parameters("par4", 30, 0, 100));
     eff.reset(new Efficiency(vPars_));
 
     variables.reset(new double[4]);
@@ -202,6 +202,7 @@ class TestEfficiency : public CppUnit::TestFixture
     // std::cout << "newSize = " << newEff->getLinearSize() << std::endl;
     // std::cout << "newEff("<<bin<<") = " << newEff->getEff(bin) << std::endl;
     CPPUNIT_ASSERT( newEff->getEff(bin) == 1./3. );
+    CPPUNIT_ASSERT( newEff->getName(0) == "par1" );
 
     // Fill the values changing the first variable such that they go in three different bins.
     variables[0] = 4.2;
@@ -231,6 +232,7 @@ class TestEfficiency : public CppUnit::TestFixture
     //   std::cout << "newEff("<<i<<") = " << newEff->getEff(i) << std::endl;
     // }
     CPPUNIT_ASSERT( newEff->getEff(bin) == 2./5. );
+    CPPUNIT_ASSERT( newEff->getName(0) == "par2" );
   }
 
   void fillBinIndex( boost::shared_array<double> variables,

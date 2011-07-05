@@ -13,7 +13,7 @@
 //
 // Original Author:  Marco De Mattia,40 3-B32,+41227671551,
 //         Created:  Wed May 25 16:44:02 CEST 2011
-// $Id: TrackingEfficiencyFromCosmics.cc,v 1.5 2011/07/04 10:22:56 demattia Exp $
+// $Id: TrackingEfficiencyFromCosmics.cc,v 1.9 2011/07/04 17:46:51 demattia Exp $
 //
 //
 
@@ -104,8 +104,8 @@ TrackingEfficiencyFromCosmics::TrackingEfficiencyFromCosmics(const edm::Paramete
 
   // Build the object to compute the efficiency
   std::vector<Efficiency::Parameters> pars;
-  pars.push_back(Efficiency::Parameters(nBins_, 0, 100));
-  pars.push_back(Efficiency::Parameters(nBins_, 0, 100));
+  pars.push_back(Efficiency::Parameters("dxy", nBins_, 0, 100));
+  pars.push_back(Efficiency::Parameters("dz", nBins_, 0, 100));
   genEfficiency_.reset(new Efficiency(pars));
   efficiency_.reset(new Efficiency(pars));
   variables_.reset(new double[2]);

@@ -4,6 +4,7 @@
 #include <vector>
 #include <memory>
 #include <cmath>
+#include <string>
 #include "boost/shared_array.hpp"
 #include "boost/shared_ptr.hpp"
 
@@ -25,11 +26,13 @@ public:
     */
   struct Parameters
   {
-    Parameters(const unsigned int inputBins, const double & inputMin, const double & inputMax) :
+    Parameters(const std::string & inputName, const unsigned int inputBins, const double & inputMin, const double & inputMax) :
+      name(inputName),
       min(inputMin),
       max(inputMax),
       bins(inputBins)
     {}
+    std::string name;
     double min;
     double max;
     unsigned int bins;
@@ -61,6 +64,7 @@ public:
       vMin_[i] = it->min;
       vMax_[i] = it->max;
       vBinSizes_[i] = (vMax_[i] - vMin_[i])/vSizes_[i];
+      names_.push_back(it->name);
     }
     values_.reset(new std::pair<unsigned int, unsigned int>[S_]);
     // This initialization should not be necessary as when the pair is built the integers are default initialized to 0.
@@ -86,7 +90,7 @@ public:
     std::vector<Parameters> newPars;
     for( unsigned int i=0; i<N_; ++i ) {
       if( vKeep[i] != -1 ) {
-        newPars.push_back(Parameters(vSizes_[i], vMin_[i], vMax_[i]));
+        newPars.push_back(Parameters(names_[i], vSizes_[i], vMin_[i], vMax_[i]));
       }
     }
     boost::shared_ptr<Efficiency> newEff(new Efficiency(newPars));
@@ -214,6 +218,7 @@ public:
   inline double binsSize(const unsigned int i) const {return vBinSizes_[i];}
   inline double min(const unsigned int i) const {return vMin_[i];}
   inline double max(const unsigned int i) const {return vMax_[i];}
+  inline std::string getName(const unsigned int i) const {return names_[i];}
 
   // Setter methods for building from serialized objects
   inline void setLinearSize(const unsigned int S) {S_ = S;}
@@ -224,6 +229,7 @@ public:
   inline void setVMax(boost::shared_array<double> & vMax) {vMax_ = vMax;}
   inline void setVBinSizes(boost::shared_array<double> & vBinSizes) {vBinSizes_ = vBinSizes;}
   inline void setValues(boost::shared_array< std::pair<unsigned int, unsigned int> > & values) {values_ = values;}
+  inline void setNames( const std::vector<std::string> & names ) {names_ = names;}
 
 protected:
   /// Compute the linearIndex for a given vector of indexes
@@ -246,6 +252,7 @@ protected:
   boost::shared_array<unsigned int> vIndexes_;
   // Linear representation of the N-dimensional matrix
   boost::shared_array<std::pair<unsigned int, unsigned int> > values_;
+  std::vector<std::string> names_;
 };
 
 #endif // EFFICIENCY_H

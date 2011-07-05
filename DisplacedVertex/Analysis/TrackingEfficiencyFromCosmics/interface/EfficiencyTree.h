@@ -32,6 +32,7 @@ public:
       sEff.vBinSizes.push_back(eff->binsSize(i));
       sEff.vMin.push_back(eff->min(i));
       sEff.vMax.push_back(eff->max(i));
+      sEff.names.push_back(eff->getName(i));
     }
     unsigned int S = eff->getLinearSize();
     for( unsigned int i=0; i<S; ++i ) {
@@ -75,6 +76,7 @@ public:
       eff->setVMin(vMin);
       eff->setVMax(vMax);
       eff->setValues(values);
+      eff->setNames(sEff->names);
     }
     file->Close();
   }
