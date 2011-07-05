@@ -13,7 +13,7 @@
 //
 // Original Author:  Marco De Mattia,40 3-B32,+41227671551,
 //         Created:  Wed May 25 16:44:02 CEST 2011
-// $Id: TrackingEfficiencyFromCosmics.cc,v 1.9 2011/07/04 17:46:51 demattia Exp $
+// $Id: TrackingEfficiencyFromCosmics.cc,v 1.11 2011/07/05 10:50:15 demattia Exp $
 //
 //
 
@@ -100,15 +100,16 @@ TrackingEfficiencyFromCosmics::TrackingEfficiencyFromCosmics(const edm::Paramete
   associatorByDeltaR_.reset(new AssociatorByDeltaR(iConfig.getParameter<double>("MaxDeltaR")));
   simAssociatorByDeltaR_.reset(new AssociatorByDeltaR(iConfig.getParameter<double>("SimMaxDeltaR")));
 
-  nBins_ = 20;
+  nBins_ = 100;
 
   // Build the object to compute the efficiency
   std::vector<Efficiency::Parameters> pars;
   pars.push_back(Efficiency::Parameters("dxy", nBins_, 0, 100));
   pars.push_back(Efficiency::Parameters("dz", nBins_, 0, 100));
+  pars.push_back(Efficiency::Parameters("pt", nBins_, 0, 1000));
   genEfficiency_.reset(new Efficiency(pars));
   efficiency_.reset(new Efficiency(pars));
-  variables_.reset(new double[2]);
+  variables_.reset(new double[3]);
 
   // maxDeltaR_ = iConfig.getParameter<double>("MaxDeltaR");
 }
@@ -176,6 +177,7 @@ void TrackingEfficiencyFromCosmics::analyze(const edm::Event& iEvent, const edm:
       }
       variables_[0] = fabs(it->first->dxy());
       variables_[1] = fabs(it->first->dz());
+      variables_[2] = fabs(it->first->pt());
       efficiency_->fill(variables_, found);
     }
   }

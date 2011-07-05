@@ -20,6 +20,7 @@
 <use name="MagneticField/Engine"/>
 <use name="MagneticField/Records"/>
 <use name="RecoLocalTracker/SiStripClusterizer"/>
+<use name="SimDataFormats/Track"/>
 <use name="TrackingTools/PatternTools"/>
 <use name="TrackingTools/Records"/>
 <use name="TrackingTools/TrackFitters"/>
