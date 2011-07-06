@@ -39,6 +39,9 @@
 
 #include <boost/foreach.hpp>
 
+#include <TCanvas.h>
+#include <TGraphAsymmErrors.h>
+
 //
 // class declaration
 //
@@ -65,15 +68,36 @@ private:
   // ----------member data ---------------------------
   std::auto_ptr<Efficiency> efficiency_;
   std::string inputFileName_;
-  edm::Service<TFileService> fileService_;
+  // edm::Service<TFileService> fileService_;
 };
 
 void EfficiencyAnalyzer::fillHistogram(const TString & name, const TString & title, const boost::shared_ptr<Efficiency> & eff )
 {
-  TH1F * hEff = fileService_->make<TH1F>(name, title, eff->bins(0), eff->min(0), eff->min(0));
-  for( unsigned int i=0; i<eff->getLinearSize(); ++i ) {
-    hEff->SetBinContent(i+1, eff->getEff(i));
+  TCanvas *c1 = new TCanvas("c1"+name,"A Simple Graph Example",200,10,700,500);
+  Int_t n = eff->bins(0);
+  Double_t x[100], y[100];
+  Double_t exl[100], exh[100];
+  Double_t eyl[100], eyh[100];
+  for (Int_t i=0;i<n;++i) {
+    // std::cout << eff->min(0) << " "<<i<<"*"<<eff->binsSize(0)<<" = "<< i*(eff->binsSize(0)) << std::endl;
+    x[i] = eff->min(0) + (i+0.5)*eff->binsSize(0);
+    y[i] = eff->getEff(i);
+    exl[i] = eff->binsSize(0)/2.;
+    exh[i] = eff->binsSize(0)/2.;
+    eyl[i] = std::min(y[i], eff->getEffError(i));
+    eyh[i] = std::min(1-y[i], eff->getEffError(i));
   }
+  // TGraph * hEff = fileService_->make<TGraph>(name, title, eff->bins(0), eff->min(0), eff->min(0));
+  TGraphAsymmErrors * hEff = new TGraphAsymmErrors(n, x, y, exl, exh, eyl, eyh);
+  hEff->Draw("AP");
+  c1->Draw();
+  c1->SaveAs(name+".root");
+  // c1->Save();
+
+//  for( unsigned int i=0; i<eff->getLinearSize(); ++i ) {
+//    std::cout << "eff["<<i<<"] = " << eff->getEff(i) << std::endl;
+//    hEff->SetBinContent(i+1, eff->getEff(i));
+//  }
 }
 
 EfficiencyAnalyzer::EfficiencyAnalyzer(const edm::ParameterSet& iConfig) :
@@ -82,6 +106,9 @@ EfficiencyAnalyzer::EfficiencyAnalyzer(const edm::ParameterSet& iConfig) :
   efficiency_.reset(new Efficiency);
   EfficiencyTree tree;
   tree.readTree(inputFileName_, &*efficiency_);
+
+  TFile * outputFile = new TFile("EfficiencyAnalyzer_1.root", "RECREATE");
+  outputFile->cd();
 
   boost::shared_array<unsigned int> vKeep(new unsigned int[3]);
   vKeep[0] = 1;
@@ -118,7 +145,7 @@ void EfficiencyAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup
 // ------------ method called once each job just before starting event loop  ------------
 void EfficiencyAnalyzer::beginJob()
 {
-  edm::Service<TFileService> fileService;
+  // edm::Service<TFileService> fileService;
 }
 
 // ------------ method called once each job just after ending the event loop  ------------

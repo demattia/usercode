@@ -15,9 +15,9 @@ process = cms.Process("TrackingEfficiencyFromCosmics")
 process.source = cms.Source("EmptySource")
 process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(1) )
 
-process.TFileService=cms.Service('TFileService',
-                                 fileName=cms.string('EfficiencyAnalyzer.root')
-                                 )
+# process.TFileService=cms.Service('TFileService',
+#                                  fileName=cms.string('EfficiencyAnalyzer.root')
+#                                  )
 
 process.demo = cms.EDAnalyzer('EfficiencyAnalyzer',
                               InputFileName = cms.string("Efficiency.root")

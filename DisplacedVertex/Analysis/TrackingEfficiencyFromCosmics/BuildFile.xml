@@ -26,8 +26,10 @@
 <use name="TrackingTools/TrackFitters"/>
 <use name="TrackingTools/TrajectoryState"/>
 <use name="TrackingTools/TransientTrackingRecHit"/>
+<use name="TrackingTools/IPTools"/>
 <use name="boost_regex"/>
 <use name="roothistmatrix"/>
 <use name="root"/>
 <use name="rootrflx"/>
+<use name="rootgraphics"/>
 <flags EDM_PLUGIN="1"/>

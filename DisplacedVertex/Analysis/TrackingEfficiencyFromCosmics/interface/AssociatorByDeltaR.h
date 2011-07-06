@@ -12,7 +12,10 @@
 class AssociatorByDeltaR
 {
 public:
-  AssociatorByDeltaR(const double & maxDeltaR) : maxDeltaR_(maxDeltaR) {}
+  AssociatorByDeltaR(const double & maxDeltaR, const bool removeMatches = true) :
+    maxDeltaR_(maxDeltaR),
+    removeMatches_(removeMatches)
+  {}
 
   template <class T1, class T2>
 //  void fillAssociationMap( const edm::Handle<std::vector<T1> > & firstCollection,
@@ -52,7 +55,8 @@ public:
       }
       if( matched != clonedSecond.end() ) {
         matchesMap.insert(std::make_pair(&*itFirst, *matched));
-        clonedSecond.erase(matched);
+
+        if( removeMatches_ ) clonedSecond.erase(matched);
 
         if( hMinDeltaR != 0 ) hMinDeltaR->Fill(deltaR);
       }
@@ -94,6 +98,7 @@ public:
 
 protected:
   double maxDeltaR_;
+  bool removeMatches_;
 };
 
 #endif // ASSOCIATORBYDELTAR_H

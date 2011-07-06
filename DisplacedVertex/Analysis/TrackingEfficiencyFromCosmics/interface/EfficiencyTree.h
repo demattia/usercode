@@ -59,9 +59,10 @@ public:
       for( unsigned int i=0; i<N; ++i ) {
         vIndexes[i] = sEff->vIndexes[i];
         vSizes[i] = sEff->vSizes[i];
+        // std::cout << "binSize["<<i<<"] = " << sEff->vBinSizes[i] << std::endl;
         vBinSizes[i] = sEff->vBinSizes[i];
-        vMin[i] = sEff->vBinSizes[i];
-        vMax[i] = sEff->vBinSizes[i];
+        vMin[i] = sEff->vMin[i];
+        vMax[i] = sEff->vMax[i];
       }
       boost::shared_array<std::pair<unsigned int, unsigned int> > values(new std::pair<unsigned int, unsigned int>[S]);
       for( unsigned int i=0; i<S; ++i ) {

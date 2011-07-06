@@ -64,6 +64,10 @@ public:
       vMin_[i] = it->min;
       vMax_[i] = it->max;
       vBinSizes_[i] = (vMax_[i] - vMin_[i])/vSizes_[i];
+      // std::cout << "vMin_["<<i<<"] = " << vMin_[i] << std::endl;
+      // std::cout << "vMax_["<<i<<"] = " << vMax_[i] << std::endl;
+      // std::cout << "vSizes_["<<i<<"] = " << vSizes_[i] << std::endl;
+      // std::cout << " NEW BIN SIZES["<<i<<"] = " << vBinSizes_[i] << std::endl;
       names_.push_back(it->name);
     }
     values_.reset(new std::pair<unsigned int, unsigned int>[S_]);
@@ -108,6 +112,7 @@ public:
       // }
       newEff->fill(getIndexes(i, vKeep, newPars.size()), values_[i]);
     }
+    // std::cout << "AFTER PROJECTION:" << newEff->binsSize(0) << std::endl;
     return newEff;
   }
 
