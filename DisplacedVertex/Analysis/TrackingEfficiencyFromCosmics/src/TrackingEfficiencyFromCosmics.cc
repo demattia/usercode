@@ -13,7 +13,7 @@
 //
 // Original Author:  Marco De Mattia,40 3-B32,+41227671551,
 //         Created:  Wed May 25 16:44:02 CEST 2011
-// $Id: TrackingEfficiencyFromCosmics.cc,v 1.12 2011/07/05 14:43:59 demattia Exp $
+// $Id: TrackingEfficiencyFromCosmics.cc,v 1.13 2011/07/06 16:19:44 demattia Exp $
 //
 //
 
@@ -103,7 +103,9 @@ private:
   // double maxDeltaR_;
   TH1F * hMinDeltaR_, * hSimMinDeltaR_;
   TH1F * hMinTrackToGenDeltaR_, * hMinStaMuonToGenDeltaR_;
-  TH1F * hStandAloneToGenDeltaDxy_, * hStandAloneToGenDeltaDz_, * hTrackToGenDeltaDxy_, * hTrackToGenDeltaDz_;
+  TH1F * hStandAloneToGenDeltaDxy_, * hStandAloneToGenDeltaDz_;
+  TH1F * hCleanedStandAloneToGenDeltaDxy_, * hCleanedStandAloneToGenDeltaDz_;
+  TH1F * hTrackToGenDeltaDxy_, * hTrackToGenDeltaDz_;
   reco::Track::TrackQuality quality_;
   bool useMCtruth_;
 
@@ -111,6 +113,7 @@ private:
   std::auto_ptr<AssociatorByDeltaR> simAssociatorByDeltaR_;
   std::auto_ptr<ControlPlots> controlPlotsGeneralTracks_;
   std::auto_ptr<ControlPlots> controlPlotsStandAloneMuons_;
+  std::auto_ptr<ControlPlots> controlPlotsCleanedStandAloneMuons_;
   std::auto_ptr<Efficiency> genToStandAloneEfficiency_;
   std::auto_ptr<Efficiency> genToTrackEfficiency_;
   std::auto_ptr<Efficiency> efficiency_;
@@ -173,6 +176,20 @@ void TrackingEfficiencyFromCosmics::analyze(const edm::Event& iEvent, const edm:
   edm::Handle<reco::TrackCollection> staMuons;
   iEvent.getByLabel("standAloneMuons", staMuons);
 
+  // Select good standAloneMuons (done such that the matching with gen is good)
+  reco::TrackCollection cleanedStaMuons;
+  reco::TrackCollection::const_iterator it = staMuons->begin();
+  for( ; it != staMuons->end(); ++it ) {
+    if( it->found() > 0 ) {
+      cleanedStaMuons.push_back(*it);
+    }
+  }
+
+  // Fill all control plots
+  controlPlotsGeneralTracks_->fillControlPlots(*tracks);
+  controlPlotsStandAloneMuons_->fillControlPlots(*staMuons);
+  controlPlotsCleanedStandAloneMuons_->fillControlPlots(cleanedStaMuons);
+
   // Gen Particles
   edm::Handle<reco::GenParticleCollection> genParticles;
   if( useMCtruth_ ) {
@@ -194,11 +211,11 @@ void TrackingEfficiencyFromCosmics::analyze(const edm::Event& iEvent, const edm:
     // Compute efficiency from MC truth
     // std::map<const math::XYZTLorentzVectorD *, const reco::Track *>::const_iterator it = simMatchesMap.begin();
     // for( ; it != simMatchesMap.end(); ++it ) {
-//      variables_[0] = it->first->pt();
-//      bool found = false;
-//      if( it->second != 0 ) found = true;
-//      genEfficiency_->fill(variables_, found);
-//    }
+    //      variables_[0] = it->first->pt();
+    //      bool found = false;
+    //      if( it->second != 0 ) found = true;
+    //      genEfficiency_->fill(variables_, found);
+    //    }
 
     // Gen muon values
     variables_[0] = dxy_.first;
@@ -243,11 +260,16 @@ void TrackingEfficiencyFromCosmics::analyze(const edm::Event& iEvent, const edm:
       hStandAloneToGenDeltaDz_->Fill(staMuon.dz() - dz_.first);
       genToStandAloneEfficiency_->fill(variables_, true);
     }
-  }
 
-  // Fill all control plots
-  controlPlotsGeneralTracks_->fillControlPlots(*tracks);
-  controlPlotsStandAloneMuons_->fillControlPlots(*staMuons);
+    // For cleanedMuons
+    BOOST_FOREACH( const reco::Track & cleanedStaMuon, cleanedStaMuons ) {
+      hMinStaMuonToGenDeltaR_->Fill(reco::deltaR(*stableMuon, cleanedStaMuon));
+      hCleanedStandAloneToGenDeltaDxy_->Fill(cleanedStaMuon.dxy() - dxy_.first);
+      hCleanedStandAloneToGenDeltaDz_->Fill(cleanedStaMuon.dz() - dz_.first);
+      // genToStandAloneEfficiency_->fill(variables_, true);
+    }
+
+  }
 
   // Association map of StandAloneMuons and TrackerTracks
   std::map<const reco::Track *, const reco::Track *> matchesMap;
@@ -313,11 +335,14 @@ void TrackingEfficiencyFromCosmics::beginJob()
 
   hStandAloneToGenDeltaDxy_ = fileService->make<TH1F>("standAloneToGenDeltaDxy", "#Delta(dxy) standAlone - gen", 100, -100, 100);
   hStandAloneToGenDeltaDz_ = fileService->make<TH1F>("standAloneToGenDeltaDz", "#Delta(dz) standAlone - gen", 100, -100, 100);
+  hCleanedStandAloneToGenDeltaDxy_ = fileService->make<TH1F>("cleanedStandAloneToGenDeltaDxy", "#Delta(dxy) cleaned standAlone - gen", 100, -100, 100);
+  hCleanedStandAloneToGenDeltaDz_ = fileService->make<TH1F>("cleanedStandAloneToGenDeltaDz", "#Delta(dz) cleaned standAlone - gen", 100, -100, 100);
   hTrackToGenDeltaDxy_ = fileService->make<TH1F>("trackToGenDeltaDxy", "#Delta(dxy) track - gen", 100, -100, 100);
   hTrackToGenDeltaDz_ = fileService->make<TH1F>("trackToGenDeltaDz", "#Delta(dz) track - gen", 100, -100, 100);
 
   controlPlotsGeneralTracks_.reset(new ControlPlots(fileService, "generalTracks"));
   controlPlotsStandAloneMuons_.reset(new ControlPlots(fileService, "standAloneMuons"));
+  controlPlotsCleanedStandAloneMuons_.reset(new ControlPlots(fileService, "cleanedStandAloneMuons"));
 }
 
 // ------------ method called once each job just after ending the event loop  ------------
