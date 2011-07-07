@@ -19,7 +19,10 @@ process.MessageLogger = cms.Service("MessageLogger",
     )
 )
 
+process.load("Configuration.StandardSequences.Services_cff")
+process.load('Configuration.StandardSequences.Reconstruction_cff')
 
+process.load("MagneticField.Engine.uniformMagneticField_cfi")
 
 process.options   = cms.untracked.PSet( wantSummary = cms.untracked.bool(True) )
 
@@ -44,7 +47,9 @@ process.demo = cms.EDAnalyzer('TrackingEfficiencyFromCosmics',
                               MaxDeltaR = cms.double(1),
                               SimMaxDeltaR = cms.double(1000),
                               UseMCtruth = cms.bool(True),
-                              EffOutputFileName = cms.string("Efficiency.root")
+                              EffOutputFileName = cms.string("Efficiency.root"),
+                              GenToStandAloneEffOutputFileName = cms.string("GenToStandAloneEfficiency.root"),
+                              GenToTrackEffOutputFileName = cms.string("GenToTrackEfficiency.root")
                               )
 
 
