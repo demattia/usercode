@@ -20,7 +20,10 @@ process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(1) )
 #                                  )
 
 process.demo = cms.EDAnalyzer('EfficiencyAnalyzer',
-                              InputFileName = cms.string("Efficiency.root")
+                              InputFileName = cms.string("Efficiency.root"),
+                              # InputFileName = cms.string("GenToTrackEfficiency.root"),
+                              # InputFileName = cms.string("GenToStandAloneEfficiency.root"),
+                              Rebin = cms.uint32(4)
                               )
 
 process.p = cms.Path(process.demo)
