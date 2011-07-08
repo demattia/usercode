@@ -123,11 +123,14 @@ private:
   std::auto_ptr<ControlPlots> controlPlotsStandAloneMuons_;
   std::auto_ptr<ControlPlots> controlPlotsCleanedStandAloneMuons_;
   std::auto_ptr<Efficiency> genToStandAloneEfficiency_;
+  std::auto_ptr<Efficiency> genToCleanedStandAloneEfficiency_;
   std::auto_ptr<Efficiency> genToTrackEfficiency_;
   std::auto_ptr<Efficiency> efficiency_;
+  std::auto_ptr<Efficiency> efficiencyCleaned_;
   boost::shared_array<double> variables_;
   unsigned int nBins_;
   std::string effOutputFileName_;
+  std::string effCleanedOutputFileName_;
   std::string genToStandAloneEffOutputFileName_;
   std::string genToTrackEffOutputFileName_;
   AnalyticalImpactPointExtrapolator * analyticalExtrapolator_;
@@ -136,13 +139,16 @@ private:
   std::pair<double, double> dxy_;
   std::pair<double, double> dz_;
   std::pair<double, double> dxyz_;
+  double dzCut_;
 };
 
 TrackingEfficiencyFromCosmics::TrackingEfficiencyFromCosmics(const edm::ParameterSet& iConfig) :
   useMCtruth_(iConfig.getParameter<bool>("UseMCtruth")),
   effOutputFileName_(iConfig.getParameter<std::string>("EffOutputFileName")),
+  effCleanedOutputFileName_(iConfig.getParameter<std::string>("EffCleanedOutputFileName")),
   genToStandAloneEffOutputFileName_(iConfig.getParameter<std::string>("GenToStandAloneEffOutputFileName")),
-  genToTrackEffOutputFileName_(iConfig.getParameter<std::string>("GenToTrackEffOutputFileName"))
+  genToTrackEffOutputFileName_(iConfig.getParameter<std::string>("GenToTrackEffOutputFileName")),
+  dzCut_(iConfig.getParameter<double>("DzCut"))
 {
   associatorByDeltaR_.reset(new AssociatorByDeltaR(iConfig.getParameter<double>("MaxDeltaR")));
   simAssociatorByDeltaR_.reset(new AssociatorByDeltaR(iConfig.getParameter<double>("SimMaxDeltaR"), false));
@@ -155,8 +161,10 @@ TrackingEfficiencyFromCosmics::TrackingEfficiencyFromCosmics(const edm::Paramete
   pars.push_back(Efficiency::Parameters("dz", nBins_, 0, 100));
   pars.push_back(Efficiency::Parameters("pt", nBins_, 0, 1000));
   genToStandAloneEfficiency_.reset(new Efficiency(pars));
+  genToCleanedStandAloneEfficiency_.reset(new Efficiency(pars));
   genToTrackEfficiency_.reset(new Efficiency(pars));
   efficiency_.reset(new Efficiency(pars));
+  efficiencyCleaned_.reset(new Efficiency(pars));
   variables_.reset(new double[3]);
 
   // maxDeltaR_ = iConfig.getParameter<double>("MaxDeltaR");
@@ -188,7 +196,8 @@ void TrackingEfficiencyFromCosmics::analyze(const edm::Event& iEvent, const edm:
   reco::TrackCollection cleanedStaMuons;
   reco::TrackCollection::const_iterator it = staMuons->begin();
   for( ; it != staMuons->end(); ++it ) {
-    if( it->found() > 0 ) {
+    if( (it->found() > 0) && (fabs(it->dz()) < dzCut_) && (it->pt() > 25) && (fabs(it->eta()) < 2.) ) {
+      // && (fabs(it->dz()) > 10) ) {
       cleanedStaMuons.push_back(*it);
     }
   }
@@ -269,35 +278,44 @@ void TrackingEfficiencyFromCosmics::analyze(const edm::Event& iEvent, const edm:
     }
 
     // For cleanedMuons
+    if( cleanedStaMuons.size() == 0 ) {
+      // Do it twice as we expect two standalone muons and we reconstruct none
+      genToCleanedStandAloneEfficiency_->fill(variables_, false);
+      genToCleanedStandAloneEfficiency_->fill(variables_, false);
+    }
+    else if( cleanedStaMuons.size() == 1 ) {
+      genToCleanedStandAloneEfficiency_->fill(variables_, false);
+    }
+    if( cleanedStaMuons.size() > 2 ) {
+      std::cout << "How did we get three cleaned standAloneMuons in simulation from a single cosmic track?" << std::endl;
+    }
     BOOST_FOREACH( const reco::Track & cleanedStaMuon, cleanedStaMuons ) {
       hMinStaMuonToGenDeltaR_->Fill(reco::deltaR(*stableMuon, cleanedStaMuon));
       hCleanedStandAloneToGenDeltaDxy_->Fill(cleanedStaMuon.dxy() - dxy_.first);
       hCleanedStandAloneToGenDeltaDz_->Fill(cleanedStaMuon.dz() - dz_.first);
-      // genToStandAloneEfficiency_->fill(variables_, true);
+      genToCleanedStandAloneEfficiency_->fill(variables_, true);
     }
 
   }
 
   // Association map of StandAloneMuons and TrackerTracks
   std::map<const reco::Track *, const reco::Track *> matchesMap;
-
   if( staMuons->size() > 0 ) {
-    // associatorByDeltaR_->fillAssociationMap(tracks, staMuons, matchesMap, hMinDeltaR_);
-    // associatorByDeltaR_->fillAssociationMap(*tracks, *staMuons, matchesMap, hMinDeltaR_);
     associatorByDeltaR_->fillAssociationMap(*staMuons, *tracks, matchesMap, hMinDeltaR_);
 
     bool found = false;
     std::map<const reco::Track *, const reco::Track *>::const_iterator it = matchesMap.begin();
     for( ; it != matchesMap.end(); ++it ) {
-      found = false;
+      // found = false;
       if( it->second == 0 ) {
-        std::cout << "NO match found for standAlone with pt = " << it->first->pt() << std::endl;
-        std::cout << "and dxy = " << fabs(it->first->dxy()) << " and dz = " << fabs(it->first->dz()) << std::endl;
+        found = false;
+        //        std::cout << "NO match found for standAlone with pt = " << it->first->pt() << std::endl;
+        //        std::cout << "and dxy = " << fabs(it->first->dxy()) << " and dz = " << fabs(it->first->dz()) << std::endl;
       }
       else {
         found = true;
-        std::cout << "MATCH FOUND for standAlone with pt = " << it->first->pt() << ", matches with track of pt = " << it->second->pt() << std::endl;
-        std::cout << "and dxy = " << fabs(it->first->dxy()) << " and dz = " << fabs(it->first->dz()) << std::endl;
+        //        std::cout << "MATCH FOUND for standAlone with pt = " << it->first->pt() << ", matches with track of pt = " << it->second->pt() << std::endl;
+        //        std::cout << "and dxy = " << fabs(it->first->dxy()) << " and dz = " << fabs(it->first->dz()) << std::endl;
       }
       variables_[0] = fabs(it->first->dxy());
       variables_[1] = fabs(it->first->dz());
@@ -313,8 +331,31 @@ void TrackingEfficiencyFromCosmics::analyze(const edm::Event& iEvent, const edm:
     }
   }
 
-  // Compute efficiency as number of times a track matching the standalone is found vs number of standalone.
-  // Do this as a function of several variables.
+
+  // Association map of cleaned StandAloneMuons and TrackerTracks
+  std::map<const reco::Track *, const reco::Track *> matchesMapCleaned;
+  if( cleanedStaMuons.size() > 0 ) {
+    associatorByDeltaR_->fillAssociationMap(cleanedStaMuons, *tracks, matchesMapCleaned, hMinDeltaR_);
+
+    bool found = false;
+    std::map<const reco::Track *, const reco::Track *>::const_iterator it = matchesMapCleaned.begin();
+    for( ; it != matchesMapCleaned.end(); ++it ) {
+      if( it->second == 0 ) {
+        found = false;
+        // std::cout << "NO match found for cleaned standAlone with pt = " << it->first->pt() << std::endl;
+        // std::cout << "and dxy = " << fabs(it->first->dxy()) << " and dz = " << fabs(it->first->dz()) << std::endl;
+      }
+      else {
+        found = true;
+        // std::cout << "MATCH FOUND for cleaned standAlone with pt = " << it->first->pt() << ", matches with track of pt = " << it->second->pt() << std::endl;
+        // std::cout << "and dxy = " << fabs(it->first->dxy()) << " and dz = " << fabs(it->first->dz()) << std::endl;
+      }
+      variables_[0] = fabs(it->first->dxy());
+      variables_[1] = fabs(it->first->dz());
+      variables_[2] = it->first->pt();
+      efficiencyCleaned_->fill(variables_, found);
+    }
+  }
 
 
 #ifdef THIS_IS_AN_EVENT_EXAMPLE
@@ -367,8 +408,6 @@ void TrackingEfficiencyFromCosmics::beginJob()
 // ------------ method called once each job just after ending the event loop  ------------
 void TrackingEfficiencyFromCosmics::endJob() 
 {
-
-  // TFile outputFile("checkEff.root", "RECREATE");
   TCanvas canvasDxy;
   canvasDxy.Draw();
   double * eff = new double[nBins_];
@@ -378,8 +417,6 @@ void TrackingEfficiencyFromCosmics::endJob()
   for( unsigned int i=0; i<nBins_/4; ++i ) {
     double numSA = hStandAloneCounterDxy_->GetBinContent(i+1);
     double numTk = hTrackCounterDxy_->GetBinContent(i+1);
-//    std::cout << "numSA = " << hStandAloneCounterDxy_->GetBinContent(i+1) << std::endl;
-//    std::cout << "numTk = " << hTrackCounterDxy_->GetBinContent(i+1) << std::endl;
     if(numSA == 0) eff[i] = 0;
     else eff[i] = numTk/numSA;
     x[i] = hStandAloneCounterDxy_->GetBinLowEdge(i);
@@ -410,31 +447,13 @@ void TrackingEfficiencyFromCosmics::endJob()
   canvasDz.SaveAs("checkEffDz.root");
 
 
-  // outputFile.Write();
-  // outputFile.Close();
-
-//  if( useMCtruth_ ) {
-//    for( unsigned int i=0; i<nBins_; ++i ) {
-//      std::cout << "genEfficiency["<<i<<"] (vs pt) = " << genEfficiency_->getEff(i) << " +/- " << genEfficiency_->getEffError(i) << std::endl;
-//    }
-//  }
-
-//  boost::shared_array<unsigned int> vKeep(new int[2]);
-//  vKeep[0] = 0;
-//  vKeep[1] = -1;
-//  boost::shared_ptr<Efficiency> newEff(efficiency_->project(vKeep));
-//  for( unsigned int i=0; i<nBins_; ++i ) {
-//    std::cout << "reco eff["<<i<<"] = " << newEff->getEff(i) << " +/- " << newEff->getEffError(i) << std::endl;
-//  }
-
-//  for( unsigned int i=0; i<nBins_; ++i ) {
-//    std::cout << "reco eff["<<i<<"] = " << efficiency_->getEff(i) << " +/- " << efficiency_->getEffError(i) << std::endl;
-//  }
 
 
   EfficiencyTree tree;
   tree.writeTree(effOutputFileName_, &*efficiency_);
-  // tree.writeTree(effOutputFileName_, &*newEff);
+
+  EfficiencyTree treeCleaned;
+  treeCleaned.writeTree(effCleanedOutputFileName_, &*efficiencyCleaned_);
 
   EfficiencyTree genToStandAloneTree;
   genToStandAloneTree.writeTree(genToStandAloneEffOutputFileName_, &*genToStandAloneEfficiency_);
