@@ -13,7 +13,7 @@
 //
 // Original Author:  Marco De Mattia,42 R-23,
 //         Created:  Mon Jul 4 18:38:0 CEST 2011
-// $Id: EfficiencyAnalyzer.cc,v 1.1 2011/07/04 17:01:11 demattia Exp $
+// $Id: EfficiencyAnalyzer.cc,v 1.2 2011/07/06 16:19:44 demattia Exp $
 //
 //
 
@@ -68,17 +68,18 @@ private:
   // ----------member data ---------------------------
   std::auto_ptr<Efficiency> efficiency_;
   std::string inputFileName_;
+  unsigned int rebin_;
   // edm::Service<TFileService> fileService_;
 };
 
 void EfficiencyAnalyzer::fillHistogram(const TString & name, const TString & title, const boost::shared_ptr<Efficiency> & eff )
 {
   TCanvas *c1 = new TCanvas("c1"+name,"A Simple Graph Example",200,10,700,500);
-  Int_t n = eff->bins(0);
+  unsigned int n = eff->bins(0);
   Double_t x[100], y[100];
   Double_t exl[100], exh[100];
   Double_t eyl[100], eyh[100];
-  for (Int_t i=0;i<n;++i) {
+  for (unsigned i=0;i<n;++i) {
     // std::cout << eff->min(0) << " "<<i<<"*"<<eff->binsSize(0)<<" = "<< i*(eff->binsSize(0)) << std::endl;
     x[i] = eff->min(0) + (i+0.5)*eff->binsSize(0);
     y[i] = eff->getEff(i);
@@ -89,6 +90,7 @@ void EfficiencyAnalyzer::fillHistogram(const TString & name, const TString & tit
   }
   // TGraph * hEff = fileService_->make<TGraph>(name, title, eff->bins(0), eff->min(0), eff->min(0));
   TGraphAsymmErrors * hEff = new TGraphAsymmErrors(n, x, y, exl, exh, eyl, eyh);
+  hEff->SetName(name);
   hEff->Draw("AP");
   c1->Draw();
   c1->SaveAs(name+".root");
@@ -101,7 +103,8 @@ void EfficiencyAnalyzer::fillHistogram(const TString & name, const TString & tit
 }
 
 EfficiencyAnalyzer::EfficiencyAnalyzer(const edm::ParameterSet& iConfig) :
-  inputFileName_(iConfig.getParameter<std::string>("InputFileName"))
+  inputFileName_(iConfig.getParameter<std::string>("InputFileName")),
+  rebin_(iConfig.getParameter<unsigned int>("Rebin"))
 {
   efficiency_.reset(new Efficiency);
   EfficiencyTree tree;
@@ -111,21 +114,21 @@ EfficiencyAnalyzer::EfficiencyAnalyzer(const edm::ParameterSet& iConfig) :
   outputFile->cd();
 
   boost::shared_array<unsigned int> vKeep(new unsigned int[3]);
-  vKeep[0] = 1;
+  vKeep[0] = rebin_;
   vKeep[1] = 0;
   vKeep[2] = 0;
   boost::shared_ptr<Efficiency> effVsDxy(efficiency_->projectAndRebin(vKeep));
   fillHistogram("EffVsDxy", "Efficiency vs absolute transverse impact parameter", effVsDxy );
 
   vKeep[0] = 0;
-  vKeep[1] = 1;
+  vKeep[1] = rebin_;
   vKeep[2] = 0;
   boost::shared_ptr<Efficiency> effVsDz(efficiency_->projectAndRebin(vKeep));
   fillHistogram("EffVsDz", "Efficiency vs absolute longitudinal impact parameter", effVsDz);
 
   vKeep[0] = 0;
   vKeep[1] = 0;
-  vKeep[2] = 1;
+  vKeep[2] = rebin_;
   boost::shared_ptr<Efficiency> effVsPt(efficiency_->projectAndRebin(vKeep));
   fillHistogram("EffVsPt", "Efficiency vs Pt", effVsPt);
 

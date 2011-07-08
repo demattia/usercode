@@ -77,7 +77,7 @@ public:
     // }
   }
 
-  unsigned int getLinearIndex(const boost::shared_array<unsigned int> & vIndexes)
+  unsigned int getLinearIndex(const boost::shared_array<unsigned int> & vIndexes) const
   {
     vIndexesTempPtr_ = vIndexes.get();
     return computeLinearIndex(0, 0);
@@ -104,15 +104,8 @@ public:
     boost::shared_ptr<Efficiency> newEff(new Efficiency(newPars));
     // Loop on all the values and fill them in the new Efficiency object.
     for( unsigned int i=0; i<S_; ++i ) {
-      // if( values_[i].first != 0 ) {
-      //   std::cout << "Filling i = " << i << " with (" << values_[i].first << ", " << values_[i].second << ")" << std::endl;
-      //   for( unsigned int i=0; i<newPars.size(); ++i) {
-      //     std::cout << "newIndex("<<i<<") = " << getIndexes(i, vKeep, newPars.size()) << std::endl;
-      //   }
-      // }
       newEff->fill(getIndexes(i, vKeep, newPars.size()), values_[i]);
     }
-    // std::cout << "AFTER PROJECTION:" << newEff->binsSize(0) << std::endl;
     return newEff;
   }
 
@@ -148,7 +141,11 @@ public:
     S /= vSizes_[counter];
 
     if( vKeep[counter] != 0 ) {
-      vNewIndexes[newCounter] = (L/S)/vKeep[counter];
+      // Careful to integer approximation and division order. Convert everything to double for safety.
+      // newIndex = oldIndex*newSize/oldSize, but the newSize/oldSize must be a float before being multiplied to
+      // the oldIndex. Only then the int() can be taken.
+      double binsReduction = double(vSizes_[counter]/vKeep[counter])/double(vSizes_[counter]);
+      vNewIndexes[newCounter] = (unsigned int)((L/S)*binsReduction);
       ++newCounter;
     }
     ++counter;
@@ -190,14 +187,14 @@ public:
     values_[getLinearIndex(indexes)].second += values.second;
   }
 
-  double getEff(const boost::shared_array<unsigned int> & vIndexes)
+  double getEff(const boost::shared_array<unsigned int> & vIndexes) const
   {
     unsigned int linearIndex = getLinearIndex(vIndexes);
     if( (values_[linearIndex].first) == 0 ) return -1;
     return( double(values_[linearIndex].second)/double(values_[linearIndex].first) );
   }
 
-  double getEffError(const boost::shared_array<unsigned int> & vIndexes)
+  double getEffError(const boost::shared_array<unsigned int> & vIndexes) const
   {
     unsigned int linearIndex = getLinearIndex(vIndexes);
     if( (values_[linearIndex].first) == 0 ) return 0;
@@ -206,14 +203,14 @@ public:
   }
 
   /// Overloaded for the case of a single variable. No check is performed and the index is assumed == linearIndex.
-  double getEff(unsigned int index)
+  double getEff(unsigned int index) const
   {
     if( (values_[index].first) == 0 ) return -1;
     return( double(values_[index].second)/double(values_[index].first) );
   }
 
   /// Overloaded for the case of a single variable. No check is performed and the index is assumed == linearIndex.
-  double getEffError(unsigned int index)
+  double getEffError(unsigned int index) const
   {
     if( (values_[index].first) == 0 ) return 0;
     double p = (values_[index].second)/double(values_[index].first);
@@ -258,7 +255,7 @@ protected:
   boost::shared_array<double> vBinSizes_;
   boost::shared_array<double> vMin_;
   boost::shared_array<double> vMax_;
-  unsigned int * vIndexesTempPtr_;
+  mutable unsigned int * vIndexesTempPtr_;
   boost::shared_array<unsigned int> vIndexes_;
   // Linear representation of the N-dimensional matrix
   boost::shared_array<std::pair<unsigned int, unsigned int> > values_;

@@ -13,7 +13,7 @@
 //
 // Original Author:  Marco De Mattia,40 3-B32,+41227671551,
 //         Created:  Wed May 25 16:44:02 CEST 2011
-// $Id: TrackingEfficiencyFromCosmics.cc,v 1.13 2011/07/06 16:19:44 demattia Exp $
+// $Id: TrackingEfficiencyFromCosmics.cc,v 1.14 2011/07/07 14:57:40 demattia Exp $
 //
 //
 
@@ -62,6 +62,8 @@
 #include "TrackingTools/TransientTrack/interface/TransientTrackBuilder.h"
 #include "RecoVertex/KalmanVertexFit/interface/KalmanVertexFitter.h"
 #include <TVector3.h>
+#include <TCanvas.h>
+#include <TGraph.h>
 
 #include "Analysis/TrackingEfficiencyFromCosmics/interface/AssociatorByDeltaR.h"
 #include "Analysis/TrackingEfficiencyFromCosmics/interface/ControlPlots.h"
@@ -106,6 +108,12 @@ private:
   TH1F * hStandAloneToGenDeltaDxy_, * hStandAloneToGenDeltaDz_;
   TH1F * hCleanedStandAloneToGenDeltaDxy_, * hCleanedStandAloneToGenDeltaDz_;
   TH1F * hTrackToGenDeltaDxy_, * hTrackToGenDeltaDz_;
+
+  TH1F * hStandAloneCounterDxy_;
+  TH1F * hTrackCounterDxy_;
+  TH1F * hStandAloneCounterDz_;
+  TH1F * hTrackCounterDz_;
+
   reco::Track::TrackQuality quality_;
   bool useMCtruth_;
 
@@ -218,10 +226,9 @@ void TrackingEfficiencyFromCosmics::analyze(const edm::Event& iEvent, const edm:
     //    }
 
     // Gen muon values
-    variables_[0] = dxy_.first;
-    variables_[1] = dz_.first;
+    variables_[0] = fabs(dxy_.first);
+    variables_[1] = fabs(dz_.first);
     variables_[2] = stableMuon->pt();
-
 
     // Compute efficiency for track vs MC-truth
     if( tracks->size() == 0 ) {
@@ -285,17 +292,24 @@ void TrackingEfficiencyFromCosmics::analyze(const edm::Event& iEvent, const edm:
       found = false;
       if( it->second == 0 ) {
         std::cout << "NO match found for standAlone with pt = " << it->first->pt() << std::endl;
-        std::cout << "and dxy = " << fabs(it->first->dxy()) << std::endl;
+        std::cout << "and dxy = " << fabs(it->first->dxy()) << " and dz = " << fabs(it->first->dz()) << std::endl;
       }
       else {
         found = true;
         std::cout << "MATCH FOUND for standAlone with pt = " << it->first->pt() << ", matches with track of pt = " << it->second->pt() << std::endl;
-        std::cout << "and dxy = " << fabs(it->first->dxy()) << std::endl;
+        std::cout << "and dxy = " << fabs(it->first->dxy()) << " and dz = " << fabs(it->first->dz()) << std::endl;
       }
       variables_[0] = fabs(it->first->dxy());
       variables_[1] = fabs(it->first->dz());
-      variables_[2] = fabs(it->first->pt());
+      variables_[2] = it->first->pt();
       efficiency_->fill(variables_, found);
+
+      hStandAloneCounterDxy_->Fill(variables_[0]);
+      hStandAloneCounterDz_->Fill(variables_[1]);
+      if( found ) {
+        hTrackCounterDxy_->Fill(variables_[0]);
+        hTrackCounterDz_->Fill(variables_[1]);
+      }
     }
   }
 
@@ -340,6 +354,11 @@ void TrackingEfficiencyFromCosmics::beginJob()
   hTrackToGenDeltaDxy_ = fileService->make<TH1F>("trackToGenDeltaDxy", "#Delta(dxy) track - gen", 100, -100, 100);
   hTrackToGenDeltaDz_ = fileService->make<TH1F>("trackToGenDeltaDz", "#Delta(dz) track - gen", 100, -100, 100);
 
+  hTrackCounterDxy_ = fileService->make<TH1F>("trackCounterDxy", "track number vs dxy", 100, 0, 100);
+  hStandAloneCounterDxy_ = fileService->make<TH1F>("standAloneCounterDxy", "standAlone number vs dxy", 100, 0, 100);
+  hTrackCounterDz_ = fileService->make<TH1F>("trackCounterDz", "track number vs dz", 100, 0, 100);
+  hStandAloneCounterDz_ = fileService->make<TH1F>("standAloneCounterDz", "standAlone number vs dz", 100, 0, 100);
+
   controlPlotsGeneralTracks_.reset(new ControlPlots(fileService, "generalTracks"));
   controlPlotsStandAloneMuons_.reset(new ControlPlots(fileService, "standAloneMuons"));
   controlPlotsCleanedStandAloneMuons_.reset(new ControlPlots(fileService, "cleanedStandAloneMuons"));
@@ -348,6 +367,52 @@ void TrackingEfficiencyFromCosmics::beginJob()
 // ------------ method called once each job just after ending the event loop  ------------
 void TrackingEfficiencyFromCosmics::endJob() 
 {
+
+  // TFile outputFile("checkEff.root", "RECREATE");
+  TCanvas canvasDxy;
+  canvasDxy.Draw();
+  double * eff = new double[nBins_];
+  double * x = new double[nBins_];
+  hStandAloneCounterDxy_->Rebin(4);
+  hTrackCounterDxy_->Rebin(4);
+  for( unsigned int i=0; i<nBins_/4; ++i ) {
+    double numSA = hStandAloneCounterDxy_->GetBinContent(i+1);
+    double numTk = hTrackCounterDxy_->GetBinContent(i+1);
+//    std::cout << "numSA = " << hStandAloneCounterDxy_->GetBinContent(i+1) << std::endl;
+//    std::cout << "numTk = " << hTrackCounterDxy_->GetBinContent(i+1) << std::endl;
+    if(numSA == 0) eff[i] = 0;
+    else eff[i] = numTk/numSA;
+    x[i] = hStandAloneCounterDxy_->GetBinLowEdge(i);
+  }
+  TGraph * effGraphDxy = new TGraph(nBins_/4, x, eff);
+  effGraphDxy->Draw("AP");
+  canvasDxy.SaveAs("checkEffDxy.root");
+
+
+  TCanvas canvasDz;
+  canvasDz.Draw();
+
+  double * effDz = new double[nBins_];
+  double * xDz = new double[nBins_];
+  hStandAloneCounterDz_->Rebin(4);
+  hTrackCounterDz_->Rebin(4);
+  for( unsigned int i=0; i<nBins_/4; ++i ) {
+    double numSA = hStandAloneCounterDz_->GetBinContent(i+1);
+    double numTk = hTrackCounterDz_->GetBinContent(i+1);
+    std::cout << "numSA = " << hStandAloneCounterDz_->GetBinContent(i+1) << std::endl;
+    std::cout << "numTk = " << hTrackCounterDz_->GetBinContent(i+1) << std::endl;
+    if(numSA == 0) effDz[i] = 0;
+    else effDz[i] = numTk/numSA;
+    xDz[i] = hStandAloneCounterDz_->GetBinLowEdge(i);
+  }
+  TGraph * effGraphDz = new TGraph(nBins_/4, xDz, effDz);
+  effGraphDz->Draw("AP");
+  canvasDz.SaveAs("checkEffDz.root");
+
+
+  // outputFile.Write();
+  // outputFile.Close();
+
 //  if( useMCtruth_ ) {
 //    for( unsigned int i=0; i<nBins_; ++i ) {
 //      std::cout << "genEfficiency["<<i<<"] (vs pt) = " << genEfficiency_->getEff(i) << " +/- " << genEfficiency_->getEffError(i) << std::endl;
