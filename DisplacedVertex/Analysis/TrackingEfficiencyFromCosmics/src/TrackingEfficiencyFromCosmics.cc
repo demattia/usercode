@@ -13,7 +13,7 @@
 //
 // Original Author:  Marco De Mattia,40 3-B32,+41227671551,
 //         Created:  Wed May 25 16:44:02 CEST 2011
-// $Id: TrackingEfficiencyFromCosmics.cc,v 1.14 2011/07/07 14:57:40 demattia Exp $
+// $Id: TrackingEfficiencyFromCosmics.cc,v 1.16 2011/07/08 14:12:45 demattia Exp $
 //
 //
 
@@ -67,6 +67,7 @@
 
 #include "Analysis/TrackingEfficiencyFromCosmics/interface/AssociatorByDeltaR.h"
 #include "Analysis/TrackingEfficiencyFromCosmics/interface/ControlPlots.h"
+#include "Analysis/TrackingEfficiencyFromCosmics/interface/ControlDeltaPlots.h"
 #include "Analysis/TrackingEfficiencyFromCosmics/interface/Efficiency.h"
 #include "Analysis/TrackingEfficiencyFromCosmics/interface/EfficiencyTree.h"
 
@@ -122,6 +123,9 @@ private:
   std::auto_ptr<ControlPlots> controlPlotsGeneralTracks_;
   std::auto_ptr<ControlPlots> controlPlotsStandAloneMuons_;
   std::auto_ptr<ControlPlots> controlPlotsCleanedStandAloneMuons_;
+  std::auto_ptr<ControlDeltaPlots> standAloneDelta_;
+  std::auto_ptr<ControlDeltaPlots> cleanedStandAloneDelta_;
+  std::auto_ptr<ControlDeltaPlots> standAloneTrackDelta_;
   std::auto_ptr<Efficiency> genToStandAloneEfficiency_;
   std::auto_ptr<Efficiency> genToCleanedStandAloneEfficiency_;
   std::auto_ptr<Efficiency> genToTrackEfficiency_;
@@ -267,9 +271,14 @@ void TrackingEfficiencyFromCosmics::analyze(const edm::Event& iEvent, const edm:
     else if( staMuons->size() == 1 ) {
       genToStandAloneEfficiency_->fill(variables_, false);
     }
-    if( staMuons->size() > 2 ) {
+    else if( staMuons->size() > 2 ) {
       std::cout << "How did we get three standAloneMuons in simulation from a single cosmic track?" << std::endl;
     }
+
+    if( staMuons->size() == 2 ) {
+      standAloneDelta_->fillControlPlots((*staMuons)[0], (*staMuons)[1]);
+    }
+
     BOOST_FOREACH( const reco::Track & staMuon, *staMuons ) {
       hMinStaMuonToGenDeltaR_->Fill(reco::deltaR(*stableMuon, staMuon));
       hStandAloneToGenDeltaDxy_->Fill(staMuon.dxy() - dxy_.first);
@@ -286,9 +295,14 @@ void TrackingEfficiencyFromCosmics::analyze(const edm::Event& iEvent, const edm:
     else if( cleanedStaMuons.size() == 1 ) {
       genToCleanedStandAloneEfficiency_->fill(variables_, false);
     }
-    if( cleanedStaMuons.size() > 2 ) {
+    else if( cleanedStaMuons.size() > 2 ) {
       std::cout << "How did we get three cleaned standAloneMuons in simulation from a single cosmic track?" << std::endl;
     }
+
+    if( cleanedStaMuons.size() == 2 ) {
+      cleanedStandAloneDelta_->fillControlPlots(cleanedStaMuons[0], cleanedStaMuons[1]);
+    }
+
     BOOST_FOREACH( const reco::Track & cleanedStaMuon, cleanedStaMuons ) {
       hMinStaMuonToGenDeltaR_->Fill(reco::deltaR(*stableMuon, cleanedStaMuon));
       hCleanedStandAloneToGenDeltaDxy_->Fill(cleanedStaMuon.dxy() - dxy_.first);
@@ -403,6 +417,9 @@ void TrackingEfficiencyFromCosmics::beginJob()
   controlPlotsGeneralTracks_.reset(new ControlPlots(fileService, "generalTracks"));
   controlPlotsStandAloneMuons_.reset(new ControlPlots(fileService, "standAloneMuons"));
   controlPlotsCleanedStandAloneMuons_.reset(new ControlPlots(fileService, "cleanedStandAloneMuons"));
+  standAloneDelta_.reset(new ControlDeltaPlots(fileService, "standAloneDelta", -1));
+  cleanedStandAloneDelta_.reset(new ControlDeltaPlots(fileService, "cleanedStandAloneDelta"));
+  standAloneTrackDelta_.reset(new ControlDeltaPlots(fileService, "standAloneTrackDelta"));
 }
 
 // ------------ method called once each job just after ending the event loop  ------------
