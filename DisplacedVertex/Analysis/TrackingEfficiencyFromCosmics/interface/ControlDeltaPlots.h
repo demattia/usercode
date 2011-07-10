@@ -27,7 +27,8 @@ public:
     // With sign = -1 back-to-back tracks have DeltaEta = 0
     hDeltaEta_->Fill(track1.eta() - sign_*track2.eta());
     hDeltaPhi_->Fill(reco::deltaPhi(track1.phi(), track2.phi()));
-    hDeltaDxy_->Fill(track1.dxy() - track2.dxy());
+    // With sign = -1 back-to-back tracks have deltaDxy = 0
+    hDeltaDxy_->Fill(track1.dxy() - sign_*track2.dxy());
     hDeltaDz_->Fill(track1.dz() - track2.dz());
   }
 

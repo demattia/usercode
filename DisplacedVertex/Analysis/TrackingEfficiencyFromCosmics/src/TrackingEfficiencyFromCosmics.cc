@@ -13,7 +13,7 @@
 //
 // Original Author:  Marco De Mattia,40 3-B32,+41227671551,
 //         Created:  Wed May 25 16:44:02 CEST 2011
-// $Id: TrackingEfficiencyFromCosmics.cc,v 1.20 2011/07/10 15:43:58 demattia Exp $
+// $Id: TrackingEfficiencyFromCosmics.cc,v 1.21 2011/07/10 15:48:20 demattia Exp $
 //
 //
 
@@ -149,6 +149,8 @@ private:
   bool matchTwoLegs_;
   double deltaDxyCut_;
   double deltaDzCut_;
+  double deltaPtCut_;
+  double deltaPhiCut_;
 };
 
 TrackingEfficiencyFromCosmics::TrackingEfficiencyFromCosmics(const edm::ParameterSet& iConfig) :
@@ -162,7 +164,9 @@ TrackingEfficiencyFromCosmics::TrackingEfficiencyFromCosmics(const edm::Paramete
   chi2Cut_(iConfig.getParameter<double>("Chi2Cut")),
   matchTwoLegs_(iConfig.getParameter<bool>("MatchTwoLegs")),
   deltaDxyCut_(iConfig.getParameter<double>("DeltaDxyCut")),
-  deltaDzCut_(iConfig.getParameter<double>("DeltaDzCut"))
+  deltaDzCut_(iConfig.getParameter<double>("DeltaDzCut")),
+  deltaPtCut_(iConfig.getParameter<double>("DeltaPtCut")),
+  deltaPhiCut_(iConfig.getParameter<double>("DeltaPhiCut"))
 {
   associatorByDeltaR_.reset(new AssociatorByDeltaR(iConfig.getParameter<double>("MaxDeltaR")));
   simAssociatorByDeltaR_.reset(new AssociatorByDeltaR(iConfig.getParameter<double>("SimMaxDeltaR"), false));
@@ -223,10 +227,35 @@ void TrackingEfficiencyFromCosmics::analyze(const edm::Event& iEvent, const edm:
     // Compare the dxy and dz of the two muons. Accept them only if they match within 1 sigma of the resolution taken by interpolating the MC-truth
     // resolution on SingleMuPt10 and SingleMuPt100 to a Pt of 25 GeV.
     if( matchTwoLegs_ ) {
-      if( !( (fabs(fabs(cleanedStaMuons[0].dxy()) - fabs(cleanedStaMuons[1].dxy())) < deltaDxyCut_) && 
-	     (fabs(fabs(cleanedStaMuons[0].dz() ) - fabs(cleanedStaMuons[1].dz()) ) < deltaDzCut_ ) ) ) {
+//       double fDxy1 = fabs(cleanedStaMuons[0].dxy());
+//       double fDxy2 = fabs(cleanedStaMuons[1].dxy());
+//       double fDz1 = fabs(cleanedStaMuons[0].dz());
+//       double fDz2 = fabs(cleanedStaMuons[1].dz());
+      //       if( !( (fabs(fDxy1 - fDxy2) < deltaDxyCut_) && 
+      // 	     (fabs(fDz1 - fDz2) < deltaDzCut_) ) ) {
+
+      double dxy1 = cleanedStaMuons[0].dxy();
+      double dxy2 = cleanedStaMuons[1].dxy();
+      double dz1 = cleanedStaMuons[0].dz();
+      double dz2 = cleanedStaMuons[1].dz();
+      double deltaPhi = reco::deltaPhi(cleanedStaMuons[0].phi(), cleanedStaMuons[1].phi());
+      double deltaPt = cleanedStaMuons[0].pt() - cleanedStaMuons[1].pt();
+
+      // Typically the dxy have opposite sign while the dz have same sign.
+      if( !( (fabs(dxy1 + dxy2) < deltaDxyCut_) && 
+	     (fabs(dz1 - dz2)   < deltaDzCut_ ) &&
+	     (fabs(deltaPhi)    > deltaPhiCut_) &&
+	     (fabs(deltaPt)     < deltaPtCut_ ) ) ) {
 	cleanedStaMuons.clear();
       }
+//       else {
+// 	std::cout << "dxy1 = " << cleanedStaMuons[0].dxy() << ", dxy2 = " << cleanedStaMuons[1].dxy() << ", dz1 = "
+// 		  << cleanedStaMuons[0].dz() << ", dz2 = " << cleanedStaMuons[1].dz() << std::endl;
+// 	std::cout << "fDxy1 = " << fDxy1 << ", fDxy2 = " << fDxy2 << ", fDz1 = " << fDz1 << ", fDz2 = " << fDz2 << std::endl;
+// 	std::cout << "fabs(dxy1 + dxy2) = " << fabs(cleanedStaMuons[0].dxy() + cleanedStaMuons[1].dxy())
+// 		  << ", fabs(dz1 - dz2) = " << fabs(cleanedStaMuons[0].dz() - cleanedStaMuons[1].dz()) << std::endl;
+// 	std::cout << "fabs(fDxy1 - fDxy2) = " << fabs(fDxy1 - fDxy2) << ", fabs(fDz1 - fDz2) = " << fabs(fDz1 - fDz2) << std::endl;
+//       }
     }
   }
 
@@ -281,8 +310,8 @@ void TrackingEfficiencyFromCosmics::analyze(const edm::Event& iEvent, const edm:
     }
     BOOST_FOREACH( const reco::Track & track, *tracks ) {
       hMinTrackToGenDeltaR_->Fill(reco::deltaR(*stableMuon, track));
-      hTrackToGenDeltaDxy_->Fill(track.dxy() - dxy_.first);
-      hTrackToGenDeltaDz_->Fill(track.dz() - dz_.first);
+      hTrackToGenDeltaDxy_->Fill(fabs(track.dxy()) - fabs(dxy_.first));
+      hTrackToGenDeltaDz_->Fill(fabs(track.dz()) - fabs(dz_.first));
       genToTrackEfficiency_->fill(variables_, true);
     }
 
@@ -299,14 +328,10 @@ void TrackingEfficiencyFromCosmics::analyze(const edm::Event& iEvent, const edm:
       std::cout << "How did we get three standAloneMuons in simulation from a single cosmic track?" << std::endl;
     }
 
-    if( staMuons->size() == 2 ) {
-      standAloneDelta_->fillControlPlots((*staMuons)[0], (*staMuons)[1]);
-    }
-
     BOOST_FOREACH( const reco::Track & staMuon, *staMuons ) {
       hMinStaMuonToGenDeltaR_->Fill(reco::deltaR(*stableMuon, staMuon));
-      hStandAloneToGenDeltaDxy_->Fill(staMuon.dxy() - dxy_.first);
-      hStandAloneToGenDeltaDz_->Fill(staMuon.dz() - dz_.first);
+      hStandAloneToGenDeltaDxy_->Fill(fabs(staMuon.dxy()) - fabs(dxy_.first));
+      hStandAloneToGenDeltaDz_->Fill(fabs(staMuon.dz()) - fabs(dz_.first));
       genToStandAloneEfficiency_->fill(variables_, true);
     }
 
@@ -322,18 +347,20 @@ void TrackingEfficiencyFromCosmics::analyze(const edm::Event& iEvent, const edm:
     else if( cleanedStaMuons.size() > 2 ) {
       std::cout << "How did we get three cleaned standAloneMuons in simulation from a single cosmic track?" << std::endl;
     }
-
-    if( cleanedStaMuons.size() == 2 ) {
-      cleanedStandAloneDelta_->fillControlPlots(cleanedStaMuons[0], cleanedStaMuons[1]);
-    }
-
     BOOST_FOREACH( const reco::Track & cleanedStaMuon, cleanedStaMuons ) {
       hMinStaMuonToGenDeltaR_->Fill(reco::deltaR(*stableMuon, cleanedStaMuon));
-      hCleanedStandAloneToGenDeltaDxy_->Fill(cleanedStaMuon.dxy() - dxy_.first);
-      hCleanedStandAloneToGenDeltaDz_->Fill(cleanedStaMuon.dz() - dz_.first);
+      hCleanedStandAloneToGenDeltaDxy_->Fill(fabs(cleanedStaMuon.dxy()) - fabs(dxy_.first));
+      hCleanedStandAloneToGenDeltaDz_->Fill(fabs(cleanedStaMuon.dz()) - fabs(dz_.first));
       genToCleanedStandAloneEfficiency_->fill(variables_, true);
     }
+  }
 
+  // Deltas between the two standAloneMuons
+  if( staMuons->size() == 2 ) {
+    standAloneDelta_->fillControlPlots((*staMuons)[0], (*staMuons)[1]);
+  }
+  if( cleanedStaMuons.size() == 2 ) {
+    cleanedStandAloneDelta_->fillControlPlots(cleanedStaMuons[0], cleanedStaMuons[1]);
   }
 
   // Association map of StandAloneMuons and TrackerTracks
@@ -442,7 +469,7 @@ void TrackingEfficiencyFromCosmics::beginJob()
   controlPlotsStandAloneMuons_.reset(new ControlPlots(fileService, "standAloneMuons"));
   controlPlotsCleanedStandAloneMuons_.reset(new ControlPlots(fileService, "cleanedStandAloneMuons"));
   standAloneDelta_.reset(new ControlDeltaPlots(fileService, "standAloneDelta", -1));
-  cleanedStandAloneDelta_.reset(new ControlDeltaPlots(fileService, "cleanedStandAloneDelta"));
+  cleanedStandAloneDelta_.reset(new ControlDeltaPlots(fileService, "cleanedStandAloneDelta", -1));
   standAloneTrackDelta_.reset(new ControlDeltaPlots(fileService, "standAloneTrackDelta"));
 }
 
