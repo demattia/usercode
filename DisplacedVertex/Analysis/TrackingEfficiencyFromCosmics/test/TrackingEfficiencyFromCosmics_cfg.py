@@ -46,8 +46,15 @@ process.TFileService=cms.Service('TFileService',
 process.demo = cms.EDAnalyzer('TrackingEfficiencyFromCosmics',
                               MaxDeltaR = cms.double(1),
                               SimMaxDeltaR = cms.double(1000),
+                              DzCut = cms.double(100000),
+                              Chi2Cut = cms.double(1000000),
+                              MatchTwoLegs = cms.bool(True),
+                              DeltaDxyCut = cms.double(18), # only if matching two legs
+                              DeltaDzCut = cms.double(30),  # only if matching two legs
+                              MinimumValidHits = cms.int32(1),
                               UseMCtruth = cms.bool(True),
                               EffOutputFileName = cms.string("Efficiency.root"),
+                              EffCleanedOutputFileName = cms.string("EfficiencyCleaned.root"),
                               GenToStandAloneEffOutputFileName = cms.string("GenToStandAloneEfficiency.root"),
                               GenToTrackEffOutputFileName = cms.string("GenToTrackEfficiency.root")
                               )
