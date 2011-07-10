@@ -13,7 +13,7 @@
 //
 // Original Author:  Marco De Mattia,40 3-B32,+41227671551,
 //         Created:  Wed May 25 16:44:02 CEST 2011
-// $Id: TrackingEfficiencyFromCosmics.cc,v 1.17 2011/07/09 19:35:24 demattia Exp $
+// $Id: TrackingEfficiencyFromCosmics.cc,v 1.18 2011/07/10 10:54:31 demattia Exp $
 //
 //
 
@@ -144,6 +144,8 @@ private:
   std::pair<double, double> dz_;
   std::pair<double, double> dxyz_;
   double dzCut_;
+  double chi2Cut_;
+  bool matchTwoLegs_;
 };
 
 TrackingEfficiencyFromCosmics::TrackingEfficiencyFromCosmics(const edm::ParameterSet& iConfig) :
@@ -152,7 +154,9 @@ TrackingEfficiencyFromCosmics::TrackingEfficiencyFromCosmics(const edm::Paramete
   effCleanedOutputFileName_(iConfig.getParameter<std::string>("EffCleanedOutputFileName")),
   genToStandAloneEffOutputFileName_(iConfig.getParameter<std::string>("GenToStandAloneEffOutputFileName")),
   genToTrackEffOutputFileName_(iConfig.getParameter<std::string>("GenToTrackEffOutputFileName")),
-  dzCut_(iConfig.getParameter<double>("DzCut"))
+  dzCut_(iConfig.getParameter<double>("DzCut")),
+  chi2Cut_(iConfig.getParameter<double>("Chi2Cut")),
+  matchTwoLegs_(iConfig.getParameter<bool>("MatchTwoLegs"))
 {
   associatorByDeltaR_.reset(new AssociatorByDeltaR(iConfig.getParameter<double>("MaxDeltaR")));
   simAssociatorByDeltaR_.reset(new AssociatorByDeltaR(iConfig.getParameter<double>("SimMaxDeltaR"), false));
@@ -200,7 +204,7 @@ void TrackingEfficiencyFromCosmics::analyze(const edm::Event& iEvent, const edm:
   reco::TrackCollection cleanedStaMuons;
   reco::TrackCollection::const_iterator it = staMuons->begin();
   for( ; it != staMuons->end(); ++it ) {
-    if( (it->found() >= 10) && (fabs(it->dz()) < dzCut_) && (it->pt() > 25) && (fabs(it->eta()) < 2.) ) {
+    if( (it->found() >= 10) && (fabs(it->dz()) < dzCut_) && (it->pt() > 25) && (fabs(it->eta()) < 2.) && (fabs(it->normalizedChi2()) < chi2Cut_) ) {
       // && (fabs(it->dz()) > 10) ) {
       cleanedStaMuons.push_back(*it);
     }
@@ -208,6 +212,15 @@ void TrackingEfficiencyFromCosmics::analyze(const edm::Event& iEvent, const edm:
 
   if( cleanedStaMuons.size() != 2 ) {
     cleanedStaMuons.clear();
+  }
+  else {
+    // Compare the dxy and dz of the two muons. Accept them only if they match within 1 sigma of the resolution taken by interpolating the MC-truth
+    // resolution on SingleMuPt10 and SingleMuPt100 to a Pt of 25 GeV.
+    if( matchTwoLegs_ ) {
+      if( !( (fabs(cleanedStaMuons[0].dxy() - cleanedStaMuons[1].dxy()) < 6) && (fabs(cleanedStaMuons[0].dz() - cleanedStaMuons[1].dz()) < 10) ) ) {
+	cleanedStaMuons.clear();
+      }
+    }
   }
 
   // Fill all control plots
