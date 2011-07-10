@@ -13,7 +13,7 @@
 //
 // Original Author:  Marco De Mattia,40 3-B32,+41227671551,
 //         Created:  Wed May 25 16:44:02 CEST 2011
-// $Id: TrackingEfficiencyFromCosmics.cc,v 1.19 2011/07/10 14:02:24 demattia Exp $
+// $Id: TrackingEfficiencyFromCosmics.cc,v 1.20 2011/07/10 15:43:58 demattia Exp $
 //
 //
 
@@ -224,7 +224,7 @@ void TrackingEfficiencyFromCosmics::analyze(const edm::Event& iEvent, const edm:
     // resolution on SingleMuPt10 and SingleMuPt100 to a Pt of 25 GeV.
     if( matchTwoLegs_ ) {
       if( !( (fabs(fabs(cleanedStaMuons[0].dxy()) - fabs(cleanedStaMuons[1].dxy())) < deltaDxyCut_) && 
-	     fabs(fabs(cleanedStaMuons[0].dz()) - fabs(cleanedStaMuons[1].dz())) < deltaDzCut_) ) ) {
+	     (fabs(fabs(cleanedStaMuons[0].dz() ) - fabs(cleanedStaMuons[1].dz()) ) < deltaDzCut_ ) ) ) {
 	cleanedStaMuons.clear();
       }
     }
