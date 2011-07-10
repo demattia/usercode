@@ -13,7 +13,7 @@
 //
 // Original Author:  Marco De Mattia,40 3-B32,+41227671551,
 //         Created:  Wed May 25 16:44:02 CEST 2011
-// $Id: TrackingEfficiencyFromCosmics.cc,v 1.16 2011/07/08 14:12:45 demattia Exp $
+// $Id: TrackingEfficiencyFromCosmics.cc,v 1.17 2011/07/09 19:35:24 demattia Exp $
 //
 //
 
@@ -200,10 +200,14 @@ void TrackingEfficiencyFromCosmics::analyze(const edm::Event& iEvent, const edm:
   reco::TrackCollection cleanedStaMuons;
   reco::TrackCollection::const_iterator it = staMuons->begin();
   for( ; it != staMuons->end(); ++it ) {
-    if( (it->found() > 0) && (fabs(it->dz()) < dzCut_) && (it->pt() > 25) && (fabs(it->eta()) < 2.) ) {
+    if( (it->found() >= 10) && (fabs(it->dz()) < dzCut_) && (it->pt() > 25) && (fabs(it->eta()) < 2.) ) {
       // && (fabs(it->dz()) > 10) ) {
       cleanedStaMuons.push_back(*it);
     }
+  }
+
+  if( cleanedStaMuons.size() != 2 ) {
+    cleanedStaMuons.clear();
   }
 
   // Fill all control plots
