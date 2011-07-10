@@ -13,7 +13,7 @@
 //
 // Original Author:  Marco De Mattia,40 3-B32,+41227671551,
 //         Created:  Wed May 25 16:44:02 CEST 2011
-// $Id: TrackingEfficiencyFromCosmics.cc,v 1.21 2011/07/10 15:48:20 demattia Exp $
+// $Id: TrackingEfficiencyFromCosmics.cc,v 1.22 2011/07/10 18:51:34 demattia Exp $
 //
 //
 
@@ -95,9 +95,11 @@ private:
   virtual void endLuminosityBlock(edm::LuminosityBlock const&, edm::EventSetup const&);
 
   const reco::GenParticle * takeStableMuon(const reco::GenParticleCollection & genParticles);
-  void impactParameterForGen(const reco::GenParticle & genMuon, const math::XYZPoint & genVertex,
-                             const int genCharge, const MagneticField * mf);
-
+  // void impactParameterForGen(const reco::GenParticle & genMuon, const math::XYZPoint & genVertex,
+  //                            const int genCharge, const MagneticField * mf);
+  template <class T>
+  void computeImpactParameters(const T & genMuon, const math::XYZPoint & genVertex,
+			       const int genCharge, const MagneticField * mf);
 
   void dumpGenParticleInfo(const reco::GenParticle & genParticle);
   void dumpTrackInfo(const reco::Track & track, const unsigned int trackNumber);
@@ -273,7 +275,8 @@ void TrackingEfficiencyFromCosmics::analyze(const edm::Event& iEvent, const edm:
     // std::map<const math::XYZTLorentzVectorD *, const reco::Track *> simMatchesMap;
 
     // Compute impact parameters for generator particle
-    impactParameterForGen(*stableMuon, stableMuon->vertex(), stableMuon->charge(), mf);
+    // impactParameterForGen(*stableMuon, stableMuon->vertex(), stableMuon->charge(), mf);
+    computeImpactParameters(*stableMuon, stableMuon->vertex(), stableMuon->charge(), mf);
 
     // // Find the simTracks (for IP)
     // edm::Handle<edm::SimTrackContainer> simTracks;
@@ -292,8 +295,11 @@ void TrackingEfficiencyFromCosmics::analyze(const edm::Event& iEvent, const edm:
     //    }
 
     // Gen muon values
-    variables_[0] = fabs(dxy_.first);
-    variables_[1] = fabs(dz_.first);
+    double genDxy = dxy_.first;
+    double genDz = dz_.first;
+
+    variables_[0] = fabs(genDxy);
+    variables_[1] = fabs(genDz);
     variables_[2] = stableMuon->pt();
 
     // Compute efficiency for track vs MC-truth
@@ -309,9 +315,14 @@ void TrackingEfficiencyFromCosmics::analyze(const edm::Event& iEvent, const edm:
       std::cout << "How did we get three tracks in simulation from a single cosmic track?" << std::endl;
     }
     BOOST_FOREACH( const reco::Track & track, *tracks ) {
+      computeImpactParameters(track, track.innerPosition(), track.charge(), mf);
+      double trackDxy = dxy_.first;
+      double trackDz = dz_.first;
       hMinTrackToGenDeltaR_->Fill(reco::deltaR(*stableMuon, track));
-      hTrackToGenDeltaDxy_->Fill(fabs(track.dxy()) - fabs(dxy_.first));
-      hTrackToGenDeltaDz_->Fill(fabs(track.dz()) - fabs(dz_.first));
+      //       hTrackToGenDeltaDxy_->Fill(fabs(track.dxy()) - fabs(genDxy));
+      //       hTrackToGenDeltaDz_->Fill(fabs(track.dz()) - fabs(genDz));
+      hTrackToGenDeltaDxy_->Fill(fabs(trackDxy) - fabs(genDxy));
+      hTrackToGenDeltaDz_->Fill(fabs(trackDz) - fabs(genDz));
       genToTrackEfficiency_->fill(variables_, true);
     }
 
@@ -329,9 +340,14 @@ void TrackingEfficiencyFromCosmics::analyze(const edm::Event& iEvent, const edm:
     }
 
     BOOST_FOREACH( const reco::Track & staMuon, *staMuons ) {
+      computeImpactParameters(staMuon, staMuon.innerPosition(), staMuon.charge(), mf);
+      double standAloneDxy = dxy_.first;
+      double standAloneDz = dz_.first;
       hMinStaMuonToGenDeltaR_->Fill(reco::deltaR(*stableMuon, staMuon));
-      hStandAloneToGenDeltaDxy_->Fill(fabs(staMuon.dxy()) - fabs(dxy_.first));
-      hStandAloneToGenDeltaDz_->Fill(fabs(staMuon.dz()) - fabs(dz_.first));
+      //       hStandAloneToGenDeltaDxy_->Fill(fabs(staMuon.dxy()) - fabs(dxy_.first));
+      //       hStandAloneToGenDeltaDz_->Fill(fabs(staMuon.dz()) - fabs(dz_.first));
+      hStandAloneToGenDeltaDxy_->Fill(fabs(standAloneDxy) - fabs(genDxy));
+      hStandAloneToGenDeltaDz_->Fill(fabs(standAloneDz) - fabs(genDz));
       genToStandAloneEfficiency_->fill(variables_, true);
     }
 
@@ -348,9 +364,14 @@ void TrackingEfficiencyFromCosmics::analyze(const edm::Event& iEvent, const edm:
       std::cout << "How did we get three cleaned standAloneMuons in simulation from a single cosmic track?" << std::endl;
     }
     BOOST_FOREACH( const reco::Track & cleanedStaMuon, cleanedStaMuons ) {
+      computeImpactParameters(cleanedStaMuon, cleanedStaMuon.innerPosition(), cleanedStaMuon.charge(), mf);
+      double cleanedStandAloneDxy = dxy_.first;
+      double cleanedStandAloneDz = dz_.first;
       hMinStaMuonToGenDeltaR_->Fill(reco::deltaR(*stableMuon, cleanedStaMuon));
-      hCleanedStandAloneToGenDeltaDxy_->Fill(fabs(cleanedStaMuon.dxy()) - fabs(dxy_.first));
-      hCleanedStandAloneToGenDeltaDz_->Fill(fabs(cleanedStaMuon.dz()) - fabs(dz_.first));
+      //       hCleanedStandAloneToGenDeltaDxy_->Fill(fabs(cleanedStaMuon.dxy()) - fabs(dxy_.first));
+      //       hCleanedStandAloneToGenDeltaDz_->Fill(fabs(cleanedStaMuon.dz()) - fabs(dz_.first));
+      hCleanedStandAloneToGenDeltaDxy_->Fill(fabs(cleanedStandAloneDxy) - fabs(genDxy));
+      hCleanedStandAloneToGenDeltaDz_->Fill(fabs(cleanedStandAloneDz) - fabs(genDz));
       genToCleanedStandAloneEfficiency_->fill(variables_, true);
     }
   }
@@ -382,8 +403,13 @@ void TrackingEfficiencyFromCosmics::analyze(const edm::Event& iEvent, const edm:
         //        std::cout << "MATCH FOUND for standAlone with pt = " << it->first->pt() << ", matches with track of pt = " << it->second->pt() << std::endl;
         //        std::cout << "and dxy = " << fabs(it->first->dxy()) << " and dz = " << fabs(it->first->dz()) << std::endl;
       }
-      variables_[0] = fabs(it->first->dxy());
-      variables_[1] = fabs(it->first->dz());
+      computeImpactParameters(*(it->first), it->first->innerPosition(), it->first->charge(), mf);
+      double standAloneDxy = dxy_.first;
+      double standAloneDz = dz_.first;
+      //       variables_[0] = fabs(it->first->dxy());
+      //       variables_[1] = fabs(it->first->dz());
+      variables_[0] = fabs(standAloneDxy);
+      variables_[1] = fabs(standAloneDz);
       variables_[2] = it->first->pt();
       efficiency_->fill(variables_, found);
 
@@ -392,6 +418,7 @@ void TrackingEfficiencyFromCosmics::analyze(const edm::Event& iEvent, const edm:
       if( found ) {
         hTrackCounterDxy_->Fill(variables_[0]);
         hTrackCounterDz_->Fill(variables_[1]);
+	standAloneTrackDelta_->fillControlPlots(*(it->first), *(it->second));
       }
     }
   }
@@ -415,8 +442,13 @@ void TrackingEfficiencyFromCosmics::analyze(const edm::Event& iEvent, const edm:
         // std::cout << "MATCH FOUND for cleaned standAlone with pt = " << it->first->pt() << ", matches with track of pt = " << it->second->pt() << std::endl;
         // std::cout << "and dxy = " << fabs(it->first->dxy()) << " and dz = " << fabs(it->first->dz()) << std::endl;
       }
-      variables_[0] = fabs(it->first->dxy());
-      variables_[1] = fabs(it->first->dz());
+      computeImpactParameters(*(it->first), it->first->innerPosition(), it->first->charge(), mf);
+      double cleanedStandAloneDxy = dxy_.first;
+      double cleanedStandAloneDz = dz_.first;
+      variables_[0] = fabs(cleanedStandAloneDxy);
+      variables_[1] = fabs(cleanedStandAloneDz);
+      //       variables_[0] = fabs(it->first->dxy());
+      //       variables_[1] = fabs(it->first->dz());
       variables_[2] = it->first->pt();
       efficiencyCleaned_->fill(variables_, found);
     }
@@ -559,8 +591,11 @@ void TrackingEfficiencyFromCosmics::fillDescriptions(edm::ConfigurationDescripti
   descriptions.addDefault(desc);
 }
 
-void TrackingEfficiencyFromCosmics::impactParameterForGen(const reco::GenParticle & genMuon, const math::XYZPoint & genVertex,
-                                                          const int genCharge, const MagneticField * mf)
+// void TrackingEfficiencyFromCosmics::impactParameterForGen(const reco::GenParticle & genMuon, const math::XYZPoint & genVertex,
+//                                                           const int genCharge, const MagneticField * mf)
+template <class T>
+void TrackingEfficiencyFromCosmics::computeImpactParameters(const T & track, const math::XYZPoint & genVertex,
+							    const int genCharge, const MagneticField * mf)
 {
   // std::cout << "impactParameterForGen" << std::endl;
   VertexDistanceXY distXY;
@@ -574,7 +609,7 @@ void TrackingEfficiencyFromCosmics::impactParameterForGen(const reco::GenParticl
   //  std::vector<double> dxyzError_PV;
 
   TVector3 genMomentum(0,0,0);
-  genMomentum.SetPtEtaPhi(genMuon.pt(),genMuon.eta(),genMuon.phi());
+  genMomentum.SetPtEtaPhi(track.pt(),track.eta(),track.phi());
   // std::cout << "genVertex = (" << genVertex.x() << "," << genVertex.y() << "," << genVertex.z() << ")" << std::endl;
   FreeTrajectoryState ftsAtProduction(GlobalPoint(genVertex.x(),genVertex.y(),genVertex.z()),
                                       GlobalVector(genMomentum.x(),genMomentum.y(),genMomentum.z()),
@@ -588,7 +623,7 @@ void TrackingEfficiencyFromCosmics::impactParameterForGen(const reco::GenParticl
                                             transverseTSOS_.surface(), transverseTSOS_.magneticField(), transverseTSOS_.weight());
     // Reco vertex default constructed to (0,0,0)
     std::pair<bool,Measurement1D> dxy = IPTools::absoluteImpactParameter(transverseTSOS, reco::Vertex(), distXY);
-    std::cout << "dxy = " << dxy.second.value() << " +/- " << dxy.second.error() << std::endl;
+    // std::cout << "dxy = " << dxy.second.value() << " +/- " << dxy.second.error() << std::endl;
     dxy_.first = dxy.second.value();
     dxy_.second = dxy.second.error();
     // dxy_PV.push_back(dxy.second.value());
