@@ -13,7 +13,7 @@
 //
 // Original Author:  Marco De Mattia,40 3-B32,+41227671551,
 //         Created:  Wed May 25 16:44:02 CEST 2011
-// $Id: TrackingEfficiencyFromCosmics.cc,v 1.23 2011/07/10 21:52:49 demattia Exp $
+// $Id: TrackingEfficiencyFromCosmics.cc,v 1.24 2011/07/11 09:02:01 demattia Exp $
 //
 //
 
@@ -153,6 +153,7 @@ private:
   double deltaDzCut_;
   double deltaPtCut_;
   double deltaPhiCut_;
+  bool recomputeIP_;
 };
 
 TrackingEfficiencyFromCosmics::TrackingEfficiencyFromCosmics(const edm::ParameterSet& iConfig) :
@@ -168,7 +169,8 @@ TrackingEfficiencyFromCosmics::TrackingEfficiencyFromCosmics(const edm::Paramete
   deltaDxyCut_(iConfig.getParameter<double>("DeltaDxyCut")),
   deltaDzCut_(iConfig.getParameter<double>("DeltaDzCut")),
   deltaPtCut_(iConfig.getParameter<double>("DeltaPtCut")),
-  deltaPhiCut_(iConfig.getParameter<double>("DeltaPhiCut"))
+  deltaPhiCut_(iConfig.getParameter<double>("DeltaPhiCut")),
+  recomputeIP_(iConfig.getParameter<bool>("RecomputeIP"))
 {
   associatorByDeltaR_.reset(new AssociatorByDeltaR(iConfig.getParameter<double>("MaxDeltaR")));
   simAssociatorByDeltaR_.reset(new AssociatorByDeltaR(iConfig.getParameter<double>("SimMaxDeltaR"), false));
@@ -327,9 +329,13 @@ void TrackingEfficiencyFromCosmics::analyze(const edm::Event& iEvent, const edm:
       std::cout << "How did we get three tracks in simulation from a single cosmic track?" << std::endl;
     }
     BOOST_FOREACH( const reco::Track & track, *tracks ) {
-      computeImpactParameters(track, track.innerPosition(), track.charge(), mf);
-      double trackDxy = dxy_.first;
-      double trackDz = dz_.first;
+      double trackDxy = track.dxy();
+      double trackDz = track.dz();
+      if( recomputeIP_ ) {
+	computeImpactParameters(track, track.innerPosition(), track.charge(), mf);
+	trackDxy = dxy_.first;
+	trackDz = dz_.first;
+      }
       hMinTrackToGenDeltaR_->Fill(reco::deltaR(*stableMuon, track));
       //       hTrackToGenDeltaDxy_->Fill(fabs(track.dxy()) - fabs(genDxy));
       //       hTrackToGenDeltaDz_->Fill(fabs(track.dz()) - fabs(genDz));
@@ -352,9 +358,13 @@ void TrackingEfficiencyFromCosmics::analyze(const edm::Event& iEvent, const edm:
     }
 
     BOOST_FOREACH( const reco::Track & staMuon, *staMuons ) {
-      computeImpactParameters(staMuon, staMuon.innerPosition(), staMuon.charge(), mf);
-      double standAloneDxy = dxy_.first;
-      double standAloneDz = dz_.first;
+      double standAloneDxy = staMuon.dxy();
+      double standAloneDz = staMuon.dz();
+      if( recomputeIP_ ) {
+	computeImpactParameters(staMuon, staMuon.innerPosition(), staMuon.charge(), mf);
+	standAloneDxy = dxy_.first;
+	standAloneDxy = dz_.first;
+      }
       hMinStaMuonToGenDeltaR_->Fill(reco::deltaR(*stableMuon, staMuon));
       //       hStandAloneToGenDeltaDxy_->Fill(fabs(staMuon.dxy()) - fabs(dxy_.first));
       //       hStandAloneToGenDeltaDz_->Fill(fabs(staMuon.dz()) - fabs(dz_.first));
@@ -376,9 +386,13 @@ void TrackingEfficiencyFromCosmics::analyze(const edm::Event& iEvent, const edm:
       std::cout << "How did we get three cleaned standAloneMuons in simulation from a single cosmic track?" << std::endl;
     }
     BOOST_FOREACH( const reco::Track & cleanedStaMuon, cleanedStaMuons ) {
-      computeImpactParameters(cleanedStaMuon, cleanedStaMuon.innerPosition(), cleanedStaMuon.charge(), mf);
-      double cleanedStandAloneDxy = dxy_.first;
-      double cleanedStandAloneDz = dz_.first;
+      double cleanedStandAloneDxy = cleanedStaMuon.dxy();
+      double cleanedStandAloneDz = cleanedStaMuon.dz();
+      if( recomputeIP_ ) {
+	computeImpactParameters(cleanedStaMuon, cleanedStaMuon.innerPosition(), cleanedStaMuon.charge(), mf);
+	cleanedStandAloneDxy = dxy_.first;
+	cleanedStandAloneDz = dz_.first;
+      }
       hMinStaMuonToGenDeltaR_->Fill(reco::deltaR(*stableMuon, cleanedStaMuon));
       //       hCleanedStandAloneToGenDeltaDxy_->Fill(fabs(cleanedStaMuon.dxy()) - fabs(dxy_.first));
       //       hCleanedStandAloneToGenDeltaDz_->Fill(fabs(cleanedStaMuon.dz()) - fabs(dz_.first));
@@ -415,9 +429,13 @@ void TrackingEfficiencyFromCosmics::analyze(const edm::Event& iEvent, const edm:
         //        std::cout << "MATCH FOUND for standAlone with pt = " << it->first->pt() << ", matches with track of pt = " << it->second->pt() << std::endl;
         //        std::cout << "and dxy = " << fabs(it->first->dxy()) << " and dz = " << fabs(it->first->dz()) << std::endl;
       }
-      computeImpactParameters(*(it->first), it->first->innerPosition(), it->first->charge(), mf);
-      double standAloneDxy = dxy_.first;
-      double standAloneDz = dz_.first;
+      double standAloneDxy = it->first->dxy();
+      double standAloneDz = it->first->dz();
+      if( recomputeIP_ ) {
+	computeImpactParameters(*(it->first), it->first->innerPosition(), it->first->charge(), mf);
+	standAloneDxy = dxy_.first;
+	standAloneDz = dz_.first;
+      }
       //       variables_[0] = fabs(it->first->dxy());
       //       variables_[1] = fabs(it->first->dz());
       variables_[0] = fabs(standAloneDxy);
@@ -454,9 +472,13 @@ void TrackingEfficiencyFromCosmics::analyze(const edm::Event& iEvent, const edm:
         // std::cout << "MATCH FOUND for cleaned standAlone with pt = " << it->first->pt() << ", matches with track of pt = " << it->second->pt() << std::endl;
         // std::cout << "and dxy = " << fabs(it->first->dxy()) << " and dz = " << fabs(it->first->dz()) << std::endl;
       }
-      computeImpactParameters(*(it->first), it->first->innerPosition(), it->first->charge(), mf);
-      double cleanedStandAloneDxy = dxy_.first;
-      double cleanedStandAloneDz = dz_.first;
+      double cleanedStandAloneDxy = it->first->dxy();
+      double cleanedStandAloneDz = it->first->dz();
+      if( recomputeIP_ ) {
+	computeImpactParameters(*(it->first), it->first->innerPosition(), it->first->charge(), mf);
+	cleanedStandAloneDxy = dxy_.first;
+	cleanedStandAloneDz = dz_.first;
+      }
       variables_[0] = fabs(cleanedStandAloneDxy);
       variables_[1] = fabs(cleanedStandAloneDz);
       //       variables_[0] = fabs(it->first->dxy());
