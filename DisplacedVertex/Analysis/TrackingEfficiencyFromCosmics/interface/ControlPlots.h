@@ -23,6 +23,8 @@ public:
     hDxy_ = fileService->make<TH1F>(name+"_dxy",name+" dxy",500,0,500);
     hDz_ = fileService->make<TH1F>(name+"_dz",name+" dz",500,0,50);
     hChi2_ = fileService->make<TH1F>(name+"_chi2",name+" chi2",500,0,100);
+    hReferencePointRadius_ = fileService->make<TH1F>(name+"_RefPointRadius",name+" radius of the reference point",500,-50,50);
+    hReferencePointZ_ = fileService->make<TH1F>(name+"_RefPointZ",name+" z of the reference point",500,-50,50);
   }
   template <class T>
   void fillControlPlots(const std::vector<T> & collection)
@@ -41,11 +43,15 @@ public:
       hDxy_->Fill(it->dxy());
       hDz_->Fill(it->dz());
       hChi2_->Fill(it->normalizedChi2());
+      hReferencePointRadius_->Fill(sqrt(it->referencePoint().x()+it->referencePoint().y()));
+      hReferencePointZ_->Fill(it->referencePoint().z());
     }
   }
 
 protected:
-  TH1F *hPt_, *hEta_, *hPhi_, *hNhits_, *hNValidHits_, *hNValidPlusInvalidHits_, *hInnermostHitRadius_, *hInnermostHitZ_, *hDxy_, *hDz_, *hChi2_;
+  TH1F *hPt_, *hEta_, *hPhi_, *hNhits_, *hNValidHits_;
+  TH1F *hNValidPlusInvalidHits_, *hInnermostHitRadius_, *hInnermostHitZ_;
+  TH1F *hDxy_, *hDz_, *hChi2_, *hReferencePointRadius_, *hReferencePointZ_;
 };
 
 #endif // CONTROLPLOTS_H

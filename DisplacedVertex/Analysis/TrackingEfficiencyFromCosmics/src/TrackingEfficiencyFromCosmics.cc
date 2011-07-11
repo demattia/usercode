@@ -13,7 +13,7 @@
 //
 // Original Author:  Marco De Mattia,40 3-B32,+41227671551,
 //         Created:  Wed May 25 16:44:02 CEST 2011
-// $Id: TrackingEfficiencyFromCosmics.cc,v 1.22 2011/07/10 18:51:34 demattia Exp $
+// $Id: TrackingEfficiencyFromCosmics.cc,v 1.23 2011/07/10 21:52:49 demattia Exp $
 //
 //
 
@@ -207,8 +207,20 @@ void TrackingEfficiencyFromCosmics::analyze(const edm::Event& iEvent, const edm:
   transverseExtrapolator_ = new TransverseImpactPointExtrapolator(mf);
   analyticalExtrapolator_ = new AnalyticalImpactPointExtrapolator(mf);
 
-  edm::Handle<reco::TrackCollection> tracks;
-  iEvent.getByLabel("generalTracks", tracks);
+  // edm::Handle<reco::TrackCollection> tracks;
+  // iEvent.getByLabel("generalTracks", tracks);
+
+  edm::Handle<reco::TrackCollection> allTracks;
+  iEvent.getByLabel("generalTracks", allTracks);
+  reco::TrackBase::TrackQuality trackQualityHighPurity = reco::TrackBase::qualityByName("highPurity");
+  reco::TrackCollection * tracks = new reco::TrackCollection();
+  reco::TrackCollection::const_iterator itTrk = allTracks->begin();
+  for( ; itTrk != allTracks->end(); ++itTrk ) {
+    if( (itTrk->quality(trackQualityHighPurity)) && (itTrk->eta() < 2.0) && (itTrk->pt() > 25) ) {
+      tracks->push_back(*itTrk);
+    }
+  }
+
   edm::Handle<reco::TrackCollection> staMuons;
   iEvent.getByLabel("standAloneMuons", staMuons);
 
