@@ -13,7 +13,7 @@
 //
 // Original Author:  Marco De Mattia,40 3-B32,+41227671551,
 //         Created:  Wed May 25 16:44:02 CEST 2011
-// $Id: TrackingEfficiencyFromCosmics.cc,v 1.25 2011/07/11 09:44:48 demattia Exp $
+// $Id: TrackingEfficiencyFromCosmics.cc,v 1.26 2011/07/11 10:38:10 demattia Exp $
 //
 //
 
@@ -514,22 +514,39 @@ const reco::GenParticle * TrackingEfficiencyFromCosmics::takeStableMuon(const re
 void TrackingEfficiencyFromCosmics::beginJob()
 {
   edm::Service<TFileService> fileService;
-  hMinDeltaR_ = fileService->make<TH1F>("minDeltaR","#Delta R between standalone muon and closest track",500,0,5);
-  hSimMinDeltaR_ = fileService->make<TH1F>("simMinDeltaR","#Delta R between simTrack and closest track",500,0,5);
-  hMinTrackToGenDeltaR_ = fileService->make<TH1F>("minTrackGenDeltaR","#Delta R between gen muon and closest track",500,0,5);
-  hMinStaMuonToGenDeltaR_ = fileService->make<TH1F>("minStaMunoGenDeltaR","#Delta R between gen muon and closest standAloneMuon",500,0,5);
+  hMinDeltaR_ =             utils::bookHistogram(fileService, "minDeltaR", "", "#Delta R", "", 500, 0, 5);
+  hSimMinDeltaR_ =          utils::bookHistogram(fileService, "simMinDeltaR", "", "#Delta R", "", 500, 0, 5);
+  hMinTrackToGenDeltaR_ =   utils::bookHistogram(fileService, "minTrackToGenDeltaR", "", "#Delta R", "", 500, 0, 5);
+  hMinStaMuonToGenDeltaR_ = utils::bookHistogram(fileService, "minStaMuonToGenDeltaR", "", "#Delta R", "", 500, 0, 5);
 
-  hStandAloneToGenDeltaDxy_ = fileService->make<TH1F>("standAloneToGenDeltaDxy", "#Delta(dxy) standAlone - gen", 100, -100, 100);
-  hStandAloneToGenDeltaDz_ = fileService->make<TH1F>("standAloneToGenDeltaDz", "#Delta(dz) standAlone - gen", 100, -100, 100);
-  hCleanedStandAloneToGenDeltaDxy_ = fileService->make<TH1F>("cleanedStandAloneToGenDeltaDxy", "#Delta(dxy) cleaned standAlone - gen", 100, -100, 100);
-  hCleanedStandAloneToGenDeltaDz_ = fileService->make<TH1F>("cleanedStandAloneToGenDeltaDz", "#Delta(dz) cleaned standAlone - gen", 100, -100, 100);
-  hTrackToGenDeltaDxy_ = fileService->make<TH1F>("trackToGenDeltaDxy", "#Delta(dxy) track - gen", 100, -100, 100);
-  hTrackToGenDeltaDz_ = fileService->make<TH1F>("trackToGenDeltaDz", "#Delta(dz) track - gen", 100, -100, 100);
+  hStandAloneToGenDeltaDxy_ =        utils::bookHistogram(fileService, "standAloneToGenDeltaDxy", "", "|#Delta |dxy||", "cm", 100, -100, 100);
+  hStandAloneToGenDeltaDz_ =         utils::bookHistogram(fileService, "standAloneToGenDeltaDz", "", "|#Delta |dz||", "cm", 100, -100, 100);
+  hCleanedStandAloneToGenDeltaDxy_ = utils::bookHistogram(fileService, "cleanedStandAloneToGenDeltaDxy", "", "|#Delta |dxy||", "cm", 100, -100, 100);
+  hCleanedStandAloneToGenDeltaDz_ =  utils::bookHistogram(fileService, "cleanedStandAloneToGenDeltaDz", "", "|#Delta |dz||", "cm", 100, -100, 100);
+  hTrackToGenDeltaDxy_ =             utils::bookHistogram(fileService, "trackToGenDeltaDxy", "", "|#Delta |dxy||", "cm", 100, -100, 100);
+  hTrackToGenDeltaDz_ =              utils::bookHistogram(fileService, "trackToGenDeltaDz", "", "|#Delta |dz||", "cm", 100, -100, 100);
 
-  hTrackCounterDxy_ = fileService->make<TH1F>("trackCounterDxy", "track number vs dxy", 100, 0, 100);
-  hStandAloneCounterDxy_ = fileService->make<TH1F>("standAloneCounterDxy", "standAlone number vs dxy", 100, 0, 100);
-  hTrackCounterDz_ = fileService->make<TH1F>("trackCounterDz", "track number vs dz", 100, 0, 100);
-  hStandAloneCounterDz_ = fileService->make<TH1F>("standAloneCounterDz", "standAlone number vs dz", 100, 0, 100);
+  hTrackCounterDxy_ =      utils::bookHistogram(fileService, "trackCounterDxy", "", "|dxy|", "cm", 100, 0, 100);
+  hStandAloneCounterDxy_ = utils::bookHistogram(fileService, "standAloneCounterDxy", "", "|dxy|", "cm", 100, 0, 100);
+  hTrackCounterDz_ =       utils::bookHistogram(fileService, "trackCounterDz", "", "|dz|", "cm", 100, 0, 100);
+  hStandAloneCounterDz_ =  utils::bookHistogram(fileService, "standAloneCounterDz", "", "|dz|", "cm", 100, 0, 100);
+
+  // hMinDeltaR_ = fileService->make<TH1F>("minDeltaR","#Delta R between standalone muon and closest track",500,0,5);
+  // hSimMinDeltaR_ = fileService->make<TH1F>("simMinDeltaR","#Delta R between simTrack and closest track",500,0,5);
+  // hMinTrackToGenDeltaR_ = fileService->make<TH1F>("minTrackGenDeltaR","#Delta R between gen muon and closest track",500,0,5);
+  // hMinStaMuonToGenDeltaR_ = fileService->make<TH1F>("minStaMunoGenDeltaR","#Delta R between gen muon and closest standAloneMuon",500,0,5);
+
+  // hStandAloneToGenDeltaDxy_ = fileService->make<TH1F>("standAloneToGenDeltaDxy", "#Delta(dxy) standAlone - gen", 100, -100, 100);
+  // hStandAloneToGenDeltaDz_ = fileService->make<TH1F>("standAloneToGenDeltaDz", "#Delta(dz) standAlone - gen", 100, -100, 100);
+  // hCleanedStandAloneToGenDeltaDxy_ = fileService->make<TH1F>("cleanedStandAloneToGenDeltaDxy", "#Delta(dxy) cleaned standAlone - gen", 100, -100, 100);
+  // hCleanedStandAloneToGenDeltaDz_ = fileService->make<TH1F>("cleanedStandAloneToGenDeltaDz", "#Delta(dz) cleaned standAlone - gen", 100, -100, 100);
+  // hTrackToGenDeltaDxy_ = fileService->make<TH1F>("trackToGenDeltaDxy", "#Delta(dxy) track - gen", 100, -100, 100);
+  // hTrackToGenDeltaDz_ = fileService->make<TH1F>("trackToGenDeltaDz", "#Delta(dz) track - gen", 100, -100, 100);
+
+  // hTrackCounterDxy_ = fileService->make<TH1F>("trackCounterDxy", "track number vs dxy", 100, 0, 100);
+  // hStandAloneCounterDxy_ = fileService->make<TH1F>("standAloneCounterDxy", "standAlone number vs dxy", 100, 0, 100);
+  // hTrackCounterDz_ = fileService->make<TH1F>("trackCounterDz", "track number vs dz", 100, 0, 100);
+  // hStandAloneCounterDz_ = fileService->make<TH1F>("standAloneCounterDz", "standAlone number vs dz", 100, 0, 100);
 
   controlPlotsGeneralTracks_.reset(new ControlPlots(fileService, "generalTracks"));
   controlPlotsStandAloneMuons_.reset(new ControlPlots(fileService, "standAloneMuons"));
