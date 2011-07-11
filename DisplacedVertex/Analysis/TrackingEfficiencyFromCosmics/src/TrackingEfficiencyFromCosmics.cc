@@ -13,7 +13,7 @@
 //
 // Original Author:  Marco De Mattia,40 3-B32,+41227671551,
 //         Created:  Wed May 25 16:44:02 CEST 2011
-// $Id: TrackingEfficiencyFromCosmics.cc,v 1.24 2011/07/11 09:02:01 demattia Exp $
+// $Id: TrackingEfficiencyFromCosmics.cc,v 1.25 2011/07/11 09:44:48 demattia Exp $
 //
 //
 
@@ -218,7 +218,7 @@ void TrackingEfficiencyFromCosmics::analyze(const edm::Event& iEvent, const edm:
   reco::TrackCollection * tracks = new reco::TrackCollection();
   reco::TrackCollection::const_iterator itTrk = allTracks->begin();
   for( ; itTrk != allTracks->end(); ++itTrk ) {
-    if( (itTrk->quality(trackQualityHighPurity)) && (itTrk->eta() < 2.0) && (itTrk->pt() > 25) ) {
+    if( (itTrk->quality(trackQualityHighPurity)) && (fabs(itTrk->eta()) < 2.0) && (itTrk->pt() > 25) && (itTrk->found() > 6) ) {
       tracks->push_back(*itTrk);
     }
   }
