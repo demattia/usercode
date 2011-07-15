@@ -13,7 +13,7 @@
 //
 // Original Author:  Marco De Mattia,40 3-B32,+41227671551,
 //         Created:  Wed May 25 16:44:02 CEST 2011
-// $Id: TrackingEfficiencyFromCosmics.cc,v 1.26 2011/07/11 10:38:10 demattia Exp $
+// $Id: TrackingEfficiencyFromCosmics.cc,v 1.27 2011/07/11 16:30:04 demattia Exp $
 //
 //
 
@@ -98,16 +98,25 @@ private:
   // void impactParameterForGen(const reco::GenParticle & genMuon, const math::XYZPoint & genVertex,
   //                            const int genCharge, const MagneticField * mf);
   template <class T>
-  void computeImpactParameters(const T & genMuon, const math::XYZPoint & genVertex,
-			       const int genCharge, const MagneticField * mf);
+  void computeGenImpactParameters(const T & genMuon, const math::XYZPoint & genVertex,
+                                  const int genCharge, const MagneticField * mf);
+  void computeImpactParameters( const reco::Track & track, const TransientTrackBuilder & theBuilder );
+  template <class T1, class T2>
+  void fillEfficiencyVsGen( const T1 & staMuons, const T2 * stableMuon,
+                            Efficiency * efficiency,
+                            const double & genDxy, const double & genDz, const MagneticField * mf,
+                            TH1F * hMinToGenDeltaR, TH1F * hToGenDeltaDxy, TH1F * hToGenDeltaDz );
+  template <class T1, class T2>
+  void fillEfficiency(const T1 & staMuons, const T2 & tracks, Efficiency * efficiency,
+                      TH1F * hMinDeltaR, const MagneticField * mf);
 
   void dumpGenParticleInfo(const reco::GenParticle & genParticle);
   void dumpTrackInfo(const reco::Track & track, const unsigned int trackNumber);
 
   // ----------member data ---------------------------
   // double maxDeltaR_;
-  TH1F * hMinDeltaR_, * hSimMinDeltaR_;
-  TH1F * hMinTrackToGenDeltaR_, * hMinStaMuonToGenDeltaR_;
+  TH1F * hMinDeltaR_, * hMinCleanedDeltaR_, * hSimMinDeltaR_;
+  TH1F * hMinTrackToGenDeltaR_, * hMinStaMuonToGenDeltaR_, * hMinCleanedStaMuonToGenDeltaR_;
   TH1F * hStandAloneToGenDeltaDxy_, * hStandAloneToGenDeltaDz_;
   TH1F * hCleanedStandAloneToGenDeltaDxy_, * hCleanedStandAloneToGenDeltaDz_;
   TH1F * hTrackToGenDeltaDxy_, * hTrackToGenDeltaDz_;
@@ -125,6 +134,7 @@ private:
   std::auto_ptr<ControlPlots> controlPlotsGeneralTracks_;
   std::auto_ptr<ControlPlots> controlPlotsStandAloneMuons_;
   std::auto_ptr<ControlPlots> controlPlotsCleanedStandAloneMuons_;
+  std::auto_ptr<ControlDeltaPlots> trackDelta_;
   std::auto_ptr<ControlDeltaPlots> standAloneDelta_;
   std::auto_ptr<ControlDeltaPlots> cleanedStandAloneDelta_;
   std::auto_ptr<ControlDeltaPlots> standAloneTrackDelta_;
@@ -154,6 +164,10 @@ private:
   double deltaPtCut_;
   double deltaPhiCut_;
   bool recomputeIP_;
+  bool singleLegMuon_;
+  edm::InputTag muonCollection_;
+  edm::InputTag trackCollection_;
+  edm::ESHandle<TransientTrackBuilder> theB_;
 };
 
 TrackingEfficiencyFromCosmics::TrackingEfficiencyFromCosmics(const edm::ParameterSet& iConfig) :
@@ -170,9 +184,14 @@ TrackingEfficiencyFromCosmics::TrackingEfficiencyFromCosmics(const edm::Paramete
   deltaDzCut_(iConfig.getParameter<double>("DeltaDzCut")),
   deltaPtCut_(iConfig.getParameter<double>("DeltaPtCut")),
   deltaPhiCut_(iConfig.getParameter<double>("DeltaPhiCut")),
-  recomputeIP_(iConfig.getParameter<bool>("RecomputeIP"))
+  recomputeIP_(iConfig.getParameter<bool>("RecomputeIP")),
+  singleLegMuon_(iConfig.getParameter<bool>("SingleLegMuon")),
+  muonCollection_(iConfig.getParameter<edm::InputTag>("MuonCollection")),
+  trackCollection_(iConfig.getParameter<edm::InputTag>("TrackCollection"))
 {
-  associatorByDeltaR_.reset(new AssociatorByDeltaR(iConfig.getParameter<double>("MaxDeltaR")));
+  // Use the unique association for tracks to standAlone muons only when
+  if( singleLegMuon_ ) associatorByDeltaR_.reset(new AssociatorByDeltaR(iConfig.getParameter<double>("MaxDeltaR"), false, true));
+  else associatorByDeltaR_.reset(new AssociatorByDeltaR(iConfig.getParameter<double>("MaxDeltaR")));
   simAssociatorByDeltaR_.reset(new AssociatorByDeltaR(iConfig.getParameter<double>("SimMaxDeltaR"), false));
 
   nBins_ = 100;
@@ -209,11 +228,8 @@ void TrackingEfficiencyFromCosmics::analyze(const edm::Event& iEvent, const edm:
   transverseExtrapolator_ = new TransverseImpactPointExtrapolator(mf);
   analyticalExtrapolator_ = new AnalyticalImpactPointExtrapolator(mf);
 
-  // edm::Handle<reco::TrackCollection> tracks;
-  // iEvent.getByLabel("generalTracks", tracks);
-
   edm::Handle<reco::TrackCollection> allTracks;
-  iEvent.getByLabel("generalTracks", allTracks);
+  iEvent.getByLabel(trackCollection_, allTracks);
   reco::TrackBase::TrackQuality trackQualityHighPurity = reco::TrackBase::qualityByName("highPurity");
   reco::TrackCollection * tracks = new reco::TrackCollection();
   reco::TrackCollection::const_iterator itTrk = allTracks->begin();
@@ -222,9 +238,11 @@ void TrackingEfficiencyFromCosmics::analyze(const edm::Event& iEvent, const edm:
       tracks->push_back(*itTrk);
     }
   }
+  // Load the transient track builder
+  iSetup.get<TransientTrackRecord>().get("TransientTrackBuilder",theB_);
 
   edm::Handle<reco::TrackCollection> staMuons;
-  iEvent.getByLabel("standAloneMuons", staMuons);
+  iEvent.getByLabel(muonCollection_, staMuons);
 
   // Select good standAloneMuons (done such that the matching with gen is good)
   reco::TrackCollection cleanedStaMuons;
@@ -236,42 +254,36 @@ void TrackingEfficiencyFromCosmics::analyze(const edm::Event& iEvent, const edm:
     }
   }
 
-  if( cleanedStaMuons.size() != 2 ) {
-    cleanedStaMuons.clear();
+  if( singleLegMuon_ ) {
+    // Two legged muon, require only one in the event
+    if( cleanedStaMuons.size() != 1 ) {
+      cleanedStaMuons.clear();
+    }
   }
   else {
-    // Compare the dxy and dz of the two muons. Accept them only if they match within 1 sigma of the resolution taken by interpolating the MC-truth
-    // resolution on SingleMuPt10 and SingleMuPt100 to a Pt of 25 GeV.
-    if( matchTwoLegs_ ) {
-//       double fDxy1 = fabs(cleanedStaMuons[0].dxy());
-//       double fDxy2 = fabs(cleanedStaMuons[1].dxy());
-//       double fDz1 = fabs(cleanedStaMuons[0].dz());
-//       double fDz2 = fabs(cleanedStaMuons[1].dz());
-      //       if( !( (fabs(fDxy1 - fDxy2) < deltaDxyCut_) && 
-      // 	     (fabs(fDz1 - fDz2) < deltaDzCut_) ) ) {
+    // Single legs, require two in the event
+    if( cleanedStaMuons.size() == 2 ) {
+      // Compare the dxy and dz of the two muons. Accept them only if they match within 1 sigma of the resolution taken by interpolating the MC-truth
+      // resolution on SingleMuPt10 and SingleMuPt100 to a Pt of 25 GeV.
+      if( matchTwoLegs_ ) {
+        double dxy1 = cleanedStaMuons[0].dxy();
+        double dxy2 = cleanedStaMuons[1].dxy();
+        double dz1 = cleanedStaMuons[0].dz();
+        double dz2 = cleanedStaMuons[1].dz();
+        double deltaPhi = reco::deltaPhi(cleanedStaMuons[0].phi(), cleanedStaMuons[1].phi());
+        double deltaPt = cleanedStaMuons[0].pt() - cleanedStaMuons[1].pt();
 
-      double dxy1 = cleanedStaMuons[0].dxy();
-      double dxy2 = cleanedStaMuons[1].dxy();
-      double dz1 = cleanedStaMuons[0].dz();
-      double dz2 = cleanedStaMuons[1].dz();
-      double deltaPhi = reco::deltaPhi(cleanedStaMuons[0].phi(), cleanedStaMuons[1].phi());
-      double deltaPt = cleanedStaMuons[0].pt() - cleanedStaMuons[1].pt();
-
-      // Typically the dxy have opposite sign while the dz have same sign.
-      if( !( (fabs(dxy1 + dxy2) < deltaDxyCut_) && 
-	     (fabs(dz1 - dz2)   < deltaDzCut_ ) &&
-	     (fabs(deltaPhi)    > deltaPhiCut_) &&
-	     (fabs(deltaPt)     < deltaPtCut_ ) ) ) {
-	cleanedStaMuons.clear();
+        // The dxy have opposite sign while the dz have same sign.
+        if( !( (fabs(dxy1 + dxy2) < deltaDxyCut_) &&
+               (fabs(dz1 - dz2)   < deltaDzCut_ ) &&
+               (fabs(deltaPhi)    > deltaPhiCut_) &&
+               (fabs(deltaPt)     < deltaPtCut_ ) ) ) {
+          cleanedStaMuons.clear();
+        }
       }
-//       else {
-// 	std::cout << "dxy1 = " << cleanedStaMuons[0].dxy() << ", dxy2 = " << cleanedStaMuons[1].dxy() << ", dz1 = "
-// 		  << cleanedStaMuons[0].dz() << ", dz2 = " << cleanedStaMuons[1].dz() << std::endl;
-// 	std::cout << "fDxy1 = " << fDxy1 << ", fDxy2 = " << fDxy2 << ", fDz1 = " << fDz1 << ", fDz2 = " << fDz2 << std::endl;
-// 	std::cout << "fabs(dxy1 + dxy2) = " << fabs(cleanedStaMuons[0].dxy() + cleanedStaMuons[1].dxy())
-// 		  << ", fabs(dz1 - dz2) = " << fabs(cleanedStaMuons[0].dz() - cleanedStaMuons[1].dz()) << std::endl;
-// 	std::cout << "fabs(fDxy1 - fDxy2) = " << fabs(fDxy1 - fDxy2) << ", fabs(fDz1 - fDz2) = " << fabs(fDz1 - fDz2) << std::endl;
-//       }
+    }
+    else {
+      cleanedStaMuons.clear();
     }
   }
 
@@ -280,33 +292,28 @@ void TrackingEfficiencyFromCosmics::analyze(const edm::Event& iEvent, const edm:
   controlPlotsStandAloneMuons_->fillControlPlots(*staMuons);
   controlPlotsCleanedStandAloneMuons_->fillControlPlots(cleanedStaMuons);
 
+  // // Find the simTracks (for IP)
+  // edm::Handle<edm::SimTrackContainer> simTracks;
+  // iEvent.getByLabel("g4SimHits", simTracks);
+  // std::map<const math::XYZTLorentzVectorD *, const reco::Track *> simMatchesMap;
+  // simAssociatorByDeltaR_->fillAssociationMap(*simTracks, *tracks, simMatchesMap, hSimMinDeltaR_);
+  // Compute efficiency from MC truth
+  // std::map<const math::XYZTLorentzVectorD *, const reco::Track *>::const_iterator it = simMatchesMap.begin();
+  // for( ; it != simMatchesMap.end(); ++it ) {
+  //      variables_[0] = it->first->pt();
+  //      bool found = false;
+  //      if( it->second != 0 ) found = true;
+  //      genEfficiency_->fill(variables_, found);
+  //    }
+
   // Gen Particles
   edm::Handle<reco::GenParticleCollection> genParticles;
   if( useMCtruth_ ) {
     iEvent.getByLabel("genParticles", genParticles);
     const reco::GenParticle * stableMuon = takeStableMuon(*genParticles);
 
-    // std::map<const math::XYZTLorentzVectorD *, const reco::Track *> simMatchesMap;
-
     // Compute impact parameters for generator particle
-    // impactParameterForGen(*stableMuon, stableMuon->vertex(), stableMuon->charge(), mf);
-    computeImpactParameters(*stableMuon, stableMuon->vertex(), stableMuon->charge(), mf);
-
-    // // Find the simTracks (for IP)
-    // edm::Handle<edm::SimTrackContainer> simTracks;
-    // iEvent.getByLabel("g4SimHits", simTracks);
-
-    std::map<const math::XYZTLorentzVectorD *, const reco::Track *> simMatchesMap;
-    // simAssociatorByDeltaR_->fillAssociationMap(*simTracks, *tracks, simMatchesMap, hSimMinDeltaR_);
-
-    // Compute efficiency from MC truth
-    // std::map<const math::XYZTLorentzVectorD *, const reco::Track *>::const_iterator it = simMatchesMap.begin();
-    // for( ; it != simMatchesMap.end(); ++it ) {
-    //      variables_[0] = it->first->pt();
-    //      bool found = false;
-    //      if( it->second != 0 ) found = true;
-    //      genEfficiency_->fill(variables_, found);
-    //    }
+    computeGenImpactParameters(*stableMuon, stableMuon->vertex(), stableMuon->charge(), mf);
 
     // Gen muon values
     double genDxy = dxy_.first;
@@ -317,177 +324,33 @@ void TrackingEfficiencyFromCosmics::analyze(const edm::Event& iEvent, const edm:
     variables_[2] = stableMuon->pt();
 
     // Compute efficiency for track vs MC-truth
-    if( tracks->size() == 0 ) {
-      // Do it twice as we expect two standalone muons and we reconstruct none
-      genToTrackEfficiency_->fill(variables_, false);
-      genToTrackEfficiency_->fill(variables_, false);
-    }
-    else if( tracks->size() == 1 ) {
-      genToTrackEfficiency_->fill(variables_, false);
-    }
-    if( tracks->size() > 2 ) {
-      std::cout << "How did we get three tracks in simulation from a single cosmic track?" << std::endl;
-    }
-    BOOST_FOREACH( const reco::Track & track, *tracks ) {
-      double trackDxy = track.dxy();
-      double trackDz = track.dz();
-      if( recomputeIP_ ) {
-	computeImpactParameters(track, track.innerPosition(), track.charge(), mf);
-	trackDxy = dxy_.first;
-	trackDz = dz_.first;
-      }
-      hMinTrackToGenDeltaR_->Fill(reco::deltaR(*stableMuon, track));
-      //       hTrackToGenDeltaDxy_->Fill(fabs(track.dxy()) - fabs(genDxy));
-      //       hTrackToGenDeltaDz_->Fill(fabs(track.dz()) - fabs(genDz));
-      hTrackToGenDeltaDxy_->Fill(fabs(trackDxy) - fabs(genDxy));
-      hTrackToGenDeltaDz_->Fill(fabs(trackDz) - fabs(genDz));
-      genToTrackEfficiency_->fill(variables_, true);
-    }
-
+    fillEfficiencyVsGen( *tracks, stableMuon, genToTrackEfficiency_.get(), genDxy, genDz, mf,
+                         hMinTrackToGenDeltaR_, hTrackToGenDeltaDxy_, hTrackToGenDeltaDz_ );
     // Compute efficiency for standalone vs MC-truth
-    if( staMuons->size() == 0 ) {
-      // Do it twice as we expect two standalone muons and we reconstruct none
-      genToStandAloneEfficiency_->fill(variables_, false);
-      genToStandAloneEfficiency_->fill(variables_, false);
-    }
-    else if( staMuons->size() == 1 ) {
-      genToStandAloneEfficiency_->fill(variables_, false);
-    }
-    else if( staMuons->size() > 2 ) {
-      std::cout << "How did we get three standAloneMuons in simulation from a single cosmic track?" << std::endl;
-    }
-
-    BOOST_FOREACH( const reco::Track & staMuon, *staMuons ) {
-      double standAloneDxy = staMuon.dxy();
-      double standAloneDz = staMuon.dz();
-      if( recomputeIP_ ) {
-	computeImpactParameters(staMuon, staMuon.innerPosition(), staMuon.charge(), mf);
-	standAloneDxy = dxy_.first;
-	standAloneDxy = dz_.first;
-      }
-      hMinStaMuonToGenDeltaR_->Fill(reco::deltaR(*stableMuon, staMuon));
-      //       hStandAloneToGenDeltaDxy_->Fill(fabs(staMuon.dxy()) - fabs(dxy_.first));
-      //       hStandAloneToGenDeltaDz_->Fill(fabs(staMuon.dz()) - fabs(dz_.first));
-      hStandAloneToGenDeltaDxy_->Fill(fabs(standAloneDxy) - fabs(genDxy));
-      hStandAloneToGenDeltaDz_->Fill(fabs(standAloneDz) - fabs(genDz));
-      genToStandAloneEfficiency_->fill(variables_, true);
-    }
-
-    // For cleanedMuons
-    if( cleanedStaMuons.size() == 0 ) {
-      // Do it twice as we expect two standalone muons and we reconstruct none
-      genToCleanedStandAloneEfficiency_->fill(variables_, false);
-      genToCleanedStandAloneEfficiency_->fill(variables_, false);
-    }
-    else if( cleanedStaMuons.size() == 1 ) {
-      genToCleanedStandAloneEfficiency_->fill(variables_, false);
-    }
-    else if( cleanedStaMuons.size() > 2 ) {
-      std::cout << "How did we get three cleaned standAloneMuons in simulation from a single cosmic track?" << std::endl;
-    }
-    BOOST_FOREACH( const reco::Track & cleanedStaMuon, cleanedStaMuons ) {
-      double cleanedStandAloneDxy = cleanedStaMuon.dxy();
-      double cleanedStandAloneDz = cleanedStaMuon.dz();
-      if( recomputeIP_ ) {
-	computeImpactParameters(cleanedStaMuon, cleanedStaMuon.innerPosition(), cleanedStaMuon.charge(), mf);
-	cleanedStandAloneDxy = dxy_.first;
-	cleanedStandAloneDz = dz_.first;
-      }
-      hMinStaMuonToGenDeltaR_->Fill(reco::deltaR(*stableMuon, cleanedStaMuon));
-      //       hCleanedStandAloneToGenDeltaDxy_->Fill(fabs(cleanedStaMuon.dxy()) - fabs(dxy_.first));
-      //       hCleanedStandAloneToGenDeltaDz_->Fill(fabs(cleanedStaMuon.dz()) - fabs(dz_.first));
-      hCleanedStandAloneToGenDeltaDxy_->Fill(fabs(cleanedStandAloneDxy) - fabs(genDxy));
-      hCleanedStandAloneToGenDeltaDz_->Fill(fabs(cleanedStandAloneDz) - fabs(genDz));
-      genToCleanedStandAloneEfficiency_->fill(variables_, true);
-    }
+    fillEfficiencyVsGen( *(staMuons.product()), stableMuon, genToStandAloneEfficiency_.get(), genDxy, genDz, mf,
+                         hMinStaMuonToGenDeltaR_, hStandAloneToGenDeltaDxy_, hStandAloneToGenDeltaDz_ );
+    // Compute efficiency for cleaned standalone vs MC-truth
+    fillEfficiencyVsGen( cleanedStaMuons, stableMuon, genToCleanedStandAloneEfficiency_.get(), genDxy, genDz, mf,
+                         hMinCleanedStaMuonToGenDeltaR_, hCleanedStandAloneToGenDeltaDxy_, hCleanedStandAloneToGenDeltaDz_ );
   }
 
   // Deltas between the two standAloneMuons
-  if( staMuons->size() == 2 ) {
-    standAloneDelta_->fillControlPlots((*staMuons)[0], (*staMuons)[1]);
-  }
-  if( cleanedStaMuons.size() == 2 ) {
-    cleanedStandAloneDelta_->fillControlPlots(cleanedStaMuons[0], cleanedStaMuons[1]);
-  }
-
-  // Association map of StandAloneMuons and TrackerTracks
-  std::map<const reco::Track *, const reco::Track *> matchesMap;
-  if( staMuons->size() > 0 ) {
-    associatorByDeltaR_->fillAssociationMap(*staMuons, *tracks, matchesMap, hMinDeltaR_);
-
-    bool found = false;
-    std::map<const reco::Track *, const reco::Track *>::const_iterator it = matchesMap.begin();
-    for( ; it != matchesMap.end(); ++it ) {
-      // found = false;
-      if( it->second == 0 ) {
-        found = false;
-        //        std::cout << "NO match found for standAlone with pt = " << it->first->pt() << std::endl;
-        //        std::cout << "and dxy = " << fabs(it->first->dxy()) << " and dz = " << fabs(it->first->dz()) << std::endl;
-      }
-      else {
-        found = true;
-        //        std::cout << "MATCH FOUND for standAlone with pt = " << it->first->pt() << ", matches with track of pt = " << it->second->pt() << std::endl;
-        //        std::cout << "and dxy = " << fabs(it->first->dxy()) << " and dz = " << fabs(it->first->dz()) << std::endl;
-      }
-      double standAloneDxy = it->first->dxy();
-      double standAloneDz = it->first->dz();
-      if( recomputeIP_ ) {
-	computeImpactParameters(*(it->first), it->first->innerPosition(), it->first->charge(), mf);
-	standAloneDxy = dxy_.first;
-	standAloneDz = dz_.first;
-      }
-      //       variables_[0] = fabs(it->first->dxy());
-      //       variables_[1] = fabs(it->first->dz());
-      variables_[0] = fabs(standAloneDxy);
-      variables_[1] = fabs(standAloneDz);
-      variables_[2] = it->first->pt();
-      efficiency_->fill(variables_, found);
-
-      hStandAloneCounterDxy_->Fill(variables_[0]);
-      hStandAloneCounterDz_->Fill(variables_[1]);
-      if( found ) {
-        hTrackCounterDxy_->Fill(variables_[0]);
-        hTrackCounterDz_->Fill(variables_[1]);
-	standAloneTrackDelta_->fillControlPlots(*(it->first), *(it->second));
-      }
+  if( !singleLegMuon_ ) {
+    if( staMuons->size() == 2 ) {
+      standAloneDelta_->fillControlPlots((*staMuons)[0], (*staMuons)[1]);
+    }
+    if( cleanedStaMuons.size() == 2 ) {
+      cleanedStandAloneDelta_->fillControlPlots(cleanedStaMuons[0], cleanedStaMuons[1]);
     }
   }
-
-
-  // Association map of cleaned StandAloneMuons and TrackerTracks
-  std::map<const reco::Track *, const reco::Track *> matchesMapCleaned;
-  if( cleanedStaMuons.size() > 0 ) {
-    associatorByDeltaR_->fillAssociationMap(cleanedStaMuons, *tracks, matchesMapCleaned, hMinDeltaR_);
-
-    bool found = false;
-    std::map<const reco::Track *, const reco::Track *>::const_iterator it = matchesMapCleaned.begin();
-    for( ; it != matchesMapCleaned.end(); ++it ) {
-      if( it->second == 0 ) {
-        found = false;
-        // std::cout << "NO match found for cleaned standAlone with pt = " << it->first->pt() << std::endl;
-        // std::cout << "and dxy = " << fabs(it->first->dxy()) << " and dz = " << fabs(it->first->dz()) << std::endl;
-      }
-      else {
-        found = true;
-        // std::cout << "MATCH FOUND for cleaned standAlone with pt = " << it->first->pt() << ", matches with track of pt = " << it->second->pt() << std::endl;
-        // std::cout << "and dxy = " << fabs(it->first->dxy()) << " and dz = " << fabs(it->first->dz()) << std::endl;
-      }
-      double cleanedStandAloneDxy = it->first->dxy();
-      double cleanedStandAloneDz = it->first->dz();
-      if( recomputeIP_ ) {
-	computeImpactParameters(*(it->first), it->first->innerPosition(), it->first->charge(), mf);
-	cleanedStandAloneDxy = dxy_.first;
-	cleanedStandAloneDz = dz_.first;
-      }
-      variables_[0] = fabs(cleanedStandAloneDxy);
-      variables_[1] = fabs(cleanedStandAloneDz);
-      //       variables_[0] = fabs(it->first->dxy());
-      //       variables_[1] = fabs(it->first->dz());
-      variables_[2] = it->first->pt();
-      efficiencyCleaned_->fill(variables_, found);
-    }
+  if( tracks->size() == 2 ) {
+    trackDelta_->fillControlPlots((*tracks)[0], (*tracks)[1]);
   }
 
+  // Efficiency for tracks vs standAlone
+  fillEfficiency(*staMuons, tracks, efficiency_.get(), hMinDeltaR_, mf);
+  // Efficiency for tracks vs cleanedStandAlone
+  fillEfficiency(cleanedStaMuons, tracks, efficiencyCleaned_.get(), hMinCleanedDeltaR_, mf);
 
 #ifdef THIS_IS_AN_EVENT_EXAMPLE
   Handle<ExampleData> pIn;
@@ -514,10 +377,12 @@ const reco::GenParticle * TrackingEfficiencyFromCosmics::takeStableMuon(const re
 void TrackingEfficiencyFromCosmics::beginJob()
 {
   edm::Service<TFileService> fileService;
-  hMinDeltaR_ =             utils::bookHistogram(fileService, "minDeltaR", "", "#Delta R", "", 500, 0, 5);
-  hSimMinDeltaR_ =          utils::bookHistogram(fileService, "simMinDeltaR", "", "#Delta R", "", 500, 0, 5);
-  hMinTrackToGenDeltaR_ =   utils::bookHistogram(fileService, "minTrackToGenDeltaR", "", "#Delta R", "", 500, 0, 5);
-  hMinStaMuonToGenDeltaR_ = utils::bookHistogram(fileService, "minStaMuonToGenDeltaR", "", "#Delta R", "", 500, 0, 5);
+  hMinDeltaR_ =                    utils::bookHistogram(fileService, "minDeltaR", "", "#Delta R", "", 500, 0, 5);
+  hMinCleanedDeltaR_ =             utils::bookHistogram(fileService, "minCleanedDeltaR", "", "#Delta R", "", 500, 0, 5);
+  hSimMinDeltaR_ =                 utils::bookHistogram(fileService, "simMinDeltaR", "", "#Delta R", "", 500, 0, 5);
+  hMinTrackToGenDeltaR_ =          utils::bookHistogram(fileService, "minTrackToGenDeltaR", "", "#Delta R", "", 500, 0, 5);
+  hMinStaMuonToGenDeltaR_ =        utils::bookHistogram(fileService, "minStaMuonToGenDeltaR", "", "#Delta R", "", 500, 0, 5);
+  hMinCleanedStaMuonToGenDeltaR_ = utils::bookHistogram(fileService, "minCleanedStaMuonToGenDeltaR", "", "#Delta R", "", 500, 0, 5);
 
   hStandAloneToGenDeltaDxy_ =        utils::bookHistogram(fileService, "standAloneToGenDeltaDxy", "", "|#Delta |dxy||", "cm", 100, -100, 100);
   hStandAloneToGenDeltaDz_ =         utils::bookHistogram(fileService, "standAloneToGenDeltaDz", "", "|#Delta |dz||", "cm", 100, -100, 100);
@@ -526,31 +391,15 @@ void TrackingEfficiencyFromCosmics::beginJob()
   hTrackToGenDeltaDxy_ =             utils::bookHistogram(fileService, "trackToGenDeltaDxy", "", "|#Delta |dxy||", "cm", 100, -100, 100);
   hTrackToGenDeltaDz_ =              utils::bookHistogram(fileService, "trackToGenDeltaDz", "", "|#Delta |dz||", "cm", 100, -100, 100);
 
-  hTrackCounterDxy_ =      utils::bookHistogram(fileService, "trackCounterDxy", "", "|dxy|", "cm", 100, 0, 100);
-  hStandAloneCounterDxy_ = utils::bookHistogram(fileService, "standAloneCounterDxy", "", "|dxy|", "cm", 100, 0, 100);
-  hTrackCounterDz_ =       utils::bookHistogram(fileService, "trackCounterDz", "", "|dz|", "cm", 100, 0, 100);
-  hStandAloneCounterDz_ =  utils::bookHistogram(fileService, "standAloneCounterDz", "", "|dz|", "cm", 100, 0, 100);
-
-  // hMinDeltaR_ = fileService->make<TH1F>("minDeltaR","#Delta R between standalone muon and closest track",500,0,5);
-  // hSimMinDeltaR_ = fileService->make<TH1F>("simMinDeltaR","#Delta R between simTrack and closest track",500,0,5);
-  // hMinTrackToGenDeltaR_ = fileService->make<TH1F>("minTrackGenDeltaR","#Delta R between gen muon and closest track",500,0,5);
-  // hMinStaMuonToGenDeltaR_ = fileService->make<TH1F>("minStaMunoGenDeltaR","#Delta R between gen muon and closest standAloneMuon",500,0,5);
-
-  // hStandAloneToGenDeltaDxy_ = fileService->make<TH1F>("standAloneToGenDeltaDxy", "#Delta(dxy) standAlone - gen", 100, -100, 100);
-  // hStandAloneToGenDeltaDz_ = fileService->make<TH1F>("standAloneToGenDeltaDz", "#Delta(dz) standAlone - gen", 100, -100, 100);
-  // hCleanedStandAloneToGenDeltaDxy_ = fileService->make<TH1F>("cleanedStandAloneToGenDeltaDxy", "#Delta(dxy) cleaned standAlone - gen", 100, -100, 100);
-  // hCleanedStandAloneToGenDeltaDz_ = fileService->make<TH1F>("cleanedStandAloneToGenDeltaDz", "#Delta(dz) cleaned standAlone - gen", 100, -100, 100);
-  // hTrackToGenDeltaDxy_ = fileService->make<TH1F>("trackToGenDeltaDxy", "#Delta(dxy) track - gen", 100, -100, 100);
-  // hTrackToGenDeltaDz_ = fileService->make<TH1F>("trackToGenDeltaDz", "#Delta(dz) track - gen", 100, -100, 100);
-
-  // hTrackCounterDxy_ = fileService->make<TH1F>("trackCounterDxy", "track number vs dxy", 100, 0, 100);
-  // hStandAloneCounterDxy_ = fileService->make<TH1F>("standAloneCounterDxy", "standAlone number vs dxy", 100, 0, 100);
-  // hTrackCounterDz_ = fileService->make<TH1F>("trackCounterDz", "track number vs dz", 100, 0, 100);
-  // hStandAloneCounterDz_ = fileService->make<TH1F>("standAloneCounterDz", "standAlone number vs dz", 100, 0, 100);
+  // hTrackCounterDxy_ =      utils::bookHistogram(fileService, "trackCounterDxy", "", "|dxy|", "cm", 100, 0, 100);
+  // hStandAloneCounterDxy_ = utils::bookHistogram(fileService, "standAloneCounterDxy", "", "|dxy|", "cm", 100, 0, 100);
+  // hTrackCounterDz_ =       utils::bookHistogram(fileService, "trackCounterDz", "", "|dz|", "cm", 100, 0, 100);
+  // hStandAloneCounterDz_ =  utils::bookHistogram(fileService, "standAloneCounterDz", "", "|dz|", "cm", 100, 0, 100);
 
   controlPlotsGeneralTracks_.reset(new ControlPlots(fileService, "generalTracks"));
   controlPlotsStandAloneMuons_.reset(new ControlPlots(fileService, "standAloneMuons"));
   controlPlotsCleanedStandAloneMuons_.reset(new ControlPlots(fileService, "cleanedStandAloneMuons"));
+  trackDelta_.reset(new ControlDeltaPlots(fileService, "tracksDelta", -1));
   standAloneDelta_.reset(new ControlDeltaPlots(fileService, "standAloneDelta", -1));
   cleanedStandAloneDelta_.reset(new ControlDeltaPlots(fileService, "cleanedStandAloneDelta", -1));
   standAloneTrackDelta_.reset(new ControlDeltaPlots(fileService, "standAloneTrackDelta"));
@@ -559,43 +408,43 @@ void TrackingEfficiencyFromCosmics::beginJob()
 // ------------ method called once each job just after ending the event loop  ------------
 void TrackingEfficiencyFromCosmics::endJob() 
 {
-  TCanvas canvasDxy;
-  canvasDxy.Draw();
-  double * eff = new double[nBins_];
-  double * x = new double[nBins_];
-  hStandAloneCounterDxy_->Rebin(4);
-  hTrackCounterDxy_->Rebin(4);
-  for( unsigned int i=0; i<nBins_/4; ++i ) {
-    double numSA = hStandAloneCounterDxy_->GetBinContent(i+1);
-    double numTk = hTrackCounterDxy_->GetBinContent(i+1);
-    if(numSA == 0) eff[i] = 0;
-    else eff[i] = numTk/numSA;
-    x[i] = hStandAloneCounterDxy_->GetBinLowEdge(i);
-  }
-  TGraph * effGraphDxy = new TGraph(nBins_/4, x, eff);
-  effGraphDxy->Draw("AP");
-  canvasDxy.SaveAs("checkEffDxy.root");
+//  TCanvas canvasDxy;
+//  canvasDxy.Draw();
+//  double * eff = new double[nBins_];
+//  double * x = new double[nBins_];
+//  hStandAloneCounterDxy_->Rebin(4);
+//  hTrackCounterDxy_->Rebin(4);
+//  for( unsigned int i=0; i<nBins_/4; ++i ) {
+//    double numSA = hStandAloneCounterDxy_->GetBinContent(i+1);
+//    double numTk = hTrackCounterDxy_->GetBinContent(i+1);
+//    if(numSA == 0) eff[i] = 0;
+//    else eff[i] = numTk/numSA;
+//    x[i] = hStandAloneCounterDxy_->GetBinLowEdge(i);
+//  }
+//  TGraph * effGraphDxy = new TGraph(nBins_/4, x, eff);
+//  effGraphDxy->Draw("AP");
+//  canvasDxy.SaveAs("checkEffDxy.root");
 
 
-  TCanvas canvasDz;
-  canvasDz.Draw();
+//  TCanvas canvasDz;
+//  canvasDz.Draw();
 
-  double * effDz = new double[nBins_];
-  double * xDz = new double[nBins_];
-  hStandAloneCounterDz_->Rebin(4);
-  hTrackCounterDz_->Rebin(4);
-  for( unsigned int i=0; i<nBins_/4; ++i ) {
-    double numSA = hStandAloneCounterDz_->GetBinContent(i+1);
-    double numTk = hTrackCounterDz_->GetBinContent(i+1);
-    std::cout << "numSA = " << hStandAloneCounterDz_->GetBinContent(i+1) << std::endl;
-    std::cout << "numTk = " << hTrackCounterDz_->GetBinContent(i+1) << std::endl;
-    if(numSA == 0) effDz[i] = 0;
-    else effDz[i] = numTk/numSA;
-    xDz[i] = hStandAloneCounterDz_->GetBinLowEdge(i);
-  }
-  TGraph * effGraphDz = new TGraph(nBins_/4, xDz, effDz);
-  effGraphDz->Draw("AP");
-  canvasDz.SaveAs("checkEffDz.root");
+//  double * effDz = new double[nBins_];
+//  double * xDz = new double[nBins_];
+//  hStandAloneCounterDz_->Rebin(4);
+//  hTrackCounterDz_->Rebin(4);
+//  for( unsigned int i=0; i<nBins_/4; ++i ) {
+//    double numSA = hStandAloneCounterDz_->GetBinContent(i+1);
+//    double numTk = hTrackCounterDz_->GetBinContent(i+1);
+//    std::cout << "numSA = " << hStandAloneCounterDz_->GetBinContent(i+1) << std::endl;
+//    std::cout << "numTk = " << hTrackCounterDz_->GetBinContent(i+1) << std::endl;
+//    if(numSA == 0) effDz[i] = 0;
+//    else effDz[i] = numTk/numSA;
+//    xDz[i] = hStandAloneCounterDz_->GetBinLowEdge(i);
+//  }
+//  TGraph * effGraphDz = new TGraph(nBins_/4, xDz, effDz);
+//  effGraphDz->Draw("AP");
+//  canvasDz.SaveAs("checkEffDz.root");
 
 
 
@@ -642,26 +491,15 @@ void TrackingEfficiencyFromCosmics::fillDescriptions(edm::ConfigurationDescripti
   descriptions.addDefault(desc);
 }
 
-// void TrackingEfficiencyFromCosmics::impactParameterForGen(const reco::GenParticle & genMuon, const math::XYZPoint & genVertex,
-//                                                           const int genCharge, const MagneticField * mf)
 template <class T>
-void TrackingEfficiencyFromCosmics::computeImpactParameters(const T & track, const math::XYZPoint & genVertex,
-							    const int genCharge, const MagneticField * mf)
+void TrackingEfficiencyFromCosmics::computeGenImpactParameters( const T & track, const math::XYZPoint & genVertex,
+                                                                const int genCharge, const MagneticField * mf )
 {
-  // std::cout << "impactParameterForGen" << std::endl;
   VertexDistanceXY distXY;
   VertexDistance3D dist3D;
 
-  //  std::vector<double> dxy_PV;
-  //  std::vector<double> dxyError_PV;
-  //  std::vector<double> dz_PV;
-  //  std::vector<double> dzError_PV;
-  //  std::vector<double> dxyz_PV;
-  //  std::vector<double> dxyzError_PV;
-
   TVector3 genMomentum(0,0,0);
   genMomentum.SetPtEtaPhi(track.pt(),track.eta(),track.phi());
-  // std::cout << "genVertex = (" << genVertex.x() << "," << genVertex.y() << "," << genVertex.z() << ")" << std::endl;
   FreeTrajectoryState ftsAtProduction(GlobalPoint(genVertex.x(),genVertex.y(),genVertex.z()),
                                       GlobalVector(genMomentum.x(),genMomentum.y(),genMomentum.z()),
                                       TrackCharge(genCharge), mf);
@@ -674,23 +512,13 @@ void TrackingEfficiencyFromCosmics::computeImpactParameters(const T & track, con
                                             transverseTSOS_.surface(), transverseTSOS_.magneticField(), transverseTSOS_.weight());
     // Reco vertex default constructed to (0,0,0)
     std::pair<bool,Measurement1D> dxy = IPTools::absoluteImpactParameter(transverseTSOS, reco::Vertex(), distXY);
-    // std::cout << "dxy = " << dxy.second.value() << " +/- " << dxy.second.error() << std::endl;
     dxy_.first = dxy.second.value();
     dxy_.second = dxy.second.error();
-    // dxy_PV.push_back(dxy.second.value());
-    // dxyError_PV.push_back(dxy.second.error());
-    // Formulae for dz taken from TrackingTools/IPTools/src/ImpactParameterComputer.cc
     dz_.first = transverseTSOS.globalPosition().z();
     dz_.second = transverseTSOS.cartesianError().position().czz();
-    // dz_PV.push_back(transverseTSOS.globalPosition().z());
-    // double refZErr = transverseTSOS.cartesianError().position().czz();
-    // dzError_PV.push_back(refZErr);
   }
   else {
-    // dxy_PV.push_back(65535);
-    // dxyError_PV.push_back(65535);
-    // dz_PV.push_back(65535);
-    // dzError_PV.push_back(65535);
+    std::cout << "Invalid trajectoryStateClosestToPoint for GEN" << std::endl;
     dxy_.first = 65535;
     dxy_.second = 65535;
     dz_.first = 65535;
@@ -703,16 +531,40 @@ void TrackingEfficiencyFromCosmics::computeImpactParameters(const T & track, con
     std::pair<bool,Measurement1D> dxyz = IPTools::absoluteImpactParameter(analyticalTSOS, reco::Vertex(), dist3D);
     dxyz_.first = dxyz.second.value();
     dxyz_.second = dxyz.second.error();
-    // dxyz_PV.push_back(dxyz.second.value());
-    // dxyzError_PV.push_back(dxyz.second.error());
   }
   else {
-    // dxyz_PV.push_back(65535);
-    // dxyzError_PV.push_back(65535);
     dxyz_.first = 65535;
     dxyz_.second = 65535;
   }
-  // std::cout << "dxy_PV[0] = " << dxy_PV[0] << std::endl;
+}
+
+void TrackingEfficiencyFromCosmics::computeImpactParameters( const reco::Track & track, const TransientTrackBuilder & theBuilder )
+{
+  const reco::TransientTrack transientTrack = theBuilder.build(&track);
+  GlobalPoint vert(0., 0., 0.);
+  TrajectoryStateClosestToPoint traj = transientTrack.trajectoryStateClosestToPoint(vert);
+  if( traj.isValid() ) {
+    dxy_.first = traj.perigeeParameters().transverseImpactParameter();
+    dxy_.second = traj.perigeeError().transverseImpactParameterError();
+    dz_.first = traj.perigeeParameters().longitudinalImpactParameter();
+    dz_.second = traj.perigeeError().longitudinalImpactParameterError();
+    // std::cout << "From origin dxy = " << dxy_.first << " +/ " << dxy_.second << std::endl;
+  }
+  else {
+    std::cout << "Invalid trajectoryStateClosestToPoint" << std::endl;
+    dxyz_.first = 65535;
+    dxyz_.second = 65535;
+    dz_.first = 65535;
+    dz_.second = 65535;
+  }
+  //  // Taking the dxy from the beamline does not make any difference
+  //  TrajectoryStateClosestToBeamLine traj2 = transientTrack.stateAtBeamLine();
+  //  Measurement1D measDxy = traj2.transverseImpactParameter();
+  // if( traj2.isValid() ) {
+  //  dxy_.first = measDxy.value();
+  //  dxy_.second = measDxy.error();
+  //  // std::cout << "From beamline dxy = " << dxy_.first << " +/ " << dxy_.second << std::endl;
+  // }
 }
 
 void TrackingEfficiencyFromCosmics::dumpGenParticleInfo(const reco::GenParticle & genParticle)
@@ -741,6 +593,79 @@ void TrackingEfficiencyFromCosmics::dumpTrackInfo(const reco::Track & track, con
         "dz/dzError = " << track.dzError() << std::endl <<
         "chi^2/ndof = " << track.normalizedChi2() << std::endl;
   edm::LogInfo("Demo") << ss.str();
+}
+
+template <class T1, class T2>
+void TrackingEfficiencyFromCosmics::fillEfficiencyVsGen( const T1 & staMuons, const T2 * stableMuon,
+                                                         Efficiency * efficiency,
+                                                         const double & genDxy, const double & genDz, const MagneticField * mf,
+                                                         TH1F * hMinToGenDeltaR, TH1F * hToGenDeltaDxy, TH1F * hToGenDeltaDz )
+{
+  if( staMuons.size() == 0 ) {
+    // Do it twice as we expect two standalone muons and we reconstruct none
+    efficiency->fill(variables_, false);
+    if( !singleLegMuon_ ) efficiency->fill(variables_, false);
+  }
+  else if( staMuons.size() == 1 ) {
+    if( !singleLegMuon_ ) efficiency->fill(variables_, false);
+  }
+  else if( staMuons.size() > 2 ) {
+    std::cout << "How did we get three standAloneMuons in simulation from a single cosmic track?" << std::endl;
+  }
+  BOOST_FOREACH( const reco::Track & staMuon, staMuons ) {
+    double standAloneDxy = staMuon.dxy();
+    double standAloneDz = staMuon.dz();
+    if( recomputeIP_ ) {
+      computeImpactParameters(staMuon, *theB_);
+      standAloneDxy = dxy_.first;
+      standAloneDxy = dz_.first;
+    }
+    hMinToGenDeltaR->Fill(reco::deltaR(*stableMuon, staMuon));
+    hToGenDeltaDxy->Fill(fabs(standAloneDxy) - fabs(genDxy));
+    hToGenDeltaDz->Fill(fabs(standAloneDz) - fabs(genDz));
+    efficiency->fill(variables_, true);
+  }
+}
+
+template <class T1, class T2>
+void TrackingEfficiencyFromCosmics::fillEfficiency(const T1 & staMuons, const T2 & tracks, Efficiency * efficiency,
+                                                   TH1F * hMinDeltaR, const MagneticField * mf)
+{
+  // Association map of StandAloneMuons and TrackerTracks
+  std::map<const reco::Track *, const reco::Track *> matchesMap;
+  if( staMuons.size() > 0 ) {
+    associatorByDeltaR_->fillAssociationMap(staMuons, *tracks, matchesMap, hMinDeltaR);
+
+    bool found = false;
+    std::map<const reco::Track *, const reco::Track *>::const_iterator it = matchesMap.begin();
+    for( ; it != matchesMap.end(); ++it ) {
+      if( it->second == 0 ) {
+        found = false;
+      }
+      else {
+        found = true;
+      }
+      double standAloneDxy = it->first->dxy();
+      double standAloneDz = it->first->dz();
+      if( recomputeIP_ ) {
+        computeImpactParameters(*(it->first), *theB_);
+        standAloneDxy = dxy_.first;
+        standAloneDz = dz_.first;
+      }
+      variables_[0] = fabs(standAloneDxy);
+      variables_[1] = fabs(standAloneDz);
+      variables_[2] = it->first->pt();
+      efficiency->fill(variables_, found);
+
+      // hStandAloneCounterDxy_->Fill(variables_[0]);
+      // hStandAloneCounterDz_->Fill(variables_[1]);
+      if( found ) {
+        // hTrackCounterDxy_->Fill(variables_[0]);
+        // hTrackCounterDz_->Fill(variables_[1]);
+        standAloneTrackDelta_->fillControlPlots(*(it->first), *(it->second));
+      }
+    }
+  }
 }
 
 //define this as a plug-in

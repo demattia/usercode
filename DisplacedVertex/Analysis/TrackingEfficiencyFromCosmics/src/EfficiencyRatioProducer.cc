@@ -13,7 +13,7 @@
 //
 // Original Author:  Marco De Mattia,42 R-23,
 //         Created:  Mon Jul 4 18:38:0 CEST 2011
-// $Id: EfficiencyRatioProducer.cc,v 1.2 2011/07/06 16:19:44 demattia Exp $
+// $Id: EfficiencyRatioProducer.cc,v 1.1 2011/07/10 21:52:49 demattia Exp $
 //
 //
 
@@ -115,6 +115,8 @@ void EfficiencyRatioProducer::fillHistogram(const TString & name, const TString 
   }
   std::cout << "Building the TGraphErrors" << std::endl;
   TGraphErrors * hEffRatio = new TGraphErrors(n, x, y, ex, ey);
+  hEffRatio->SetName(name);
+  hEffRatio->SetTitle(name);
   hEffRatio->Draw("AP");
   c1->Draw();
   c1->SaveAs(name+".root");

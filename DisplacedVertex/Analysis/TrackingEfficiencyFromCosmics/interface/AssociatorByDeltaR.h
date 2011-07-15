@@ -12,16 +12,13 @@
 class AssociatorByDeltaR
 {
 public:
-  AssociatorByDeltaR(const double & maxDeltaR, const bool removeMatches = true) :
+  AssociatorByDeltaR(const double & maxDeltaR, const bool removeMatches = true, const bool takeOppositeTracks = false) :
     maxDeltaR_(maxDeltaR),
-    removeMatches_(removeMatches)
+    removeMatches_(removeMatches),
+  takeOppositeTracks_(takeOppositeTracks)
   {}
 
   template <class T1, class T2>
-//  void fillAssociationMap( const edm::Handle<std::vector<T1> > & firstCollection,
-//                           const edm::Handle<std::vector<T2> > & secondCollection,
-//                           std::map<const T1 *, const T2 *> & matchesMap,
-//                           TH1 * hMinDeltaR = 0 )
   void fillAssociationMap( const std::vector<T1> & firstCollection,
                            const std::vector<T2> & secondCollection,
                            std::map<const T1 *, const T2 *> & matchesMap,
@@ -35,13 +32,8 @@ public:
     }
 
     // Loop over the first collection
-    // unsigned int staNumber = 0;
     typename std::vector<T1>::const_iterator itFirst = firstCollection.begin();
-    // edm::LogInfo("Demo") << firstCollection->size() << std::endl;
-    for( ; itFirst != firstCollection.end(); ++itFirst ) { // , ++staNumber ) {
-      // edm::LogInfo("Demo") << "standAloneMuon["<<staNumber<<"] pt = " << itFirst->pt() << std::endl;
-
-      // if( clonedTracks.empty() ) break;
+    for( ; itFirst != firstCollection.end(); ++itFirst ) {
       double minDeltaR = maxDeltaR_;
       typename std::vector<const T2 *>::iterator matched = clonedSecond.end();
       double deltaR = maxDeltaR_;
@@ -51,6 +43,12 @@ public:
         if( deltaR < minDeltaR ) {
           minDeltaR = deltaR;
           matched = itSecond;
+        }
+        else if( takeOppositeTracks_ ) {
+          if( (deltaR > (3.14 - minDeltaR)) && (deltaR < 3.14 + minDeltaR) ) {
+            minDeltaR = deltaR;
+            matched = itSecond;
+          }
         }
       }
       if( matched != clonedSecond.end() ) {
@@ -65,7 +63,6 @@ public:
         matchesMap.insert(std::make_pair(&*itFirst, emptyPointer));
       }
     }
-    // }
   }
 
   /// Specialization to cope with SimTracks...
@@ -99,6 +96,7 @@ public:
 protected:
   double maxDeltaR_;
   bool removeMatches_;
+  bool takeOppositeTracks_;
 };
 
 #endif // ASSOCIATORBYDELTAR_H
