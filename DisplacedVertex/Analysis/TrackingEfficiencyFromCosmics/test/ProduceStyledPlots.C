@@ -24,8 +24,10 @@ TList *FileList;
 TFile *Target;
 void draw( TDirectory *target, TList *sourcelist );
 
-void ProduceStyledPlots()
+void ProduceStyledPlots(const TString & inputFile = "TrackingEfficiencyFromCosmics.root", const TString & type = "")
 {
+  TString underscoreType("");
+  if( type != "" ) underscoreType = "_"+type;
   gROOT->SetBatch(true);
   //   gROOT->SetStyle("Plain");
   //   gStyle->SetCanvasColor(kWhite);
@@ -42,12 +44,12 @@ void ProduceStyledPlots()
 
   // ************************************************************
   // List of Files
-  FileList->Add( TFile::Open("TrackingEfficiencyFromCosmics.root") );    // 1
+  FileList->Add( TFile::Open(inputFile) );    // 1
 
-  draw( Target, FileList );
+  draw( Target, FileList, underscoreType );
 }
 
-void draw( TDirectory *target, TList *sourcelist )
+void draw( TDirectory *target, TList *sourcelist, const TString & type )
 {
   //  cout << "Target path: " << target->GetPath() << endl;
   TString path( (char*)strstr( target->GetPath(), ":" ) );
@@ -91,7 +93,7 @@ void draw( TDirectory *target, TList *sourcelist )
       // newdir is now the starting point of another round of merging
       // newdir still knows its depth within the target file via
       // GetPath(), so we can still figure out where we are in the recursion
-      draw( newdir, sourcelist );
+      draw( newdir, sourcelist, type );
     }
     else {
       // object is of no type that we know or can handle
@@ -115,8 +117,8 @@ void draw( TDirectory *target, TList *sourcelist )
         // If the update is not called, the gStyle attributes are not used.
         canvas.Update();
         canvas.Write();
-	canvas.SaveAs("plots/"+TString(obj->GetName())+".pdf");
-	canvas.SaveAs("plots/"+TString(obj->GetName())+".png");
+	canvas.SaveAs("plots"+type+"/"+TString(obj->GetName())+".pdf");
+	canvas.SaveAs("plots"+type+"/"+TString(obj->GetName())+".png");
       }
     }
 

@@ -28,8 +28,8 @@ unsigned int countDifferences = 0;
 
 void CompareRootfile( TDirectory *target, TList *sourcelist );
 
-void ComparePlots() {
-
+void ComparePlots(const TString & file1, const TString & file2)
+{
   setTDRStyle();
 
   // in an interactive ROOT session, edit the file names
@@ -45,8 +45,8 @@ void ComparePlots() {
 
   // ************************************************************
   // List of Files
-  FileList->Add( TFile::Open("TrackingEfficiencyFromCosmics_Data.root") );    // 1
-  FileList->Add( TFile::Open("TrackingEfficiencyFromCosmics_Sim.root") );    // 2
+  FileList->Add( TFile::Open(file1) );    // 1
+  FileList->Add( TFile::Open(file2) );    // 2
 
   CompareRootfile( Target, FileList );
 

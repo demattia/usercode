@@ -3,12 +3,12 @@
 
 #include "tdrstyle.C"
 
-void CompareDxy()
+void CompareDxy(const TString & file1, const TString & file2)
 {
   setTDRStyle();
 
-  TFile inputFileData("TrackingEfficiencyFromCosmics_Data.root", "READ");
-  TFile inputFileSim("TrackingEfficiencyFromCosmics_Sim.root", "READ");
+  TFile inputFileData(file1, "READ");
+  TFile inputFileSim(file2, "READ");
 
   TDirectory * dirData = (TDirectory*)inputFileData.Get("demo");
   TH1F * histoData = (TH1F*)dirData->Get("standAloneMuons_dxy");
