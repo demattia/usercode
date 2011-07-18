@@ -13,7 +13,7 @@
 //
 // Original Author:  Marco De Mattia,42 R-23,
 //         Created:  Mon Jul 4 18:38:0 CEST 2011
-// $Id: EfficiencyRatioProducer.cc,v 1.1 2011/07/10 21:52:49 demattia Exp $
+// $Id: EfficiencyRatioProducer.cc,v 1.2 2011/07/15 15:53:04 demattia Exp $
 //
 //
 
@@ -71,6 +71,7 @@ private:
   std::auto_ptr<Efficiency> efficiencyRatioNumerator_;
   std::auto_ptr<Efficiency> efficiencyRatioDenominator_;
   std::string inputFileNameNumerator_, inputFileNameDenominator_;
+  unsigned int rebin_;
 };
 
 void EfficiencyRatioProducer::fillHistogram(const TString & name, const TString & title,
@@ -124,13 +125,14 @@ void EfficiencyRatioProducer::fillHistogram(const TString & name, const TString 
 
 EfficiencyRatioProducer::EfficiencyRatioProducer(const edm::ParameterSet& iConfig) :
   inputFileNameNumerator_(iConfig.getParameter<std::string>("InputFileNameNumerator")),
-  inputFileNameDenominator_(iConfig.getParameter<std::string>("InputFileNameDenominator"))
+  inputFileNameDenominator_(iConfig.getParameter<std::string>("InputFileNameDenominator")),
+  rebin_(iConfig.getParameter<unsigned int>("Rebin"))
 {
   efficiencyRatioNumerator_.reset(new Efficiency);
   EfficiencyTree treeRatioNumerator;
   treeRatioNumerator.readTree(inputFileNameNumerator_, &*efficiencyRatioNumerator_);
   boost::shared_array<unsigned int> vKeep(new unsigned int[3]);
-  vKeep[0] = 4;
+  vKeep[0] = rebin_;
   vKeep[1] = 0;
   vKeep[2] = 0;
   boost::shared_ptr<Efficiency> effVsDxyRatioNumerator(efficiencyRatioNumerator_->projectAndRebin(vKeep));
@@ -138,7 +140,7 @@ EfficiencyRatioProducer::EfficiencyRatioProducer(const edm::ParameterSet& iConfi
   efficiencyRatioDenominator_.reset(new Efficiency);
   EfficiencyTree treeRatioDenominator;
   treeRatioDenominator.readTree(inputFileNameDenominator_, &*efficiencyRatioDenominator_);
-  vKeep[0] = 4;
+  vKeep[0] = rebin_;
   vKeep[1] = 0;
   vKeep[2] = 0;
   boost::shared_ptr<Efficiency> effVsDxyRatioDenominator(efficiencyRatioDenominator_->projectAndRebin(vKeep));

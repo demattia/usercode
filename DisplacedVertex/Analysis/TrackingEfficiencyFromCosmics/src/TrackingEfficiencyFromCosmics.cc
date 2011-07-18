@@ -13,7 +13,7 @@
 //
 // Original Author:  Marco De Mattia,40 3-B32,+41227671551,
 //         Created:  Wed May 25 16:44:02 CEST 2011
-// $Id: TrackingEfficiencyFromCosmics.cc,v 1.29 2011/07/16 18:39:39 demattia Exp $
+// $Id: TrackingEfficiencyFromCosmics.cc,v 1.30 2011/07/18 06:15:19 demattia Exp $
 //
 //
 
@@ -108,7 +108,8 @@ private:
                             TH1F * hMinToGenDeltaR, TH1F * hToGenDeltaDxy, TH1F * hToGenDeltaDz );
   template <class T1, class T2>
   void fillEfficiency(const T1 & staMuons, const T2 & tracks, Efficiency * efficiency,
-                      TH1F * hMinDeltaR, ControlDeltaPlots * standAloneTrackDelta);
+                      TH1F * hMinDeltaR, ControlDeltaPlots * standAloneTrackDelta,
+		      ControlPlots * matchedStandAlone, ControlPlots * unmatchedStandAlone);
 
   void dumpGenParticleInfo(const reco::GenParticle & genParticle);
   void dumpTrackInfo(const reco::Track & track, const unsigned int trackNumber);
@@ -133,7 +134,11 @@ private:
   std::auto_ptr<AssociatorByDeltaR> simAssociatorByDeltaR_;
   std::auto_ptr<ControlPlots> controlPlotsGeneralTracks_;
   std::auto_ptr<ControlPlots> controlPlotsStandAloneMuons_;
+  std::auto_ptr<ControlPlots> controlPlotsMatchedStandAloneMuons_;
+  std::auto_ptr<ControlPlots> controlPlotsUnmatchedStandAloneMuons_;
   std::auto_ptr<ControlPlots> controlPlotsCleanedStandAloneMuons_;
+  std::auto_ptr<ControlPlots> controlPlotsMatchedCleanedStandAloneMuons_;
+  std::auto_ptr<ControlPlots> controlPlotsUnmatchedCleanedStandAloneMuons_;
   std::auto_ptr<ControlDeltaPlots> trackDelta_;
   std::auto_ptr<ControlDeltaPlots> standAloneDelta_;
   std::auto_ptr<ControlDeltaPlots> cleanedStandAloneDelta_;
@@ -146,6 +151,9 @@ private:
   std::auto_ptr<Efficiency> efficiencyCleaned_;
   boost::shared_array<double> variables_;
   unsigned int nBins_;
+  double effDxyMin_, effDxyMax_;
+  double effDzMin_, effDzMax_;
+  double effPtMin_, effPtMax_;
   std::string effOutputFileName_;
   std::string effCleanedOutputFileName_;
   std::string genToStandAloneEffOutputFileName_;
@@ -158,6 +166,7 @@ private:
   std::pair<double, double> dxyz_;
   int minimumValidHits_;
   double dzCut_;
+  double dxyCut_;
   double chi2Cut_;
   double trackPtCut_;
   double standAlonePtCut_;
@@ -172,16 +181,24 @@ private:
   edm::InputTag muonCollection_;
   edm::InputTag trackCollection_;
   edm::ESHandle<TransientTrackBuilder> theB_;
+  bool useAllTracks_;
 };
 
 TrackingEfficiencyFromCosmics::TrackingEfficiencyFromCosmics(const edm::ParameterSet& iConfig) :
   useMCtruth_(iConfig.getParameter<bool>("UseMCtruth")),
+  effDxyMin_(iConfig.getParameter<double>("EffDxyMin")),
+  effDxyMax_(iConfig.getParameter<double>("EffDxyMax")),
+  effDzMin_(iConfig.getParameter<double>("EffDzMin")),
+  effDzMax_(iConfig.getParameter<double>("EffDzMax")),
+  effPtMin_(iConfig.getParameter<double>("EffPtMin")),
+  effPtMax_(iConfig.getParameter<double>("EffPtMax")),
   effOutputFileName_(iConfig.getParameter<std::string>("EffOutputFileName")),
   effCleanedOutputFileName_(iConfig.getParameter<std::string>("EffCleanedOutputFileName")),
   genToStandAloneEffOutputFileName_(iConfig.getParameter<std::string>("GenToStandAloneEffOutputFileName")),
   genToTrackEffOutputFileName_(iConfig.getParameter<std::string>("GenToTrackEffOutputFileName")),
   minimumValidHits_(iConfig.getParameter<int>("MinimumValidHits")),
   dzCut_(iConfig.getParameter<double>("DzCut")),
+  dxyCut_(iConfig.getParameter<double>("DxyCut")),
   chi2Cut_(iConfig.getParameter<double>("Chi2Cut")),
   trackPtCut_(iConfig.getParameter<double>("TrackPtCut")),
   standAlonePtCut_(iConfig.getParameter<double>("StandAlonePtCut")),
@@ -194,7 +211,8 @@ TrackingEfficiencyFromCosmics::TrackingEfficiencyFromCosmics(const edm::Paramete
   recomputeIP_(iConfig.getParameter<bool>("RecomputeIP")),
   singleLegMuon_(iConfig.getParameter<bool>("SingleLegMuon")),
   muonCollection_(iConfig.getParameter<edm::InputTag>("MuonCollection")),
-  trackCollection_(iConfig.getParameter<edm::InputTag>("TrackCollection"))
+  trackCollection_(iConfig.getParameter<edm::InputTag>("TrackCollection")),
+  useAllTracks_(iConfig.getParameter<bool>("UseAllTracks"))
 {
   // Use the unique association for tracks to standAlone muons only when
   if( singleLegMuon_ ) associatorByDeltaR_.reset(new AssociatorByDeltaR(iConfig.getParameter<double>("MaxDeltaR"), false, true));
@@ -205,9 +223,9 @@ TrackingEfficiencyFromCosmics::TrackingEfficiencyFromCosmics(const edm::Paramete
 
   // Build the object to compute the efficiency
   std::vector<Efficiency::Parameters> pars;
-  pars.push_back(Efficiency::Parameters("dxy", nBins_, 0, 100));
-  pars.push_back(Efficiency::Parameters("dz", nBins_, 0, 100));
-  pars.push_back(Efficiency::Parameters("pt", nBins_, 0, 1000));
+  pars.push_back(Efficiency::Parameters("dxy", nBins_, effDxyMin_, effDxyMax_));
+  pars.push_back(Efficiency::Parameters("dz", nBins_, effDzMin_, effDzMax_));
+  pars.push_back(Efficiency::Parameters("pt", nBins_, effPtMin_, effPtMax_));
   genToStandAloneEfficiency_.reset(new Efficiency(pars));
   genToCleanedStandAloneEfficiency_.reset(new Efficiency(pars));
   genToTrackEfficiency_.reset(new Efficiency(pars));
@@ -242,7 +260,10 @@ void TrackingEfficiencyFromCosmics::analyze(const edm::Event& iEvent, const edm:
   reco::TrackCollection::const_iterator itTrk = allTracks->begin();
   for( ; itTrk != allTracks->end(); ++itTrk ) {
     // if( (itTrk->quality(trackQualityHighPurity)) && (fabs(itTrk->eta()) < 2.0) && (itTrk->pt() > trackPtCut_) && (itTrk->found() > 6) ) {
-    if( (!highPurity_ || (itTrk->quality(trackQualityHighPurity))) && (fabs(itTrk->eta()) < 2.0) && (itTrk->pt() > trackPtCut_) && (itTrk->found() > 6) ) {
+    if( useAllTracks_ ) {
+      tracks->push_back(*itTrk);
+    }
+    else if( (!highPurity_ || (itTrk->quality(trackQualityHighPurity))) && (fabs(itTrk->eta()) < 2.0) && (itTrk->pt() > trackPtCut_) && (itTrk->found() > 6) ) {
       tracks->push_back(*itTrk);
     }
   }
@@ -256,7 +277,9 @@ void TrackingEfficiencyFromCosmics::analyze(const edm::Event& iEvent, const edm:
   reco::TrackCollection cleanedStaMuons;
   reco::TrackCollection::const_iterator it = staMuons->begin();
   for( ; it != staMuons->end(); ++it ) {
-    if( (it->found() >= minimumValidHits_) && (fabs(it->dz()) < dzCut_) && (it->pt() > standAlonePtCut_) && (fabs(it->eta()) < 2.) && (fabs(it->normalizedChi2()) < chi2Cut_) ) {
+    // if( (it->found() >= minimumValidHits_) && (fabs(it->dz()) < dzCut_) && (it->pt() > standAlonePtCut_) && (fabs(it->eta()) < 2.) && (fabs(it->normalizedChi2()) < chi2Cut_) ) {
+    if( (it->found() >= minimumValidHits_) && (fabs(it->dz()) < dzCut_) && (fabs(it->dxy()) < dxyCut_) &&
+	(it->pt() > standAlonePtCut_) && (fabs(it->eta()) < 2.) && (fabs(it->normalizedChi2()) < chi2Cut_) ) {
       // && (fabs(it->dz()) > 10) ) {
       cleanedStaMuons.push_back(*it);
     }
@@ -356,9 +379,11 @@ void TrackingEfficiencyFromCosmics::analyze(const edm::Event& iEvent, const edm:
   }
 
   // Efficiency for tracks vs standAlone
-  fillEfficiency(*staMuons, tracks, efficiency_.get(), hMinDeltaR_, standAloneTrackDelta_.get());
+  fillEfficiency(*staMuons, tracks, efficiency_.get(), hMinDeltaR_, standAloneTrackDelta_.get(),
+		 controlPlotsMatchedStandAloneMuons_.get(), controlPlotsUnmatchedStandAloneMuons_.get());
   // Efficiency for tracks vs cleanedStandAlone
-  fillEfficiency(cleanedStaMuons, tracks, efficiencyCleaned_.get(), hMinCleanedDeltaR_, cleanedStandAloneTrackDelta_.get());
+  fillEfficiency(cleanedStaMuons, tracks, efficiencyCleaned_.get(), hMinCleanedDeltaR_, cleanedStandAloneTrackDelta_.get(),
+		 controlPlotsMatchedCleanedStandAloneMuons_.get(), controlPlotsUnmatchedCleanedStandAloneMuons_.get());
 
 #ifdef THIS_IS_AN_EVENT_EXAMPLE
   Handle<ExampleData> pIn;
@@ -392,21 +417,28 @@ void TrackingEfficiencyFromCosmics::beginJob()
   hMinStaMuonToGenDeltaR_ =        utils::bookHistogram(fileService, "minStaMuonToGenDeltaR", "", "#Delta R", "", 500, 0, 5);
   hMinCleanedStaMuonToGenDeltaR_ = utils::bookHistogram(fileService, "minCleanedStaMuonToGenDeltaR", "", "#Delta R", "", 500, 0, 5);
 
-  hStandAloneToGenDeltaDxy_ =        utils::bookHistogram(fileService, "standAloneToGenDeltaDxy", "", "|#Delta |dxy||", "cm", 100, -100, 100);
-  hStandAloneToGenDeltaDz_ =         utils::bookHistogram(fileService, "standAloneToGenDeltaDz", "", "|#Delta |dz||", "cm", 100, -100, 100);
-  hCleanedStandAloneToGenDeltaDxy_ = utils::bookHistogram(fileService, "cleanedStandAloneToGenDeltaDxy", "", "|#Delta |dxy||", "cm", 100, -100, 100);
-  hCleanedStandAloneToGenDeltaDz_ =  utils::bookHistogram(fileService, "cleanedStandAloneToGenDeltaDz", "", "|#Delta |dz||", "cm", 100, -100, 100);
-  hTrackToGenDeltaDxy_ =             utils::bookHistogram(fileService, "trackToGenDeltaDxy", "", "|#Delta |dxy||", "cm", 100, -100, 100);
-  hTrackToGenDeltaDz_ =              utils::bookHistogram(fileService, "trackToGenDeltaDz", "", "|#Delta |dz||", "cm", 100, -100, 100);
+  hStandAloneToGenDeltaDxy_ =        utils::bookHistogram(fileService, "standAloneToGenDeltaDxy", "", "|#Delta |d_{0}||", "cm", 100, -100, 100);
+  hStandAloneToGenDeltaDz_ =         utils::bookHistogram(fileService, "standAloneToGenDeltaDz", "", "|#Delta |d_{z}||", "cm", 100, -100, 100);
+  hCleanedStandAloneToGenDeltaDxy_ = utils::bookHistogram(fileService, "cleanedStandAloneToGenDeltaDxy", "", "|#Delta |d_{0}||", "cm", 100, -100, 100);
+  hCleanedStandAloneToGenDeltaDz_ =  utils::bookHistogram(fileService, "cleanedStandAloneToGenDeltaDz", "", "|#Delta |d_{z}||", "cm", 100, -100, 100);
+  hTrackToGenDeltaDxy_ =             utils::bookHistogram(fileService, "trackToGenDeltaDxy", "", "|#Delta |d_{0}||", "cm", 100, -100, 100);
+  hTrackToGenDeltaDz_ =              utils::bookHistogram(fileService, "trackToGenDeltaDz", "", "|#Delta |d_{z}||", "cm", 100, -100, 100);
 
-  // hTrackCounterDxy_ =      utils::bookHistogram(fileService, "trackCounterDxy", "", "|dxy|", "cm", 100, 0, 100);
-  // hStandAloneCounterDxy_ = utils::bookHistogram(fileService, "standAloneCounterDxy", "", "|dxy|", "cm", 100, 0, 100);
-  // hTrackCounterDz_ =       utils::bookHistogram(fileService, "trackCounterDz", "", "|dz|", "cm", 100, 0, 100);
-  // hStandAloneCounterDz_ =  utils::bookHistogram(fileService, "standAloneCounterDz", "", "|dz|", "cm", 100, 0, 100);
+  // hTrackCounterDxy_ =      utils::bookHistogram(fileService, "trackCounterDxy", "", "|d_{0}|", "cm", 100, 0, 100);
+  // hStandAloneCounterDxy_ = utils::bookHistogram(fileService, "standAloneCounterDxy", "", "|d_{0}|", "cm", 100, 0, 100);
+  // hTrackCounterDz_ =       utils::bookHistogram(fileService, "trackCounterDz", "", "|d_{z}|", "cm", 100, 0, 100);
+  // hStandAloneCounterDz_ =  utils::bookHistogram(fileService, "standAloneCounterDz", "", "|d_{z}|", "cm", 100, 0, 100);
 
   controlPlotsGeneralTracks_.reset(new ControlPlots(fileService, "generalTracks"));
+
   controlPlotsStandAloneMuons_.reset(new ControlPlots(fileService, "standAloneMuons"));
+  controlPlotsMatchedStandAloneMuons_.reset(new ControlPlots(fileService, "matchedStandAloneMuons"));
+  controlPlotsUnmatchedStandAloneMuons_.reset(new ControlPlots(fileService, "unmatchedStandAloneMuons"));
+
   controlPlotsCleanedStandAloneMuons_.reset(new ControlPlots(fileService, "cleanedStandAloneMuons"));
+  controlPlotsMatchedCleanedStandAloneMuons_.reset(new ControlPlots(fileService, "matchedCleanedStandAloneMuons"));
+  controlPlotsUnmatchedCleanedStandAloneMuons_.reset(new ControlPlots(fileService, "unmatchedCleanedStandAloneMuons"));
+
   trackDelta_.reset(new ControlDeltaPlots(fileService, "tracksDelta", -1));
   standAloneDelta_.reset(new ControlDeltaPlots(fileService, "standAloneDelta", -1));
   cleanedStandAloneDelta_.reset(new ControlDeltaPlots(fileService, "cleanedStandAloneDelta", -1));
@@ -638,7 +670,8 @@ void TrackingEfficiencyFromCosmics::fillEfficiencyVsGen( const T1 & staMuons, co
 
 template <class T1, class T2>
 void TrackingEfficiencyFromCosmics::fillEfficiency(const T1 & staMuons, const T2 & tracks, Efficiency * efficiency,
-                                                   TH1F * hMinDeltaR, ControlDeltaPlots * standAloneTrackDelta)
+                                                   TH1F * hMinDeltaR, ControlDeltaPlots * standAloneTrackDelta,
+						   ControlPlots * matchedStandAlone, ControlPlots * unmatchedStandAlone)
 {
   // Association map of StandAloneMuons and TrackerTracks
   std::map<const reco::Track *, const reco::Track *> matchesMap;
@@ -659,7 +692,9 @@ void TrackingEfficiencyFromCosmics::fillEfficiency(const T1 & staMuons, const T2
       double standAloneDz = it->first->dz();
       if( recomputeIP_ ) {
         computeImpactParameters(*(it->first), *theB_);
+	// std::cout << "standAloneDxy            = " << standAloneDxy << std::endl;
         standAloneDxy = dxy_.first;
+	// std::cout << "recomputed standAloneDxy = " << standAloneDxy << std::endl;
         standAloneDz = dz_.first;
       }
       variables_[0] = fabs(standAloneDxy);
@@ -673,6 +708,10 @@ void TrackingEfficiencyFromCosmics::fillEfficiency(const T1 & staMuons, const T2
         // hTrackCounterDxy_->Fill(variables_[0]);
         // hTrackCounterDz_->Fill(variables_[1]);
         standAloneTrackDelta->fillControlPlots(*(it->first), *(it->second));
+	matchedStandAlone->fillControlPlots(staMuons);
+      }
+      else {
+	unmatchedStandAlone->fillControlPlots(staMuons);
       }
     }
 
@@ -699,6 +738,10 @@ void TrackingEfficiencyFromCosmics::fillEfficiency(const T1 & staMuons, const T2
 
       if( found ) {
         standAloneTrackDelta->fillControlPlots(*(opIt->first), *(opIt->second));
+	matchedStandAlone->fillControlPlots(staMuons);
+      }
+      else {
+	unmatchedStandAlone->fillControlPlots(staMuons);
       }
     }
   }

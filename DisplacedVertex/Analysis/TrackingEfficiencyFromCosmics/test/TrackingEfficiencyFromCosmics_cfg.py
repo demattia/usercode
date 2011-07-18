@@ -45,8 +45,25 @@ process.source = cms.Source("PoolSource",
     'file:/home/demattia/Simulation/CosmicSimulation/Second/reco_RAW2DIGI_L1Reco_RECOSIM_DQM_2.root',
     'file:/home/demattia/Simulation/CosmicSimulation/Third/reco_RAW2DIGI_L1Reco_RECOSIM_DQM_3.root',
     'castor:/castor/cern.ch/user/d/demattia/DisplacedVertex/MC/Cosmics/reco_RAW2DIGI_L1Reco_RECOSIM_DQM_4.root',
-    'castor:/castor/cern.ch/user/d/demattia/DisplacedVertex/MC/Cosmics/reco_RAW2DIGI_L1Reco_RECOSIM_DQM_5.root'
-    # 'file:/home/demattia/Simulation/CosmicSimulation/Sixth/reco_RAW2DIGI_L1Reco_RECOSIM_DQM.root'
+    'castor:/castor/cern.ch/user/d/demattia/DisplacedVertex/MC/Cosmics/reco_RAW2DIGI_L1Reco_RECOSIM_DQM_5.root',
+    'file:/home/demattia/Simulation/CosmicSimulation/12/reco_RAW2DIGI_L1Reco_RECOSIM_DQM.root',
+    'file:/home/demattia/Simulation/CosmicSimulation/13/reco_RAW2DIGI_L1Reco_RECOSIM_DQM.root',
+    'file:/home/demattia/Simulation/CosmicSimulation/14/reco_RAW2DIGI_L1Reco_RECOSIM_DQM.root',
+    'file:/home/demattia/Simulation/CosmicSimulation/15/reco_RAW2DIGI_L1Reco_RECOSIM_DQM.root',
+    'file:/home/demattia/Simulation/CosmicSimulation/16/reco_RAW2DIGI_L1Reco_RECOSIM_DQM.root',
+    'file:/home/demattia/Simulation/CosmicSimulation/17/reco_RAW2DIGI_L1Reco_RECOSIM_DQM.root',
+    'file:/home/demattia/Simulation/CosmicSimulation/18/reco_RAW2DIGI_L1Reco_RECOSIM_DQM.root',
+    'file:/home/demattia/Simulation/CosmicSimulation/19/reco_RAW2DIGI_L1Reco_RECOSIM_DQM.root',
+    'file:/home/demattia/Simulation/CosmicSimulation/20/reco_RAW2DIGI_L1Reco_RECOSIM_DQM.root',
+    # 'file:/home/demattia/Simulation/CosmicSimulation/21/reco_RAW2DIGI_L1Reco_RECOSIM_DQM.root',
+    'castor:/castor/cern.ch/user/d/demattia/DisplacedVertex/MC/Cosmics/reco_RAW2DIGI_L1Reco_RECOSIM_DQM_25.root',
+    'castor:/castor/cern.ch/user/d/demattia/DisplacedVertex/MC/Cosmics/reco_RAW2DIGI_L1Reco_RECOSIM_DQM_26.root',
+    'castor:/castor/cern.ch/user/d/demattia/DisplacedVertex/MC/Cosmics/reco_RAW2DIGI_L1Reco_RECOSIM_DQM_27.root',
+    'castor:/castor/cern.ch/user/d/demattia/DisplacedVertex/MC/Cosmics/reco_RAW2DIGI_L1Reco_RECOSIM_DQM_28.root',
+    'castor:/castor/cern.ch/user/d/demattia/DisplacedVertex/MC/Cosmics/reco_RAW2DIGI_L1Reco_RECOSIM_DQM_29.root',
+    'castor:/castor/cern.ch/user/d/demattia/DisplacedVertex/MC/Cosmics/reco_RAW2DIGI_L1Reco_RECOSIM_DQM_30.root',
+    'castor:/castor/cern.ch/user/d/demattia/DisplacedVertex/MC/Cosmics/reco_RAW2DIGI_L1Reco_RECOSIM_DQM_31.root',
+    'castor:/castor/cern.ch/user/d/demattia/DisplacedVertex/MC/Cosmics/reco_RAW2DIGI_L1Reco_RECOSIM_DQM_32.root',
     )
 )
 
@@ -55,9 +72,16 @@ process.TFileService=cms.Service('TFileService',
                                  )
 
 process.demo = cms.EDAnalyzer('TrackingEfficiencyFromCosmics',
+                              EffDxyMin = cms.double(0),
+                              EffDxyMax = cms.double(100),
+                              EffDzMin = cms.double(0),
+                              EffDzMax = cms.double(100),
+                              EffPtMin = cms.double(0),
+                              EffPtMax = cms.double(200),
                               MaxDeltaR = cms.double(1),
                               SimMaxDeltaR = cms.double(1000),
-                              DzCut = cms.double(100000),
+                              DzCut = cms.double(30),
+                              DxyCut = cms.double(50),
                               Chi2Cut = cms.double(1000000),
                               TrackPtCut = cms.double(25),
                               StandAlonePtCut = cms.double(35),
@@ -67,17 +91,18 @@ process.demo = cms.EDAnalyzer('TrackingEfficiencyFromCosmics',
                               DeltaDzCut = cms.double(30),  # only if matching two legs
                               DeltaPtCut = cms.double(1000),  # only if matching two legs
                               DeltaPhiCut = cms.double(1),  # only if matching two legs
-                              MinimumValidHits = cms.int32(10),
+                              MinimumValidHits = cms.int32(0),
                               UseMCtruth = cms.bool(True),
                               EffOutputFileName = cms.string("Efficiency.root"),
                               EffCleanedOutputFileName = cms.string("EfficiencyCleaned.root"),
                               GenToStandAloneEffOutputFileName = cms.string("GenToStandAloneEfficiency.root"),
                               GenToTrackEffOutputFileName = cms.string("GenToTrackEfficiency.root"),
-                              RecomputeIP = cms.bool(True),
+                              RecomputeIP = cms.bool(False),
                               SingleLegMuon = cms.bool(True),
                               # MuonCollection = cms.InputTag("standAloneMuons"),
                               MuonCollection = cms.InputTag("cosmicMuons1Leg"),
                               TrackCollection = cms.InputTag("generalTracks"),
+                              UseAllTracks = cms.bool(False)
                               )
 
 
