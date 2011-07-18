@@ -15,7 +15,7 @@ public:
   ControlDeltaPlots( edm::Service<TFileService> & fileService, const TString & name, const int sign = 1 ) :
     sign_(sign)
   {
-    hDeltaPt_ =  utils::bookHistogram(fileService, name, "DeltaPt", "#Delta P_{T}", "[GeV/c]", 500, 0, 500);
+    hDeltaPt_ =  utils::bookHistogram(fileService, name, "DeltaPt", "#Delta P_{T}", "[GeV/c]", 400, -50, 50);
     hDeltaEta_ = utils::bookHistogram(fileService, name, "DeltaEta", "#Delta #eta", "", 500, -6, 6);
     hDeltaPhi_ = utils::bookHistogram(fileService, name, "DeltaPhi", "#Delta #phi", "", 200, -3.4, 3.4);
     hDeltaDxy_ = utils::bookHistogram(fileService, name, "DeltaDxy", "|#Delta |dxy||", "cm", 1000, -50, 50);

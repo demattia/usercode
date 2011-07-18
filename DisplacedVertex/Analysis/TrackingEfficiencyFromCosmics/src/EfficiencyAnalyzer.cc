@@ -13,7 +13,7 @@
 //
 // Original Author:  Marco De Mattia,42 R-23,
 //         Created:  Mon Jul 4 18:38:0 CEST 2011
-// $Id: EfficiencyAnalyzer.cc,v 1.2 2011/07/06 16:19:44 demattia Exp $
+// $Id: EfficiencyAnalyzer.cc,v 1.3 2011/07/08 12:05:57 demattia Exp $
 //
 //
 
@@ -119,6 +119,12 @@ EfficiencyAnalyzer::EfficiencyAnalyzer(const edm::ParameterSet& iConfig) :
   vKeep[2] = 0;
   boost::shared_ptr<Efficiency> effVsDxy(efficiency_->projectAndRebin(vKeep));
   fillHistogram("EffVsDxy", "Efficiency vs absolute transverse impact parameter", effVsDxy );
+
+  unsigned int S = effVsDxy->getLinearSize();
+  for( unsigned int i=0; i<S; ++i ) {
+    std::cout << "reco eff vs Dxy ["<<i<<"] = " << effVsDxy->getValues(i).second<<"/"<<effVsDxy->getValues(i).first << " = "
+	      << effVsDxy->getEff(i) << " +/- " << effVsDxy->getEffError(i) << std::endl;
+  }
 
   vKeep[0] = 0;
   vKeep[1] = rebin_;

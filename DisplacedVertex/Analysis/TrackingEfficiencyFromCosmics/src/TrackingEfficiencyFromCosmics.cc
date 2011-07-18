@@ -13,7 +13,7 @@
 //
 // Original Author:  Marco De Mattia,40 3-B32,+41227671551,
 //         Created:  Wed May 25 16:44:02 CEST 2011
-// $Id: TrackingEfficiencyFromCosmics.cc,v 1.27 2011/07/11 16:30:04 demattia Exp $
+// $Id: TrackingEfficiencyFromCosmics.cc,v 1.29 2011/07/16 18:39:39 demattia Exp $
 //
 //
 
@@ -108,7 +108,7 @@ private:
                             TH1F * hMinToGenDeltaR, TH1F * hToGenDeltaDxy, TH1F * hToGenDeltaDz );
   template <class T1, class T2>
   void fillEfficiency(const T1 & staMuons, const T2 & tracks, Efficiency * efficiency,
-                      TH1F * hMinDeltaR, const MagneticField * mf);
+                      TH1F * hMinDeltaR, ControlDeltaPlots * standAloneTrackDelta);
 
   void dumpGenParticleInfo(const reco::GenParticle & genParticle);
   void dumpTrackInfo(const reco::Track & track, const unsigned int trackNumber);
@@ -138,6 +138,7 @@ private:
   std::auto_ptr<ControlDeltaPlots> standAloneDelta_;
   std::auto_ptr<ControlDeltaPlots> cleanedStandAloneDelta_;
   std::auto_ptr<ControlDeltaPlots> standAloneTrackDelta_;
+  std::auto_ptr<ControlDeltaPlots> cleanedStandAloneTrackDelta_;
   std::auto_ptr<Efficiency> genToStandAloneEfficiency_;
   std::auto_ptr<Efficiency> genToCleanedStandAloneEfficiency_;
   std::auto_ptr<Efficiency> genToTrackEfficiency_;
@@ -158,6 +159,9 @@ private:
   int minimumValidHits_;
   double dzCut_;
   double chi2Cut_;
+  double trackPtCut_;
+  double standAlonePtCut_;
+  bool highPurity_;
   bool matchTwoLegs_;
   double deltaDxyCut_;
   double deltaDzCut_;
@@ -179,6 +183,9 @@ TrackingEfficiencyFromCosmics::TrackingEfficiencyFromCosmics(const edm::Paramete
   minimumValidHits_(iConfig.getParameter<int>("MinimumValidHits")),
   dzCut_(iConfig.getParameter<double>("DzCut")),
   chi2Cut_(iConfig.getParameter<double>("Chi2Cut")),
+  trackPtCut_(iConfig.getParameter<double>("TrackPtCut")),
+  standAlonePtCut_(iConfig.getParameter<double>("StandAlonePtCut")),
+  highPurity_(iConfig.getParameter<bool>("HighPurity")),
   matchTwoLegs_(iConfig.getParameter<bool>("MatchTwoLegs")),
   deltaDxyCut_(iConfig.getParameter<double>("DeltaDxyCut")),
   deltaDzCut_(iConfig.getParameter<double>("DeltaDzCut")),
@@ -234,7 +241,8 @@ void TrackingEfficiencyFromCosmics::analyze(const edm::Event& iEvent, const edm:
   reco::TrackCollection * tracks = new reco::TrackCollection();
   reco::TrackCollection::const_iterator itTrk = allTracks->begin();
   for( ; itTrk != allTracks->end(); ++itTrk ) {
-    if( (itTrk->quality(trackQualityHighPurity)) && (fabs(itTrk->eta()) < 2.0) && (itTrk->pt() > 25) && (itTrk->found() > 6) ) {
+    // if( (itTrk->quality(trackQualityHighPurity)) && (fabs(itTrk->eta()) < 2.0) && (itTrk->pt() > trackPtCut_) && (itTrk->found() > 6) ) {
+    if( (!highPurity_ || (itTrk->quality(trackQualityHighPurity))) && (fabs(itTrk->eta()) < 2.0) && (itTrk->pt() > trackPtCut_) && (itTrk->found() > 6) ) {
       tracks->push_back(*itTrk);
     }
   }
@@ -248,7 +256,7 @@ void TrackingEfficiencyFromCosmics::analyze(const edm::Event& iEvent, const edm:
   reco::TrackCollection cleanedStaMuons;
   reco::TrackCollection::const_iterator it = staMuons->begin();
   for( ; it != staMuons->end(); ++it ) {
-    if( (it->found() >= minimumValidHits_) && (fabs(it->dz()) < dzCut_) && (it->pt() > 25) && (fabs(it->eta()) < 2.) && (fabs(it->normalizedChi2()) < chi2Cut_) ) {
+    if( (it->found() >= minimumValidHits_) && (fabs(it->dz()) < dzCut_) && (it->pt() > standAlonePtCut_) && (fabs(it->eta()) < 2.) && (fabs(it->normalizedChi2()) < chi2Cut_) ) {
       // && (fabs(it->dz()) > 10) ) {
       cleanedStaMuons.push_back(*it);
     }
@@ -348,9 +356,9 @@ void TrackingEfficiencyFromCosmics::analyze(const edm::Event& iEvent, const edm:
   }
 
   // Efficiency for tracks vs standAlone
-  fillEfficiency(*staMuons, tracks, efficiency_.get(), hMinDeltaR_, mf);
+  fillEfficiency(*staMuons, tracks, efficiency_.get(), hMinDeltaR_, standAloneTrackDelta_.get());
   // Efficiency for tracks vs cleanedStandAlone
-  fillEfficiency(cleanedStaMuons, tracks, efficiencyCleaned_.get(), hMinCleanedDeltaR_, mf);
+  fillEfficiency(cleanedStaMuons, tracks, efficiencyCleaned_.get(), hMinCleanedDeltaR_, cleanedStandAloneTrackDelta_.get());
 
 #ifdef THIS_IS_AN_EVENT_EXAMPLE
   Handle<ExampleData> pIn;
@@ -403,6 +411,7 @@ void TrackingEfficiencyFromCosmics::beginJob()
   standAloneDelta_.reset(new ControlDeltaPlots(fileService, "standAloneDelta", -1));
   cleanedStandAloneDelta_.reset(new ControlDeltaPlots(fileService, "cleanedStandAloneDelta", -1));
   standAloneTrackDelta_.reset(new ControlDeltaPlots(fileService, "standAloneTrackDelta"));
+  cleanedStandAloneTrackDelta_.reset(new ControlDeltaPlots(fileService, "cleanedStandAloneTrackDelta"));
 }
 
 // ------------ method called once each job just after ending the event loop  ------------
@@ -629,12 +638,13 @@ void TrackingEfficiencyFromCosmics::fillEfficiencyVsGen( const T1 & staMuons, co
 
 template <class T1, class T2>
 void TrackingEfficiencyFromCosmics::fillEfficiency(const T1 & staMuons, const T2 & tracks, Efficiency * efficiency,
-                                                   TH1F * hMinDeltaR, const MagneticField * mf)
+                                                   TH1F * hMinDeltaR, ControlDeltaPlots * standAloneTrackDelta)
 {
   // Association map of StandAloneMuons and TrackerTracks
   std::map<const reco::Track *, const reco::Track *> matchesMap;
+  std::map<const reco::Track *, const reco::Track *> oppositeMatchesMap;
   if( staMuons.size() > 0 ) {
-    associatorByDeltaR_->fillAssociationMap(staMuons, *tracks, matchesMap, hMinDeltaR);
+    associatorByDeltaR_->fillAssociationMap(staMuons, *tracks, matchesMap, hMinDeltaR, &oppositeMatchesMap);
 
     bool found = false;
     std::map<const reco::Track *, const reco::Track *>::const_iterator it = matchesMap.begin();
@@ -662,7 +672,33 @@ void TrackingEfficiencyFromCosmics::fillEfficiency(const T1 & staMuons, const T2
       if( found ) {
         // hTrackCounterDxy_->Fill(variables_[0]);
         // hTrackCounterDz_->Fill(variables_[1]);
-        standAloneTrackDelta_->fillControlPlots(*(it->first), *(it->second));
+        standAloneTrackDelta->fillControlPlots(*(it->first), *(it->second));
+      }
+    }
+
+    found = false;
+    std::map<const reco::Track *, const reco::Track *>::const_iterator opIt = oppositeMatchesMap.begin();
+    for( ; opIt != oppositeMatchesMap.end(); ++opIt ) {
+      if( opIt->second == 0 ) {
+        found = false;
+      }
+      else {
+        found = true;
+      }
+      double standAloneDxy = opIt->first->dxy();
+      double standAloneDz = opIt->first->dz();
+      if( recomputeIP_ ) {
+        computeImpactParameters(*(opIt->first), *theB_);
+        standAloneDxy = dxy_.first;
+        standAloneDz = dz_.first;
+      }
+      variables_[0] = fabs(standAloneDxy);
+      variables_[1] = fabs(standAloneDz);
+      variables_[2] = opIt->first->pt();
+      efficiency->fill(variables_, found);
+
+      if( found ) {
+        standAloneTrackDelta->fillControlPlots(*(opIt->first), *(opIt->second));
       }
     }
   }

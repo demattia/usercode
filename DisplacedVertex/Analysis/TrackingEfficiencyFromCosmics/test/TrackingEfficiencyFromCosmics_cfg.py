@@ -57,11 +57,14 @@ process.TFileService=cms.Service('TFileService',
 process.demo = cms.EDAnalyzer('TrackingEfficiencyFromCosmics',
                               MaxDeltaR = cms.double(1),
                               SimMaxDeltaR = cms.double(1000),
-                              DzCut = cms.double(40),
+                              DzCut = cms.double(100000),
                               Chi2Cut = cms.double(1000000),
-                              MatchTwoLegs = cms.bool(True), # effective only if SingleLegMuon == False
+                              TrackPtCut = cms.double(25),
+                              StandAlonePtCut = cms.double(35),
+                              HighPurity = cms.bool(True),
+                              MatchTwoLegs = cms.bool(True),
                               DeltaDxyCut = cms.double(15), # only if matching two legs
-                              DeltaDzCut = cms.double(20),  # only if matching two legs
+                              DeltaDzCut = cms.double(30),  # only if matching two legs
                               DeltaPtCut = cms.double(1000),  # only if matching two legs
                               DeltaPhiCut = cms.double(1),  # only if matching two legs
                               MinimumValidHits = cms.int32(10),
