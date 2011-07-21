@@ -13,7 +13,7 @@
 //
 // Original Author:  Marco De Mattia,40 3-B32,+41227671551,
 //         Created:  Wed May 25 16:44:02 CEST 2011
-// $Id: TrackingEfficiencyFromCosmics.cc,v 1.30 2011/07/18 06:15:19 demattia Exp $
+// $Id: TrackingEfficiencyFromCosmics.cc,v 1.31 2011/07/18 14:37:11 demattia Exp $
 //
 //
 
@@ -182,6 +182,11 @@ private:
   edm::InputTag trackCollection_;
   edm::ESHandle<TransientTrackBuilder> theB_;
   bool useAllTracks_;
+  bool useTrackParameters_;
+  bool dxyErrorCut_;
+  bool dzErrorCut_;
+  bool cleaned_;
+  unsigned int eventNum_;
 };
 
 TrackingEfficiencyFromCosmics::TrackingEfficiencyFromCosmics(const edm::ParameterSet& iConfig) :
@@ -212,7 +217,12 @@ TrackingEfficiencyFromCosmics::TrackingEfficiencyFromCosmics(const edm::Paramete
   singleLegMuon_(iConfig.getParameter<bool>("SingleLegMuon")),
   muonCollection_(iConfig.getParameter<edm::InputTag>("MuonCollection")),
   trackCollection_(iConfig.getParameter<edm::InputTag>("TrackCollection")),
-  useAllTracks_(iConfig.getParameter<bool>("UseAllTracks"))
+  useAllTracks_(iConfig.getParameter<bool>("UseAllTracks")),
+  useTrackParameters_(iConfig.getParameter<bool>("UseTrackParameters")),
+  dxyErrorCut_(iConfig.getParameter<bool>("DxyErrorCut")),
+  dzErrorCut_(iConfig.getParameter<bool>("DzErrorCut")),
+  cleaned_(true),
+  eventNum_(0)
 {
   // Use the unique association for tracks to standAlone muons only when
   if( singleLegMuon_ ) associatorByDeltaR_.reset(new AssociatorByDeltaR(iConfig.getParameter<double>("MaxDeltaR"), false, true));
@@ -247,6 +257,7 @@ TrackingEfficiencyFromCosmics::~TrackingEfficiencyFromCosmics() {}
 
 void TrackingEfficiencyFromCosmics::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 {
+  eventNum_ = iEvent.id().event();
   edm::ESHandle<MagneticField> theMF;
   iSetup.get<IdealMagneticFieldRecord>().get(theMF);
   MagneticField * mf = const_cast<MagneticField*>(&*theMF);
@@ -278,8 +289,12 @@ void TrackingEfficiencyFromCosmics::analyze(const edm::Event& iEvent, const edm:
   reco::TrackCollection::const_iterator it = staMuons->begin();
   for( ; it != staMuons->end(); ++it ) {
     // if( (it->found() >= minimumValidHits_) && (fabs(it->dz()) < dzCut_) && (it->pt() > standAlonePtCut_) && (fabs(it->eta()) < 2.) && (fabs(it->normalizedChi2()) < chi2Cut_) ) {
+    // if( (it->found() >= minimumValidHits_) && (fabs(it->dz()) < dzCut_) && (fabs(it->dxy()) < dxyCut_) &&
+    //     (it->pt() > standAlonePtCut_) && (fabs(it->eta()) < 2.) && (fabs(it->normalizedChi2()) < chi2Cut_) ) {
     if( (it->found() >= minimumValidHits_) && (fabs(it->dz()) < dzCut_) && (fabs(it->dxy()) < dxyCut_) &&
-	(it->pt() > standAlonePtCut_) && (fabs(it->eta()) < 2.) && (fabs(it->normalizedChi2()) < chi2Cut_) ) {
+	(it->pt() > standAlonePtCut_) && (fabs(it->eta()) < 2.) && (fabs(it->normalizedChi2()) < chi2Cut_) &&
+	((!dxyErrorCut_) || (fabs(it->dxyError()) < utils::dxyErrMax(it->pt()))) &&
+	((!dzErrorCut_) || (fabs(it->dzError()) < utils::dxyErrMax(it->pt()))) ) { // Note the use of the same function is intentional.
       // && (fabs(it->dz()) > 10) ) {
       cleanedStaMuons.push_back(*it);
     }
@@ -379,9 +394,11 @@ void TrackingEfficiencyFromCosmics::analyze(const edm::Event& iEvent, const edm:
   }
 
   // Efficiency for tracks vs standAlone
+  cleaned_ = false;
   fillEfficiency(*staMuons, tracks, efficiency_.get(), hMinDeltaR_, standAloneTrackDelta_.get(),
 		 controlPlotsMatchedStandAloneMuons_.get(), controlPlotsUnmatchedStandAloneMuons_.get());
   // Efficiency for tracks vs cleanedStandAlone
+  cleaned_ = true;
   fillEfficiency(cleanedStaMuons, tracks, efficiencyCleaned_.get(), hMinCleanedDeltaR_, cleanedStandAloneTrackDelta_.get(),
 		 controlPlotsMatchedCleanedStandAloneMuons_.get(), controlPlotsUnmatchedCleanedStandAloneMuons_.get());
 
@@ -682,24 +699,34 @@ void TrackingEfficiencyFromCosmics::fillEfficiency(const T1 & staMuons, const T2
     bool found = false;
     std::map<const reco::Track *, const reco::Track *>::const_iterator it = matchesMap.begin();
     for( ; it != matchesMap.end(); ++it ) {
-      if( it->second == 0 ) {
-        found = false;
-      }
-      else {
-        found = true;
-      }
+
       double standAloneDxy = it->first->dxy();
       double standAloneDz = it->first->dz();
       if( recomputeIP_ ) {
-        computeImpactParameters(*(it->first), *theB_);
+	computeImpactParameters(*(it->first), *theB_);
 	// std::cout << "standAloneDxy            = " << standAloneDxy << std::endl;
-        standAloneDxy = dxy_.first;
+	standAloneDxy = dxy_.first;
 	// std::cout << "recomputed standAloneDxy = " << standAloneDxy << std::endl;
-        standAloneDz = dz_.first;
+	standAloneDz = dz_.first;
       }
       variables_[0] = fabs(standAloneDxy);
       variables_[1] = fabs(standAloneDz);
       variables_[2] = it->first->pt();
+
+      if( it->second == 0 ) {
+        found = false;
+	if( cleaned_ ) {
+	  std::cout << "No match found in this event: " << eventNum_ << std::endl;
+	}
+      }
+      else {
+        found = true;
+	if( useTrackParameters_ ) {
+	  variables_[0] = it->second->dxy();
+	  variables_[1] = it->second->dz();
+	  variables_[2] = it->second->pt();
+	}
+      }
       efficiency->fill(variables_, found);
 
       // hStandAloneCounterDxy_->Fill(variables_[0]);
@@ -718,12 +745,7 @@ void TrackingEfficiencyFromCosmics::fillEfficiency(const T1 & staMuons, const T2
     found = false;
     std::map<const reco::Track *, const reco::Track *>::const_iterator opIt = oppositeMatchesMap.begin();
     for( ; opIt != oppositeMatchesMap.end(); ++opIt ) {
-      if( opIt->second == 0 ) {
-        found = false;
-      }
-      else {
-        found = true;
-      }
+
       double standAloneDxy = opIt->first->dxy();
       double standAloneDz = opIt->first->dz();
       if( recomputeIP_ ) {
@@ -734,6 +756,21 @@ void TrackingEfficiencyFromCosmics::fillEfficiency(const T1 & staMuons, const T2
       variables_[0] = fabs(standAloneDxy);
       variables_[1] = fabs(standAloneDz);
       variables_[2] = opIt->first->pt();
+
+      if( opIt->second == 0 ) {
+        found = false;
+	if( cleaned_ ) {
+	  std::cout << "No opposite match found in this event: " << eventNum_ << std::endl;
+	}
+      }
+      else {
+        found = true;
+	if( useTrackParameters_ ) {
+	  variables_[0] = opIt->second->dxy();
+	  variables_[1] = opIt->second->dz();
+	  variables_[2] = opIt->second->pt();
+	}
+      }
       efficiency->fill(variables_, found);
 
       if( found ) {
