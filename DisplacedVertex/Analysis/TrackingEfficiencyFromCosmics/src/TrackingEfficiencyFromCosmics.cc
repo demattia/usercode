@@ -13,7 +13,7 @@
 //
 // Original Author:  Marco De Mattia,40 3-B32,+41227671551,
 //         Created:  Wed May 25 16:44:02 CEST 2011
-// $Id: TrackingEfficiencyFromCosmics.cc,v 1.31 2011/07/18 14:37:11 demattia Exp $
+// $Id: TrackingEfficiencyFromCosmics.cc,v 1.32 2011/07/21 16:57:38 demattia Exp $
 //
 //
 
@@ -165,7 +165,8 @@ private:
   std::pair<double, double> dz_;
   std::pair<double, double> dxyz_;
   int minimumValidHits_;
-  double dzCut_;
+  double dzMinCut_;
+  double dzMaxCut_;
   double dxyCut_;
   double chi2Cut_;
   double trackPtCut_;
@@ -202,7 +203,8 @@ TrackingEfficiencyFromCosmics::TrackingEfficiencyFromCosmics(const edm::Paramete
   genToStandAloneEffOutputFileName_(iConfig.getParameter<std::string>("GenToStandAloneEffOutputFileName")),
   genToTrackEffOutputFileName_(iConfig.getParameter<std::string>("GenToTrackEffOutputFileName")),
   minimumValidHits_(iConfig.getParameter<int>("MinimumValidHits")),
-  dzCut_(iConfig.getParameter<double>("DzCut")),
+  dzMinCut_(iConfig.getParameter<double>("DzMinCut")),
+  dzMaxCut_(iConfig.getParameter<double>("DzMaxCut")),
   dxyCut_(iConfig.getParameter<double>("DxyCut")),
   chi2Cut_(iConfig.getParameter<double>("Chi2Cut")),
   trackPtCut_(iConfig.getParameter<double>("TrackPtCut")),
@@ -291,7 +293,8 @@ void TrackingEfficiencyFromCosmics::analyze(const edm::Event& iEvent, const edm:
     // if( (it->found() >= minimumValidHits_) && (fabs(it->dz()) < dzCut_) && (it->pt() > standAlonePtCut_) && (fabs(it->eta()) < 2.) && (fabs(it->normalizedChi2()) < chi2Cut_) ) {
     // if( (it->found() >= minimumValidHits_) && (fabs(it->dz()) < dzCut_) && (fabs(it->dxy()) < dxyCut_) &&
     //     (it->pt() > standAlonePtCut_) && (fabs(it->eta()) < 2.) && (fabs(it->normalizedChi2()) < chi2Cut_) ) {
-    if( (it->found() >= minimumValidHits_) && (fabs(it->dz()) < dzCut_) && (fabs(it->dxy()) < dxyCut_) &&
+    // if( (it->found() >= minimumValidHits_) && (fabs(it->dz()) < dzCut_) && (fabs(it->dxy()) < dxyCut_) &&
+    if( (it->found() >= minimumValidHits_) && (fabs(it->dz()) < dzMaxCut_) && (fabs(it->dz()) > dzMinCut_) && (fabs(it->dxy()) < dxyCut_) &&
 	(it->pt() > standAlonePtCut_) && (fabs(it->eta()) < 2.) && (fabs(it->normalizedChi2()) < chi2Cut_) &&
 	((!dxyErrorCut_) || (fabs(it->dxyError()) < utils::dxyErrMax(it->pt()))) &&
 	((!dzErrorCut_) || (fabs(it->dzError()) < utils::dxyErrMax(it->pt()))) ) { // Note the use of the same function is intentional.
