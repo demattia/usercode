@@ -13,7 +13,7 @@
 //
 // Original Author:  Marco De Mattia,40 3-B32,+41227671551,
 //         Created:  Wed May 25 16:44:02 CEST 2011
-// $Id: TrackingEfficiencyFromCosmics.cc,v 1.32 2011/07/21 16:57:38 demattia Exp $
+// $Id: TrackingEfficiencyFromCosmics.cc,v 1.33 2011/07/22 13:47:18 demattia Exp $
 //
 //
 
@@ -137,6 +137,7 @@ private:
   std::auto_ptr<ControlPlots> controlPlotsMatchedStandAloneMuons_;
   std::auto_ptr<ControlPlots> controlPlotsUnmatchedStandAloneMuons_;
   std::auto_ptr<ControlPlots> controlPlotsCleanedStandAloneMuons_;
+  std::auto_ptr<ControlPlots> controlPlotsCleanedStandAloneMuonsNoDzCut_;
   std::auto_ptr<ControlPlots> controlPlotsMatchedCleanedStandAloneMuons_;
   std::auto_ptr<ControlPlots> controlPlotsUnmatchedCleanedStandAloneMuons_;
   std::auto_ptr<ControlDeltaPlots> trackDelta_;
@@ -188,6 +189,7 @@ private:
   bool dzErrorCut_;
   bool cleaned_;
   unsigned int eventNum_;
+  double dxyCutForNoDzCut_;
 };
 
 TrackingEfficiencyFromCosmics::TrackingEfficiencyFromCosmics(const edm::ParameterSet& iConfig) :
@@ -224,7 +226,8 @@ TrackingEfficiencyFromCosmics::TrackingEfficiencyFromCosmics(const edm::Paramete
   dxyErrorCut_(iConfig.getParameter<bool>("DxyErrorCut")),
   dzErrorCut_(iConfig.getParameter<bool>("DzErrorCut")),
   cleaned_(true),
-  eventNum_(0)
+  eventNum_(0),
+  dxyCutForNoDzCut_(iConfig.getParameter<bool>("DxyCutForNoDzCut"))
 {
   // Use the unique association for tracks to standAlone muons only when
   if( singleLegMuon_ ) associatorByDeltaR_.reset(new AssociatorByDeltaR(iConfig.getParameter<double>("MaxDeltaR"), false, true));
@@ -288,18 +291,22 @@ void TrackingEfficiencyFromCosmics::analyze(const edm::Event& iEvent, const edm:
 
   // Select good standAloneMuons (done such that the matching with gen is good)
   reco::TrackCollection cleanedStaMuons;
+  reco::TrackCollection cleanedStaMuonsNoDzCut;
   reco::TrackCollection::const_iterator it = staMuons->begin();
   for( ; it != staMuons->end(); ++it ) {
-    // if( (it->found() >= minimumValidHits_) && (fabs(it->dz()) < dzCut_) && (it->pt() > standAlonePtCut_) && (fabs(it->eta()) < 2.) && (fabs(it->normalizedChi2()) < chi2Cut_) ) {
-    // if( (it->found() >= minimumValidHits_) && (fabs(it->dz()) < dzCut_) && (fabs(it->dxy()) < dxyCut_) &&
-    //     (it->pt() > standAlonePtCut_) && (fabs(it->eta()) < 2.) && (fabs(it->normalizedChi2()) < chi2Cut_) ) {
-    // if( (it->found() >= minimumValidHits_) && (fabs(it->dz()) < dzCut_) && (fabs(it->dxy()) < dxyCut_) &&
-    if( (it->found() >= minimumValidHits_) && (fabs(it->dz()) < dzMaxCut_) && (fabs(it->dz()) > dzMinCut_) && (fabs(it->dxy()) < dxyCut_) &&
+    if( (it->found() >= minimumValidHits_) && (fabs(it->dxy()) < dxyCut_) &&
 	(it->pt() > standAlonePtCut_) && (fabs(it->eta()) < 2.) && (fabs(it->normalizedChi2()) < chi2Cut_) &&
 	((!dxyErrorCut_) || (fabs(it->dxyError()) < utils::dxyErrMax(it->pt()))) &&
 	((!dzErrorCut_) || (fabs(it->dzError()) < utils::dxyErrMax(it->pt()))) ) { // Note the use of the same function is intentional.
-      // && (fabs(it->dz()) > 10) ) {
-      cleanedStaMuons.push_back(*it);
+
+
+      if( fabs(it->dxy()) < dxyCutForNoDzCut_ ) {
+        cleanedStaMuonsNoDzCut.push_back(*it);
+      }
+
+      if( (fabs(it->dz()) < dzMaxCut_) && (fabs(it->dz()) > dzMinCut_) ) {
+        cleanedStaMuons.push_back(*it);
+      }
     }
   }
 
@@ -339,6 +346,7 @@ void TrackingEfficiencyFromCosmics::analyze(const edm::Event& iEvent, const edm:
   // Fill all control plots
   controlPlotsGeneralTracks_->fillControlPlots(*tracks);
   controlPlotsStandAloneMuons_->fillControlPlots(*staMuons);
+  controlPlotsCleanedStandAloneMuonsNoDzCut_->fillControlPlots(cleanedStaMuonsNoDzCut);
   controlPlotsCleanedStandAloneMuons_->fillControlPlots(cleanedStaMuons);
 
   // // Find the simTracks (for IP)
@@ -456,6 +464,7 @@ void TrackingEfficiencyFromCosmics::beginJob()
   controlPlotsUnmatchedStandAloneMuons_.reset(new ControlPlots(fileService, "unmatchedStandAloneMuons"));
 
   controlPlotsCleanedStandAloneMuons_.reset(new ControlPlots(fileService, "cleanedStandAloneMuons"));
+  controlPlotsCleanedStandAloneMuonsNoDzCut_.reset(new ControlPlots(fileService, "cleanedStandAloneMuonsNoDzCut"));
   controlPlotsMatchedCleanedStandAloneMuons_.reset(new ControlPlots(fileService, "matchedCleanedStandAloneMuons"));
   controlPlotsUnmatchedCleanedStandAloneMuons_.reset(new ControlPlots(fileService, "unmatchedCleanedStandAloneMuons"));
 

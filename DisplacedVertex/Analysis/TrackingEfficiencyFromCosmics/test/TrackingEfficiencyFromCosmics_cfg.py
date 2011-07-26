@@ -475,7 +475,8 @@ process.demo = cms.EDAnalyzer('TrackingEfficiencyFromCosmics',
                               UseAllTracks = cms.bool(False),
                               UseTrackParameters = cms.bool(False),
                               DxyErrorCut = cms.bool(True),
-                              DzErrorCut = cms.bool(True)
+                              DzErrorCut = cms.bool(True),
+                              DxyCutForNoDzCut = cms.double(4)
                               )
 
 
