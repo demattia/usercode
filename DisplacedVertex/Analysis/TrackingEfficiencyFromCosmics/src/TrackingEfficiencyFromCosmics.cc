@@ -294,7 +294,7 @@ void TrackingEfficiencyFromCosmics::analyze(const edm::Event& iEvent, const edm:
   reco::TrackCollection cleanedStaMuonsNoDzCut;
   reco::TrackCollection::const_iterator it = staMuons->begin();
   for( ; it != staMuons->end(); ++it ) {
-    if( (it->found() >= minimumValidHits_) && (fabs(it->dxy()) < dxyCut_) &&
+    if( (it->found() >= minimumValidHits_) &&
 	(it->pt() > standAlonePtCut_) && (fabs(it->eta()) < 2.) && (fabs(it->normalizedChi2()) < chi2Cut_) &&
 	((!dxyErrorCut_) || (fabs(it->dxyError()) < utils::dxyErrMax(it->pt()))) &&
 	((!dzErrorCut_) || (fabs(it->dzError()) < utils::dxyErrMax(it->pt()))) ) { // Note the use of the same function is intentional.
@@ -304,7 +304,7 @@ void TrackingEfficiencyFromCosmics::analyze(const edm::Event& iEvent, const edm:
         cleanedStaMuonsNoDzCut.push_back(*it);
       }
 
-      if( (fabs(it->dz()) < dzMaxCut_) && (fabs(it->dz()) > dzMinCut_) ) {
+      if( (fabs(it->dz()) < dzMaxCut_) && (fabs(it->dz()) > dzMinCut_) && (fabs(it->dxy()) < dxyCut_) ) {
         cleanedStaMuons.push_back(*it);
       }
     }
