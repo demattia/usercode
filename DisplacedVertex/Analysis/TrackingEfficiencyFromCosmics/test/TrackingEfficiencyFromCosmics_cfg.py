@@ -478,6 +478,7 @@ process.demo = cms.EDAnalyzer('TrackingEfficiencyFromCosmics',
                               DxyErrorCut = cms.bool(True),
                               DzErrorCut = cms.bool(True),
                               DxyCutForNoDzCut = cms.double(4),
+							  CountSameSide = cms.bool(True),
                               PhiRegion = cms.bool(True),
                               PhiMinCut = cms.double(-3.2),
                               PhiMaxCut = cms.double(0)							  

@@ -13,7 +13,7 @@
 //
 // Original Author:  Marco De Mattia,40 3-B32,+41227671551,
 //         Created:  Wed May 25 16:44:02 CEST 2011
-// $Id: TrackingEfficiencyFromCosmics.cc,v 1.38 2011/07/27 18:17:58 demattia Exp $
+// $Id: TrackingEfficiencyFromCosmics.cc,v 1.39 2011/07/27 19:38:11 demattia Exp $
 //
 //
 
@@ -188,6 +188,7 @@ private:
   bool dxyErrorCut_;
   bool dzErrorCut_;
   bool cleaned_;
+  bool countSameSide_;
   unsigned int eventNum_;
   double dxyCutForNoDzCut_;
   bool phiRegion_;
@@ -229,6 +230,7 @@ TrackingEfficiencyFromCosmics::TrackingEfficiencyFromCosmics(const edm::Paramete
   dxyErrorCut_(iConfig.getParameter<bool>("DxyErrorCut")),
   dzErrorCut_(iConfig.getParameter<bool>("DzErrorCut")),
   cleaned_(true),
+  countSameSide_(iConfig.getParameter<bool>("CountSameSide")),
   eventNum_(0),
   dxyCutForNoDzCut_(iConfig.getParameter<double>("DxyCutForNoDzCut")),
   phiRegion_(iConfig.getParameter<bool>("PhiRegion")),
@@ -730,48 +732,51 @@ void TrackingEfficiencyFromCosmics::fillEfficiency(const T1 & staMuons, const T2
     associatorByDeltaR_->fillAssociationMap(staMuons, *tracks, matchesMap, hMinDeltaR, &oppositeMatchesMap);
 
     bool found = false;
-    std::map<const reco::Track *, const reco::Track *>::const_iterator it = matchesMap.begin();
-    for( ; it != matchesMap.end(); ++it ) {
 
-      double standAloneDxy = it->first->dxy();
-      double standAloneDz = it->first->dz();
-      if( recomputeIP_ ) {
-	computeImpactParameters(*(it->first), *theB_);
-	// std::cout << "standAloneDxy            = " << standAloneDxy << std::endl;
-	standAloneDxy = dxy_.first;
-	// std::cout << "recomputed standAloneDxy = " << standAloneDxy << std::endl;
-	standAloneDz = dz_.first;
-      }
-      variables_[0] = fabs(standAloneDxy);
-      variables_[1] = fabs(standAloneDz);
-      variables_[2] = it->first->pt();
+    if( !countSameSide_ ) {
+      std::map<const reco::Track *, const reco::Track *>::const_iterator it = matchesMap.begin();
+      for( ; it != matchesMap.end(); ++it ) {
 
-      if( it->second == 0 ) {
-        found = false;
-	if( cleaned_ ) {
-	  std::cout << "No match found in this event: " << eventNum_ << std::endl;
-	}
-      }
-      else {
-        found = true;
-	if( useTrackParameters_ ) {
-	  variables_[0] = it->second->dxy();
-	  variables_[1] = it->second->dz();
-	  variables_[2] = it->second->pt();
-	}
-      }
-      efficiency->fill(variables_, found);
+        double standAloneDxy = it->first->dxy();
+        double standAloneDz = it->first->dz();
+        if( recomputeIP_ ) {
+	      computeImpactParameters(*(it->first), *theB_);
+	      // std::cout << "standAloneDxy            = " << standAloneDxy << std::endl;
+	      standAloneDxy = dxy_.first;
+	      // std::cout << "recomputed standAloneDxy = " << standAloneDxy << std::endl;
+	      standAloneDz = dz_.first;
+        }
+        variables_[0] = fabs(standAloneDxy);
+        variables_[1] = fabs(standAloneDz);
+        variables_[2] = it->first->pt();
 
-      // hStandAloneCounterDxy_->Fill(variables_[0]);
-      // hStandAloneCounterDz_->Fill(variables_[1]);
-      if( found ) {
-        // hTrackCounterDxy_->Fill(variables_[0]);
-        // hTrackCounterDz_->Fill(variables_[1]);
-        standAloneTrackDelta->fillControlPlots(*(it->first), *(it->second));
-	matchedStandAlone->fillControlPlots(staMuons);
-      }
-      else {
-	unmatchedStandAlone->fillControlPlots(staMuons);
+        if( it->second == 0 ) {
+          found = false;
+	      if( cleaned_ ) {
+	        std::cout << "No match found in this event: " << eventNum_ << std::endl;
+	      }
+        }
+        else {
+          found = true;
+	      if( useTrackParameters_ ) {
+	        variables_[0] = it->second->dxy();
+	        variables_[1] = it->second->dz();
+	        variables_[2] = it->second->pt();
+	      }
+        }
+        efficiency->fill(variables_, found);
+
+        // hStandAloneCounterDxy_->Fill(variables_[0]);
+        // hStandAloneCounterDz_->Fill(variables_[1]);
+        if( found ) {
+          // hTrackCounterDxy_->Fill(variables_[0]);
+          // hTrackCounterDz_->Fill(variables_[1]);
+          standAloneTrackDelta->fillControlPlots(*(it->first), *(it->second));
+	      matchedStandAlone->fillControlPlots(staMuons);
+        }
+        else {
+	      unmatchedStandAlone->fillControlPlots(staMuons);
+        }
       }
     }
 
