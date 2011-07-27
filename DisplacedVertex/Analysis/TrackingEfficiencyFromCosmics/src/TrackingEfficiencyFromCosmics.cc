@@ -13,7 +13,7 @@
 //
 // Original Author:  Marco De Mattia,40 3-B32,+41227671551,
 //         Created:  Wed May 25 16:44:02 CEST 2011
-// $Id: TrackingEfficiencyFromCosmics.cc,v 1.33 2011/07/22 13:47:18 demattia Exp $
+// $Id: TrackingEfficiencyFromCosmics.cc,v 1.34 2011/07/26 15:30:19 demattia Exp $
 //
 //
 
@@ -227,7 +227,7 @@ TrackingEfficiencyFromCosmics::TrackingEfficiencyFromCosmics(const edm::Paramete
   dzErrorCut_(iConfig.getParameter<bool>("DzErrorCut")),
   cleaned_(true),
   eventNum_(0),
-  dxyCutForNoDzCut_(iConfig.getParameter<bool>("DxyCutForNoDzCut"))
+  dxyCutForNoDzCut_(iConfig.getParameter<double>("DxyCutForNoDzCut"))
 {
   // Use the unique association for tracks to standAlone muons only when
   if( singleLegMuon_ ) associatorByDeltaR_.reset(new AssociatorByDeltaR(iConfig.getParameter<double>("MaxDeltaR"), false, true));
