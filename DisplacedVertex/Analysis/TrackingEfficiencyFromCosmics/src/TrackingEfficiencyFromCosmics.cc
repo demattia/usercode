@@ -13,7 +13,7 @@
 //
 // Original Author:  Marco De Mattia,40 3-B32,+41227671551,
 //         Created:  Wed May 25 16:44:02 CEST 2011
-// $Id: TrackingEfficiencyFromCosmics.cc,v 1.34 2011/07/26 15:30:19 demattia Exp $
+// $Id: TrackingEfficiencyFromCosmics.cc,v 1.36 2011/07/27 09:09:46 demattia Exp $
 //
 //
 
@@ -190,6 +190,9 @@ private:
   bool cleaned_;
   unsigned int eventNum_;
   double dxyCutForNoDzCut_;
+  bool phiRegion_;
+  double phiMin_;
+  double phiMax_;
 };
 
 TrackingEfficiencyFromCosmics::TrackingEfficiencyFromCosmics(const edm::ParameterSet& iConfig) :
@@ -227,7 +230,10 @@ TrackingEfficiencyFromCosmics::TrackingEfficiencyFromCosmics(const edm::Paramete
   dzErrorCut_(iConfig.getParameter<bool>("DzErrorCut")),
   cleaned_(true),
   eventNum_(0),
-  dxyCutForNoDzCut_(iConfig.getParameter<double>("DxyCutForNoDzCut"))
+  dxyCutForNoDzCut_(iConfig.getParameter<double>("DxyCutForNoDzCut")),
+  phiRegion_(iConfig.getParameter<bool>("PhiRegion")),
+  phiMax_(iConfig.getParameter<double>("PhiMaxCut")),
+  phiMin_(iConfig.getParameter<double>("PhiMinCut"))
 {
   // Use the unique association for tracks to standAlone muons only when
   if( singleLegMuon_ ) associatorByDeltaR_.reset(new AssociatorByDeltaR(iConfig.getParameter<double>("MaxDeltaR"), false, true));
@@ -279,7 +285,9 @@ void TrackingEfficiencyFromCosmics::analyze(const edm::Event& iEvent, const edm:
     if( useAllTracks_ ) {
       tracks->push_back(*itTrk);
     }
-    else if( (!highPurity_ || (itTrk->quality(trackQualityHighPurity))) && (fabs(itTrk->eta()) < 2.0) && (itTrk->pt() > trackPtCut_) && (itTrk->found() > 6) ) {
+    else if( // (!highPurity_ || (itTrk->quality(trackQualityHighPurity))) 
+		(!phiRegion_ || (itTrk->phi() > phiMin_ && itTrk->phi() < phiMax_ ))
+		&& (fabs(itTrk->eta()) < 2.0) && (itTrk->pt() > trackPtCut_) && (itTrk->found() > 6) ) {
       tracks->push_back(*itTrk);
     }
   }

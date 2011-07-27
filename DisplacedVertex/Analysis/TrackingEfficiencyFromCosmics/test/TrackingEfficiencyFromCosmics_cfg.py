@@ -477,8 +477,10 @@ process.demo = cms.EDAnalyzer('TrackingEfficiencyFromCosmics',
                               UseTrackParameters = cms.bool(False),
                               DxyErrorCut = cms.bool(True),
                               DzErrorCut = cms.bool(True),
-                              DxyCutForNoDzCut = cms.double(4)
+                              DxyCutForNoDzCut = cms.double(4),
+                              PhiRegion = cms.bool(True),
+                              PhiMinCut = cms.double(-3.2),
+                              PhiMaxCut = cms.double(0)							  
                               )
-
 
 process.p = cms.Path(process.demo)
