@@ -13,7 +13,7 @@
 //
 // Original Author:  Marco De Mattia,40 3-B32,+41227671551,
 //         Created:  Wed May 25 16:44:02 CEST 2011
-// $Id: TrackingEfficiencyFromCosmics.cc,v 1.37 2011/07/27 17:49:20 zhenhu Exp $
+// $Id: TrackingEfficiencyFromCosmics.cc,v 1.38 2011/07/27 18:17:58 demattia Exp $
 //
 //
 
@@ -275,22 +275,35 @@ void TrackingEfficiencyFromCosmics::analyze(const edm::Event& iEvent, const edm:
   transverseExtrapolator_ = new TransverseImpactPointExtrapolator(mf);
   analyticalExtrapolator_ = new AnalyticalImpactPointExtrapolator(mf);
 
-  edm::Handle<reco::TrackCollection> allTracks;
-  iEvent.getByLabel(trackCollection_, allTracks);
-  reco::TrackBase::TrackQuality trackQualityHighPurity = reco::TrackBase::qualityByName("highPurity");
   reco::TrackCollection * tracks = new reco::TrackCollection();
-  reco::TrackCollection::const_iterator itTrk = allTracks->begin();
-  for( ; itTrk != allTracks->end(); ++itTrk ) {
-    // if( (itTrk->quality(trackQualityHighPurity)) && (fabs(itTrk->eta()) < 2.0) && (itTrk->pt() > trackPtCut_) && (itTrk->found() > 6) ) {
-    if( useAllTracks_ ) {
-      tracks->push_back(*itTrk);
-    }
-    else if( (!highPurity_ || (itTrk->quality(trackQualityHighPurity))) &&
-	     (!phiRegion_ || (itTrk->phi() > phiMin_ && itTrk->phi() < phiMax_ )) &&
-	     (fabs(itTrk->eta()) < 2.0) && (itTrk->pt() > trackPtCut_) && (itTrk->found() > 6) ) {
-      tracks->push_back(*itTrk);
+
+  try {
+    edm::Handle<reco::TrackCollection> allTracks;
+    // edm::Handle<edm::View<reco::Track> > allTracks;
+    iEvent.getByLabel(trackCollection_, allTracks);
+    reco::TrackBase::TrackQuality trackQualityHighPurity = reco::TrackBase::qualityByName("highPurity");
+    reco::TrackCollection::const_iterator itTrk = allTracks->begin();
+    // edm::View<reco::Track>::const_iterator itTrk = allTracks->begin();
+    for( ; itTrk != allTracks->end(); ++itTrk ) {
+      // if( (itTrk->quality(trackQualityHighPurity)) && (fabs(itTrk->eta()) < 2.0) && (itTrk->pt() > trackPtCut_) && (itTrk->found() > 6) ) {
+      if( useAllTracks_ ) {
+	tracks->push_back(*itTrk);
+      }
+      else if( (!highPurity_ || (itTrk->quality(trackQualityHighPurity))) &&
+	       (!phiRegion_ || (itTrk->phi() > phiMin_ && itTrk->phi() < phiMax_ )) &&
+	       (fabs(itTrk->eta()) < 2.0) && (itTrk->pt() > trackPtCut_) && (itTrk->found() > 6) ) {
+	tracks->push_back(*itTrk);
+      }
     }
   }
+  catch (cms::Exception & ex) {
+    std::cerr << ex;
+    // std::cerr << ex.what();
+    // std::cerr << ex.explainSelf();
+  }
+
+
+
   // Load the transient track builder
   iSetup.get<TransientTrackRecord>().get("TransientTrackBuilder",theB_);
 
