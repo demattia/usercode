@@ -13,7 +13,7 @@
 //
 // Original Author:  Marco De Mattia,40 3-B32,+41227671551,
 //         Created:  Wed May 25 16:44:02 CEST 2011
-// $Id: TrackingEfficiencyFromCosmics.cc,v 1.39 2011/07/27 19:38:11 demattia Exp $
+// $Id: TrackingEfficiencyFromCosmics.cc,v 1.40 2011/07/27 19:46:41 zhenhu Exp $
 //
 //
 
@@ -189,6 +189,7 @@ private:
   bool dzErrorCut_;
   bool cleaned_;
   bool countSameSide_;
+  bool countOppoSide_;
   unsigned int eventNum_;
   double dxyCutForNoDzCut_;
   bool phiRegion_;
@@ -231,6 +232,7 @@ TrackingEfficiencyFromCosmics::TrackingEfficiencyFromCosmics(const edm::Paramete
   dzErrorCut_(iConfig.getParameter<bool>("DzErrorCut")),
   cleaned_(true),
   countSameSide_(iConfig.getParameter<bool>("CountSameSide")),
+  countOppoSide_(iConfig.getParameter<bool>("CountOppoSide")),
   eventNum_(0),
   dxyCutForNoDzCut_(iConfig.getParameter<double>("DxyCutForNoDzCut")),
   phiRegion_(iConfig.getParameter<bool>("PhiRegion")),
@@ -481,7 +483,7 @@ void TrackingEfficiencyFromCosmics::beginJob()
   // hStandAloneCounterDz_ =  utils::bookHistogram(fileService, "standAloneCounterDz", "", "|d_{z}|", "cm", 100, 0, 100);
 
   controlPlotsGeneralTracks_.reset(new ControlPlots(fileService, "generalTracks"));
-
+//  controlPlotsGeneralTracks_.reset(new ControlPlots(fileService, "hltL2Muons"));
   controlPlotsStandAloneMuons_.reset(new ControlPlots(fileService, "standAloneMuons"));
   controlPlotsMatchedStandAloneMuons_.reset(new ControlPlots(fileService, "matchedStandAloneMuons"));
   controlPlotsUnmatchedStandAloneMuons_.reset(new ControlPlots(fileService, "unmatchedStandAloneMuons"));
@@ -781,42 +783,45 @@ void TrackingEfficiencyFromCosmics::fillEfficiency(const T1 & staMuons, const T2
     }
 
     found = false;
-    std::map<const reco::Track *, const reco::Track *>::const_iterator opIt = oppositeMatchesMap.begin();
-    for( ; opIt != oppositeMatchesMap.end(); ++opIt ) {
 
-      double standAloneDxy = opIt->first->dxy();
-      double standAloneDz = opIt->first->dz();
-      if( recomputeIP_ ) {
-        computeImpactParameters(*(opIt->first), *theB_);
-        standAloneDxy = dxy_.first;
-        standAloneDz = dz_.first;
-      }
-      variables_[0] = fabs(standAloneDxy);
-      variables_[1] = fabs(standAloneDz);
-      variables_[2] = opIt->first->pt();
+    if ( !countOppoSide_ ) {
+      std::map<const reco::Track *, const reco::Track *>::const_iterator opIt = oppositeMatchesMap.begin();
+      for( ; opIt != oppositeMatchesMap.end(); ++opIt ) {
 
-      if( opIt->second == 0 ) {
-        found = false;
-	if( cleaned_ ) {
-	  std::cout << "No opposite match found in this event: " << eventNum_ << std::endl;
-	}
-      }
-      else {
-        found = true;
-	if( useTrackParameters_ ) {
-	  variables_[0] = opIt->second->dxy();
-	  variables_[1] = opIt->second->dz();
-	  variables_[2] = opIt->second->pt();
-	}
-      }
-      efficiency->fill(variables_, found);
+        double standAloneDxy = opIt->first->dxy();
+        double standAloneDz = opIt->first->dz();
+        if( recomputeIP_ ) {
+          computeImpactParameters(*(opIt->first), *theB_);
+          standAloneDxy = dxy_.first;
+          standAloneDz = dz_.first;
+        }
+        variables_[0] = fabs(standAloneDxy);
+        variables_[1] = fabs(standAloneDz);
+        variables_[2] = opIt->first->pt();
 
-      if( found ) {
-        standAloneTrackDelta->fillControlPlots(*(opIt->first), *(opIt->second));
-	matchedStandAlone->fillControlPlots(staMuons);
-      }
-      else {
-	unmatchedStandAlone->fillControlPlots(staMuons);
+        if( opIt->second == 0 ) {
+          found = false;
+	      if( cleaned_ ) {
+	        std::cout << "No opposite match found in this event: " << eventNum_ << std::endl;
+	      }
+        }
+        else {
+          found = true;
+	      if( useTrackParameters_ ) {
+	        variables_[0] = opIt->second->dxy();
+	        variables_[1] = opIt->second->dz();
+	        variables_[2] = opIt->second->pt();
+	      }
+        }
+        efficiency->fill(variables_, found);
+
+        if( found ) {
+          standAloneTrackDelta->fillControlPlots(*(opIt->first), *(opIt->second));
+	      matchedStandAlone->fillControlPlots(staMuons);
+        }
+        else {
+	      unmatchedStandAlone->fillControlPlots(staMuons);
+        }
       }
     }
   }
