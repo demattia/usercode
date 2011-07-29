@@ -1,0 +1,2 @@
+The generate.sh script can be used to split and submit generation and reconstruction jobs to the CERN batch system.
+The CosmicGeneration.py configuration file is a template
