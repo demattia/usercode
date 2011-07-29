@@ -4,3 +4,8 @@ The configuration file for the job must be templatized with the maxEvents, skipE
 The word NUMBER must be introduced in the name of the output, that word will be changed by the script in the number identifying the job (needed to avoid overwrites).
 
 The cfg rereco_pp.py is an example of a template cfg.
+
+The parameters totalEvents and eventsPerJob can be changed in SplitAndRun.py.
+
+To submit the jobs:
+python SplitAndRun.py
