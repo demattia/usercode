@@ -1,0 +1,11 @@
+'/store/data/Commissioning11/MinimumBias/RAW/v1/000/157/953/EEA0A355-3939-E011-973C-001D09F23F2A.root',
+'/store/data/Commissioning11/MinimumBias/RAW/v1/000/157/953/E49EB423-5739-E011-AE48-001617E30E2C.root',
+'/store/data/Commissioning11/MinimumBias/RAW/v1/000/157/953/C499D54A-3939-E011-9450-003048F117B4.root',
+'/store/data/Commissioning11/MinimumBias/RAW/v1/000/157/953/980AD6C9-5639-E011-B3DB-0019B9F705A3.root',
+'/store/data/Commissioning11/MinimumBias/RAW/v1/000/157/953/924639C5-3A39-E011-B3CF-001D09F2424A.root',
+'/store/data/Commissioning11/MinimumBias/RAW/v1/000/157/953/56950A47-5739-E011-AD90-0030487CD710.root',
+'/store/data/Commissioning11/MinimumBias/RAW/v1/000/157/953/348E7D12-5639-E011-B84F-001D09F241F0.root',
+'/store/data/Commissioning11/MinimumBias/RAW/v1/000/157/953/2411DB5C-3B39-E011-9032-001D09F2424A.root',
+'/store/data/Commissioning11/MinimumBias/RAW/v1/000/157/953/1A26FC16-3C39-E011-9C13-001D09F2AF96.root',
+'/store/data/Commissioning11/MinimumBias/RAW/v1/000/157/953/189320F5-3739-E011-A4A7-0019B9F72BAA.root',
+'/store/data/Commissioning11/MinimumBias/RAW/v1/000/157/953/06018FDA-3C39-E011-B2F1-003048F1C424.root'
