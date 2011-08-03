@@ -41,6 +41,12 @@ public:
   /// This is used only when building from a SerializedEfficiency
   Efficiency() {}
 
+  Efficiency(const Efficiency &)
+  {
+    std::cout << "The copy constructor is disabled. Use the clone method instead to get a copy of this object." << std::endl;
+    exit(1);
+  }
+
   /**
     * The constructor receives a vector with the sizes of all the variables.
     * The order of these variables must be preserved when they are filled later on.
@@ -216,6 +222,33 @@ public:
     double p = (values_[index].second)/double(values_[index].first);
     return( sqrt(p*(1-p)/(double(values_[index].first))) );
   }
+
+  /// Adds the counts in the passed efficiency object to this one.
+  void add(const Efficiency & eff)
+  {
+    if(eff.getLinearSize() != S_) {
+      std::cout << "Error, different linearSize. Not adding." << std::endl;
+    }
+    else if(eff.getN() != N_) {
+      std::cout << "Error, different number of variables. Not adding." << std::endl;
+    }
+    else {
+      for( unsigned int i=0; i<S_; ++i ) {
+        values_[i].first += eff.getValues(i).first;
+        values_[i].second += eff.getValues(i).second;
+      }
+    }
+  }
+
+  boost::shared_ptr<Efficiency> clone()
+  {
+    boost::shared_array<unsigned int> vKeep(new unsigned int[N_]);
+    for( unsigned int i=0; i<N_; ++i ) {
+      vKeep[i] = 1;
+    }
+    return projectAndRebin(vKeep);
+  }
+
 
   inline unsigned int getLinearSize() const {return S_;}
   inline unsigned int getN() const {return N_;}

@@ -269,6 +269,57 @@ class TestEfficiency : public CppUnit::TestFixture
     }
   }
 
+  void testAdd()
+  {
+    variables[0] = 4.2;
+    variables[1] = 0.3;
+    variables[2] = 5.;
+    variables[3] = 45.;
+    eff->fill(variables, false);
+    eff->fill(variables, true);
+    fillBinIndex(variables, binIndex);
+    CPPUNIT_ASSERT(float(eff->getEff(binIndex)) == float(0.5));
+    CPPUNIT_ASSERT(eff->getValues(eff->getLinearIndex(binIndex)).first == 2);
+    CPPUNIT_ASSERT(eff->getValues(eff->getLinearIndex(binIndex)).second == 1);
+
+    // Copy the efficiency object and sum. It should give the same values, but with twice the entries.
+    // Note that the copy constructor is disabled because it would copy the pointers in the shared objects.
+    // The clone method is used instead to create a copy (internally uses the projectAndRebin method defined above with all 1.
+    boost::shared_ptr<Efficiency> eff2(eff->clone());
+    eff2->add(*eff);
+    CPPUNIT_ASSERT(float(eff2->getEff(binIndex)) == float(0.5));
+    CPPUNIT_ASSERT(eff2->getValues(eff2->getLinearIndex(binIndex)).first == 4);
+    CPPUNIT_ASSERT(eff2->getValues(eff2->getLinearIndex(binIndex)).second == 2);
+
+    // This is summed, but the bin is different.
+    std::auto_ptr<Efficiency> eff3;
+    eff3.reset(new Efficiency(vPars_));
+    variables[0] = 4.2;
+    variables[1] = 0.3;
+    variables[2] = 5.;
+    variables[3] = 0.;
+    eff3->fill(variables, false);
+    fillBinIndex(variables, binIndex);
+    CPPUNIT_ASSERT(float(eff3->getEff(binIndex)) == float(0.));
+    CPPUNIT_ASSERT(eff3->getValues(eff3->getLinearIndex(binIndex)).first == 1);
+    CPPUNIT_ASSERT(eff3->getValues(eff3->getLinearIndex(binIndex)).second == 0);
+
+    eff3->add(*eff);
+    fillBinIndex(variables, binIndex);
+    CPPUNIT_ASSERT(float(eff3->getEff(binIndex)) == float(0.));
+    CPPUNIT_ASSERT(eff3->getValues(eff3->getLinearIndex(binIndex)).first == 1);
+    CPPUNIT_ASSERT(eff3->getValues(eff3->getLinearIndex(binIndex)).second == 0);
+
+    variables[0] = 4.2;
+    variables[1] = 0.3;
+    variables[2] = 5.;
+    variables[3] = 45.;
+    fillBinIndex(variables, binIndex);
+    CPPUNIT_ASSERT(float(eff3->getEff(binIndex)) == float(0.5));
+    CPPUNIT_ASSERT(eff3->getValues(eff3->getLinearIndex(binIndex)).first == 2);
+    CPPUNIT_ASSERT(eff3->getValues(eff3->getLinearIndex(binIndex)).second == 1);
+  }
+
   CPPUNIT_TEST_SUITE( TestEfficiency );
   CPPUNIT_TEST( testLinearRepresentation );
   CPPUNIT_TEST( testParameters );
@@ -278,6 +329,7 @@ class TestEfficiency : public CppUnit::TestFixture
   CPPUNIT_TEST( testEfficiency );
   CPPUNIT_TEST( testEffError );
   CPPUNIT_TEST( testProjectAndRebin );
+  CPPUNIT_TEST( testAdd );
   CPPUNIT_TEST_SUITE_END();
 
   std::auto_ptr<Efficiency> eff;
