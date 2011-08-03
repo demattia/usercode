@@ -13,7 +13,7 @@
 //
 // Original Author:  Marco De Mattia,40 3-B32,+41227671551,
 //         Created:  Wed May 25 16:44:02 CEST 2011
-// $Id: TrackingEfficiencyFromCosmics.cc,v 1.40 2011/07/27 19:46:41 zhenhu Exp $
+// $Id: TrackingEfficiencyFromCosmics.cc,v 1.41 2011/07/28 22:41:41 zhenhu Exp $
 //
 //
 
@@ -735,7 +735,7 @@ void TrackingEfficiencyFromCosmics::fillEfficiency(const T1 & staMuons, const T2
 
     bool found = false;
 
-    if( !countSameSide_ ) {
+    if( countSameSide_ ) {
       std::map<const reco::Track *, const reco::Track *>::const_iterator it = matchesMap.begin();
       for( ; it != matchesMap.end(); ++it ) {
 
@@ -784,7 +784,7 @@ void TrackingEfficiencyFromCosmics::fillEfficiency(const T1 & staMuons, const T2
 
     found = false;
 
-    if ( !countOppoSide_ ) {
+    if ( countOppoSide_ ) {
       std::map<const reco::Track *, const reco::Track *>::const_iterator opIt = oppositeMatchesMap.begin();
       for( ; opIt != oppositeMatchesMap.end(); ++opIt ) {
 
