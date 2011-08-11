@@ -260,9 +260,11 @@ class TestEfficiency : public CppUnit::TestFixture
   }
 
   void fillBinIndex( boost::shared_array<double> variables,
-                     boost::shared_array<unsigned int> & binIndex )
+                     boost::shared_array<unsigned int> & binIndex, const unsigned int N = 0 )
   {
-    for( unsigned int i=0; i<4; ++i ) {
+    double num = 4;
+    if( N != 0 ) num = N;
+    for( unsigned int i=0; i < num; ++i ) {
       if( variables[i] < vPars_[i].min ) binIndex[i] = 0;
       else if( variables[i] >= vPars_[i].max ) binIndex[i] = vPars_[i].bins - 1;
       else binIndex[i] = (variables[i]-vPars_[i].min)*vPars_[i].bins/(vPars_[i].max - vPars_[i].min);
@@ -320,6 +322,54 @@ class TestEfficiency : public CppUnit::TestFixture
     CPPUNIT_ASSERT(eff3->getValues(eff3->getLinearIndex(binIndex)).second == 1);
   }
 
+  void testCut()
+  {
+    variables[0] = 4.2;
+    variables[1] = 0.3;
+    variables[2] = 5.;
+    variables[3] = 45.;
+    eff->fill(variables, false);
+    eff->fill(variables, true);
+
+    variables[0] = 4.2;
+    variables[1] = 0.3;
+    variables[2] = 5.;
+    variables[3] = 75.;
+    eff->fill(variables, false);
+    eff->fill(variables, true);
+    eff->fill(variables, false);
+
+    fillBinIndex(variables, binIndex);
+
+    CPPUNIT_ASSERT(float(eff->getEff(binIndex)) == float(1/3.));
+    CPPUNIT_ASSERT(eff->getValues(eff->getLinearIndex(binIndex)).first == 3);
+    CPPUNIT_ASSERT(eff->getValues(eff->getLinearIndex(binIndex)).second == 1);
+
+    // Reduce the size by projecting on the first 3 variables. There should be 5/2 entries
+    vKeep[0] = 1;
+    vKeep[1] = 1;
+    vKeep[2] = 1;
+    vKeep[3] = 0;
+    boost::shared_ptr<Efficiency> newEff(eff->projectAndRebin(vKeep));
+    fillBinIndex(variables, binIndex, 3);
+    CPPUNIT_ASSERT( float(newEff->getEff(binIndex)) == float(2./5.) );
+    CPPUNIT_ASSERT( newEff->getValues(newEff->getLinearIndex(binIndex)).first == 5 );
+    CPPUNIT_ASSERT( newEff->getValues(newEff->getLinearIndex(binIndex)).second == 2 );
+
+    // Cut the values for variables[2] > 50, it will give 0 entries and -1 for the value
+    eff->cut(3, 0., 50.);
+    CPPUNIT_ASSERT(eff->getEff(binIndex) == -1);
+    CPPUNIT_ASSERT(eff->getValues(eff->getLinearIndex(binIndex)).first == 0);
+    CPPUNIT_ASSERT(eff->getValues(eff->getLinearIndex(binIndex)).second == 0);
+
+    // Reduce the size by projecting on the first 3 variables. There should be only 2/1 entries
+    newEff = eff->projectAndRebin(vKeep);
+    fillBinIndex(variables, binIndex, 3);
+    CPPUNIT_ASSERT( float(newEff->getEff(binIndex)) == 1./2. );
+    CPPUNIT_ASSERT( newEff->getValues(newEff->getLinearIndex(binIndex)).first == 2 );
+    CPPUNIT_ASSERT( newEff->getValues(newEff->getLinearIndex(binIndex)).second == 1 );
+  }
+
   CPPUNIT_TEST_SUITE( TestEfficiency );
   CPPUNIT_TEST( testLinearRepresentation );
   CPPUNIT_TEST( testParameters );
@@ -330,6 +380,7 @@ class TestEfficiency : public CppUnit::TestFixture
   CPPUNIT_TEST( testEffError );
   CPPUNIT_TEST( testProjectAndRebin );
   CPPUNIT_TEST( testAdd );
+  CPPUNIT_TEST( testCut );
   CPPUNIT_TEST_SUITE_END();
 
   std::auto_ptr<Efficiency> eff;
