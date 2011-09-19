@@ -42,8 +42,8 @@ void CompareHistograms() {
   // ************************************************************
   // List of Files
   FileList->Add( TFile::Open("Default/4.17_RunMinBias2011A+RunMinBias2011A+RECOD+HARVESTD+SKIMD/DQM_V0001_R000165121__Global__CMSSW_X_Y_Z__RECO.root") );    // 1
-  // FileList->Add( TFile::Open("RunInfoRemoval/4.17_RunMinBias2011A+RunMinBias2011A+RECOD+HARVESTD+SKIMD/DQM_V0001_R000165121__Global__CMSSW_X_Y_Z__RECO.root") );    // 2
-  FileList->Add( TFile::Open("SiStripDetCablingChange/4.17_RunMinBias2011A+RunMinBias2011A+RECOD+HARVESTD+SKIMD/DQM_V0001_R000165121__Global__CMSSW_X_Y_Z__RECO.root") );    // 2
+  FileList->Add( TFile::Open("RunInfoRemoval/4.17_RunMinBias2011A+RunMinBias2011A+RECOD+HARVESTD+SKIMD/DQM_V0001_R000165121__Global__CMSSW_X_Y_Z__RECO.root") );    // 2
+  // FileList->Add( TFile::Open("SiStripDetCablingChange/4.17_RunMinBias2011A+RunMinBias2011A+RECOD+HARVESTD+SKIMD/DQM_V0001_R000165121__Global__CMSSW_X_Y_Z__RECO.root") );    // 2
   // FileList->Add( TFile::Open("CrossCheck/4.17_RunMinBias2011A+RunMinBias2011A+RECOD+HARVESTD+SKIMD/DQM_V0001_R000165121__Global__CMSSW_X_Y_Z__RECO.root") );    // 2
 
   CompareRootfile( Target, FileList );
@@ -112,21 +112,17 @@ void CompareRootfile( TDirectory *target, TList *sourcelist ) {
             exit(1);
           }
           // 0 is the underflow and nBins+1 is the overflow.
-          double diff = 0.;
+          long double diff = 0.;
           for( int iBin = 1; iBin <= h1->GetNbinsX(); ++iBin ) {
 
             // Using long double for precision. This could still fail for approximations
             long double binH1 = h1->GetBinContent(iBin);
             long double binH2 = h2->GetBinContent(iBin);
 
-            // if ( string(h1->GetName()).find("hLikeVSMu_LikelihoodVSPt_prof") != string::npos ) {
-            //   cout << "h1["<<iBin<<"] = " << binH1 << ", h2["<<iBin<<"] = " << binH2 << endl;
-            // }
-
             // Sum only if the bin contents are different (to avoid approximation errors)
             //if( binH1 != binH2 ) {
-              diff = binH1 - binH2;
-              // cout << "binH1 = " << binH1 << ", binH2 = " << binH2 << endl;
+	    diff += fabs(binH1 - binH2);
+	    // cout << "binH1 = " << binH1 << ", binH2 = " << binH2 << endl;
             //}
 
           }
@@ -145,7 +141,7 @@ void CompareRootfile( TDirectory *target, TList *sourcelist ) {
       // it's a subdirectory
 
       TString tempName(obj->GetName());
-      if( tempName.Contains("DQM") || tempName.Contains("Run") || tempName.Contains("SiStrip") || tempName.Contains("Tracking") || tempName.Contains("MechanicalView")
+      if( tempName.Contains("DQM") || tempName.Contains("Run") || tempName.Contains("SiStrip") || tempName.Contains("MechanicalView")
 	  || tempName.Contains("TIB") || tempName.Contains("TOB") || tempName.Contains("TID") || tempName.Contains("TEC") || tempName.Contains("side") || tempName.Contains("wheel")
 	  || tempName.Contains("Bad") || tempName.Contains("layer") || tempName.Contains("Track") || tempName.Contains("Beam") || tempName.Contains("General") || tempName.Contains("Hit") ) {
 
@@ -175,7 +171,7 @@ void CompareRootfile( TDirectory *target, TList *sourcelist ) {
       target->cd();
 
       if( obj->IsA()->InheritsFrom( "TH1" ) ) {
-	if( !obj->IsA()->InheritsFrom( "TH2" ) && obj->IsA()->InheritsFrom( "THStack" ) ) {
+	if( !obj->IsA()->InheritsFrom( "TH2" ) && !obj->IsA()->InheritsFrom( "THStack" ) ) {
 	  // Write the superimposed histograms to file
 	  //obj->Write( key->GetName() );
 	  TCanvas canvas( TString(obj->GetName())+"Canvas", TString(obj->GetName())+" canvas", 1000, 800 );
