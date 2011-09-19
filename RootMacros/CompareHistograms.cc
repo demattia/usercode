@@ -106,7 +106,7 @@ void CompareRootfile( TDirectory *target, TList *sourcelist ) {
             exit(1);
           }
           // 0 is the underflow and nBins+1 is the overflow.
-          double diff = 0.;
+          long double diff = 0.;
           for( int iBin = 1; iBin <= h1->GetNbinsX(); ++iBin ) {
 
             // Using long double for precision. This could still fail for approximations
@@ -119,7 +119,7 @@ void CompareRootfile( TDirectory *target, TList *sourcelist ) {
 
             // Sum only if the bin contents are different (to avoid approximation errors)
             //if( binH1 != binH2 ) {
-              diff = binH1 - binH2;
+	    diff += fabs(binH1 - binH2);
               // cout << "binH1 = " << binH1 << ", binH2 = " << binH2 << endl;
             //}
 
