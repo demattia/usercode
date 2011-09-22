@@ -18,10 +18,10 @@ if [ -e "$1" ]; then
     fileEnd=`echo $1 | awk -F. '{print $2}'`
     if [ "$fileEnd" == "includes" ]; then
 	mv "$1" "$1.backup"
-	pwd >> $1
-	echo "$CMSSW_RELEASE_BASE" >> $1
-	echo "${ROOTSYS}/include" >> $1
-	echo "/cms/slc5_amd64_gcc434/external/boost/1.44.0-cms/include" >> $1
+	pwd | sed s@/afs/cern.ch@/Users/demattia/afs@g >> $1
+	echo "$CMSSW_RELEASE_BASE" | sed s@/afs/cern.ch@/Users/demattia/afs@g >> $1
+	echo "${ROOTSYS}/include" | sed s@/afs/cern.ch@/Users/demattia/afs@g >> $1
+	echo "/afs/cern.ch/cms/slc5_amd64_gcc434/external/boost/1.44.0-cms/include" | sed s@/afs/cern.ch@/Users/demattia/afs@g >> $1
     else
 	echo "Error:include file does not end in .includes"
     fi
