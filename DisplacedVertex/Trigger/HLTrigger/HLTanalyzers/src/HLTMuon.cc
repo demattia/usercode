@@ -14,7 +14,7 @@
 HLTMuon::HLTMuon() {
   evtCounter=0;
 
-  //set parameter defaults
+  //set parameter defaults 
   _Monte=false;
   _Debug=false;
 }
@@ -26,7 +26,7 @@ void HLTMuon::setup(const edm::ParameterSet& pSet, TTree* HltTree) {
   std::vector<std::string> parameterNames = myEmParams.getParameterNames() ;
 
   for ( std::vector<std::string>::iterator iParam = parameterNames.begin();
-        iParam != parameterNames.end(); iParam++ ){
+	iParam != parameterNames.end(); iParam++ ){
     if  ( (*iParam) == "Monte" ) _Monte =  myEmParams.getParameter<bool>( *iParam );
     else if ( (*iParam) == "Debug" ) _Debug =  myEmParams.getParameter<bool>( *iParam );
   }
@@ -57,8 +57,8 @@ void HLTMuon::setup(const edm::ParameterSet& pSet, TTree* HltTree) {
   muonl2pterr = new float[kMaxMuonL2];
   muonl2iso = new int[kMaxMuonL2];
   muonl2nhits = new int[kMaxMuonL2];
-  muonl2nchambers = new int[kMaxMuonL2];
-  muonl2nstat = new int[kMaxMuonL2];
+  muonl2nchambers = new int[kMaxMuonL2]; 
+  muonl2nstat = new int[kMaxMuonL2]; 
   muonl21idx = new int[kMaxMuonL2];
   const int kMaxMuonL3 = 500;
   muonl3pt = new float[kMaxMuonL3];
@@ -70,6 +70,7 @@ void HLTMuon::setup(const edm::ParameterSet& pSet, TTree* HltTree) {
   muonl3chg = new int[kMaxMuonL3];
   muonl3pterr = new float[kMaxMuonL3];
   muonl3iso = new int[kMaxMuonL3];
+  muonl3trk10iso = new int[kMaxMuonL3];
   muonl3nhits = new int[kMaxMuonL3];
   muonl3normchi2 = new float[kMaxMuonL3];
   muonl3ntrackerhits = new int[kMaxMuonL3];
@@ -93,17 +94,17 @@ void HLTMuon::setup(const edm::ParameterSet& pSet, TTree* HltTree) {
   oniaTrackchg = new int[kMaxTrackPixel];
   oniaTrackHits = new int[kMaxTrackPixel];
   oniaTrackNormChi2 = new float[kMaxTrackPixel];
-  const int kMaxMuonL2NoVtx = 500;
-  muonl2novtxpt = new float[kMaxMuonL2NoVtx];
-  muonl2novtxphi = new float[kMaxMuonL2NoVtx];
-  muonl2novtxeta = new float[kMaxMuonL2NoVtx];
-  muonl2novtxdr = new float[kMaxMuonL2NoVtx];
-  muonl2novtxdz = new float[kMaxMuonL2NoVtx];
-  muonl2novtxchg = new int[kMaxMuonL2NoVtx];
-  muonl2novtxpterr = new float[kMaxMuonL2NoVtx];
+  const int kMaxMuonL2NoVtx = 500; 
+  muonl2novtxpt = new float[kMaxMuonL2NoVtx]; 
+  muonl2novtxphi = new float[kMaxMuonL2NoVtx]; 
+  muonl2novtxeta = new float[kMaxMuonL2NoVtx]; 
+  muonl2novtxdr = new float[kMaxMuonL2NoVtx]; 
+  muonl2novtxdz = new float[kMaxMuonL2NoVtx]; 
+  muonl2novtxchg = new int[kMaxMuonL2NoVtx]; 
+  muonl2novtxpterr = new float[kMaxMuonL2NoVtx]; 
   muonl2novtxnhits = new int[kMaxMuonL2NoVtx];
   muonl2novtxnchambers = new int[kMaxMuonL2NoVtx];
-  muonl2novtx1idx = new int[kMaxMuonL2NoVtx];
+  muonl2novtx1idx = new int[kMaxMuonL2NoVtx]; 
   const int kMaxDiMu = 500;
   dimudca = new float[kMaxDiMu];
   dimu1st = new int[kMaxDiMu];
@@ -121,7 +122,7 @@ void HLTMuon::setup(const edm::ParameterSet& pSet, TTree* HltTree) {
   dimuvtxmu2dipsigmax = new float[kMaxDiMuVtx];
   dimuvtxmu2dipsigmin = new float[kMaxDiMuVtx];
 
-  // Muon-specific branches of the tree
+  // Muon-specific branches of the tree 
   HltTree->Branch("NrecoMuon",&nmuon,"NrecoMuon/I");
   HltTree->Branch("recoMuonPt",muonpt,"recoMuonPt[NrecoMuon]/F");
   HltTree->Branch("recoMuonPhi",muonphi,"recoMuonPhi[NrecoMuon]/F");
@@ -149,9 +150,9 @@ void HLTMuon::setup(const edm::ParameterSet& pSet, TTree* HltTree) {
   HltTree->Branch("ohMuL2Dz",muonl2dz,"ohMuL2Dz[NohMuL2]/F");
   HltTree->Branch("ohMuL2VtxZ",muonl2vtxz,"ohMuL2VtxZ[NohMuL2]/F");
   HltTree->Branch("ohMuL2Nhits",muonl2nhits,"ohMuL2Nhits[NohMuL2]/I");
-  HltTree->Branch("ohMuL2Nchambers",muonl2nchambers,"ohMuL2Nchambers[NohMuL2]/I");
-  HltTree->Branch("ohMuL2Nstat",muonl2nstat,"ohMuL2Nstat[NohMuL2]/I");
-  HltTree->Branch("ohMuL2L1idx",muonl21idx,"ohMuL2L1idx[NohMuL2]/I");
+  HltTree->Branch("ohMuL2Nchambers",muonl2nchambers,"ohMuL2Nchambers[NohMuL2]/I");   
+  HltTree->Branch("ohMuL2Nstat",muonl2nstat,"ohMuL2Nstat[NohMuL2]/I");   
+  HltTree->Branch("ohMuL2L1idx",muonl21idx,"ohMuL2L1idx[NohMuL2]/I");   
   HltTree->Branch("NohMuL3",&nmu3cand,"NohMuL3/I");
   HltTree->Branch("ohMuL3Pt",muonl3pt,"ohMuL3Pt[NohMuL3]/F");
   HltTree->Branch("ohMuL3Phi",muonl3phi,"ohMuL3Phi[NohMuL3]/F");
@@ -159,13 +160,14 @@ void HLTMuon::setup(const edm::ParameterSet& pSet, TTree* HltTree) {
   HltTree->Branch("ohMuL3Chg",muonl3chg,"ohMuL3Chg[NohMuL3]/I");
   HltTree->Branch("ohMuL3PtErr",muonl3pterr,"ohMuL3PtErr[NohMuL3]/F");
   HltTree->Branch("ohMuL3Iso",muonl3iso,"ohMuL3Iso[NohMuL3]/I");
+  HltTree->Branch("ohMuL3Trk10Iso",muonl3trk10iso,"ohMuL3Trk10Iso[NohMuL3]/I");
   HltTree->Branch("ohMuL3Dr",muonl3dr,"ohMuL3Dr[NohMuL3]/F");
   HltTree->Branch("ohMuL3Dz",muonl3dz,"ohMuL3Dz[NohMuL3]/F");
   HltTree->Branch("ohMuL3VtxZ",muonl3vtxz,"ohMuL3VtxZ[NohMuL3]/F");
-  HltTree->Branch("ohMuL3Nhits",muonl3nhits,"ohMuL3Nhits[NohMuL3]/I");
+  HltTree->Branch("ohMuL3Nhits",muonl3nhits,"ohMuL3Nhits[NohMuL3]/I");    
   HltTree->Branch("ohMuL3NormChi2", muonl3normchi2, "ohMuL3NormChi2[NohMuL3]/F");
-  HltTree->Branch("ohMuL3Ntrackerhits", muonl3ntrackerhits, "ohMuL3Ntrackerhits[NohMuL3]/I");
-  HltTree->Branch("ohMuL3Nmuonhits", muonl3nmuonhits, "ohMuL3Nmuonhits[NohMuL3]/I");
+  HltTree->Branch("ohMuL3Ntrackerhits", muonl3ntrackerhits, "ohMuL3Ntrackerhits[NohMuL3]/I"); 
+  HltTree->Branch("ohMuL3Nmuonhits", muonl3nmuonhits, "ohMuL3Nmuonhits[NohMuL3]/I"); 
   HltTree->Branch("ohMuL3L2idx",muonl32idx,"ohMuL3L2idx[NohMuL3]/I");
   HltTree->Branch("NohOniaPixel",&nOniaPixelCand,"NohOniaPixel/I");
   HltTree->Branch("ohOniaPixelPt",oniaPixelpt,"ohOniaPixelPt[NohOniaPixel]/F");
@@ -185,56 +187,57 @@ void HLTMuon::setup(const edm::ParameterSet& pSet, TTree* HltTree) {
   HltTree->Branch("ohOniaTrackDz",oniaTrackdz,"ohOniaTrackDz[NohOniaTrack]/F");
   HltTree->Branch("ohOniaTrackHits",oniaTrackHits,"ohOniaTrackHits[NohOniaTrack]/I");
   HltTree->Branch("ohOniaTrackNormChi2",oniaTrackNormChi2,"ohOniaTrackNormChi2[NohOniaTrack]/F");
-  HltTree->Branch("NohMuL2NoVtx",&nmu2cand,"NohMuL2NoVtx/I");
-  HltTree->Branch("ohMuL2NoVtxPt",muonl2novtxpt,"ohMuL2NoVtxPt[NohMuL2NoVtx]/F");
-  HltTree->Branch("ohMuL2NoVtxPhi",muonl2novtxphi,"ohMuL2NoVtxPhi[NohMuL2NoVtx]/F");
-  HltTree->Branch("ohMuL2NoVtxEta",muonl2novtxeta,"ohMuL2NoVtxEta[NohMuL2NoVtx]/F");
-  HltTree->Branch("ohMuL2NoVtxChg",muonl2novtxchg,"ohMuL2NoVtxChg[NohMuL2NoVtx]/I");
-  HltTree->Branch("ohMuL2NoVtxPtErr",muonl2novtxpterr,"ohMuL2NoVtxPtErr[NohMuL2NoVtx]/F");
-  HltTree->Branch("ohMuL2NoVtxDr",muonl2novtxdr,"ohMuL2NoVtxDr[NohMuL2NoVtx]/F");
-  HltTree->Branch("ohMuL2NoVtxDz",muonl2novtxdz,"ohMuL2NoVtxDz[NohMuL2NoVtx]/F");
+  HltTree->Branch("NohMuL2NoVtx",&nmu2cand,"NohMuL2NoVtx/I"); 
+  HltTree->Branch("ohMuL2NoVtxPt",muonl2novtxpt,"ohMuL2NoVtxPt[NohMuL2NoVtx]/F"); 
+  HltTree->Branch("ohMuL2NoVtxPhi",muonl2novtxphi,"ohMuL2NoVtxPhi[NohMuL2NoVtx]/F"); 
+  HltTree->Branch("ohMuL2NoVtxEta",muonl2novtxeta,"ohMuL2NoVtxEta[NohMuL2NoVtx]/F"); 
+  HltTree->Branch("ohMuL2NoVtxChg",muonl2novtxchg,"ohMuL2NoVtxChg[NohMuL2NoVtx]/I"); 
+  HltTree->Branch("ohMuL2NoVtxPtErr",muonl2novtxpterr,"ohMuL2NoVtxPtErr[NohMuL2NoVtx]/F"); 
+  HltTree->Branch("ohMuL2NoVtxDr",muonl2novtxdr,"ohMuL2NoVtxDr[NohMuL2NoVtx]/F"); 
+  HltTree->Branch("ohMuL2NoVtxDz",muonl2novtxdz,"ohMuL2NoVtxDz[NohMuL2NoVtx]/F"); 
   HltTree->Branch("ohMuL2NoVtxNhits",muonl2novtxnhits,"ohMuL2NoVtxNhits[NohMuL2NoVtx]/I");
-  HltTree->Branch("ohMuL2NoVtxNchambers",muonl2novtxnchambers,"ohMuL2NoVtxNchambers[NohMuL2NoVtx]/I");
-  HltTree->Branch("ohMuL2NoVtxL1idx",muonl2novtx1idx,"ohMuL2NoVtxL1idx[NohMuL2NoVtx]/I");
-  HltTree->Branch("NohDiMu",&nDiMu,"NohDiMu/I");
-  HltTree->Branch("ohDiMuDCA",dimudca,"ohDiMuDCA[NohDiMu]/F");
-  HltTree->Branch("ohDiMu1st",dimu1st,"ohDiMu1st[NohDiMu]/I");
-  HltTree->Branch("ohDiMu2nd",dimu2nd,"ohDiMu2nd[NohDiMu]/I");
-  HltTree->Branch("NohDiMuVtx",&nDiMuVtx,"NohDiMuVtx/I");
-  HltTree->Branch("ohDiMuVtx1st",dimuvtx1st,"ohDiMuVtx1st[NohDiMuVtx]/I");
-  HltTree->Branch("ohDiMuVtx2nd",dimuvtx2nd,"ohDiMuVtx2nd[NohDiMuVtx]/I");
-  HltTree->Branch("ohDiMuVtxChi2",dimuvtxchi2,"ohDiMuVtxChi2[NohDiMuVtx]/F");
-  HltTree->Branch("ohDiMuVtxR",dimuvtxr,"ohDiMuVtxR[NohDiMuVtx]/F");
-  HltTree->Branch("ohDiMuVtxRSig",dimuvtxrsig,"ohDiMuVtxRSig[NohDiMuVtx]/F");
-  HltTree->Branch("ohDiMuVtxROverSig",dimuvtxroversig,"ohDiMuVtxROverSig[NohDiMuVtx]/F");
-  HltTree->Branch("ohDiMuVtxCosAlpha",dimuvtxcosalpha,"ohDiMuVtxCosAlpha[NohDiMuVtx]/F");
-  HltTree->Branch("ohDiMuVtxMu2DIpMax",dimuvtxmu2dipmax,"ohDiMuVtxMu2DIpMax[NohDiMuVtx]/F");
-  HltTree->Branch("ohDiMuVtxMu2DIpMin",dimuvtxmu2dipmin,"ohDiMuVtxMu2DIpMin[NohDiMuVtx]/F");
-  HltTree->Branch("ohDiMuVtxMu2DIpSigMax",dimuvtxmu2dipsigmax,"ohDiMuVtxMu2DIpSigMax[NohDiMuVtx]/F");
-  HltTree->Branch("ohDiMuVtxMu2DIpSigMin",dimuvtxmu2dipsigmin,"ohDiMuVtxMu2DIpSigMin[NohDiMuVtx]/F");
+  HltTree->Branch("ohMuL2NoVtxNchambers",muonl2novtxnchambers,"ohMuL2NoVtxNchambers[NohMuL2NoVtx]/I");  
+  HltTree->Branch("ohMuL2NoVtxL1idx",muonl2novtx1idx,"ohMuL2NoVtxL1idx[NohMuL2NoVtx]/I");   
+  HltTree->Branch("NohDiMu",&nDiMu,"NohDiMu/I");    
+  HltTree->Branch("ohDiMuDCA",dimudca,"ohDiMuDCA[NohDiMu]/F");    
+  HltTree->Branch("ohDiMu1st",dimu1st,"ohDiMu1st[NohDiMu]/I");    
+  HltTree->Branch("ohDiMu2nd",dimu2nd,"ohDiMu2nd[NohDiMu]/I");    
+  HltTree->Branch("NohDiMuVtx",&nDiMuVtx,"NohDiMuVtx/I");    
+  HltTree->Branch("ohDiMuVtx1st",dimuvtx1st,"ohDiMuVtx1st[NohDiMuVtx]/I");    
+  HltTree->Branch("ohDiMuVtx2nd",dimuvtx2nd,"ohDiMuVtx2nd[NohDiMuVtx]/I");    
+  HltTree->Branch("ohDiMuVtxChi2",dimuvtxchi2,"ohDiMuVtxChi2[NohDiMuVtx]/F");    
+  HltTree->Branch("ohDiMuVtxR",dimuvtxr,"ohDiMuVtxR[NohDiMuVtx]/F");    
+  HltTree->Branch("ohDiMuVtxRSig",dimuvtxrsig,"ohDiMuVtxRSig[NohDiMuVtx]/F");    
+  HltTree->Branch("ohDiMuVtxROverSig",dimuvtxroversig,"ohDiMuVtxROverSig[NohDiMuVtx]/F");    
+  HltTree->Branch("ohDiMuVtxCosAlpha",dimuvtxcosalpha,"ohDiMuVtxCosAlpha[NohDiMuVtx]/F");    
+  HltTree->Branch("ohDiMuVtxMu2DIpMax",dimuvtxmu2dipmax,"ohDiMuVtxMu2DIpMax[NohDiMuVtx]/F");    
+  HltTree->Branch("ohDiMuVtxMu2DIpMin",dimuvtxmu2dipmin,"ohDiMuVtxMu2DIpMin[NohDiMuVtx]/F");    
+  HltTree->Branch("ohDiMuVtxMu2DIpSigMax",dimuvtxmu2dipsigmax,"ohDiMuVtxMu2DIpSigMax[NohDiMuVtx]/F");    
+  HltTree->Branch("ohDiMuVtxMu2DIpSigMin",dimuvtxmu2dipsigmin,"ohDiMuVtxMu2DIpSigMin[NohDiMuVtx]/F");    
 
 }
 
 /* **Analyze the event** */
 void HLTMuon::analyze(const edm::Handle<reco::MuonCollection>                 & Muon,
-                      const edm::Handle<l1extra::L1MuonParticleCollection>    & MuCands1,
-                      const edm::Handle<reco::RecoChargedCandidateCollection> & MuCands2,
-                      const edm::Handle<edm::ValueMap<bool> >                 & isoMap2,
-                      const edm::Handle<reco::RecoChargedCandidateCollection> & MuCands3,
-                      const edm::Handle<edm::ValueMap<bool> >                 & isoMap3,
-                      const edm::Handle<reco::RecoChargedCandidateCollection> & oniaPixelCands,
-                      const edm::Handle<reco::RecoChargedCandidateCollection> & oniaTrackCands,
-                      const edm::Handle<reco::VertexCollection> & DiMuVtxCands3,
-                      const edm::Handle<reco::RecoChargedCandidateCollection> & MuNoVtxCands2,
-                      const edm::ESHandle<MagneticField> & theMagField,
-                      const edm::Handle<reco::BeamSpot> & recoBeamSpotHandle,
+		      const edm::Handle<l1extra::L1MuonParticleCollection>    & MuCands1, 
+		      const edm::Handle<reco::RecoChargedCandidateCollection> & MuCands2,
+		      const edm::Handle<edm::ValueMap<bool> >                 & isoMap2,
+		      const edm::Handle<reco::RecoChargedCandidateCollection> & MuCands3,
+		      const edm::Handle<edm::ValueMap<bool> >                 & isoMap3,
+		      const edm::Handle<edm::ValueMap<bool> >                 & isoTrk10Map3,
+		      const edm::Handle<reco::RecoChargedCandidateCollection> & oniaPixelCands,
+		      const edm::Handle<reco::RecoChargedCandidateCollection> & oniaTrackCands,
+		      const edm::Handle<reco::VertexCollection> & DiMuVtxCands3,
+		      const edm::Handle<reco::RecoChargedCandidateCollection> & MuNoVtxCands2, 
+		      const edm::ESHandle<MagneticField> & theMagField,
+		      const edm::Handle<reco::BeamSpot> & recoBeamSpotHandle,
 		      TTree* HltTree) {
 
   reco::BeamSpot::Point BSPosition(0,0,0);
   BSPosition = recoBeamSpotHandle->position();
   const GlobalPoint theBeamSpot = GlobalPoint(recoBeamSpotHandle->position().x(),
-                                              recoBeamSpotHandle->position().y(),
-                                              recoBeamSpotHandle->position().z());
+					      recoBeamSpotHandle->position().y(),
+					      recoBeamSpotHandle->position().z());
   reco::BeamSpot vtxBS = *recoBeamSpotHandle;
 
   //std::cout << " Beginning HLTMuon " << std::endl;
@@ -246,45 +249,45 @@ void HLTMuon::analyze(const edm::Handle<reco::MuonCollection>                 & 
     nmuon = mymuons.size();
     typedef reco::MuonCollection::const_iterator muiter;
     int imu=0;
-    for (muiter i=mymuons.begin(); i!=mymuons.end(); i++)
-    {
-      muonpt[imu]         = i->pt();
-      muonphi[imu]        = i->phi();
-      muoneta[imu]        = i->eta();
-      muonet[imu]         = i->et();
-      muone[imu]          = i->energy();
-      muontype[imu]       = i->type();
-      muoncharge[imu]     = i->charge();
-      muonTrkIsoR03[imu]  = i->isolationR03().sumPt;
-      muonECalIsoR03[imu] = i->isolationR03().emEt;
-      muonHCalIsoR03[imu] = i->isolationR03().hadEt;
-
-
-      if (i->globalTrack().isNonnull())
+    for (muiter i=mymuons.begin(); i!=mymuons.end(); i++) 
       {
-        muonchi2NDF[imu] = i->globalTrack()->normalizedChi2();
-        muonD0[imu] = i->globalTrack()->dxy(BSPosition);
+	muonpt[imu]         = i->pt();
+	muonphi[imu]        = i->phi();
+	muoneta[imu]        = i->eta();
+	muonet[imu]         = i->et();
+	muone[imu]          = i->energy(); 
+	muontype[imu]       = i->type();
+	muoncharge[imu]     = i->charge(); 
+	muonTrkIsoR03[imu]  = i->isolationR03().sumPt;
+	muonECalIsoR03[imu] = i->isolationR03().emEt;
+	muonHCalIsoR03[imu] = i->isolationR03().hadEt;
+
+
+	if (i->globalTrack().isNonnull())
+	  {
+	    muonchi2NDF[imu] = i->globalTrack()->normalizedChi2();
+	    muonD0[imu] = i->globalTrack()->dxy(BSPosition);
+	  }
+	else 
+	  {
+	    muonchi2NDF[imu] = -99.;
+	    muonD0[imu] = -99.;}
+
+	if (i->innerTrack().isNonnull()) muonNValidTrkHits[imu] = i->innerTrack()->numberOfValidHits();
+	else muonNValidTrkHits[imu] = -99;
+
+	if (i->isGlobalMuon()!=0) muonNValidMuonHits[imu] = i->globalTrack()->hitPattern().numberOfValidMuonHits();
+	else muonNValidMuonHits[imu] = -99;
+
+	imu++;
       }
-      else
-      {
-        muonchi2NDF[imu] = -99.;
-        muonD0[imu] = -99.;}
-
-      if (i->innerTrack().isNonnull()) muonNValidTrkHits[imu] = i->innerTrack()->numberOfValidHits();
-      else muonNValidTrkHits[imu] = -99;
-
-      if (i->isGlobalMuon()!=0) muonNValidMuonHits[imu] = i->globalTrack()->hitPattern().numberOfValidMuonHits();
-      else muonNValidMuonHits[imu] = -99;
-
-      imu++;
-    }
   }
   else {nmuon = 0;}
 
-  l1extra::L1MuonParticleCollection myMucands1;
-  myMucands1 = * MuCands1;
+  l1extra::L1MuonParticleCollection myMucands1; 
+  myMucands1 = * MuCands1; 
   //  reco::RecoChargedCandidateCollection myMucands1;
-  std::sort(myMucands1.begin(),myMucands1.end(),PtGreater());
+  std::sort(myMucands1.begin(),myMucands1.end(),PtGreater()); 
 
   /////////////////////////////// Open-HLT muons ///////////////////////////////
 
@@ -342,34 +345,34 @@ void HLTMuon::analyze(const edm::Handle<reco::MuonCollection>                 & 
       muonl2chg[imu2c] = tk->charge();
 
       if (isoMap2.isValid()){
-        // Isolation flag (this is a bool value: true => isolated)
-        edm::ValueMap<bool> ::value_type muon1IsIsolated = (*isoMap2)[tk];
-        muonl2iso[imu2c] = muon1IsIsolated;
+	// Isolation flag (this is a bool value: true => isolated)
+	edm::ValueMap<bool> ::value_type muon1IsIsolated = (*isoMap2)[tk];
+	muonl2iso[imu2c] = muon1IsIsolated;
       }
       else {muonl2iso[imu2c] = -999;}
 
       //JH
-      l1extra::L1MuonParticleRef l1;
-      int il2 = 0;
-      //find the corresponding L1
+      l1extra::L1MuonParticleRef l1; 
+      int il2 = 0; 
+      //find the corresponding L1 
       l1 = tk->seedRef().castTo<edm::Ref< L2MuonTrajectorySeedCollection> >()->l1Particle();
-      il2++;
-      int imu1idx = 0;
-      if (MuCands1.isValid()) {
-        typedef l1extra::L1MuonParticleCollection::const_iterator candl1;
-        for (candl1 j=myMucands1.begin(); j!=myMucands1.end(); j++) {
-          if((j->pt() == l1->pt()) &&
-             (j->eta() == l1->eta()) &&
-             (j->phi() == l1->phi()) &&
-             (j->gmtMuonCand().quality() == l1->gmtMuonCand().quality()))
-          {break;}
-          //	  std::cout << << std::endl;
-          //          if ( tkl1 == l1 ) {break;}
-          imu1idx++;
-        }
-      }
-      else {imu1idx = -999;}
-      muonl21idx[imu2c] = imu1idx; // Index of the L1 muon having matched with the L2 muon with index imu2c
+      il2++; 
+      int imu1idx = 0; 
+      if (MuCands1.isValid()) { 
+	typedef l1extra::L1MuonParticleCollection::const_iterator candl1; 
+	for (candl1 j=myMucands1.begin(); j!=myMucands1.end(); j++) { 
+	  if((j->pt() == l1->pt()) &&
+	     (j->eta() == l1->eta()) &&
+	     (j->phi() == l1->phi()) &&
+	     (j->gmtMuonCand().quality() == l1->gmtMuonCand().quality()))
+	    {break;}
+	  //	  std::cout << << std::endl;
+	  //          if ( tkl1 == l1 ) {break;} 
+	  imu1idx++; 
+	} 
+      } 
+      else {imu1idx = -999;} 
+      muonl21idx[imu2c] = imu1idx; // Index of the L1 muon having matched with the L2 muon with index imu2c 
       //end JH
 
       imu2c++;
@@ -397,12 +400,12 @@ void HLTMuon::analyze(const edm::Handle<reco::MuonCollection>                 & 
       il3++;
       int imu2idx = 0;
       if (MuCands2.isValid()) {
-        typedef reco::RecoChargedCandidateCollection::const_iterator candl2;
-        for (candl2 i=myMucands2.begin(); i!=myMucands2.end(); i++) {
-          reco::TrackRef tkl2 = i->get<reco::TrackRef>();
-          if ( tkl2 == staTrack ) {break;}
-          imu2idx++;
-        }
+	typedef reco::RecoChargedCandidateCollection::const_iterator candl2;
+	for (candl2 i=myMucands2.begin(); i!=myMucands2.end(); i++) {
+	  reco::TrackRef tkl2 = i->get<reco::TrackRef>();
+	  if ( tkl2 == staTrack ) {break;}
+	  imu2idx++;
+	}
       }
       else {imu2idx = -999;}
       muonl32idx[imu3c] = imu2idx; // Index of the L2 muon having matched with the L3 muon with index imu3c
@@ -421,7 +424,7 @@ void HLTMuon::analyze(const edm::Handle<reco::MuonCollection>                 & 
       //       // For baseline triggers, we do no cut (|dz|<9999 cm), neither at L2 nor at L3
       muonl3dz[imu3c] = tk->dz(BSPosition);
       muonl3vtxz[imu3c] = tk->dz();
-      muonl3nhits[imu3c] = tk->numberOfValidHits();
+      muonl3nhits[imu3c] = tk->numberOfValidHits();  
 
       //       // At present we do not cut on this, but on a 90% CL value "ptLx" defined here below
       //       // We should change this in the future and cut directly on "pt", to avoid unnecessary complications and risks
@@ -451,31 +454,39 @@ void HLTMuon::analyze(const edm::Handle<reco::MuonCollection>                 & 
       muonl3nmuonhits[imu3c] = tk->hitPattern().numberOfValidMuonHits();
 
       if (isoMap3.isValid()){
-        // Isolation flag (this is a bool value: true => isolated)
-        edm::ValueMap<bool> ::value_type muon1IsIsolated = (*isoMap3)[tk];
-        muonl3iso[imu3c] = muon1IsIsolated;
+	// Isolation flag (this is a bool value: true => isolated)
+	edm::ValueMap<bool> ::value_type muon1IsIsolated = (*isoMap3)[tk];
+	muonl3iso[imu3c] = muon1IsIsolated;
       }
       else {muonl3iso[imu3c] = -999;}
+
+      if (isoTrk10Map3.isValid()){
+	// Isolation flag (this is a bool value: true => isolated) 
+	edm::ValueMap<bool> ::value_type muon1IsTrk10Isolated = (*isoTrk10Map3)[tk];
+	muonl3trk10iso[imu3c] = muon1IsTrk10Isolated;
+      }
+      else {muonl3trk10iso[imu3c] =-999;}
+
       //Check DCA for muon combinations
       int imu3c2nd = imu3c + 1;// This will be the index in the hltTree for the 2nd muon of the dimuon combination
 
       for (cand j=i; j!=myMucands3.end(); j++) if (i!=j) {//Loop over all L3 muons from the one we are already treating
-        reco::TrackRef tk2nd = j->get<reco::TrackRef>();
-        reco::TransientTrack transMu1(*tk, &(*theMagField) );
-        reco::TransientTrack transMu2(*tk2nd, &(*theMagField) );
-        TrajectoryStateClosestToPoint mu1TS = transMu1.impactPointTSCP();
-        TrajectoryStateClosestToPoint mu2TS = transMu2.impactPointTSCP();
-        if (mu1TS.isValid() && mu2TS.isValid()) {
-          ClosestApproachInRPhi cApp;
-          cApp.calculate(mu1TS.theState(), mu2TS.theState());
-          if (cApp.status()) {
-            dimudca[idimuc] = cApp.distance();//Save the DCA
-            dimu1st[idimuc] = imu3c;//Save which is the index in the hltTree for the 1st muon
-            dimu2nd[idimuc] = imu3c2nd;//Save which is the index in the hltTree for the 2nd muon
-            idimuc++;
-          }
-        }
-        imu3c2nd++;
+	reco::TrackRef tk2nd = j->get<reco::TrackRef>();
+	reco::TransientTrack transMu1(*tk, &(*theMagField) );
+	reco::TransientTrack transMu2(*tk2nd, &(*theMagField) );
+	TrajectoryStateClosestToPoint mu1TS = transMu1.impactPointTSCP();
+	TrajectoryStateClosestToPoint mu2TS = transMu2.impactPointTSCP();
+	if (mu1TS.isValid() && mu2TS.isValid()) {
+	  ClosestApproachInRPhi cApp;
+	  cApp.calculate(mu1TS.theState(), mu2TS.theState());
+	  if (cApp.status()) {
+	    dimudca[idimuc] = cApp.distance();//Save the DCA
+	    dimu1st[idimuc] = imu3c;//Save which is the index in the hltTree for the 1st muon
+	    dimu2nd[idimuc] = imu3c2nd;//Save which is the index in the hltTree for the 2nd muon
+	    idimuc++;
+	  }
+	}
+	imu3c2nd++;
       }
 
       imu3c++;
@@ -500,18 +511,18 @@ void HLTMuon::analyze(const edm::Handle<reco::MuonCollection>                 & 
       reco::TrackRef vertextkRef2 = (*trackIt).castTo<reco::TrackRef>();
       dimuvtx2nd[idimu3c] = -1; dimuvtx1st[idimu3c] = -1;
       for (int j=0 ; j<nmu3cand ; j++){
-        if(fabs(muonl3pt[j] - vertextkRef1->pt()) < 0.0001 && fabs(muonl3eta[j] - vertextkRef1->eta()) < 0.0001 && fabs(muonl3phi[j] - vertextkRef1->phi()) < 0.0001) dimuvtx1st[idimu3c] = j;
-        if(fabs(muonl3pt[j] - vertextkRef2->pt()) < 0.0001 && fabs(muonl3eta[j] - vertextkRef2->eta()) < 0.0001 && fabs(muonl3phi[j] - vertextkRef2->phi()) < 0.0001) dimuvtx2nd[idimu3c] = j;
+	if(fabs(muonl3pt[j] - vertextkRef1->pt()) < 0.0001 && fabs(muonl3eta[j] - vertextkRef1->eta()) < 0.0001 && fabs(muonl3phi[j] - vertextkRef1->phi()) < 0.0001) dimuvtx1st[idimu3c] = j; 
+	if(fabs(muonl3pt[j] - vertextkRef2->pt()) < 0.0001 && fabs(muonl3eta[j] - vertextkRef2->eta()) < 0.0001 && fabs(muonl3phi[j] - vertextkRef2->phi()) < 0.0001) dimuvtx2nd[idimu3c] = j; 
       }
-      math::XYZVector pperp(vertextkRef1->px() + vertextkRef2->px(),
-                            vertextkRef1->py() + vertextkRef2->py(),
-                            0.);
+      math::XYZVector pperp(vertextkRef1->px() + vertextkRef2->px(), 
+			    vertextkRef1->py() + vertextkRef2->py(), 
+			    0.);
       reco::Vertex::Point vpoint = ivtx->position();
       GlobalPoint vtxPos (vpoint.x(), vpoint.y(), vpoint.z());
       reco::Vertex::Error verr = ivtx->error();
       GlobalError vtxErr (verr.At(0,0),verr.At(1,0),verr.At(1,1),verr.At(2,0),verr.At(2,1),verr.At(2,2));
       GlobalPoint vtxDisFromBS(-1*((vtxBS.x0() - vtxPos.x()) + (vtxPos.z() - vtxBS.z0())*vtxBS.dxdz()),
-                               -1*((vtxBS.y0() - vtxPos.y()) + (vtxPos.z() - vtxBS.z0())*vtxBS.dydz()), 0.0);
+			       -1*((vtxBS.y0() - vtxPos.y()) + (vtxPos.z() - vtxBS.z0())*vtxBS.dydz()), 0.0);
       dimuvtxr[idimu3c] = vtxDisFromBS.perp();
       dimuvtxrsig[idimu3c] = sqrt(vtxErr.rerr(vtxDisFromBS));
       dimuvtxroversig[idimu3c] = dimuvtxr[idimu3c]/dimuvtxrsig[idimu3c];
@@ -524,14 +535,14 @@ void HLTMuon::analyze(const edm::Handle<reco::MuonCollection>                 & 
       reco::TransientTrack transMu1(*vertextkRef1, &(*theMagField) );
       TrajectoryStateClosestToPoint trajMu1BS = transMu1.trajectoryStateClosestToPoint(theBeamSpot);
       if(trajMu1BS.isValid()){
-        mu1ip = fabs(trajMu1BS.perigeeParameters().transverseImpactParameter());
-        if(trajMu1BS.hasError()) mu1ipsig = mu1ip/trajMu1BS.perigeeError().transverseImpactParameterError();
+	mu1ip = fabs(trajMu1BS.perigeeParameters().transverseImpactParameter());
+	if(trajMu1BS.hasError()) mu1ipsig = mu1ip/trajMu1BS.perigeeError().transverseImpactParameterError();
       }
       reco::TransientTrack transMu2(*vertextkRef2, &(*theMagField) );
       TrajectoryStateClosestToPoint trajMu2BS = transMu2.trajectoryStateClosestToPoint(theBeamSpot);
       if(trajMu2BS.isValid()){
-        mu2ip = fabs(trajMu2BS.perigeeParameters().transverseImpactParameter());
-        if(trajMu2BS.hasError()) mu2ipsig = mu2ip/trajMu2BS.perigeeError().transverseImpactParameterError();
+	mu2ip = fabs(trajMu2BS.perigeeParameters().transverseImpactParameter());
+	if(trajMu2BS.hasError()) mu2ipsig = mu2ip/trajMu2BS.perigeeError().transverseImpactParameterError();
       }
       dimuvtxmu2dipmax[idimu3c] = fmax(mu1ip,mu2ip);
       dimuvtxmu2dipmin[idimu3c] = fmin(mu1ip,mu2ip);
@@ -569,25 +580,25 @@ void HLTMuon::analyze(const edm::Handle<reco::MuonCollection>                 & 
       muonl2novtxpterr[imu2c] = l2_err0/l2_abspar0;
       muonl2novtxchg[imu2c] = tk->charge();
 
-      l1extra::L1MuonParticleRef l1;
-      int il2 = 0;
-      //find the corresponding L1
+      l1extra::L1MuonParticleRef l1; 
+      int il2 = 0; 
+      //find the corresponding L1 
       l1 = tk->seedRef().castTo<edm::Ref< L2MuonTrajectorySeedCollection> >()->l1Particle();
-      il2++;
-      int imu1idx = 0;
-      if (MuCands1.isValid()) {
-        typedef l1extra::L1MuonParticleCollection::const_iterator candl1;
-        for (candl1 j=myMucands1.begin(); j!=myMucands1.end(); j++) {
-          if((j->pt() == l1->pt()) &&
-             (j->eta() == l1->eta()) &&
-             (j->phi() == l1->phi()) &&
-             (j->gmtMuonCand().quality() == l1->gmtMuonCand().quality()))
-          {break;}
-          imu1idx++;
-        }
-      }
-      else {imu1idx = -999;}
-      muonl2novtx1idx[imu2c] = imu1idx; // Index of the L1 muon having matched with the L2 muon with index imu2c
+      il2++; 
+      int imu1idx = 0; 
+      if (MuCands1.isValid()) { 
+	typedef l1extra::L1MuonParticleCollection::const_iterator candl1; 
+	for (candl1 j=myMucands1.begin(); j!=myMucands1.end(); j++) { 
+	  if((j->pt() == l1->pt()) &&
+	     (j->eta() == l1->eta()) &&
+	     (j->phi() == l1->phi()) &&
+	     (j->gmtMuonCand().quality() == l1->gmtMuonCand().quality()))
+	    {break;}
+	  imu1idx++; 
+	} 
+      } 
+      else {imu1idx = -999;} 
+      muonl2novtx1idx[imu2c] = imu1idx; // Index of the L1 muon having matched with the L2 muon with index imu2c 
 
       imu2c++;
     }
@@ -645,6 +656,7 @@ void HLTMuon::analyze(const edm::Handle<reco::MuonCollection>                 & 
     }
   }
   else {nOniaTrackCand = 0;}
+
   //////////////////////////////////////////////////////////////////////////////
 }
 
