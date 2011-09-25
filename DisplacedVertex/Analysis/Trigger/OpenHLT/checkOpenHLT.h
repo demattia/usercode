@@ -218,6 +218,7 @@ public :
    Float_t         ohMuL2NoVtxDz[4];   //[NohMuL2NoVtx]
    Int_t           ohMuL2NoVtxL1idx[4];   //[NohMuL2NoVtx]
    Int_t           ohMuL2NoVtxNhits[4];   //[NohMuL2NoVtx]
+   Int_t           ohMuL2NoVtxNchambers[4];   //[NohMuL2NoVtx]
    Float_t         ohHighestEnergyEERecHit;
    Float_t         ohHighestEnergyEBRecHit;
    Float_t         ohHighestEnergyHBHERecHit;
@@ -1302,6 +1303,7 @@ public :
    TBranch        *b_ohMuL2NoVtxDz;   //!
    TBranch        *b_ohMuL2NoVtxL1idx;   //!
    TBranch        *b_ohMuL2NoVtxNhits;   //!
+   TBranch        *b_ohMuL2NoVtxNchambers;   //!
    TBranch        *b_ohHighestEnergyEERecHit;   //!
    TBranch        *b_ohHighestEnergyEBRecHit;   //!
    TBranch        *b_ohHighestEnergyHBHERecHit;   //!
@@ -2491,6 +2493,7 @@ void checkOpenHLT::Init(TTree *tree)
    fChain->SetBranchAddress("ohMuL2NoVtxDz", ohMuL2NoVtxDz, &b_ohMuL2NoVtxDz);
    fChain->SetBranchAddress("ohMuL2NoVtxL1idx", ohMuL2NoVtxL1idx, &b_ohMuL2NoVtxL1idx);
    fChain->SetBranchAddress("ohMuL2NoVtxNhits", ohMuL2NoVtxNhits, &b_ohMuL2NoVtxNhits);
+   fChain->SetBranchAddress("ohMuL2NoVtxNchambers", ohMuL2NoVtxNchambers, &b_ohMuL2NoVtxNchambers);
    fChain->SetBranchAddress("ohHighestEnergyEERecHit", &ohHighestEnergyEERecHit, &b_ohHighestEnergyEERecHit);
    fChain->SetBranchAddress("ohHighestEnergyEBRecHit", &ohHighestEnergyEBRecHit, &b_ohHighestEnergyEBRecHit);
    fChain->SetBranchAddress("ohHighestEnergyHBHERecHit", &ohHighestEnergyHBHERecHit, &b_ohHighestEnergyHBHERecHit);
