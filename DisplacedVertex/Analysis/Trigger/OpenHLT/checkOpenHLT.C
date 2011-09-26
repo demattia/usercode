@@ -55,6 +55,46 @@ void checkOpenHLT::prepareHistograms(const TString & name, const int bins, const
   }
 }
 
+void checkOpenHLT::prepareAllHistograms(const TString & name, TFile * outputFile)
+{
+  outputFile->cd();
+  outputFile->mkdir(name);
+  outputFile->cd(name);
+  prepareHistograms("pt"+name, 100, 0., 300., "p_{T} [GeV/c]");
+  prepareHistograms("eta"+name, 100, -3., 3., "#eta");
+  prepareHistograms("phi"+name, 100, -3.2, 3.2, "#phi");
+  // prepareHistograms("chg"+name, 2, -1, 1);
+  prepareHistograms("nhits"+name, 30, 0, 30, "number of valid hits");
+  prepareHistograms("nchambers"+name, 10, 0, 10, "number of valid chambers");
+}
+
+void checkOpenHLT::applyCuts(const int arraySize, const bool selectOnChambers, const double & parallelDiff,
+                             const bool selectOnParallelism, bool * selectionArray)
+{
+  // Initialize for the selections
+  selectionArray[0] = false;
+  selectionArray[1] = false;
+  selectionArray[2] = false;
+  selectionArray[3] = false;
+  for( int i=0; i<arraySize; ++i ) {
+    if( ohMuL2NoVtxNhits[i] &&
+        ((ohMuL2NoVtxNchambers[i] > 1) || !selectOnChambers) &&
+        ((parallelDiff < 2.) || !selectOnParallelism) ) {
+      selectionArray[i] = true;
+    }
+  }
+}
+
+void checkOpenHLT::fillAllHistograms(const TString & name, const int arraySize, const bool * selectionArray)
+{
+  fillHistograms("pt"+name, ohMuL2NoVtxPt, arraySize, selectionArray);
+  fillHistograms("eta"+name, ohMuL2NoVtxEta, arraySize, selectionArray);
+  fillHistograms("phi"+name, ohMuL2NoVtxPhi, arraySize, selectionArray);
+  // fillHistograms("chg"+name, ohMuL2NoVtxChg, arraySize, selectionArray);
+  fillHistograms("nhits"+name, ohMuL2NoVtxNhits, arraySize, selectionArray);
+  fillHistograms("nchambers"+name, ohMuL2NoVtxNchambers, arraySize, selectionArray);
+}
+
 void checkOpenHLT::saveHistograms(const TString & name)
 {
   std::locale loc;
@@ -80,6 +120,15 @@ void checkOpenHLT::saveHistograms(const TString & name)
       canvas->Print(dir_+correlationName+".gif");
     }
   }
+}
+
+void checkOpenHLT::saveAllHistograms(const TString & name)
+{
+  saveHistograms("pt"+name);
+  saveHistograms("eta"+name);
+  saveHistograms("phi"+name);
+  saveHistograms("nhits"+name);
+  saveHistograms("nchambers"+name);
 }
 
 void checkOpenHLT::saveHistogram(TH1F * histo)
@@ -138,12 +187,15 @@ void checkOpenHLT::Loop()
    TH1F * numMuons = new TH1F("NumMuons", "Number of muons", 5, 0, 4);
    TH1F * parallelism = new TH1F("Parallelism", "parallelism", 100, 0., 3.2);
 
-   prepareHistograms("pt", 100, 0., 300., "p_{T} [GeV/c]");
-   prepareHistograms("eta", 100, -3., 3., "#eta");
-   prepareHistograms("phi", 100, -3.2, 3.2, "#phi");
-   // prepareHistograms("chg", 2, -1, 1);
-   prepareHistograms("nhits", 30, 0, 30, "number of valid hits");
-   prepareHistograms("nchambers", 10, 0, 10, "number of valid chambers");
+   TString noCutsName("_NoCuts_");
+   TString oneValidHitName("_OneValidHit_");
+   TString oneValidChamberName("_OneValidChamber_");
+   TString parallelismCutName("_ParallelismCut_");
+
+   prepareAllHistograms(noCutsName, outputFile);
+   prepareAllHistograms(oneValidHitName, outputFile);
+   prepareAllHistograms(oneValidChamberName, outputFile);
+   prepareAllHistograms(parallelismCutName, outputFile);
 
    Long64_t nentries = fChain->GetEntriesFast();
    Long64_t nbytes = 0, nb = 0;
@@ -174,46 +226,44 @@ void checkOpenHLT::Loop()
       if( NohMuL2NoVtx > 0 ) {
         int arraySize = std::min(NohMuL2NoVtx, 4);
 
-        bool selection = true;
+        // bool selection = false;
         bool selectOnChambers = false;
         bool selectOnParallelism = false;
 
         bool selectionArray[4];
-        if( selection ) {
-          selectionArray[0] = false;
-          selectionArray[1] = false;
-          selectionArray[2] = false;
-          selectionArray[3] = false;
-          for( int i=0; i<arraySize; ++i ) {
-            if( ohMuL2NoVtxNhits[i] &&
-                ((ohMuL2NoVtxNchambers[i] > 1) || !selectOnChambers) &&
-                ((parallelDiff < 2.) || !selectOnParallelism) ) selectionArray[i] = true;
-          }
-        }
-        else {
-          selectionArray[0] = true;
-          selectionArray[1] = true;
-          selectionArray[2] = true;
-          selectionArray[3] = true;
-        }
 
-        fillHistograms("pt", ohMuL2NoVtxPt, arraySize, selectionArray);
-        fillHistograms("eta", ohMuL2NoVtxEta, arraySize, selectionArray);
-        fillHistograms("phi", ohMuL2NoVtxPhi, arraySize, selectionArray);
-        // fillHistograms("chg", ohMuL2NoVtxChg, arraySize, selectionArray);
-        fillHistograms("nhits", ohMuL2NoVtxNhits, arraySize, selectionArray);
-        fillHistograms("nchambers", ohMuL2NoVtxNchambers, arraySize, selectionArray);
+        // No cuts
+        selectionArray[0] = true;
+        selectionArray[1] = true;
+        selectionArray[2] = true;
+        selectionArray[3] = true;
+        fillAllHistograms(noCutsName, arraySize, selectionArray);
+
+        // Fill histograms for the > 0 valid hit cut
+        // selection = true;
+        applyCuts(arraySize, selectOnChambers, parallelDiff, selectOnParallelism, selectionArray);
+        fillAllHistograms(oneValidHitName, arraySize, selectionArray);
+
+        // One valid chamber cut
+        selectOnChambers = true;
+        applyCuts(arraySize, selectOnChambers, parallelDiff, selectOnParallelism, selectionArray);
+        fillAllHistograms(oneValidChamberName, arraySize, selectionArray);
+
+        // Anti-parallel cut
+        selectOnParallelism = true;
+        applyCuts(arraySize, selectOnChambers, parallelDiff, selectOnParallelism, selectionArray);
+        fillAllHistograms(parallelismCutName, arraySize, selectionArray);
 
         if( selectionArray[0] && selectionArray[1] ) parallelism->Fill(parallelDiff);
       }
-
       // if (Cut(ientry) < 0) continue;
    }
    saveHistogram(parallelism);
-   saveHistograms("pt");
-   saveHistograms("eta");
-   saveHistograms("phi");
-   saveHistograms("nhits");
-   saveHistograms("nchambers");
+
+   saveAllHistograms(noCutsName);
+   saveAllHistograms(oneValidHitName);
+   saveAllHistograms(oneValidChamberName);
+   saveAllHistograms(parallelismCutName);
+
    outputFile->Write();
 }
