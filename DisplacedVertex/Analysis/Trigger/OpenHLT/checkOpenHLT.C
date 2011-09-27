@@ -66,6 +66,7 @@ void checkOpenHLT::prepareAllHistograms(const TString & name, TFile * outputFile
   // prepareHistograms("chg"+name, 2, -1, 1);
   prepareHistograms("nhits"+name, 30, 0, 30, "number of valid hits");
   prepareHistograms("nchambers"+name, 10, 0, 10, "number of valid chambers");
+  histoMap_.insert(std::make_pair("parallelism"+name, new TH1F("Parallelism"+name, "parallelism"+name, 100, 0., 3.2)));
 }
 
 void checkOpenHLT::applyCuts(const int arraySize, const bool selectOnChambers, const double & parallelDiff,
@@ -93,6 +94,7 @@ void checkOpenHLT::fillAllHistograms(const TString & name, const int arraySize, 
   // fillHistograms("chg"+name, ohMuL2NoVtxChg, arraySize, selectionArray);
   fillHistograms("nhits"+name, ohMuL2NoVtxNhits, arraySize, selectionArray);
   fillHistograms("nchambers"+name, ohMuL2NoVtxNchambers, arraySize, selectionArray);
+  if( arraySize > 1 && selectionArray[0] && selectionArray[1] ) histoMap_["parallelism"+name]->Fill(parallelDiff_);
 }
 
 void checkOpenHLT::saveHistograms(const TString & name)
@@ -116,8 +118,8 @@ void checkOpenHLT::saveHistograms(const TString & name)
       canvas->cd();
       histoMap_[correlationName]->Draw();
       histoMap_[correlationName]->SetMarkerStyle(1);
-      canvas->Print(dir_+correlationName+".pdf");
-      canvas->Print(dir_+correlationName+".gif");
+      // canvas->Print(dir_+correlationName+".pdf");
+      // canvas->Print(dir_+correlationName+".gif");
     }
   }
 }
@@ -129,6 +131,7 @@ void checkOpenHLT::saveAllHistograms(const TString & name)
   saveHistograms("phi"+name);
   saveHistograms("nhits"+name);
   saveHistograms("nchambers"+name);
+  saveHistogram((TH1F*)histoMap_["parallelism"+name]);
 }
 
 void checkOpenHLT::saveHistogram(TH1F * histo)
@@ -136,12 +139,15 @@ void checkOpenHLT::saveHistogram(TH1F * histo)
   TCanvas * canvas = new TCanvas;
   canvas->cd();
   histo->Draw();
-  canvas->Print(dir_+TString(histo->GetName())+".pdf");
-  canvas->Print(dir_+TString(histo->GetName())+".gif");
+  // canvas->Print(dir_+TString(histo->GetName())+".pdf");
+  // canvas->Print(dir_+TString(histo->GetName())+".gif");
 }
 
 void checkOpenHLT::Loop()
 {
+  // Apply the default trigger cuts
+  defaultTriggerCuts_ = true;
+
   // gROOT->Reset();
   gStyle->SetOptStat(0);
 //   In a ROOT session, you can do:
@@ -185,7 +191,6 @@ void checkOpenHLT::Loop()
    // Setup all histograms
    TFile * outputFile = new TFile("CheckOpenHLT.root", "RECREATE");
    TH1F * numMuons = new TH1F("NumMuons", "Number of muons", 5, 0, 4);
-   TH1F * parallelism = new TH1F("Parallelism", "parallelism", 100, 0., 3.2);
 
    TString noCutsName("_NoCuts_");
    TString oneValidHitName("_OneValidHit_");
@@ -208,7 +213,7 @@ void checkOpenHLT::Loop()
       if( jentry%100 == 0 ) std::cout << "Analyzing entry number " << jentry << std::endl;
       // std::cout << "Number of L2 NoVtx muons = " << NohMuL2NoVtx << std::endl;
 
-      double parallelDiff = -99.;
+      parallelDiff_ = -99.;
       if( NohMuL2NoVtx > 1 ) {
         TLorentzVector firstMuon = fromPtEtaPhiToPxPyPz(ohMuL2NoVtxPt[0], ohMuL2NoVtxEta[0], ohMuL2NoVtxPhi[0]);
         TLorentzVector secondMuon = fromPtEtaPhiToPxPyPz(ohMuL2NoVtxPt[1], ohMuL2NoVtxEta[1], ohMuL2NoVtxPhi[1]);
@@ -218,15 +223,18 @@ void checkOpenHLT::Loop()
         double px2 = secondMuon.Px();
         double py2 = secondMuon.Py();
         double pz2 = secondMuon.Pz();
-        parallelDiff = acos((px1*px2 + py1*py2 + pz1*pz2)/sqrt(px1*px1 + py1*py1 + pz1*pz1)/sqrt(px2*px2 + py2*py2 + pz2*pz2));
+        parallelDiff_ = acos((px1*px2 + py1*py2 + pz1*pz2)/sqrt(px1*px1 + py1*py1 + pz1*pz1)/sqrt(px2*px2 + py2*py2 + pz2*pz2));
       }
 
       numMuons->Fill(NohMuL2NoVtx);
 
       if( NohMuL2NoVtx > 0 ) {
+
+        // Skip if need to apply the default trigger cuts and they do not pass the pt cut
+        if( defaultTriggerCuts_ && !(NohMuL2NoVtx > 1 && ohMuL2NoVtxPt[0] > 23 && ohMuL2NoVtxPt[1] > 23) ) continue;
+
         int arraySize = std::min(NohMuL2NoVtx, 4);
 
-        // bool selection = false;
         bool selectOnChambers = false;
         bool selectOnParallelism = false;
 
@@ -240,26 +248,21 @@ void checkOpenHLT::Loop()
         fillAllHistograms(noCutsName, arraySize, selectionArray);
 
         // Fill histograms for the > 0 valid hit cut
-        // selection = true;
-        applyCuts(arraySize, selectOnChambers, parallelDiff, selectOnParallelism, selectionArray);
+        applyCuts(arraySize, selectOnChambers, parallelDiff_, selectOnParallelism, selectionArray);
         fillAllHistograms(oneValidHitName, arraySize, selectionArray);
 
         // One valid chamber cut
         selectOnChambers = true;
-        applyCuts(arraySize, selectOnChambers, parallelDiff, selectOnParallelism, selectionArray);
+        applyCuts(arraySize, selectOnChambers, parallelDiff_, selectOnParallelism, selectionArray);
         fillAllHistograms(oneValidChamberName, arraySize, selectionArray);
 
         // Anti-parallel cut
         selectOnParallelism = true;
-        applyCuts(arraySize, selectOnChambers, parallelDiff, selectOnParallelism, selectionArray);
+        applyCuts(arraySize, selectOnChambers, parallelDiff_, selectOnParallelism, selectionArray);
         fillAllHistograms(parallelismCutName, arraySize, selectionArray);
-
-        if( selectionArray[0] && selectionArray[1] ) parallelism->Fill(parallelDiff);
       }
       // if (Cut(ientry) < 0) continue;
    }
-   saveHistogram(parallelism);
-
    saveAllHistograms(noCutsName);
    saveAllHistograms(oneValidHitName);
    saveAllHistograms(oneValidChamberName);

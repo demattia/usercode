@@ -2852,6 +2852,8 @@ public :
 
    std::map<TString, TH1*> histoMap_;
    TString dir_;
+   double parallelDiff_;
+   bool defaultTriggerCuts_;
 };
 
 #endif
