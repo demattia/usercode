@@ -79,6 +79,22 @@ void drawSuperimposed(const TString & firstPart, const TString & secondPart, TFi
   canvas->SaveAs(firstPart+secondPart+".pdf");
 }
 
+void countEntries(const TString & firstPart, const TString & secondPart, TFile * inputFile)
+{
+  Int_t noCutsEntries = ((TH2F*)getHisto(firstPart+noCutsName+secondPart, noCutsName, inputFile))->GetEntries();
+  Int_t oneValidHitEntries = ((TH2F*)getHisto(firstPart+oneValidHitName+secondPart, oneValidHitName, inputFile))->GetEntries();
+  Int_t oneValidChamberEntries = ((TH2F*)getHisto(firstPart+oneValidChamberName+secondPart, oneValidChamberName, inputFile))->GetEntries();
+  Int_t parallelismCutEntries = ((TH2F*)getHisto(firstPart+parallelismCutName+secondPart, parallelismCutName, inputFile))->GetEntries();
+
+  std::cout << "Total number of entries = " << noCutsEntries << std::endl;
+  std::cout << "Entries after 1 hit = " << oneValidHitEntries << " ratio with previous cut = "
+            << oneValidHitEntries/double(noCutsEntries) << std::endl;
+  std::cout << "Entries after > 1 valid chamber = " << oneValidChamberEntries << " ratio with previous cut = "
+            << oneValidChamberEntries/double(oneValidHitEntries) << " total eff = " << oneValidChamberEntries/double(noCutsEntries) << std::endl;
+  std::cout << "Entries after parallelism cut = " << parallelismCutEntries << " ratio with previous cut = "
+            << parallelismCutEntries/double(oneValidChamberEntries) << " total eff = " << parallelismCutEntries/double(noCutsEntries) << std::endl;
+}
+
 void drawCanvases()
 {
   gStyle->SetOptStat(0);
@@ -96,4 +112,5 @@ void drawCanvases()
   drawCanvas("eta", "Correlation_0_1", inputFile);
   drawCanvas("pt", "Correlation_0_1", inputFile);
   drawCanvas("phi", "Correlation_0_1", inputFile);
+  countEntries("eta", "Correlation_0_1", inputFile);
 }

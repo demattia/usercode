@@ -79,6 +79,7 @@ void checkOpenHLT::applyCuts(const int arraySize, const bool selectOnChambers, c
   selectionArray[3] = false;
   for( int i=0; i<arraySize; ++i ) {
     if( ohMuL2NoVtxNhits[i] &&
+        ((NohMuL2NoVtx > 1 && ohMuL2NoVtxPt[0] > 23 && ohMuL2NoVtxPt[1] > 23) || !defaultTriggerCuts_) &&
         ((ohMuL2NoVtxNchambers[i] > 1) || !selectOnChambers) &&
         ((parallelDiff < 2.) || !selectOnParallelism) ) {
       selectionArray[i] = true;
@@ -231,7 +232,7 @@ void checkOpenHLT::Loop()
       if( NohMuL2NoVtx > 0 ) {
 
         // Skip if need to apply the default trigger cuts and they do not pass the pt cut
-        if( defaultTriggerCuts_ && !(NohMuL2NoVtx > 1 && ohMuL2NoVtxPt[0] > 23 && ohMuL2NoVtxPt[1] > 23) ) continue;
+        // if( defaultTriggerCuts_ && !(NohMuL2NoVtx > 1 && ohMuL2NoVtxPt[0] > 23 && ohMuL2NoVtxPt[1] > 23) ) continue;
 
         int arraySize = std::min(NohMuL2NoVtx, 4);
 
