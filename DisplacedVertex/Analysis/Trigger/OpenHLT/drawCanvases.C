@@ -71,7 +71,8 @@ void drawSuperimposed(const TString & firstPart, const TString & secondPart, TFi
   ss << noCutsHisto->GetEntries();
   leg->SetHeader(firstPart+secondPart+" with "+TString(ss.str())+" entries");
   leg->AddEntry(noCutsHisto,"No cuts","l");
-  leg->AddEntry(oneValidHitHisto,"At least one valid hit","l");
+  // leg->AddEntry(oneValidHitHisto,"At least one valid hit","l");
+  leg->AddEntry(oneValidHitHisto,"Standard trigger cuts","l");
   leg->AddEntry(oneValidChamberHisto,"More than 1 valid chamber","l");
   leg->AddEntry(parallelismCutHisto,"Parallelism cut","l");
   leg->Draw();

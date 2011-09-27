@@ -229,7 +229,7 @@ void checkOpenHLT::Loop()
 
       numMuons->Fill(NohMuL2NoVtx);
 
-      if( NohMuL2NoVtx > 0 ) {
+      if( NohMuL2NoVtx > 1 ) {
 
         // Skip if need to apply the default trigger cuts and they do not pass the pt cut
         // if( defaultTriggerCuts_ && !(NohMuL2NoVtx > 1 && ohMuL2NoVtxPt[0] > 23 && ohMuL2NoVtxPt[1] > 23) ) continue;
