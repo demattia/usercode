@@ -92,7 +92,8 @@ void countEntries(const TString & firstPart, const TString & secondPart, TFile *
   std::cout << "Entries after > 1 valid chamber = " << oneValidChamberEntries << " ratio with previous cut = "
             << oneValidChamberEntries/double(oneValidHitEntries) << " total eff = " << oneValidChamberEntries/double(noCutsEntries) << std::endl;
   std::cout << "Entries after parallelism cut = " << parallelismCutEntries << " ratio with previous cut = "
-            << parallelismCutEntries/double(oneValidChamberEntries) << " total eff = " << parallelismCutEntries/double(noCutsEntries) << std::endl;
+            << parallelismCutEntries/double(oneValidChamberEntries) << " total eff with respect to on hit cut = "
+            << parallelismCutEntries/double(oneValidHitEntries) << " total eff = " << parallelismCutEntries/double(noCutsEntries) << std::endl;
 }
 
 void drawCanvases()
