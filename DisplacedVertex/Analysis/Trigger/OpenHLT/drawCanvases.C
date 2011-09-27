@@ -5,6 +5,7 @@
 #include <iostream>
 #include <sstream>
 #include <algorithm>
+#include <fstream>
 
 TString noCutsName("_NoCuts_");
 TString oneValidHitName("_OneValidHit_");
@@ -41,6 +42,7 @@ void drawCanvas(const TString & firstPart, const TString & secondPart, TFile * i
   // parallelismCutHisto->SetMarkerStyle(20);
   // parallelismCutHisto->SetMarkerStyle(0.8);
   canvas->SaveAs(firstPart+secondPart+".pdf");
+  canvas->SaveAs(firstPart+secondPart+".png");
 }
 
 void drawSuperimposed(const TString & firstPart, const TString & secondPart, TFile * inputFile)
@@ -78,6 +80,7 @@ void drawSuperimposed(const TString & firstPart, const TString & secondPart, TFi
   leg->Draw();
 
   canvas->SaveAs(firstPart+secondPart+".pdf");
+  canvas->SaveAs(firstPart+secondPart+".png");
 }
 
 void countEntries(const TString & firstPart, const TString & secondPart, TFile * inputFile)
@@ -88,13 +91,27 @@ void countEntries(const TString & firstPart, const TString & secondPart, TFile *
   Int_t parallelismCutEntries = ((TH2F*)getHisto(firstPart+parallelismCutName+secondPart, parallelismCutName, inputFile))->GetEntries();
 
   std::cout << "Total number of entries = " << noCutsEntries << std::endl;
-  std::cout << "Entries after 1 hit = " << oneValidHitEntries << " ratio with previous cut = "
+  std::cout << "Entries after 1 hit = " << oneValidHitEntries << ", ratio with previous cut = "
             << oneValidHitEntries/double(noCutsEntries) << std::endl;
-  std::cout << "Entries after > 1 valid chamber = " << oneValidChamberEntries << " ratio with previous cut = "
-            << oneValidChamberEntries/double(oneValidHitEntries) << " total eff = " << oneValidChamberEntries/double(noCutsEntries) << std::endl;
-  std::cout << "Entries after parallelism cut = " << parallelismCutEntries << " ratio with previous cut = "
-            << parallelismCutEntries/double(oneValidChamberEntries) << " total eff with respect to one hit cut = "
-            << parallelismCutEntries/double(oneValidHitEntries) << " total eff = " << parallelismCutEntries/double(noCutsEntries) << std::endl;
+  std::cout << "Entries after > 1 valid chamber = " << oneValidChamberEntries << ", ratio with previous cut = "
+            << oneValidChamberEntries/double(oneValidHitEntries) << ", total eff = " << oneValidChamberEntries/double(noCutsEntries) << std::endl;
+  std::cout << "Entries after parallelism cut = " << parallelismCutEntries << ", ratio with previous cut = "
+            << parallelismCutEntries/double(oneValidChamberEntries) << ", total eff with respect to one hit cut = "
+            << parallelismCutEntries/double(oneValidHitEntries) << ", total eff = " << parallelismCutEntries/double(noCutsEntries) << std::endl;
+
+  ofstream countEntriesFile;
+  countEntriesFile.open("entriesFile.txt");
+  countEntriesFile << "Total number of entries = " << noCutsEntries << "<br/>"  << std::endl;
+  countEntriesFile << "Entries after 1 hit = " << oneValidHitEntries << ", ratio with previous cut = "
+                   << oneValidHitEntries/double(noCutsEntries) << "<br/>" << std::endl;
+  countEntriesFile << "Entries after > 1 valid chamber = " << oneValidChamberEntries << ", ratio with previous cut = "
+                   << oneValidChamberEntries/double(oneValidHitEntries) << ", total eff = "
+                   << oneValidChamberEntries/double(noCutsEntries) << "<br/>"  << std::endl;
+  countEntriesFile << "Entries after parallelism cut = " << parallelismCutEntries << ", ratio with previous cut = "
+                   << parallelismCutEntries/double(oneValidChamberEntries) << ", total eff with respect to one hit cut = "
+                   << parallelismCutEntries/double(oneValidHitEntries) << ", total eff = "
+                   << parallelismCutEntries/double(noCutsEntries) << "<br/>"  << std::endl;
+  countEntriesFile.close();
 }
 
 void drawCanvases()
