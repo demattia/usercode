@@ -14,6 +14,7 @@
 #include <TH2.h>
 #include <TLorentzVector.h>
 #include <sstream>
+#include <iostream>
 
 class checkOpenHLT {
 public :
@@ -2807,6 +2808,7 @@ public :
    TBranch        *b_L1Tech_ZDC_Scint_tight_vertex_v0_5bx;   //!
 
    checkOpenHLT(TTree *tree=0);
+   checkOpenHLT(const TString & fileName, const double & parallelDiffCut);
    virtual ~checkOpenHLT();
    virtual Int_t    Cut(Long64_t entry);
    virtual Int_t    GetEntry(Long64_t entry);
@@ -2854,6 +2856,7 @@ public :
    TString dir_;
    double parallelDiff_;
    bool defaultTriggerCuts_;
+   double parallelDiffCut_;
 };
 
 #endif
@@ -2872,6 +2875,18 @@ checkOpenHLT::checkOpenHLT(TTree *tree)
 
    }
    Init(tree);
+}
+
+checkOpenHLT::checkOpenHLT(const TString & fileName, const double & parallelDiffCut)
+  : parallelDiffCut_(parallelDiffCut)
+{
+  TTree * tree = 0;
+  TFile *f = new TFile(fileName);
+  if( f == 0 ) {
+    f = new TFile("openhlt_merge.root");
+  }
+  tree = (TTree*)gDirectory->Get("HltTree");
+  Init(tree);
 }
 
 checkOpenHLT::~checkOpenHLT()

@@ -81,7 +81,7 @@ void checkOpenHLT::applyCuts(const int arraySize, const bool selectOnChambers, c
     if( ohMuL2NoVtxNhits[i] &&
         ((NohMuL2NoVtx > 1 && ohMuL2NoVtxPt[0] > 23 && ohMuL2NoVtxPt[1] > 23) || !defaultTriggerCuts_) &&
         ((ohMuL2NoVtxNchambers[i] > 1) || !selectOnChambers) &&
-        ((parallelDiff < 2.) || !selectOnParallelism) ) {
+        ((parallelDiff < parallelDiffCut_) || !selectOnParallelism) ) {
       selectionArray[i] = true;
     }
   }
@@ -110,8 +110,8 @@ void checkOpenHLT::saveHistograms(const TString & name)
     TCanvas * canvas = new TCanvas;
     canvas->cd();
     histoMap_[namePart]->Draw();
-    canvas->Print(dir_+namePart+".pdf");
-    canvas->Print(dir_+namePart+".gif");
+    // canvas->Print(dir_+namePart+".pdf");
+    // canvas->Print(dir_+namePart+".gif");
     for( int j=i+1; j<4; ++j ) {
       std::stringstream ss;
       ss << i << "_" << j;
