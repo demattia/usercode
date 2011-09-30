@@ -146,6 +146,7 @@ void checkOpenHLT::saveHistogram(TH1F * histo)
 
 void checkOpenHLT::Loop()
 {
+  gROOT->SetBatch(true);
   // Apply the default trigger cuts
   defaultTriggerCuts_ = true;
 
