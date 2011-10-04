@@ -81,7 +81,7 @@ void checkOpenHLT::applyCuts(const int arraySize, const bool selectOnChambers, c
     if( ohMuL2NoVtxNhits[i] &&
         ((NohMuL2NoVtx > 1 && ohMuL2NoVtxPt[0] > 23 && ohMuL2NoVtxPt[1] > 23) || !defaultTriggerCuts_) &&
         ((ohMuL2NoVtxNchambers[i] > 1) || !selectOnChambers) &&
-        ((parallelDiff < parallelDiffCut_) || !selectOnParallelism) ) {
+        ((parallelDiff < 2.) || !selectOnParallelism) ) {
       selectionArray[i] = true;
     }
   }
@@ -89,13 +89,16 @@ void checkOpenHLT::applyCuts(const int arraySize, const bool selectOnChambers, c
 
 void checkOpenHLT::fillAllHistograms(const TString & name, const int arraySize, const bool * selectionArray)
 {
-  fillHistograms("pt"+name, ohMuL2NoVtxPt, arraySize, selectionArray);
-  fillHistograms("eta"+name, ohMuL2NoVtxEta, arraySize, selectionArray);
-  fillHistograms("phi"+name, ohMuL2NoVtxPhi, arraySize, selectionArray);
-  // fillHistograms("chg"+name, ohMuL2NoVtxChg, arraySize, selectionArray);
-  fillHistograms("nhits"+name, ohMuL2NoVtxNhits, arraySize, selectionArray);
-  fillHistograms("nchambers"+name, ohMuL2NoVtxNchambers, arraySize, selectionArray);
-  if( arraySize > 1 && selectionArray[0] && selectionArray[1] ) histoMap_["parallelism"+name]->Fill(parallelDiff_);
+  // Apply the trigger cut to everything
+  if( arraySize > 1 && selectionArray[0] && selectionArray[1] ) {
+    fillHistograms("pt"+name, ohMuL2NoVtxPt, arraySize, selectionArray);
+    fillHistograms("eta"+name, ohMuL2NoVtxEta, arraySize, selectionArray);
+    fillHistograms("phi"+name, ohMuL2NoVtxPhi, arraySize, selectionArray);
+    // fillHistograms("chg"+name, ohMuL2NoVtxChg, arraySize, selectionArray);
+    fillHistograms("nhits"+name, ohMuL2NoVtxNhits, arraySize, selectionArray);
+    fillHistograms("nchambers"+name, ohMuL2NoVtxNchambers, arraySize, selectionArray);
+    histoMap_["parallelism"+name]->Fill(parallelDiff_);
+  }
 }
 
 void checkOpenHLT::saveHistograms(const TString & name)
@@ -110,8 +113,8 @@ void checkOpenHLT::saveHistograms(const TString & name)
     TCanvas * canvas = new TCanvas;
     canvas->cd();
     histoMap_[namePart]->Draw();
-    // canvas->Print(dir_+namePart+".pdf");
-    // canvas->Print(dir_+namePart+".gif");
+    canvas->Print(dir_+namePart+".pdf");
+    canvas->Print(dir_+namePart+".gif");
     for( int j=i+1; j<4; ++j ) {
       std::stringstream ss;
       ss << i << "_" << j;
@@ -226,11 +229,8 @@ void checkOpenHLT::Loop()
         double py2 = secondMuon.Py();
         double pz2 = secondMuon.Pz();
         parallelDiff_ = acos((px1*px2 + py1*py2 + pz1*pz2)/sqrt(px1*px1 + py1*py1 + pz1*pz1)/sqrt(px2*px2 + py2*py2 + pz2*pz2));
-      }
 
-      numMuons->Fill(NohMuL2NoVtx);
-
-      if( NohMuL2NoVtx > 1 ) {
+	numMuons->Fill(NohMuL2NoVtx);
 
         // Skip if need to apply the default trigger cuts and they do not pass the pt cut
         // if( defaultTriggerCuts_ && !(NohMuL2NoVtx > 1 && ohMuL2NoVtxPt[0] > 23 && ohMuL2NoVtxPt[1] > 23) ) continue;
