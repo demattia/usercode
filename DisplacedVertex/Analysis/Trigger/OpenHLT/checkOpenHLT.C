@@ -81,7 +81,7 @@ void checkOpenHLT::applyCuts(const int arraySize, const bool selectOnChambers, c
     if( ohMuL2NoVtxNhits[i] &&
         ((NohMuL2NoVtx > 1 && ohMuL2NoVtxPt[0] > 23 && ohMuL2NoVtxPt[1] > 23) || !defaultTriggerCuts_) &&
         ((ohMuL2NoVtxNchambers[i] > 1) || !selectOnChambers) &&
-        ((parallelDiff < 2.) || !selectOnParallelism) ) {
+        ((parallelDiff < 2.6) || !selectOnParallelism) ) {
       selectionArray[i] = true;
     }
   }
