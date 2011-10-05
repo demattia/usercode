@@ -79,7 +79,7 @@ void checkOpenHLT::applyCuts(const int arraySize, const bool selectOnChambers, c
   selectionArray[3] = false;
   for( int i=0; i<arraySize; ++i ) {
     if( ohMuL2NoVtxNhits[i] &&
-        ((NohMuL2NoVtx > 1 && ohMuL2NoVtxPt[0] > 23 && ohMuL2NoVtxPt[1] > 23) || !defaultTriggerCuts_) &&
+        ((NohMuL2NoVtx > 1 && ohMuL2NoVtxPt[0] > 30 && ohMuL2NoVtxPt[1] > 30) || !defaultTriggerCuts_) &&
         ((ohMuL2NoVtxNchambers[i] > 1) || !selectOnChambers) &&
         ((parallelDiff < 2.6) || !selectOnParallelism) ) {
       selectionArray[i] = true;
@@ -196,6 +196,7 @@ void checkOpenHLT::Loop()
    // Setup all histograms
    TFile * outputFile = new TFile("CheckOpenHLT.root", "RECREATE");
    TH1F * numMuons = new TH1F("NumMuons", "Number of muons", 5, 0, 4);
+   TH1F * num2Muons = new TH1F("Num2Muons", "Number of muons in events with at least 2", 5, 0, 4);
 
    TString noCutsName("_NoCuts_");
    TString oneValidHitName("_OneValidHit_");
@@ -218,6 +219,8 @@ void checkOpenHLT::Loop()
       if( jentry%100 == 0 ) std::cout << "Analyzing entry number " << jentry << std::endl;
       // std::cout << "Number of L2 NoVtx muons = " << NohMuL2NoVtx << std::endl;
 
+      numMuons->Fill(NohMuL2NoVtx);
+
       parallelDiff_ = -99.;
       if( NohMuL2NoVtx > 1 ) {
         TLorentzVector firstMuon = fromPtEtaPhiToPxPyPz(ohMuL2NoVtxPt[0], ohMuL2NoVtxEta[0], ohMuL2NoVtxPhi[0]);
@@ -230,7 +233,7 @@ void checkOpenHLT::Loop()
         double pz2 = secondMuon.Pz();
         parallelDiff_ = acos((px1*px2 + py1*py2 + pz1*pz2)/sqrt(px1*px1 + py1*py1 + pz1*pz1)/sqrt(px2*px2 + py2*py2 + pz2*pz2));
 
-	numMuons->Fill(NohMuL2NoVtx);
+	num2Muons->Fill(NohMuL2NoVtx);
 
         // Skip if need to apply the default trigger cuts and they do not pass the pt cut
         // if( defaultTriggerCuts_ && !(NohMuL2NoVtx > 1 && ohMuL2NoVtxPt[0] > 23 && ohMuL2NoVtxPt[1] > 23) ) continue;

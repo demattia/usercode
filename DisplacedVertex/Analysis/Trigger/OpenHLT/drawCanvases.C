@@ -85,31 +85,44 @@ void drawSuperimposed(const TString & firstPart, const TString & secondPart, TFi
 
 void countEntries(const TString & firstPart, const TString & secondPart, TFile * inputFile)
 {
-  Int_t noCutsEntries = ((TH2F*)getHisto(firstPart+noCutsName+secondPart, noCutsName, inputFile))->GetEntries();
+  Int_t noCutsEntries = ((TH1F*)inputFile->Get("NumMuons"))->GetEntries();
+  Int_t noCutsEntries2Muons = ((TH2F*)getHisto(firstPart+noCutsName+secondPart, noCutsName, inputFile))->GetEntries();
   Int_t oneValidHitEntries = ((TH2F*)getHisto(firstPart+oneValidHitName+secondPart, oneValidHitName, inputFile))->GetEntries();
   Int_t oneValidChamberEntries = ((TH2F*)getHisto(firstPart+oneValidChamberName+secondPart, oneValidChamberName, inputFile))->GetEntries();
   Int_t parallelismCutEntries = ((TH2F*)getHisto(firstPart+parallelismCutName+secondPart, parallelismCutName, inputFile))->GetEntries();
 
   std::cout << "Total number of entries = " << noCutsEntries << std::endl;
-  std::cout << "Entries after default trigger cuts = " << oneValidHitEntries << ", ratio with previous cut = "
+  std::cout << "Total number of entries with at least 2 muons = " << noCutsEntries2Muons << ", eff = "
+	    << noCutsEntries2Muons/double(noCutsEntries) << std::endl;
+  std::cout << "Entries after 1 hit = " << oneValidHitEntries << ", ratio with previous cut = "
+            << oneValidHitEntries/double(noCutsEntries2Muons) << ", ratio with total = "
             << oneValidHitEntries/double(noCutsEntries) << std::endl;
   std::cout << "Entries after > 1 valid chamber = " << oneValidChamberEntries << ", ratio with previous cut = "
-            << oneValidChamberEntries/double(oneValidHitEntries) << ", total eff = " << oneValidChamberEntries/double(noCutsEntries) << std::endl;
+            << oneValidChamberEntries/double(oneValidHitEntries) << ", ratio with 2 reconstructed muons eff = "
+	    << oneValidChamberEntries/double(noCutsEntries2Muons) << ", ratio with total = "
+	    << oneValidChamberEntries/double(noCutsEntries) << std::endl;
   std::cout << "Entries after parallelism cut = " << parallelismCutEntries << ", ratio with previous cut = "
-            << parallelismCutEntries/double(oneValidChamberEntries) << ", total eff with respect to default trigger cuts = "
-            << parallelismCutEntries/double(oneValidHitEntries) << ", total eff = " << parallelismCutEntries/double(noCutsEntries) << std::endl;
+            << parallelismCutEntries/double(oneValidChamberEntries) << ", total eff with respect to one hit cut = "
+            << parallelismCutEntries/double(oneValidHitEntries) << ", ratio with 2 reconstructed muons eff = "
+	    << parallelismCutEntries/double(noCutsEntries2Muons) << ", ratio with total = "
+	    << parallelismCutEntries/double(noCutsEntries) << std::endl;
 
   ofstream countEntriesFile;
   countEntriesFile.open("entriesFile.txt");
   countEntriesFile << "Total number of entries = " << noCutsEntries << "<br/>"  << std::endl;
-  countEntriesFile << "Entries after default trigger cuts = " << oneValidHitEntries << ", ratio with previous cut = "
-                   << oneValidHitEntries/double(noCutsEntries) << "<br/>" << std::endl;
+  countEntriesFile << "Total number of entries with at least 2 muons = " << noCutsEntries2Muons << ", eff = "
+		   << noCutsEntries2Muons/double(noCutsEntries) << "<br/>" << std::endl;
+  countEntriesFile << "Entries after 1 hit = " << oneValidHitEntries << ", ratio with previous cut = "
+		   << oneValidHitEntries/double(noCutsEntries2Muons) << ", ratio with total = "
+		   << oneValidHitEntries/double(noCutsEntries) << "<br/>" << std::endl;
   countEntriesFile << "Entries after > 1 valid chamber = " << oneValidChamberEntries << ", ratio with previous cut = "
-                   << oneValidChamberEntries/double(oneValidHitEntries) << ", total eff = "
+		   << oneValidChamberEntries/double(oneValidHitEntries) << ", ratio with 2 reconstructed muons eff = "
+		   << oneValidChamberEntries/double(noCutsEntries2Muons) << ", ratio with total = "
                    << oneValidChamberEntries/double(noCutsEntries) << "<br/>"  << std::endl;
   countEntriesFile << "Entries after parallelism cut = " << parallelismCutEntries << ", ratio with previous cut = "
-                   << parallelismCutEntries/double(oneValidChamberEntries) << ", total eff with respect to default trigger cuts = "
-                   << parallelismCutEntries/double(oneValidHitEntries) << ", total eff = "
+		   << parallelismCutEntries/double(oneValidChamberEntries) << ", total eff with respect to one hit cut = "
+		   << parallelismCutEntries/double(oneValidHitEntries) << ", ratio with 2 reconstructed muons eff = "
+		   << parallelismCutEntries/double(noCutsEntries2Muons) << ", ratio with total = "
                    << parallelismCutEntries/double(noCutsEntries) << "<br/>"  << std::endl;
   countEntriesFile.close();
 }
