@@ -97,7 +97,7 @@ public:
     * division is integer.
     * This method builds a new Efficiency object with the new sizes and values and returns a shared_ptr to it.
     */
-  boost::shared_ptr<Efficiency> projectAndRebin(const boost::shared_array<unsigned int> & vKeep)
+  boost::shared_ptr<Efficiency> projectAndRebin(const boost::shared_array<unsigned int> & vKeep) const
   {
     // Find the sizes to be kept
     std::vector<Parameters> newPars;
@@ -123,7 +123,7 @@ public:
     * - the array with the selection of variables to keep (see project method)
     * - the number of variables to keep
     */
-  boost::shared_array<unsigned int> getIndexes(const unsigned int linearIndex, const boost::shared_array<unsigned int> & vKeep, const unsigned int newN)
+  boost::shared_array<unsigned int> getIndexes(const unsigned int linearIndex, const boost::shared_array<unsigned int> & vKeep, const unsigned int newN) const
   {
     boost::shared_array<unsigned int> vNewIndexes(new unsigned int[newN]);
     unsigned int tempS = S_;
@@ -140,7 +140,7 @@ public:
     */
   void computeIndexes(const unsigned int L, unsigned int & S, const boost::shared_array<unsigned int> & vKeep,
                       const unsigned int newN, boost::shared_array<unsigned int> & vNewIndexes,
-                      unsigned int & counter, unsigned int & newCounter)
+                      unsigned int & counter, unsigned int & newCounter) const
   {
     if( newCounter == newN ) return;
 
@@ -240,7 +240,7 @@ public:
     }
   }
 
-  boost::shared_ptr<Efficiency> clone()
+  boost::shared_ptr<Efficiency> clone() const
   {
     boost::shared_array<unsigned int> vKeep(new unsigned int[N_]);
     for( unsigned int i=0; i<N_; ++i ) {
@@ -249,6 +249,27 @@ public:
     return projectAndRebin(vKeep);
   }
 
+  /// Allows to cut on a given variable. The cut means all the values outside the range are set to 0.
+  void cut(const unsigned int varIndex, const double & min, const double & max)
+  {
+    if( varIndex >= N_ ) {
+      std::cout << "Cut requested for variable out of range. No cut will be applied." << std::endl;
+    }
+    boost::shared_array<unsigned int> indexes;
+    // Loop over the linear representation and set to zero all the counters outside the range.
+    const boost::shared_array<unsigned int> vKeep( new unsigned int[N_]);
+    for( unsigned int i=0; i<N_; ++i ) {
+      vKeep[i] = 1;
+    }
+    for( unsigned int i=0; i<S_; ++i ) {
+      indexes = getIndexes( i, vKeep, N_);
+      double position = vMin_[varIndex] + vBinSizes_[varIndex]*indexes[varIndex];
+      if( position < min || position > max ) {
+        values_[i].first = 0;
+        values_[i].second = 0;
+      }
+    }
+  }
 
   inline unsigned int getLinearSize() const {return S_;}
   inline unsigned int getN() const {return N_;}

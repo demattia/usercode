@@ -13,7 +13,7 @@
 //
 // Original Author:  Marco De Mattia,42 R-23,
 //         Created:  Mon Jul 4 18:38:0 CEST 2011
-// $Id: EfficiencyAnalyzer.cc,v 1.3 2011/07/08 12:05:57 demattia Exp $
+// $Id: EfficiencyAnalyzer.cc,v 1.4 2011/07/18 06:15:19 demattia Exp $
 //
 //
 
@@ -117,7 +117,12 @@ EfficiencyAnalyzer::EfficiencyAnalyzer(const edm::ParameterSet& iConfig) :
   vKeep[0] = rebin_;
   vKeep[1] = 0;
   vKeep[2] = 0;
-  boost::shared_ptr<Efficiency> effVsDxy(efficiency_->projectAndRebin(vKeep));
+
+  boost::shared_ptr<Efficiency> effClonedForDxy(efficiency_->clone());
+  // Apply a cut on dz
+  effClonedForDxy->cut(1, 0, 10);
+  // boost::shared_ptr<Efficiency> effVsDxy(efficiency_->projectAndRebin(vKeep));
+  boost::shared_ptr<Efficiency> effVsDxy(effClonedForDxy->projectAndRebin(vKeep));
   fillHistogram("EffVsDxy", "Efficiency vs absolute transverse impact parameter", effVsDxy );
 
   unsigned int S = effVsDxy->getLinearSize();
@@ -129,7 +134,12 @@ EfficiencyAnalyzer::EfficiencyAnalyzer(const edm::ParameterSet& iConfig) :
   vKeep[0] = 0;
   vKeep[1] = rebin_;
   vKeep[2] = 0;
-  boost::shared_ptr<Efficiency> effVsDz(efficiency_->projectAndRebin(vKeep));
+
+  boost::shared_ptr<Efficiency> effClonedForDz(efficiency_->clone());
+  // Apply a cut on dxy  
+  effClonedForDz->cut(0, 0, 4);
+  // boost::shared_ptr<Efficiency> effVsDz(efficiency_->projectAndRebin(vKeep));
+  boost::shared_ptr<Efficiency> effVsDz(effClonedForDz->projectAndRebin(vKeep));
   fillHistogram("EffVsDz", "Efficiency vs absolute longitudinal impact parameter", effVsDz);
 
   vKeep[0] = 0;

@@ -13,7 +13,7 @@
 //
 // Original Author:  Marco De Mattia,42 R-23,
 //         Created:  Mon Jul 4 18:38:0 CEST 2011
-// $Id: EfficiencyRatioProducer.cc,v 1.2 2011/07/15 15:53:04 demattia Exp $
+// $Id: EfficiencyRatioProducer.cc,v 1.3 2011/07/18 14:37:11 demattia Exp $
 //
 //
 
@@ -131,6 +131,8 @@ EfficiencyRatioProducer::EfficiencyRatioProducer(const edm::ParameterSet& iConfi
   efficiencyRatioNumerator_.reset(new Efficiency);
   EfficiencyTree treeRatioNumerator;
   treeRatioNumerator.readTree(inputFileNameNumerator_, &*efficiencyRatioNumerator_);
+  efficiencyRatioNumerator_->cut(1, 0, 10);
+
   boost::shared_array<unsigned int> vKeep(new unsigned int[3]);
   vKeep[0] = rebin_;
   vKeep[1] = 0;
@@ -140,6 +142,8 @@ EfficiencyRatioProducer::EfficiencyRatioProducer(const edm::ParameterSet& iConfi
   efficiencyRatioDenominator_.reset(new Efficiency);
   EfficiencyTree treeRatioDenominator;
   treeRatioDenominator.readTree(inputFileNameDenominator_, &*efficiencyRatioDenominator_);
+  efficiencyRatioDenominator_->cut(1, 0, 10);
+
   vKeep[0] = rebin_;
   vKeep[1] = 0;
   vKeep[2] = 0;
