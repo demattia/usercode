@@ -6,6 +6,7 @@
 #include <sstream>
 
 #include "Analysis/TrackingEfficiencyFromCosmics/interface/Utils.h"
+#include "Analysis/TrackingEfficiencyFromCosmics/interface/SmartPropagatorWithIP.h"
 
 /**
   * Fill a set of control plots for all the tracks in a given collection.
@@ -44,24 +45,66 @@ public:
     hDzErrVsDz_ =             utils::bookHistogram(fileService, name, "d_z_errorVsDz", "d_{z}", "cm", 500, 0, 50, "#sigma(d_{z})", "cm", 400, 0, 4);
   }
 
+  enum propType
+  {
+    INSIDETKVOL,
+    INSIDEOUT,
+    OUTSIDEIN
+  };
+
+  /**
+   * Propagator type:
+   * 0 is inside the tracker volume
+   * 1 is inside-out
+   * 2 is outside-in
+   */
   template <class T>
-  void fillControlPlots(const std::vector<T> & collection)
+  void fillControlPlots(const std::vector<T> & collection, const SmartPropagatorWithIP * smartPropIP = 0, const int type = 0)
   {
     typename std::vector<T>::const_iterator it = collection.begin();
     for( ; it != collection.end(); ++it ) {
-      hPt_->Fill(it->pt());
-      hEta_->Fill(it->eta());
-      hPhi_->Fill(it->phi());
       hNhits_->Fill(it->recHitsSize());
       hNValidHits_->Fill(it->found());
       hNValidPlusInvalidHits_->Fill(it->found() + it->lost());
       math::XYZPoint innermostHitPosition(it->innerPosition());
       hInnermostHitRadius_->Fill(innermostHitPosition.r());
       hInnermostHitZ_->Fill(innermostHitPosition.z());
-      hDxy_->Fill(fabs(it->dxy()));
-      hDxyErr_->Fill(it->dxyError());
-      hDz_->Fill(fabs(it->dz()));
-      hDzErr_->Fill(it->dzError());
+
+      SmartPropagatorWithIP::IP ip(it->pt(), it->eta(), it->phi(), it->dxy(), it->dxyError(), it->dz(), it->dzError());
+
+      if( smartPropIP != 0 ) {
+        if( type == INSIDETKVOL ) {
+          std::cout << "propagating inside tk volume" << std::endl;
+          ip = smartPropIP->computeImpactParametersInsideTkVol(*it, GlobalPoint(0,0,0));
+        }
+        else if( type == INSIDEOUT ) {
+          std::cout << "propagating inside-out" << std::endl;
+          ip = smartPropIP->computeImpactParametersInsideOutTkVol(*it, GlobalPoint(0,0,0));
+        }
+        else if( type == OUTSIDEIN ) {
+          std::cout << "propagating outside-in" << std::endl;
+          ip = smartPropIP->computeImpactParametersOutsideInTkVol(*it, GlobalPoint(0,0,0));
+        }
+        else {
+          std::cout << "Unknown propagation type: " << type << " reading IP from the track" << std::endl;
+        }
+      }
+
+      hPt_->Fill(ip.pt);
+      hEta_->Fill(ip.eta);
+      hPhi_->Fill(ip.phi);
+
+      hDxy_->Fill(fabs(ip.dxyValue));
+      hDxyErr_->Fill(ip.dxyError);
+      hDxyErrVsNValidHit_->Fill(it->found(), ip.dxyError);
+      hDxyErrVsPt_->Fill(it->pt(), ip.dxyError);
+      hDxyErrVsDxy_->Fill(fabs(ip.dxyValue), ip.dxyError);
+      hDz_->Fill(fabs(ip.dzValue));
+      hDzErr_->Fill(ip.dzError);
+      hDzErrVsNValidHit_->Fill(it->found(), ip.dzError);
+      hDzErrVsPt_->Fill(it->pt(), ip.dzError);
+      hDzErrVsDz_->Fill(fabs(it->dz()), ip.dzError);
+
       hChi2_->Fill(it->normalizedChi2());
       hReferencePointRadius_->Fill(sqrt(it->referencePoint().x()+it->referencePoint().y()));
       hReferencePointZ_->Fill(it->referencePoint().z());
@@ -69,13 +112,6 @@ public:
       hVertexY_->Fill(it->vertex().y());
       hVertexZ_->Fill(it->vertex().z());
       
-      hDxyErrVsNValidHit_->Fill(it->found(), it->dxyError());
-      hDxyErrVsPt_->Fill(it->pt(), it->dxyError());
-      hDxyErrVsDxy_->Fill(fabs(it->dxy()), it->dxyError());
-
-      hDzErrVsNValidHit_->Fill(it->found(), it->dzError());
-      hDzErrVsPt_->Fill(it->pt(), it->dzError());
-      hDzErrVsDz_->Fill(fabs(it->dz()), it->dzError());
     }
   }
 

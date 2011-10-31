@@ -38,6 +38,7 @@ public:
       double minDeltaR = maxDeltaR_;
       double oppositeMinDeltaR = maxDeltaR_;
       typename std::vector<const T2 *>::iterator matched = clonedSecond.end();
+      bool oppositeMatchFound = false;
       typename std::vector<const T2 *>::iterator oppositeMatched = clonedSecond.end();
       double deltaR = maxDeltaR_;
       typename std::vector<const T2 *>::iterator itSecond = clonedSecond.begin();
@@ -51,6 +52,7 @@ public:
           matched = itSecond;
         }
         else if( takeOppositeTracks_ ) {
+          std::cout << "taking opposite track" << std::endl;
           // if( (deltaR > (3.14 - minDeltaR)) && (deltaR < 3.14 + minDeltaR) ) {
 	  deltaR = sqrt(pow(reco::deltaPhi(itFirst->phi(), (*itSecond)->phi() - 3.141592), 2) + pow(itFirst->eta() + (*itSecond)->eta(), 2));
 	  std::cout << "opposite deltaR = " << deltaR << std::endl;
@@ -58,25 +60,32 @@ public:
           if( deltaR < oppositeMinDeltaR ) {
             oppositeMinDeltaR = deltaR;
             oppositeMatched = itSecond;
+            oppositeMatchFound = true;
           }
         }
       }
       if( matched != clonedSecond.end() ) {
         matchesMap.insert(std::make_pair(&*itFirst, *matched));
+        // bool oppositeAlreadyMatched = true;
+        // if( oppositeMatched == clonedSecond.end() ) oppositeAlreadyMatched = false;
         if( removeMatches_ ) clonedSecond.erase(matched);
+        // if( !oppositeAlreadyMatched ) oppositeMatched = clonedSecond.end();
         if( hMinDeltaR != 0 ) hMinDeltaR->Fill(deltaR);
-	std::cout << "matched" << std::endl;
       }
       else {
         T2 * emptyPointer = 0;
         matchesMap.insert(std::make_pair(&*itFirst, emptyPointer));
       }
       if( oppositeMatchesMap !=0 ) {
-	if( oppositeMatched != clonedSecond.end() ) {
-	  std::cout << "opposite matched" << std::endl;
-	  oppositeMatchesMap->insert(std::make_pair(&*itFirst, *oppositeMatched));
-	  if( removeMatches_ ) clonedSecond.erase(oppositeMatched);
-	  if( hMinDeltaR != 0 ) hMinDeltaR->Fill(deltaR);
+        // if( oppositeMatched != clonedSecond.end() ) { // cannot use this because above the erase method is changing the vector.
+        if( oppositeMatchFound ) {
+          oppositeMatchesMap->insert(std::make_pair(&*itFirst, *oppositeMatched));
+          if( removeMatches_ ) {
+            clonedSecond.erase(oppositeMatched);
+          }
+          if( hMinDeltaR != 0 ) {
+            hMinDeltaR->Fill(deltaR);
+          }
 	}
 	else {
 	  T2 * emptyPointer = 0;
