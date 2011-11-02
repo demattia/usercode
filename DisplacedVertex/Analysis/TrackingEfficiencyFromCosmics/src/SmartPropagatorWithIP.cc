@@ -159,6 +159,9 @@ Propagator* SmartPropagatorWithIP::getGenPropagator() const
 
 SmartPropagatorWithIP::IP SmartPropagatorWithIP::computeImpactParametersInsideTkVol( const reco::Track & track, const GlobalPoint & vertex ) const
 {
+  std::cout << "track = " << &track << std::endl;
+  std::cout << "track pt = " << track.pt() << std::endl;
+  std::cout << "track = " << &track << std::endl;
   const reco::TransientTrack transientTrack = theBuilder_->build(&track);
   TrajectoryStateClosestToPoint traj = transientTrack.trajectoryStateClosestToPoint(vertex);
   if( traj.isValid() ) {

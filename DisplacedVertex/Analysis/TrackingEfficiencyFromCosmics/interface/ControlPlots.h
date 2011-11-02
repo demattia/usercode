@@ -52,6 +52,25 @@ public:
     OUTSIDEIN
   };
 
+  /// Used for genParticles
+  void fillControlPlots(const SmartPropagatorWithIP::IP & ip, const reco::LeafCandidate::Point & vertex)
+  {
+    hPt_->Fill(ip.pt);
+    hEta_->Fill(ip.eta);
+    hPhi_->Fill(ip.phi);
+    hDxy_->Fill(fabs(ip.dxyValue));
+    hDxyErr_->Fill(ip.dxyError);
+    hDxyErrVsPt_->Fill(ip.pt, ip.dxyError);
+    hDxyErrVsDxy_->Fill(fabs(ip.dxyValue), ip.dxyError);
+    hDz_->Fill(fabs(ip.dzValue));
+    hDzErr_->Fill(ip.dzError);
+    hDzErrVsPt_->Fill(ip.pt, ip.dzError);
+    hDzErrVsDz_->Fill(fabs(ip.dzValue), ip.dzError);
+    hVertexX_->Fill(vertex.x());
+    hVertexY_->Fill(vertex.y());
+    hVertexZ_->Fill(vertex.z());
+  }
+
   /**
    * Propagator type:
    * 0 is inside the tracker volume
@@ -59,59 +78,61 @@ public:
    * 2 is outside-in
    */
   template <class T>
+  void fillControlPlots(const T & track, const SmartPropagatorWithIP * smartPropIP = 0, const int type = 0)
+  {
+    hNhits_->Fill(track.recHitsSize());
+    hNValidHits_->Fill(track.found());
+    hNValidPlusInvalidHits_->Fill(track.found() + track.lost());
+    math::XYZPoint innermostHitPosition(track.innerPosition());
+    hInnermostHitRadius_->Fill(innermostHitPosition.r());
+    hInnermostHitZ_->Fill(innermostHitPosition.z());
+    hChi2_->Fill(track.normalizedChi2());
+    hReferencePointRadius_->Fill(sqrt(track.referencePoint().x()+track.referencePoint().y()));
+    hReferencePointZ_->Fill(track.referencePoint().z());
+    hVertexX_->Fill(track.vertex().x());
+    hVertexY_->Fill(track.vertex().y());
+    hVertexZ_->Fill(track.vertex().z());
+
+    SmartPropagatorWithIP::IP ip(track.pt(), track.eta(), track.phi(), track.dxy(), track.dxyError(), track.dz(), track.dzError());
+
+    if( smartPropIP != 0 ) {
+      if( type == INSIDETKVOL ) {
+        std::cout << "propagating inside tk volume" << std::endl;
+        ip = smartPropIP->computeImpactParametersInsideTkVol(track, GlobalPoint(0,0,0));
+      }
+      else if( type == INSIDEOUT ) {
+        std::cout << "propagating inside-out" << std::endl;
+        ip = smartPropIP->computeImpactParametersInsideOutTkVol(track, GlobalPoint(0,0,0));
+      }
+      else if( type == OUTSIDEIN ) {
+        std::cout << "propagating outside-in" << std::endl;
+        ip = smartPropIP->computeImpactParametersOutsideInTkVol(track, GlobalPoint(0,0,0));
+      }
+      else {
+        std::cout << "Unknown propagation type: " << type << " reading IP from the track" << std::endl;
+      }
+    }
+    hPt_->Fill(ip.pt);
+    hEta_->Fill(ip.eta);
+    hPhi_->Fill(ip.phi);
+    hDxy_->Fill(fabs(ip.dxyValue));
+    hDxyErr_->Fill(ip.dxyError);
+    hDxyErrVsNValidHit_->Fill(track.found(), ip.dxyError);
+    hDxyErrVsPt_->Fill(ip.pt, ip.dxyError);
+    hDxyErrVsDxy_->Fill(fabs(ip.dxyValue), ip.dxyError);
+    hDz_->Fill(fabs(ip.dzValue));
+    hDzErr_->Fill(ip.dzError);
+    hDzErrVsNValidHit_->Fill(track.found(), ip.dzError);
+    hDzErrVsPt_->Fill(ip.pt, ip.dzError);
+    hDzErrVsDz_->Fill(fabs(ip.dzValue), ip.dzError);
+  }
+
+  template <class T>
   void fillControlPlots(const std::vector<T> & collection, const SmartPropagatorWithIP * smartPropIP = 0, const int type = 0)
   {
     typename std::vector<T>::const_iterator it = collection.begin();
-    for( ; it != collection.end(); ++it ) {
-      hNhits_->Fill(it->recHitsSize());
-      hNValidHits_->Fill(it->found());
-      hNValidPlusInvalidHits_->Fill(it->found() + it->lost());
-      math::XYZPoint innermostHitPosition(it->innerPosition());
-      hInnermostHitRadius_->Fill(innermostHitPosition.r());
-      hInnermostHitZ_->Fill(innermostHitPosition.z());
-
-      SmartPropagatorWithIP::IP ip(it->pt(), it->eta(), it->phi(), it->dxy(), it->dxyError(), it->dz(), it->dzError());
-
-      if( smartPropIP != 0 ) {
-        if( type == INSIDETKVOL ) {
-          std::cout << "propagating inside tk volume" << std::endl;
-          ip = smartPropIP->computeImpactParametersInsideTkVol(*it, GlobalPoint(0,0,0));
-        }
-        else if( type == INSIDEOUT ) {
-          std::cout << "propagating inside-out" << std::endl;
-          ip = smartPropIP->computeImpactParametersInsideOutTkVol(*it, GlobalPoint(0,0,0));
-        }
-        else if( type == OUTSIDEIN ) {
-          std::cout << "propagating outside-in" << std::endl;
-          ip = smartPropIP->computeImpactParametersOutsideInTkVol(*it, GlobalPoint(0,0,0));
-        }
-        else {
-          std::cout << "Unknown propagation type: " << type << " reading IP from the track" << std::endl;
-        }
-      }
-
-      hPt_->Fill(ip.pt);
-      hEta_->Fill(ip.eta);
-      hPhi_->Fill(ip.phi);
-
-      hDxy_->Fill(fabs(ip.dxyValue));
-      hDxyErr_->Fill(ip.dxyError);
-      hDxyErrVsNValidHit_->Fill(it->found(), ip.dxyError);
-      hDxyErrVsPt_->Fill(it->pt(), ip.dxyError);
-      hDxyErrVsDxy_->Fill(fabs(ip.dxyValue), ip.dxyError);
-      hDz_->Fill(fabs(ip.dzValue));
-      hDzErr_->Fill(ip.dzError);
-      hDzErrVsNValidHit_->Fill(it->found(), ip.dzError);
-      hDzErrVsPt_->Fill(it->pt(), ip.dzError);
-      hDzErrVsDz_->Fill(fabs(it->dz()), ip.dzError);
-
-      hChi2_->Fill(it->normalizedChi2());
-      hReferencePointRadius_->Fill(sqrt(it->referencePoint().x()+it->referencePoint().y()));
-      hReferencePointZ_->Fill(it->referencePoint().z());
-      hVertexX_->Fill(it->vertex().x());
-      hVertexY_->Fill(it->vertex().y());
-      hVertexZ_->Fill(it->vertex().z());
-      
+    for( ; it != collection.end(); ++it ) {      
+      fillControlPlots(*it, smartPropIP, type);
     }
   }
 

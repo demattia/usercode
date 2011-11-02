@@ -95,7 +95,7 @@ private:
   template <class T>
   SmartPropagatorWithIP::IP computeGenImpactParameters(const T & genMuon, const math::XYZPoint & genVertex,
                                                        const int genCharge, const MagneticField * mf);
-  void computeImpactParameters( const reco::Track & track, const TransientTrackBuilder & theBuilder );
+  // void computeImpactParameters( const reco::Track & track, const TransientTrackBuilder & theBuilder );
   template <class T1, class T2>
   void fillEfficiencyVsGen( const T1 & tracks, const T2 stableMuon,
                             Efficiency * efficiency,
@@ -106,6 +106,10 @@ private:
   void fillEfficiency(const T1 & staMuons, const T2 & tracks, Efficiency * efficiency,
                       TH1F * hMinDeltaR, ControlDeltaPlots * standAloneTrackDelta,
 		      ControlPlots * matchedStandAlone, ControlPlots * unmatchedStandAlone);
+
+  void fillEfficiency(const std::map<const reco::Track *, const reco::Track *> & matchesMap,
+                      Efficiency * efficiency, ControlDeltaPlots * standAloneTrackDelta,
+                      ControlPlots * matchedStandAlone, ControlPlots * unmatchedStandAlone);
 
   void dumpGenParticleInfo(const reco::GenParticle & genParticle);
   void dumpTrackInfo(const reco::Track & track, const unsigned int trackNumber);
@@ -381,10 +385,6 @@ void TrackingEfficiencyFromCosmics::analyze(const edm::Event& iEvent, const edm:
   }
 
   // Fill all control plots
-
-
-  // controlPlotsGenTracks_->fillControlPlots();
-
   controlPlotsGeneralTracks_->fillControlPlots(*tracks, smartPropIP_, ControlPlots::INSIDETKVOL);
   controlPlotsStandAloneMuons_->fillControlPlots(*staMuons, smartPropIP_, ControlPlots::OUTSIDEIN);
   controlPlotsCleanedStandAloneMuonsNoDzCut_->fillControlPlots(cleanedStaMuonsNoDzCut, smartPropIP_, ControlPlots::OUTSIDEIN);
@@ -415,10 +415,10 @@ void TrackingEfficiencyFromCosmics::analyze(const edm::Event& iEvent, const edm:
     tkIp2 = smartPropIP_->computeImpactParametersInsideTkVol((*tracks)[1], vertex);
   }
   if( staMuons->size() > 0 ) {
-    saIp1 = smartPropIP_->computeImpactParametersInsideTkVol((*staMuons)[0], vertex);
+    saIp1 = smartPropIP_->computeImpactParametersOutsideInTkVol((*staMuons)[0], vertex);
   }
   if( staMuons->size() > 1 ) {
-    saIp2 = smartPropIP_->computeImpactParametersInsideTkVol((*staMuons)[1], vertex);
+    saIp2 = smartPropIP_->computeImpactParametersOutsideInTkVol((*staMuons)[1], vertex);
   }
 
   // Gen Particles
@@ -431,13 +431,11 @@ void TrackingEfficiencyFromCosmics::analyze(const edm::Event& iEvent, const edm:
     SmartPropagatorWithIP::IP stableMuonIP(computeGenImpactParameters(*stableMuon, stableMuon->vertex(), stableMuon->charge(), mf));
 
     // Gen muon values
-    // double genDxy = dxy_.first;
-    // double genDz = dz_.first;
-
     variables_[0] = fabs(stableMuonIP.dxyValue);
     variables_[1] = fabs(stableMuonIP.dzValue);
-    // variables_[2] = stableMuon->pt();
     variables_[2] = stableMuonIP.pt;
+
+    controlPlotsGenTracks_->fillControlPlots(stableMuonIP, stableMuon->vertex());
 
     // Compute efficiency for track vs MC-truth
     fillEfficiencyVsGen( *tracks, stableMuonIP, genToTrackEfficiency_.get(),
@@ -656,86 +654,88 @@ SmartPropagatorWithIP::IP TrackingEfficiencyFromCosmics::computeGenImpactParamet
                                       GlobalVector(genMomentum.x(),genMomentum.y(),genMomentum.z()),
                                       TrackCharge(genCharge), mf);
 
-  std::cout << "genVertex (x,y,z) = (" << genVertex.x() << "," << genVertex.y() << "," << genVertex.z() << ")" << std::endl;
-  std::cout << "genMomentum (x,y,z) = (" << genMomentum.x() << "," << genMomentum.y() << "," << genMomentum.z() << ")" << std::endl;
-  std::cout << "genCharge = (" << genCharge <<  std::endl;
+  std::cout << "gen pt before propagation = " << track.pt() << std::endl;
+  std::cout << "gen pt after propagation = " << ip.pt << std::endl;
+//  std::cout << "genVertex (x,y,z) = (" << genVertex.x() << "," << genVertex.y() << "," << genVertex.z() << ")" << std::endl;
+//  std::cout << "genMomentum (x,y,z) = (" << genMomentum.x() << "," << genMomentum.y() << "," << genMomentum.z() << ")" << std::endl;
+//  std::cout << "genCharge = (" << genCharge <<  std::endl;
 
-  TrajectoryStateOnSurface analyticalTSOS_ = analyticalExtrapolator_->extrapolate(ftsAtProduction, GlobalPoint(0,0,0));
-  TrajectoryStateOnSurface transverseTSOS_ = transverseExtrapolator_->extrapolate(ftsAtProduction, GlobalPoint(0,0,0));
+//  TrajectoryStateOnSurface analyticalTSOS_ = analyticalExtrapolator_->extrapolate(ftsAtProduction, GlobalPoint(0,0,0));
+//  TrajectoryStateOnSurface transverseTSOS_ = transverseExtrapolator_->extrapolate(ftsAtProduction, GlobalPoint(0,0,0));
 
-  if(transverseTSOS_.isValid()) {
-    TrajectoryStateOnSurface transverseTSOS(transverseTSOS_.localParameters(), LocalTrajectoryError(nullCovariance_),
-                                            transverseTSOS_.surface(), transverseTSOS_.magneticField(), transverseTSOS_.weight());
-    // Reco vertex default constructed to (0,0,0)
-    std::pair<bool,Measurement1D> dxy = IPTools::absoluteImpactParameter(transverseTSOS, reco::Vertex(), distXY);
-    dxy_.first = dxy.second.value();
-    dxy_.second = dxy.second.error();
-    dz_.first = transverseTSOS.globalPosition().z();
-    dz_.second = transverseTSOS.cartesianError().position().czz();
-    std::cout << "transverseTSOS pt = " << transverseTSOS.globalMomentum().perp() << std::endl;
-  }
-  else {
-    std::cout << "Invalid trajectoryStateClosestToPoint for GEN" << std::endl;
-    dxy_.first = 65535;
-    dxy_.second = 65535;
-    dz_.first = 65535;
-    dz_.second = 65535;
-  }
-  if(analyticalTSOS_.isValid()) {
-    std::cout << "analytical extrapolation successful" << std::endl;
-    // analyticalTSOS_ has no errors defined. Explicitly set the errors to 0 for the genparticle state
-    TrajectoryStateOnSurface analyticalTSOS(analyticalTSOS_.localParameters(), LocalTrajectoryError(nullCovariance_),
-                                            analyticalTSOS_.surface(), analyticalTSOS_.magneticField(), analyticalTSOS_.weight());
-    std::pair<bool,Measurement1D> dxyz = IPTools::absoluteImpactParameter(analyticalTSOS, reco::Vertex(), dist3D);
-    dxyz_.first = dxyz.second.value();
-    dxyz_.second = dxyz.second.error();
-  }
-  else {
-    std::cout << "Invalid trajectoryStateClosestToPoint for analyticalExtrapolator for GEN" << std::endl;
-    dxyz_.first = 65535;
-    dxyz_.second = 65535;
-  }
+//  if(transverseTSOS_.isValid()) {
+//    TrajectoryStateOnSurface transverseTSOS(transverseTSOS_.localParameters(), LocalTrajectoryError(nullCovariance_),
+//                                            transverseTSOS_.surface(), transverseTSOS_.magneticField(), transverseTSOS_.weight());
+//    // Reco vertex default constructed to (0,0,0)
+//    std::pair<bool,Measurement1D> dxy = IPTools::absoluteImpactParameter(transverseTSOS, reco::Vertex(), distXY);
+//    dxy_.first = dxy.second.value();
+//    dxy_.second = dxy.second.error();
+//    dz_.first = transverseTSOS.globalPosition().z();
+//    dz_.second = transverseTSOS.cartesianError().position().czz();
+//    std::cout << "transverseTSOS pt = " << transverseTSOS.globalMomentum().perp() << std::endl;
+//  }
+//  else {
+//    std::cout << "Invalid trajectoryStateClosestToPoint for GEN" << std::endl;
+//    dxy_.first = 65535;
+//    dxy_.second = 65535;
+//    dz_.first = 65535;
+//    dz_.second = 65535;
+//  }
+//  if(analyticalTSOS_.isValid()) {
+//    std::cout << "analytical extrapolation successful" << std::endl;
+//    // analyticalTSOS_ has no errors defined. Explicitly set the errors to 0 for the genparticle state
+//    TrajectoryStateOnSurface analyticalTSOS(analyticalTSOS_.localParameters(), LocalTrajectoryError(nullCovariance_),
+//                                            analyticalTSOS_.surface(), analyticalTSOS_.magneticField(), analyticalTSOS_.weight());
+//    std::pair<bool,Measurement1D> dxyz = IPTools::absoluteImpactParameter(analyticalTSOS, reco::Vertex(), dist3D);
+//    dxyz_.first = dxyz.second.value();
+//    dxyz_.second = dxyz.second.error();
+//  }
+//  else {
+//    std::cout << "Invalid trajectoryStateClosestToPoint for analyticalExtrapolator for GEN" << std::endl;
+//    dxyz_.first = 65535;
+//    dxyz_.second = 65535;
+//  }
 
-  std::cout << "transverseExtrapolator dxy = " << dxy_.first << std::endl;
-  std::cout << "transverseExtrapolator dz = " << dz_.first << std::endl;
-  dxy_.first = ip.dxyValue;
-  dxy_.second = ip.dxyError;
-  dz_.first = ip.dzValue;
-  dz_.second = ip.dzError;
-  std::cout << "steppingHelix dxy = " << dxy_.first << std::endl;
-  std::cout << "steppingHelix dz = " << dz_.first << std::endl;
+//  std::cout << "transverseExtrapolator dxy = " << dxy_.first << std::endl;
+//  std::cout << "transverseExtrapolator dz = " << dz_.first << std::endl;
+//  dxy_.first = ip.dxyValue;
+//  dxy_.second = ip.dxyError;
+//  dz_.first = ip.dzValue;
+//  dz_.second = ip.dzError;
+//  std::cout << "steppingHelix dxy = " << dxy_.first << std::endl;
+//  std::cout << "steppingHelix dz = " << dz_.first << std::endl;
 
   return ip;
 }
 
-void TrackingEfficiencyFromCosmics::computeImpactParameters( const reco::Track & track, const TransientTrackBuilder & theBuilder )
-{  
-  const reco::TransientTrack transientTrack = theBuilder.build(&track);
-  GlobalPoint vert(0., 0., 0.);
-  TrajectoryStateClosestToPoint traj = transientTrack.trajectoryStateClosestToPoint(vert);
-  if( traj.isValid() ) {
-    dxy_.first = traj.perigeeParameters().transverseImpactParameter();
-    dxy_.second = traj.perigeeError().transverseImpactParameterError();
-    dz_.first = traj.perigeeParameters().longitudinalImpactParameter();
-    dz_.second = traj.perigeeError().longitudinalImpactParameterError();
-    std::cout << "From origin dxy = " << dxy_.first << " +/- " << dxy_.second << std::endl;
-  }
-  else {
-    std::cout << "Invalid trajectoryStateClosestToPoint" << std::endl;
-    dxyz_.first = 65535;
-    dxyz_.second = 65535;
-    dz_.first = 65535;
-    dz_.second = 65535;
-  }
-  //  // Taking the dxy from the beamline does not make any difference
-  //  TrajectoryStateClosestToBeamLine traj2 = transientTrack.stateAtBeamLine();
-  //  Measurement1D measDxy = traj2.transverseImpactParameter();
-  //  if( traj2.isValid() ) {
-  //    dxy_.first = measDxy.value();
-  //    dxy_.second = measDxy.error();
-  //    // std::cout << "From beamline dxy = " << dxy_.first << " +/ " << dxy_.second << std::endl;
-  //  }
-}
+//void TrackingEfficiencyFromCosmics::computeImpactParameters( const reco::Track & track, const TransientTrackBuilder & theBuilder )
+//{
+//  const reco::TransientTrack transientTrack = theBuilder.build(&track);
+//  GlobalPoint vert(0., 0., 0.);
+//  TrajectoryStateClosestToPoint traj = transientTrack.trajectoryStateClosestToPoint(vert);
+//  if( traj.isValid() ) {
+//    dxy_.first = traj.perigeeParameters().transverseImpactParameter();
+//    dxy_.second = traj.perigeeError().transverseImpactParameterError();
+//    dz_.first = traj.perigeeParameters().longitudinalImpactParameter();
+//    dz_.second = traj.perigeeError().longitudinalImpactParameterError();
+//    std::cout << "From origin dxy = " << dxy_.first << " +/- " << dxy_.second << std::endl;
+//  }
+//  else {
+//    std::cout << "Invalid trajectoryStateClosestToPoint" << std::endl;
+//    dxyz_.first = 65535;
+//    dxyz_.second = 65535;
+//    dz_.first = 65535;
+//    dz_.second = 65535;
+//  }
+//  //  // Taking the dxy from the beamline does not make any difference
+//  //  TrajectoryStateClosestToBeamLine traj2 = transientTrack.stateAtBeamLine();
+//  //  Measurement1D measDxy = traj2.transverseImpactParameter();
+//  //  if( traj2.isValid() ) {
+//  //    dxy_.first = measDxy.value();
+//  //    dxy_.second = measDxy.error();
+//  //    // std::cout << "From beamline dxy = " << dxy_.first << " +/ " << dxy_.second << std::endl;
+//  //  }
+//}
 
 void TrackingEfficiencyFromCosmics::dumpGenParticleInfo(const reco::GenParticle & genParticle)
 {
@@ -786,7 +786,6 @@ void TrackingEfficiencyFromCosmics::fillEfficiencyVsGen( const T1 & tracks, cons
     SmartPropagatorWithIP::IP ip(track.pt(), track.eta(), track.phi(),
                                  track.dxy(), track.dxyError(), track.dz(), track.dzError());
     if( recomputeIP_ ) {
-      // computeImpactParameters(staMuon, *theB_);
       if( propagationType == ControlPlots::INSIDETKVOL ) {
         ip = smartPropIP_->computeImpactParametersInsideTkVol(track, GlobalPoint(0,0,0));
       }
@@ -798,10 +797,58 @@ void TrackingEfficiencyFromCosmics::fillEfficiencyVsGen( const T1 & tracks, cons
       }
     }
     hMinToGenDeltaR->Fill(reco::deltaR(stableMuonIP.eta, stableMuonIP.phi, ip.eta, ip.phi));
-    // hMinToGenDeltaR->Fill(reco::deltaR(*stableMuon, staMuon));
-    // hToGenDeltaDxy->Fill(fabs(ip.dxyValue) - fabs(stableMuonIP.dxyValue));
-    // hToGenDeltaDz->Fill(fabs(ip.dzValue) - fabs(stableMuonIP.dzValue));
     efficiency->fill(variables_, true);
+  }
+}
+
+void TrackingEfficiencyFromCosmics::fillEfficiency(const std::map<const reco::Track *, const reco::Track *> & matchesMap,
+                                                   Efficiency * efficiency, ControlDeltaPlots * standAloneTrackDelta,
+                                                   ControlPlots * matchedStandAlone, ControlPlots * unmatchedStandAlone)
+{
+  bool found = false;
+  std::map<const reco::Track *, const reco::Track *>::const_iterator it = matchesMap.begin();
+  for( ; it != matchesMap.end(); ++it ) {
+    found = false;
+    SmartPropagatorWithIP::IP ip1(it->first->pt(), it->first->eta(), it->first->phi(),
+                                  it->first->dxy(), it->first->dxyError(), it->first->dz(), it->first->dzError());
+    if( recomputeIP_ ) {
+      ip1 = smartPropIP_->computeImpactParametersOutsideInTkVol(*(it->first), GlobalPoint(0,0,0));
+    }
+    SmartPropagatorWithIP::IP ip2;
+    variables_[0] = fabs(ip1.dxyValue);
+    variables_[1] = fabs(ip1.dzValue);
+    variables_[2] = ip1.pt;
+
+    if( it->second == 0 ) {
+      found = false;
+      if( cleaned_ ) {
+        std::cout << "No match found in this event: " << eventNum_ << std::endl;
+      }
+    }
+    else {
+      found = true;
+      if( recomputeIP_ ) {
+        ip2 = smartPropIP_->computeImpactParametersInsideTkVol(*(it->second), GlobalPoint(0,0,0));
+      }
+      else {
+        ip2 = SmartPropagatorWithIP::IP(it->second->pt(), it->second->eta(), it->second->phi(),
+                                        it->second->dxy(), it->second->dxyError(), it->second->dz(), it->second->dzError());
+      }
+      if( useTrackParameters_ ) {
+        variables_[0] = ip2.dxyValue;
+        variables_[1] = ip2.dzValue;
+        variables_[2] = ip2.pt;
+      }
+    }
+    efficiency->fill(variables_, found);
+
+    if( found ) {
+      standAloneTrackDelta->fillControlPlots(*(it->first), ip1, *(it->second), ip2);
+      matchedStandAlone->fillControlPlots(*(it->first), smartPropIP_, ControlPlots::OUTSIDEIN);
+    }
+    else {
+      unmatchedStandAlone->fillControlPlots(*(it->first), smartPropIP_, ControlPlots::OUTSIDEIN);
+    }
   }
 }
 
@@ -815,103 +862,11 @@ void TrackingEfficiencyFromCosmics::fillEfficiency(const T1 & staMuons, const T2
   std::map<const reco::Track *, const reco::Track *> oppositeMatchesMap;
   if( staMuons.size() > 0 ) {
     associatorByDeltaR_->fillAssociationMap(staMuons, *tracks, matchesMap, hMinDeltaR, &oppositeMatchesMap);
-
-    bool found = false;
-
     if( countSameSide_ ) {
-      std::map<const reco::Track *, const reco::Track *>::const_iterator it = matchesMap.begin();
-      for( ; it != matchesMap.end(); ++it ) {
-
-        double standAloneDxy = it->first->dxy();
-        double standAloneDz = it->first->dz();
-        if( recomputeIP_ ) {
-          // computeImpactParameters(*(it->first), *theB_);
-          SmartPropagatorWithIP::IP ip(smartPropIP_->computeImpactParametersOutsideInTkVol(*(it->first), GlobalPoint(0,0,0)));
-          standAloneDxy = ip.dxyValue;
-          standAloneDz = ip.dzValue;
-          // std::cout << "standAloneDxy            = " << standAloneDxy << std::endl;
-          // standAloneDxy = dxy_.first;
-          // std::cout << "recomputed standAloneDxy = " << standAloneDxy << std::endl;
-          // standAloneDz = dz_.first;
-        }
-        variables_[0] = fabs(standAloneDxy);
-        variables_[1] = fabs(standAloneDz);
-        variables_[2] = it->first->pt();
-
-        if( it->second == 0 ) {
-          found = false;
-          if( cleaned_ ) {
-            std::cout << "No match found in this event: " << eventNum_ << std::endl;
-          }
-        }
-        else {
-          found = true;
-          if( useTrackParameters_ ) {
-            variables_[0] = it->second->dxy();
-            variables_[1] = it->second->dz();
-            variables_[2] = it->second->pt();
-          }
-        }
-        efficiency->fill(variables_, found);
-
-        // hStandAloneCounterDxy_->Fill(variables_[0]);
-        // hStandAloneCounterDz_->Fill(variables_[1]);
-        if( found ) {
-          // hTrackCounterDxy_->Fill(variables_[0]);
-          // hTrackCounterDz_->Fill(variables_[1]);
-          standAloneTrackDelta->fillControlPlots(*(it->first), *(it->second));
-          matchedStandAlone->fillControlPlots(staMuons, smartPropIP_);
-        }
-        else {
-          unmatchedStandAlone->fillControlPlots(staMuons, smartPropIP_);
-        }
-      }
+      fillEfficiency(matchesMap, efficiency, standAloneTrackDelta, matchedStandAlone, unmatchedStandAlone);
     }
-
-    found = false;
-
-    if ( countOppoSide_ ) {
-      std::map<const reco::Track *, const reco::Track *>::const_iterator opIt = oppositeMatchesMap.begin();
-      for( ; opIt != oppositeMatchesMap.end(); ++opIt ) {
-
-        double standAloneDxy = opIt->first->dxy();
-        double standAloneDz = opIt->first->dz();
-        if( recomputeIP_ ) {
-          SmartPropagatorWithIP::IP ip(smartPropIP_->computeImpactParametersOutsideInTkVol(*(opIt->first), GlobalPoint(0,0,0)));
-          standAloneDxy = ip.dxyValue;
-          standAloneDz = ip.dzValue;
-          // computeImpactParameters(*(opIt->first), *theB_);
-          // standAloneDxy = dxy_.first;
-          // standAloneDz = dz_.first;
-        }
-        variables_[0] = fabs(standAloneDxy);
-        variables_[1] = fabs(standAloneDz);
-        variables_[2] = opIt->first->pt();
-
-        if( opIt->second == 0 ) {
-          found = false;
-          if( cleaned_ ) {
-            std::cout << "No opposite match found in this event: " << eventNum_ << std::endl;
-          }
-        }
-        else {
-          found = true;
-          if( useTrackParameters_ ) {
-            variables_[0] = opIt->second->dxy();
-            variables_[1] = opIt->second->dz();
-            variables_[2] = opIt->second->pt();
-          }
-        }
-        efficiency->fill(variables_, found);
-
-        if( found ) {
-          standAloneTrackDelta->fillControlPlots(*(opIt->first), *(opIt->second));
-          matchedStandAlone->fillControlPlots(staMuons, smartPropIP_);
-        }
-        else {
-          unmatchedStandAlone->fillControlPlots(staMuons, smartPropIP_);
-        }
-      }
+    if( countOppoSide_ ) {
+      fillEfficiency(oppositeMatchesMap, efficiency, standAloneTrackDelta, matchedStandAlone, unmatchedStandAlone);
     }
   }
 }
