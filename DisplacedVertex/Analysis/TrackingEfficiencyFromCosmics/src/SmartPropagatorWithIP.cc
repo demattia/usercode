@@ -16,13 +16,18 @@
 
 /* ====================================================================== */
 
+ReferenceCountingPointer<Cylinder> & SmartPropagatorWithIP::theTkVolume()
+{
+  static ReferenceCountingPointer<Cylinder> local=0;
+  return local;
+}
+
+
 /* Constructor */
 SmartPropagatorWithIP::SmartPropagatorWithIP(Propagator* aTkProp, Propagator* aGenProp, const MagneticField* field,
                                              const TransientTrackBuilder * theBuilder,
                                              PropagationDirection dir, float epsilon) :
   Propagator(dir), theTkProp_(aTkProp->clone()), theGenProp_(aGenProp->clone()), theField_(field), epsilon_(epsilon),
-  // transverseExtrapolator_(new TransverseImpactPointExtrapolator(theField_)),
-  // analyticalExtrapolator_(new AnalyticalImpactPointExtrapolator(theField_)),
   theBuilder_(theBuilder)
 {
   transverseExtrapolator_ = new TransverseImpactPointExtrapolator(theField_);
@@ -33,6 +38,7 @@ SmartPropagatorWithIP::SmartPropagatorWithIP(Propagator* aTkProp, Propagator* aG
       nullCovariance_(i,j) = 0;
     }
   }
+  if (theTkVolume()==0) initTkVolume(epsilon);
 }
 
 SmartPropagatorWithIP::SmartPropagatorWithIP(const Propagator& aTkProp, const Propagator& aGenProp,const MagneticField* field,
@@ -49,6 +55,7 @@ SmartPropagatorWithIP::SmartPropagatorWithIP(const Propagator& aTkProp, const Pr
       nullCovariance_(i,j) = 0;
     }
   }
+  if (theTkVolume()==0) initTkVolume(epsilon);
 }
 
 SmartPropagatorWithIP::SmartPropagatorWithIP(const SmartPropagatorWithIP& aProp) :
@@ -79,10 +86,18 @@ SmartPropagatorWithIP::~SmartPropagatorWithIP()
 }
 
 ///* Operations */
+void SmartPropagatorWithIP::initTkVolume(float epsilon)
+{
+  // fill tracker dimensions
+  Surface::PositionType pos(0,0,0); // centered at the global origin
+  Surface::RotationType rot; // unit matrix - barrel cylinder orientation
+  theTkVolume() = Cylinder::build(pos, rot, TrackerBounds::radius()+epsilon);
+}
+
 TrajectoryStateOnSurface SmartPropagatorWithIP::propagate(const FreeTrajectoryState& fts,
                                                           const Surface& surface) const
 {
-  return Propagator::propagate( fts, surface);
+  return Propagator::propagate(fts, surface);
 }
 
 TrajectoryStateOnSurface SmartPropagatorWithIP::propagate(const FreeTrajectoryState& fts,
@@ -157,12 +172,11 @@ Propagator* SmartPropagatorWithIP::getGenPropagator() const
   return theGenProp_;
 }
 
+//template <class T>
+//SmartPropagatorWithIP::IP SmartPropagatorWithIP::computeImpactParametersInsideTkVol( const T & track, const GlobalPoint & vertex ) const
 SmartPropagatorWithIP::IP SmartPropagatorWithIP::computeImpactParametersInsideTkVol( const reco::Track & track, const GlobalPoint & vertex ) const
 {
-  std::cout << "track = " << &track << std::endl;
-  std::cout << "track pt = " << track.pt() << std::endl;
-  std::cout << "track = " << &track << std::endl;
-  const reco::TransientTrack transientTrack = theBuilder_->build(&track);
+  const reco::TransientTrack transientTrack = theBuilder_->build(track);
   TrajectoryStateClosestToPoint traj = transientTrack.trajectoryStateClosestToPoint(vertex);
   if( traj.isValid() ) {
     return IP(traj.theState().momentum(),
@@ -192,19 +206,72 @@ SmartPropagatorWithIP::IP SmartPropagatorWithIP::computeImpactParametersOutsideT
   return IP();
 }
 
+//SmartPropagatorWithIP::IP SmartPropagatorWithIP::computeImpactParametersOutsideInTkVol( const reco::Track & track, const GlobalPoint & vertex ) const
+//{
+//  return computeImpactParametersOutsideTkVol(FreeTrajectoryState(GlobalPoint(track.innerPosition().x(),track.innerPosition().y(),track.innerPosition().z()),
+//                                                                 GlobalVector(track.innerMomentum().x(),track.innerMomentum().y(),track.innerMomentum().z()),
+//                                                                 TrackCharge(track.charge()), theField_),
+//                                             vertex);
+//}
+
+//SmartPropagatorWithIP::IP SmartPropagatorWithIP::computeImpactParametersInsideOutTkVol( const reco::Track & track, const GlobalPoint & vertex ) const
+//{
+//  return computeImpactParametersOutsideTkVol(FreeTrajectoryState(GlobalPoint(track.outerPosition().x(),track.outerPosition().y(),track.outerPosition().z()),
+//                                                                 GlobalVector(track.outerMomentum().x(),track.outerMomentum().y(),track.outerMomentum().z()),
+//                                                                 TrackCharge(track.charge()), theField_),
+//                                             vertex);
+//}
+
+SmartPropagatorWithIP::IP SmartPropagatorWithIP::computeImpactParametersOutsideInTkVol( const FreeTrajectoryState & fts, const GlobalPoint & vertex ) const
+{
+  TrajectoryStateOnSurface tsos(propagate(fts, *(theTkVolume().get())));
+  if( tsos.isValid() ) {
+    // return computeImpactParametersInsideTkVol(*(tsos.freeTrajectoryState()), vertex);
+    return computeImpactParametersOutsideTkVol(fts, vertex);
+  }
+  std::cout << "Mixed propagation failed, trying again with stepping helix only" << std::endl;
+  return computeImpactParametersOutsideTkVol(fts, vertex);
+}
+
 SmartPropagatorWithIP::IP SmartPropagatorWithIP::computeImpactParametersOutsideInTkVol( const reco::Track & track, const GlobalPoint & vertex ) const
 {
+  return computeImpactParametersOutsideInTkVol(FreeTrajectoryState(GlobalPoint(track.innerPosition().x(),track.innerPosition().y(),track.innerPosition().z()),
+                                                                   GlobalVector(track.innerMomentum().x(),track.innerMomentum().y(),track.innerMomentum().z()),
+                                                                   TrackCharge(track.charge()), theField_), vertex);
+}
 
-  return computeImpactParametersOutsideTkVol(FreeTrajectoryState(GlobalPoint(track.innerPosition().x(),track.innerPosition().y(),track.innerPosition().z()),
-								 GlobalVector(track.innerMomentum().x(),track.innerMomentum().y(),track.innerMomentum().z()),
-								 TrackCharge(track.charge()), theField_),
-                                             vertex);
+SmartPropagatorWithIP::IP SmartPropagatorWithIP::computeImpactParametersInsideOutTkVol( const FreeTrajectoryState & fts, const GlobalPoint & vertex ) const
+{
+  TrajectoryStateOnSurface tsos(propagate(fts, *(theTkVolume().get())));
+  if( tsos.isValid() ) {
+    return computeImpactParametersOutsideTkVol(*(tsos.freeTrajectoryState()), vertex);
+  }
+  std::cout << "Mixed propagation failed, trying again with stepping helix only" << std::endl;
+  return computeImpactParametersOutsideTkVol(fts, vertex);
 }
 
 SmartPropagatorWithIP::IP SmartPropagatorWithIP::computeImpactParametersInsideOutTkVol( const reco::Track & track, const GlobalPoint & vertex ) const
 {
-  return computeImpactParametersOutsideTkVol(FreeTrajectoryState(GlobalPoint(track.outerPosition().x(),track.outerPosition().y(),track.outerPosition().z()),
-								 GlobalVector(track.outerMomentum().x(),track.outerMomentum().y(),track.outerMomentum().z()),
-								 TrackCharge(track.charge()), theField_),
-					     vertex);
+  return computeImpactParametersInsideOutTkVol(FreeTrajectoryState(GlobalPoint(track.outerPosition().x(),track.outerPosition().y(),track.outerPosition().z()),
+                                                                   GlobalVector(track.outerMomentum().x(),track.outerMomentum().y(),track.outerMomentum().z()),
+                                                                   TrackCharge(track.charge()), theField_), vertex);
+}
+
+SmartPropagatorWithIP::IP SmartPropagatorWithIP::computeImpactParameters( const reco::Track & track, const GlobalPoint & vertex ) const
+{
+  // When the vertex is inside the tkVolume
+  if( insideTkVol(vertex) ) {
+    FreeTrajectoryState innerTsos(GlobalPoint(track.innerPosition().x(),track.innerPosition().y(),track.innerPosition().z()),
+                                  GlobalVector(track.innerMomentum().x(),track.innerMomentum().y(),track.innerMomentum().z()),
+                                  TrackCharge(track.charge()), theField_);
+    if( insideTkVol(innerTsos) ) return computeImpactParametersInsideTkVol(track, vertex);
+    return computeImpactParametersOutsideInTkVol(innerTsos, vertex);
+  }
+  else {
+    FreeTrajectoryState outerTsos(GlobalPoint(track.outerPosition().x(),track.outerPosition().y(),track.outerPosition().z()),
+                                  GlobalVector(track.outerMomentum().x(),track.outerMomentum().y(),track.outerMomentum().z()),
+                                  TrackCharge(track.charge()), theField_);
+    if( insideTkVol(outerTsos) ) return computeImpactParametersInsideOutTkVol(outerTsos, vertex);
+    return computeImpactParametersOutsideTkVol(outerTsos, vertex);
+  }
 }

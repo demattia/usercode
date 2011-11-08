@@ -90,11 +90,9 @@ private:
   virtual void endLuminosityBlock(edm::LuminosityBlock const&, edm::EventSetup const&);
 
   const reco::GenParticle * takeStableMuon(const reco::GenParticleCollection & genParticles);
-  // void impactParameterForGen(const reco::GenParticle & genMuon, const math::XYZPoint & genVertex,
-  //                            const int genCharge, const MagneticField * mf);
   template <class T>
   SmartPropagatorWithIP::IP computeGenImpactParameters(const T & genMuon, const math::XYZPoint & genVertex,
-                                                       const int genCharge, const MagneticField * mf);
+                                                       const int genCharge);
   // void computeImpactParameters( const reco::Track & track, const TransientTrackBuilder & theBuilder );
   template <class T1, class T2>
   void fillEfficiencyVsGen( const T1 & tracks, const T2 stableMuon,
@@ -115,12 +113,8 @@ private:
   void dumpTrackInfo(const reco::Track & track, const unsigned int trackNumber);
 
   // ----------member data ---------------------------
-  // double maxDeltaR_;
   TH1F * hMinDeltaR_, * hMinCleanedDeltaR_, * hSimMinDeltaR_;
   TH1F * hMinTrackToGenDeltaR_, * hMinStaMuonToGenDeltaR_, * hMinCleanedStaMuonToGenDeltaR_;
-//  TH1F * hStandAloneToGenDeltaDxy_, * hStandAloneToGenDeltaDz_;
-//  TH1F * hCleanedStandAloneToGenDeltaDxy_, * hCleanedStandAloneToGenDeltaDz_;
-//  TH1F * hTrackToGenDeltaDxy_, * hTrackToGenDeltaDz_;
 
   TH1F * hStandAloneCounterDxy_;
   TH1F * hTrackCounterDxy_;
@@ -166,8 +160,6 @@ private:
   std::string effCleanedOutputFileName_;
   std::string genToStandAloneEffOutputFileName_;
   std::string genToTrackEffOutputFileName_;
-  AnalyticalImpactPointExtrapolator * analyticalExtrapolator_;
-  TransverseImpactPointExtrapolator * transverseExtrapolator_;
   AlgebraicSymMatrix55 nullCovariance_;
   std::pair<double, double> dxy_;
   std::pair<double, double> dz_;
@@ -203,6 +195,7 @@ private:
   bool phiRegion_;
   double phiMin_;
   double phiMax_;
+  bool genInsideTkVol_;
 };
 
 TrackingEfficiencyFromCosmics::TrackingEfficiencyFromCosmics(const edm::ParameterSet& iConfig) :
@@ -245,7 +238,8 @@ TrackingEfficiencyFromCosmics::TrackingEfficiencyFromCosmics(const edm::Paramete
   dxyCutForNoDzCut_(iConfig.getParameter<double>("DxyCutForNoDzCut")),
   phiRegion_(iConfig.getParameter<bool>("PhiRegion")),
   phiMin_(iConfig.getParameter<double>("PhiMinCut")),
-  phiMax_(iConfig.getParameter<double>("PhiMaxCut"))
+  phiMax_(iConfig.getParameter<double>("PhiMaxCut")),
+  genInsideTkVol_(iConfig.getParameter<bool>("GenInsideTkVol"))
 {
   // Use the unique association for tracks to standAlone muons only when
   if( singleLegMuon_ ) associatorByDeltaR_.reset(new AssociatorByDeltaR(iConfig.getParameter<double>("MaxDeltaR"), false, true));
@@ -266,8 +260,6 @@ TrackingEfficiencyFromCosmics::TrackingEfficiencyFromCosmics(const edm::Paramete
   efficiencyCleaned_.reset(new Efficiency(pars));
   variables_.reset(new double[3]);
 
-  // maxDeltaR_ = iConfig.getParameter<double>("MaxDeltaR");
-
   // Initialize the nullCovariance matrix
   for( unsigned int i=0; i<5; ++i ) {
     for( unsigned int j=0; j<5; ++j ) {
@@ -282,6 +274,7 @@ TrackingEfficiencyFromCosmics::~TrackingEfficiencyFromCosmics() {}
 void TrackingEfficiencyFromCosmics::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 {
   eventNum_ = iEvent.id().event();
+  std::cout << "event = " << eventNum_ << std::endl;
 
   // Load the transient track builder
   iSetup.get<TransientTrackRecord>().get("TransientTrackBuilder",theB_);
@@ -291,26 +284,14 @@ void TrackingEfficiencyFromCosmics::analyze(const edm::Event& iEvent, const edm:
   iSetup.get<SmartPropagatorWithIPComponentsRecord>().get("SmartPropagatorWithIP", smartPropIPHandle);
   smartPropIP_ = dynamic_cast<const SmartPropagatorWithIP*>(&*smartPropIPHandle);
 
-  // edm::ESHandle<MagneticField> theMF;
-  // iSetup.get<IdealMagneticFieldRecord>().get(theMF);
-  // MagneticField * mf = const_cast<MagneticField*>(&*theMF);
-  std::cout << "event = " << eventNum_ << std::endl;
-  const MagneticField * mf = smartPropIP_->magneticField();
-  std::cout << "mf = " << mf << std::endl;
-  transverseExtrapolator_ = new TransverseImpactPointExtrapolator(mf);
-  analyticalExtrapolator_ = new AnalyticalImpactPointExtrapolator(mf);
-
   reco::TrackCollection * tracks = new reco::TrackCollection();
 
   try {
     edm::Handle<reco::TrackCollection> allTracks;
-    // edm::Handle<edm::View<reco::Track> > allTracks;
     iEvent.getByLabel(trackCollection_, allTracks);
     reco::TrackBase::TrackQuality trackQualityHighPurity = reco::TrackBase::qualityByName("highPurity");
     reco::TrackCollection::const_iterator itTrk = allTracks->begin();
-    // edm::View<reco::Track>::const_iterator itTrk = allTracks->begin();
     for( ; itTrk != allTracks->end(); ++itTrk ) {
-      // if( (itTrk->quality(trackQualityHighPurity)) && (fabs(itTrk->eta()) < 2.0) && (itTrk->pt() > trackPtCut_) && (itTrk->found() > 6) ) {
       if( useAllTracks_ ) {
 	tracks->push_back(*itTrk);
       }
@@ -323,8 +304,6 @@ void TrackingEfficiencyFromCosmics::analyze(const edm::Event& iEvent, const edm:
   }
   catch (cms::Exception & ex) {
     std::cerr << ex;
-    // std::cerr << ex.what();
-    // std::cerr << ex.explainSelf();
   }
 
   edm::Handle<reco::TrackCollection> staMuons;
@@ -336,10 +315,10 @@ void TrackingEfficiencyFromCosmics::analyze(const edm::Event& iEvent, const edm:
   reco::TrackCollection::const_iterator it = staMuons->begin();
   for( ; it != staMuons->end(); ++it ) {
     if( (it->found() >= minimumValidHits_) &&
-	(it->pt() > standAlonePtCut_) && (fabs(it->eta()) < 2.) && (fabs(it->normalizedChi2()) < chi2Cut_) &&
-	((!dxyErrorCut_) || (fabs(it->dxyError()) < utils::dxyErrMax(it->pt()))) &&
-	((!dzErrorCut_) || (fabs(it->dzError()) < utils::dxyErrMax(it->pt()))) ) { // Note the use of the same function is intentional.
-
+        ( it->hitPattern().dtStationsWithValidHits() + it->hitPattern().cscStationsWithValidHits() > 1 ) &&
+        (it->pt() > standAlonePtCut_) && (fabs(it->eta()) < 2.) && (fabs(it->normalizedChi2()) < chi2Cut_) &&
+        ((!dxyErrorCut_) || (fabs(it->dxyError()) < utils::dxyErrMax(it->pt()))) &&
+        ((!dzErrorCut_) || (fabs(it->dzError()) < utils::dxyErrMax(it->pt()))) ) { // Note the use of the same function is intentional.
 
       if( fabs(it->dxy()) < dxyCutForNoDzCut_ ) {
         cleanedStaMuonsNoDzCut.push_back(*it);
@@ -409,16 +388,34 @@ void TrackingEfficiencyFromCosmics::analyze(const edm::Event& iEvent, const edm:
   SmartPropagatorWithIP::IP tkIp1, tkIp2;
   SmartPropagatorWithIP::IP saIp1, saIp2;
   if( tracks->size() > 0 ) {
-    tkIp1 = smartPropIP_->computeImpactParametersInsideTkVol((*tracks)[0], vertex);
+    std::cout << "First track pt before = " << (*tracks)[0].pt() << std::endl;
+    std::cout << "First track dxy before = " << (*tracks)[0].dxy() << std::endl;
+    // tkIp1 = smartPropIP_->computeImpactParametersInsideTkVol((*tracks)[0], vertex);
+    tkIp1 = smartPropIP_->computeImpactParameters((*tracks)[0], vertex);
+    std::cout << "First track pt after = " << tkIp1.pt << std::endl;
+    std::cout << "First track dxy after = " << tkIp1.dxyValue << std::endl;
   }
   if( tracks->size() > 1 ) {
-    tkIp2 = smartPropIP_->computeImpactParametersInsideTkVol((*tracks)[1], vertex);
+    std::cout << "Second track pt before = " << (*tracks)[1].pt() << std::endl;
+    std::cout << "Second track dxy before = " << (*tracks)[1].dxy() << std::endl;
+    // tkIp2 = smartPropIP_->computeImpactParametersInsideTkVol((*tracks)[1], vertex);
+    tkIp2 = smartPropIP_->computeImpactParameters((*tracks)[1], vertex);
+    std::cout << "Second track pt after = " << tkIp2.pt << std::endl;
+    std::cout << "Second track dxy after = " << tkIp2.dxyValue << std::endl;
   }
   if( staMuons->size() > 0 ) {
-    saIp1 = smartPropIP_->computeImpactParametersOutsideInTkVol((*staMuons)[0], vertex);
+    std::cout << "First standAlone pt before = " << (*staMuons)[0].pt() << std::endl;
+    // saIp1 = smartPropIP_->computeImpactParametersOutsideInTkVol((*staMuons)[0], vertex);
+    saIp1 = smartPropIP_->computeImpactParameters((*staMuons)[0], vertex);
+    std::cout << "First standAlone pt after = " << saIp1.pt << std::endl;
+    std::cout << "First standAlone dxy = " << saIp1.dxyValue << std::endl;
   }
   if( staMuons->size() > 1 ) {
-    saIp2 = smartPropIP_->computeImpactParametersOutsideInTkVol((*staMuons)[1], vertex);
+    std::cout << "Second standAlone pt before = " << (*staMuons)[1].pt() << std::endl;
+    // saIp2 = smartPropIP_->computeImpactParametersOutsideInTkVol((*staMuons)[1], vertex);
+    saIp2 = smartPropIP_->computeImpactParameters((*staMuons)[1], vertex);
+    std::cout << "Second standAlone pt after = " << saIp2.pt << std::endl;
+    std::cout << "Second standAlone dxy = " << saIp2.dxyValue << std::endl;
   }
 
   // Gen Particles
@@ -428,7 +425,7 @@ void TrackingEfficiencyFromCosmics::analyze(const edm::Event& iEvent, const edm:
     const reco::GenParticle * stableMuon = takeStableMuon(*genParticles);
 
     // Compute impact parameters for generator particle
-    SmartPropagatorWithIP::IP stableMuonIP(computeGenImpactParameters(*stableMuon, stableMuon->vertex(), stableMuon->charge(), mf));
+    SmartPropagatorWithIP::IP stableMuonIP(computeGenImpactParameters(*stableMuon, stableMuon->vertex(), stableMuon->charge()));
 
     // Gen muon values
     variables_[0] = fabs(stableMuonIP.dxyValue);
@@ -448,7 +445,6 @@ void TrackingEfficiencyFromCosmics::analyze(const edm::Event& iEvent, const edm:
                          hMinCleanedStaMuonToGenDeltaR_ );
 
     if( tracks->size() > 0 ) {
-      // trackVsGenDelta_->fillControlPlots((*tracks)[0], (*tracks)[0].dxy(), (*tracks)[0].dz(), *stableMuon, genDxy, genDz);
       trackVsGenDelta_->fillControlPlots((*tracks)[0], tkIp1, *stableMuon, stableMuonIP);
     }
     if( tracks->size() > 1 ) {
@@ -465,16 +461,13 @@ void TrackingEfficiencyFromCosmics::analyze(const edm::Event& iEvent, const edm:
   // Deltas between the two standAloneMuons
   if( !singleLegMuon_ ) {
     if( staMuons->size() == 2 ) {
-      // standAloneDelta_->fillControlPlots((*staMuons)[0], (*staMuons)[1]);
       standAloneDelta_->fillControlPlots((*staMuons)[0], saIp1, (*staMuons)[1], saIp2);
     }
     if( cleanedStaMuons.size() == 2 ) {
-      // cleanedStandAloneDelta_->fillControlPlots(cleanedStaMuons[0], cleanedStaMuons[1]);
       cleanedStandAloneDelta_->fillControlPlots(cleanedStaMuons[0], saIp1, cleanedStaMuons[1], saIp2);
     }
   }
   if( tracks->size() == 2 ) {
-    // trackDelta_->fillControlPlots((*tracks)[0], (*tracks)[1]);
     trackDelta_->fillControlPlots((*tracks)[0], tkIp1, (*tracks)[1], tkIp2);
   }
 
@@ -519,21 +512,9 @@ void TrackingEfficiencyFromCosmics::beginJob()
   hMinStaMuonToGenDeltaR_ =        utils::bookHistogram(fileService, "minStaMuonToGenDeltaR", "", "#Delta R", "", 500, 0, 5);
   hMinCleanedStaMuonToGenDeltaR_ = utils::bookHistogram(fileService, "minCleanedStaMuonToGenDeltaR", "", "#Delta R", "", 500, 0, 5);
 
-//  hStandAloneToGenDeltaDxy_ =        utils::bookHistogram(fileService, "standAloneToGenDeltaDxy", "", "|#Delta |d_{0}||", "cm", 100, -100, 100);
-//  hStandAloneToGenDeltaDz_ =         utils::bookHistogram(fileService, "standAloneToGenDeltaDz", "", "|#Delta |d_{z}||", "cm", 100, -100, 100);
-//  hCleanedStandAloneToGenDeltaDxy_ = utils::bookHistogram(fileService, "cleanedStandAloneToGenDeltaDxy", "", "|#Delta |d_{0}||", "cm", 100, -100, 100);
-//  hCleanedStandAloneToGenDeltaDz_ =  utils::bookHistogram(fileService, "cleanedStandAloneToGenDeltaDz", "", "|#Delta |d_{z}||", "cm", 100, -100, 100);
-//  hTrackToGenDeltaDxy_ =             utils::bookHistogram(fileService, "trackToGenDeltaDxy", "", "|#Delta |d_{0}||", "cm", 100, -100, 100);
-//  hTrackToGenDeltaDz_ =              utils::bookHistogram(fileService, "trackToGenDeltaDz", "", "|#Delta |d_{z}||", "cm", 100, -100, 100);
-
-  // hTrackCounterDxy_ =      utils::bookHistogram(fileService, "trackCounterDxy", "", "|d_{0}|", "cm", 100, 0, 100);
-  // hStandAloneCounterDxy_ = utils::bookHistogram(fileService, "standAloneCounterDxy", "", "|d_{0}|", "cm", 100, 0, 100);
-  // hTrackCounterDz_ =       utils::bookHistogram(fileService, "trackCounterDz", "", "|d_{z}|", "cm", 100, 0, 100);
-  // hStandAloneCounterDz_ =  utils::bookHistogram(fileService, "standAloneCounterDz", "", "|d_{z}|", "cm", 100, 0, 100);
-
   controlPlotsGenTracks_.reset(new ControlPlots(fileService, "genTracks"));
   controlPlotsGeneralTracks_.reset(new ControlPlots(fileService, "generalTracks"));
-//  controlPlotsGeneralTracks_.reset(new ControlPlots(fileService, "hltL2Muons"));
+  //  controlPlotsGeneralTracks_.reset(new ControlPlots(fileService, "hltL2Muons"));
   controlPlotsStandAloneMuons_.reset(new ControlPlots(fileService, "standAloneMuons"));
   controlPlotsMatchedStandAloneMuons_.reset(new ControlPlots(fileService, "matchedStandAloneMuons"));
   controlPlotsUnmatchedStandAloneMuons_.reset(new ControlPlots(fileService, "unmatchedStandAloneMuons"));
@@ -641,101 +622,20 @@ void TrackingEfficiencyFromCosmics::fillDescriptions(edm::ConfigurationDescripti
 
 template <class T>
 SmartPropagatorWithIP::IP TrackingEfficiencyFromCosmics::computeGenImpactParameters( const T & track, const math::XYZPoint & genVertex,
-                                                                const int genCharge, const MagneticField * mf )
+                                                                                     const int genCharge )
 {
-  SmartPropagatorWithIP::IP ip(smartPropIP_->computeGenImpactParametersOutsideTkVol( track, genVertex, genCharge, GlobalPoint(0,0,0) ));
-
-  VertexDistanceXY distXY;
-  VertexDistance3D dist3D;
-
-  TVector3 genMomentum(0,0,0);
-  genMomentum.SetPtEtaPhi(track.pt(),track.eta(),track.phi());
-  FreeTrajectoryState ftsAtProduction(GlobalPoint(genVertex.x(),genVertex.y(),genVertex.z()),
-                                      GlobalVector(genMomentum.x(),genMomentum.y(),genMomentum.z()),
-                                      TrackCharge(genCharge), mf);
-
+  SmartPropagatorWithIP::IP ip;
+  if( genInsideTkVol_ ) {
+    ip = smartPropIP_->computeGenImpactParametersInsideTkVol( track, genVertex, genCharge, GlobalPoint(0,0,0) );
+  }
+  else {
+    ip = smartPropIP_->computeGenImpactParametersOutsideTkVol( track, genVertex, genCharge, GlobalPoint(0,0,0) );
+  }
   std::cout << "gen pt before propagation = " << track.pt() << std::endl;
   std::cout << "gen pt after propagation = " << ip.pt << std::endl;
-//  std::cout << "genVertex (x,y,z) = (" << genVertex.x() << "," << genVertex.y() << "," << genVertex.z() << ")" << std::endl;
-//  std::cout << "genMomentum (x,y,z) = (" << genMomentum.x() << "," << genMomentum.y() << "," << genMomentum.z() << ")" << std::endl;
-//  std::cout << "genCharge = (" << genCharge <<  std::endl;
-
-//  TrajectoryStateOnSurface analyticalTSOS_ = analyticalExtrapolator_->extrapolate(ftsAtProduction, GlobalPoint(0,0,0));
-//  TrajectoryStateOnSurface transverseTSOS_ = transverseExtrapolator_->extrapolate(ftsAtProduction, GlobalPoint(0,0,0));
-
-//  if(transverseTSOS_.isValid()) {
-//    TrajectoryStateOnSurface transverseTSOS(transverseTSOS_.localParameters(), LocalTrajectoryError(nullCovariance_),
-//                                            transverseTSOS_.surface(), transverseTSOS_.magneticField(), transverseTSOS_.weight());
-//    // Reco vertex default constructed to (0,0,0)
-//    std::pair<bool,Measurement1D> dxy = IPTools::absoluteImpactParameter(transverseTSOS, reco::Vertex(), distXY);
-//    dxy_.first = dxy.second.value();
-//    dxy_.second = dxy.second.error();
-//    dz_.first = transverseTSOS.globalPosition().z();
-//    dz_.second = transverseTSOS.cartesianError().position().czz();
-//    std::cout << "transverseTSOS pt = " << transverseTSOS.globalMomentum().perp() << std::endl;
-//  }
-//  else {
-//    std::cout << "Invalid trajectoryStateClosestToPoint for GEN" << std::endl;
-//    dxy_.first = 65535;
-//    dxy_.second = 65535;
-//    dz_.first = 65535;
-//    dz_.second = 65535;
-//  }
-//  if(analyticalTSOS_.isValid()) {
-//    std::cout << "analytical extrapolation successful" << std::endl;
-//    // analyticalTSOS_ has no errors defined. Explicitly set the errors to 0 for the genparticle state
-//    TrajectoryStateOnSurface analyticalTSOS(analyticalTSOS_.localParameters(), LocalTrajectoryError(nullCovariance_),
-//                                            analyticalTSOS_.surface(), analyticalTSOS_.magneticField(), analyticalTSOS_.weight());
-//    std::pair<bool,Measurement1D> dxyz = IPTools::absoluteImpactParameter(analyticalTSOS, reco::Vertex(), dist3D);
-//    dxyz_.first = dxyz.second.value();
-//    dxyz_.second = dxyz.second.error();
-//  }
-//  else {
-//    std::cout << "Invalid trajectoryStateClosestToPoint for analyticalExtrapolator for GEN" << std::endl;
-//    dxyz_.first = 65535;
-//    dxyz_.second = 65535;
-//  }
-
-//  std::cout << "transverseExtrapolator dxy = " << dxy_.first << std::endl;
-//  std::cout << "transverseExtrapolator dz = " << dz_.first << std::endl;
-//  dxy_.first = ip.dxyValue;
-//  dxy_.second = ip.dxyError;
-//  dz_.first = ip.dzValue;
-//  dz_.second = ip.dzError;
-//  std::cout << "steppingHelix dxy = " << dxy_.first << std::endl;
-//  std::cout << "steppingHelix dz = " << dz_.first << std::endl;
-
+  std::cout << "gen dxy = " << ip.dxyValue << std::endl;
   return ip;
 }
-
-//void TrackingEfficiencyFromCosmics::computeImpactParameters( const reco::Track & track, const TransientTrackBuilder & theBuilder )
-//{
-//  const reco::TransientTrack transientTrack = theBuilder.build(&track);
-//  GlobalPoint vert(0., 0., 0.);
-//  TrajectoryStateClosestToPoint traj = transientTrack.trajectoryStateClosestToPoint(vert);
-//  if( traj.isValid() ) {
-//    dxy_.first = traj.perigeeParameters().transverseImpactParameter();
-//    dxy_.second = traj.perigeeError().transverseImpactParameterError();
-//    dz_.first = traj.perigeeParameters().longitudinalImpactParameter();
-//    dz_.second = traj.perigeeError().longitudinalImpactParameterError();
-//    std::cout << "From origin dxy = " << dxy_.first << " +/- " << dxy_.second << std::endl;
-//  }
-//  else {
-//    std::cout << "Invalid trajectoryStateClosestToPoint" << std::endl;
-//    dxyz_.first = 65535;
-//    dxyz_.second = 65535;
-//    dz_.first = 65535;
-//    dz_.second = 65535;
-//  }
-//  //  // Taking the dxy from the beamline does not make any difference
-//  //  TrajectoryStateClosestToBeamLine traj2 = transientTrack.stateAtBeamLine();
-//  //  Measurement1D measDxy = traj2.transverseImpactParameter();
-//  //  if( traj2.isValid() ) {
-//  //    dxy_.first = measDxy.value();
-//  //    dxy_.second = measDxy.error();
-//  //    // std::cout << "From beamline dxy = " << dxy_.first << " +/ " << dxy_.second << std::endl;
-//  //  }
-//}
 
 void TrackingEfficiencyFromCosmics::dumpGenParticleInfo(const reco::GenParticle & genParticle)
 {
@@ -787,10 +687,12 @@ void TrackingEfficiencyFromCosmics::fillEfficiencyVsGen( const T1 & tracks, cons
                                  track.dxy(), track.dxyError(), track.dz(), track.dzError());
     if( recomputeIP_ ) {
       if( propagationType == ControlPlots::INSIDETKVOL ) {
-        ip = smartPropIP_->computeImpactParametersInsideTkVol(track, GlobalPoint(0,0,0));
+        // ip = smartPropIP_->computeImpactParametersInsideTkVol(track, GlobalPoint(0,0,0));
+        ip = smartPropIP_->computeImpactParameters(track, GlobalPoint(0,0,0));
       }
       else if( propagationType == ControlPlots::OUTSIDEIN ) {
-        ip = smartPropIP_->computeImpactParametersOutsideInTkVol(track, GlobalPoint(0,0,0));
+        // ip = smartPropIP_->computeImpactParametersOutsideInTkVol(track, GlobalPoint(0,0,0));
+        ip = smartPropIP_->computeImpactParameters(track, GlobalPoint(0,0,0));
       }
       else {
         std::cout << "[TrackingEfficiencyFromCosmics::fillEfficiencyVsGen]: unknown propagation type: " << propagationType << std::endl;
@@ -812,7 +714,8 @@ void TrackingEfficiencyFromCosmics::fillEfficiency(const std::map<const reco::Tr
     SmartPropagatorWithIP::IP ip1(it->first->pt(), it->first->eta(), it->first->phi(),
                                   it->first->dxy(), it->first->dxyError(), it->first->dz(), it->first->dzError());
     if( recomputeIP_ ) {
-      ip1 = smartPropIP_->computeImpactParametersOutsideInTkVol(*(it->first), GlobalPoint(0,0,0));
+      // ip1 = smartPropIP_->computeImpactParametersOutsideInTkVol(*(it->first), GlobalPoint(0,0,0));
+      ip1 = smartPropIP_->computeImpactParameters(*(it->first), GlobalPoint(0,0,0));
     }
     SmartPropagatorWithIP::IP ip2;
     variables_[0] = fabs(ip1.dxyValue);
@@ -828,7 +731,8 @@ void TrackingEfficiencyFromCosmics::fillEfficiency(const std::map<const reco::Tr
     else {
       found = true;
       if( recomputeIP_ ) {
-        ip2 = smartPropIP_->computeImpactParametersInsideTkVol(*(it->second), GlobalPoint(0,0,0));
+        // ip2 = smartPropIP_->computeImpactParametersInsideTkVol(*(it->second), GlobalPoint(0,0,0));
+        ip2 = smartPropIP_->computeImpactParameters(*(it->second), GlobalPoint(0,0,0));
       }
       else {
         ip2 = SmartPropagatorWithIP::IP(it->second->pt(), it->second->eta(), it->second->phi(),

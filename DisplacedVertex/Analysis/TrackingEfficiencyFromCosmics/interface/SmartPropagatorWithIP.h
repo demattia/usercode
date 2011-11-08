@@ -176,12 +176,19 @@ public:
                                                                    const int genCharge, const GlobalPoint & vertex ) const;
   template <class T>
   SmartPropagatorWithIP::IP computeGenImpactParametersOutsideTkVol( const T & track, const math::XYZPoint & genVertex,
-                                                                                           const int genCharge, const GlobalPoint & vertex ) const;
+                                                                    const int genCharge, const GlobalPoint & vertex ) const;
+  // template <class T>
+  // SmartPropagatorWithIP::IP computeImpactParametersInsideTkVol( const T & track, const GlobalPoint & vertex ) const;
   SmartPropagatorWithIP::IP computeImpactParametersInsideTkVol( const reco::Track & track, const GlobalPoint & vertex ) const;
   /// This is more for internal use, but leaving it public because it is generic enough that it might be useful
   SmartPropagatorWithIP::IP computeImpactParametersOutsideTkVol(const FreeTrajectoryState & fts, const GlobalPoint & vertex) const;
+  SmartPropagatorWithIP::IP computeImpactParametersOutsideInTkVol( const FreeTrajectoryState & tsos, const GlobalPoint & vertex ) const;
   SmartPropagatorWithIP::IP computeImpactParametersOutsideInTkVol( const reco::Track & track, const GlobalPoint & vertex ) const;
+  SmartPropagatorWithIP::IP computeImpactParametersInsideOutTkVol( const FreeTrajectoryState & tsos, const GlobalPoint & vertex ) const;
   SmartPropagatorWithIP::IP computeImpactParametersInsideOutTkVol( const reco::Track & track, const GlobalPoint & vertex ) const;
+  SmartPropagatorWithIP::IP computeImpactParameters( const reco::Track & track, const GlobalPoint & vertex ) const;
+
+  static void initTkVolume(float epsilon);
 
   inline double epsilon() const {return epsilon_;}
   inline TransverseImpactPointExtrapolator * transverseExtrapolator() const {return transverseExtrapolator_;}
@@ -201,6 +208,7 @@ private:
   mutable AnalyticalImpactPointExtrapolator * analyticalExtrapolator_;
   const TransientTrackBuilder * theBuilder_;
   mutable AlgebraicSymMatrix55 nullCovariance_;
+  static ReferenceCountingPointer<Cylinder> & theTkVolume();
 
 protected:
 };
@@ -220,38 +228,46 @@ SmartPropagatorWithIP::IP SmartPropagatorWithIP::computeGenImpactParametersInsid
                                                                                         const int genCharge, const GlobalPoint & vertex ) const
 {
   VertexDistanceXY distXY;
-  VertexDistance3D dist3D;
+  // VertexDistance3D dist3D;
 
   FreeTrajectoryState ftsAtProd = ftsAtProduction(track, genVertex, genCharge);
-  TrajectoryStateOnSurface analyticalTSOS_ = analyticalExtrapolator_->extrapolate(ftsAtProd, vertex);
+  // TrajectoryStateOnSurface analyticalTSOS_ = analyticalExtrapolator_->extrapolate(ftsAtProd, vertex);
   TrajectoryStateOnSurface transverseTSOS_ = transverseExtrapolator_->extrapolate(ftsAtProd, vertex);
 
   if(transverseTSOS_.isValid()) {
     TrajectoryStateOnSurface transverseTSOS(transverseTSOS_.localParameters(), LocalTrajectoryError(nullCovariance_),
                                             transverseTSOS_.surface(), transverseTSOS_.magneticField(), transverseTSOS_.weight());
-    std::pair<bool,Measurement1D> dxy = IPTools::absoluteImpactParameter(transverseTSOS, reco::Vertex(vertex), distXY);
+    // Create a dummy vertex
+    reco::Vertex::Error e;
+    e(0, 0) = 0.0015 * 0.0015;
+    e(1, 1) = 0.0015 * 0.0015;
+    e(2, 2) = 15. * 15.;
+    reco::Vertex::Point p(vertex.x(), vertex.y(), vertex.z());
+    reco::Vertex dummyVertex(p, e, 0, 0, 0);
+
+    std::pair<bool,Measurement1D> dxy = IPTools::absoluteImpactParameter(transverseTSOS, dummyVertex, distXY);
     return IP(transverseTSOS.freeTrajectoryState()->momentum(),
               dxy.second.value(), dxy.second.error(),
               transverseTSOS.globalPosition().z(), transverseTSOS.cartesianError().position().czz());
   }
   return IP();
 
-  // This is for the 3D impact parameter
-  // activate if needed.
+//  // This is for the 3D impact parameter
+//  // activate if needed.
 
-  if(analyticalTSOS_.isValid()) {
-    // analyticalTSOS_ has no errors defined. Explicitly set the errors to 0 for the genparticle state
-    TrajectoryStateOnSurface analyticalTSOS(analyticalTSOS_.localParameters(), LocalTrajectoryError(nullCovariance_),
-                                            analyticalTSOS_.surface(), analyticalTSOS_.magneticField(), analyticalTSOS_.weight());
-    std::pair<bool,Measurement1D> dxyz = IPTools::absoluteImpactParameter(analyticalTSOS, reco::Vertex(vertex), dist3D);
-    // dxyz_.first = dxyz.second.value();
-    // dxyz_.second = dxyz.second.error();
-  }
-  else {
-    std::cout << "Invalid trajectoryStateClosestToPoint for analyticalExtrapolator for GEN" << std::endl;
-    // dxyz_.first = 65535;
-    // dxyz_.second = 65535;
-  }
+//  if(analyticalTSOS_.isValid()) {
+//    // analyticalTSOS_ has no errors defined. Explicitly set the errors to 0 for the genparticle state
+//    TrajectoryStateOnSurface analyticalTSOS(analyticalTSOS_.localParameters(), LocalTrajectoryError(nullCovariance_),
+//                                            analyticalTSOS_.surface(), analyticalTSOS_.magneticField(), analyticalTSOS_.weight());
+//    std::pair<bool,Measurement1D> dxyz = IPTools::absoluteImpactParameter(analyticalTSOS, reco::Vertex(vertex), dist3D);
+//    // dxyz_.first = dxyz.second.value();
+//    // dxyz_.second = dxyz.second.error();
+//  }
+//  else {
+//    std::cout << "Invalid trajectoryStateClosestToPoint for analyticalExtrapolator for GEN" << std::endl;
+//    // dxyz_.first = 65535;
+//    // dxyz_.second = 65535;
+//  }
 }
 
 template <class T>

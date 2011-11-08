@@ -98,15 +98,18 @@ public:
     if( smartPropIP != 0 ) {
       if( type == INSIDETKVOL ) {
         std::cout << "propagating inside tk volume" << std::endl;
-        ip = smartPropIP->computeImpactParametersInsideTkVol(track, GlobalPoint(0,0,0));
+        // ip = smartPropIP->computeImpactParametersInsideTkVol(track, GlobalPoint(0,0,0));
+        ip = smartPropIP->computeImpactParameters(track, GlobalPoint(0,0,0));
       }
       else if( type == INSIDEOUT ) {
         std::cout << "propagating inside-out" << std::endl;
-        ip = smartPropIP->computeImpactParametersInsideOutTkVol(track, GlobalPoint(0,0,0));
+        // ip = smartPropIP->computeImpactParametersInsideOutTkVol(track, GlobalPoint(0,0,0));
+        ip = smartPropIP->computeImpactParameters(track, GlobalPoint(0,0,0));
       }
       else if( type == OUTSIDEIN ) {
         std::cout << "propagating outside-in" << std::endl;
-        ip = smartPropIP->computeImpactParametersOutsideInTkVol(track, GlobalPoint(0,0,0));
+        // ip = smartPropIP->computeImpactParametersOutsideInTkVol(track, GlobalPoint(0,0,0));
+        ip = smartPropIP->computeImpactParameters(track, GlobalPoint(0,0,0));
       }
       else {
         std::cout << "Unknown propagation type: " << type << " reading IP from the track" << std::endl;
