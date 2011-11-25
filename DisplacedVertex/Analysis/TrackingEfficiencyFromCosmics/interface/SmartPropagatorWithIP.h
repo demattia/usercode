@@ -149,12 +149,15 @@ public:
 
   struct IP
   {
-    IP(): dxyValue(65535.), dxyError(65535.), dzValue(65535.), dzError(65535.), pt(0.), eta(0.), phi(0.)
+    IP(): dxyValue(65535.), dxyError(65535.), dzValue(65535.), dzError(65535.), pt(0.), eta(0.), phi(0.), ptError(0.), etaError(0.), phiError(0.)
     {}
-    IP(const double & inputPt, const double inputEta, const double & inputPhi,
-       const double & inputDxyValue, const double & inputDxyError, const double & inputDzValue, const double & inputDzError) :
+    IP(const double & inputPt, const double & inputPtError,
+       const double & inputEta, const double & inputEtaError,
+       const double & inputPhi, const double & inputPhiError,
+       const double & inputDxyValue, const double & inputDxyError,
+       const double & inputDzValue, const double & inputDzError) :
       dxyValue(inputDxyValue), dxyError(inputDxyError), dzValue(inputDzValue), dzError(inputDzError),
-      pt(inputPt), eta(inputEta), phi(inputPhi)
+      pt(inputPt), eta(inputEta), phi(inputPhi), ptError(inputPtError), etaError(inputEtaError), phiError(inputPhiError)
     {}
     template <class T>
     IP(const T & momentum, const double & inputDxyValue, const double & inputDxyError, const double & inputDzValue, const double & inputDzError) :
@@ -163,10 +166,15 @@ public:
       pt = momentum.perp();
       eta = momentum.eta();
       phi = momentum.phi();
+      // Do not have the error available in the momentum, need to check how to get it from the propagated track.
+      ptError = 0.;
+      etaError = 0.;
+      phiError = 0.;
     }
     double dxyValue, dxyError;
     double dzValue, dzError;
     double pt, eta, phi;
+    double ptError, etaError, phiError;
   };
 
   // IP methods

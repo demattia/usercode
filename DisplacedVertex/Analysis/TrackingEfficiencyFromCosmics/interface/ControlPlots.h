@@ -17,6 +17,7 @@ public:
   ControlPlots( edm::Service<TFileService> & fileService, const TString & name )
   {
     hPt_ =                    utils::bookHistogram(fileService, name, "pt", "P_{T}", "[GeV/c]", 500, 0, 500);
+    h1OverPt_ =               utils::bookHistogram(fileService, name, "1OverPt", "1/P_{T}", "1/[GeV/c]", 500, 0, 10);
     hEta_ =                   utils::bookHistogram(fileService, name, "eta", "#eta", "", 500, -3, 3);
     hPhi_ =                   utils::bookHistogram(fileService, name, "phi", "#phi", "", 500, -3.2, 3.2);
     hNhits_ =                 utils::bookHistogram(fileService, name, "Nhits", "# hits", "", 100, 0, 100);
@@ -29,7 +30,7 @@ public:
     hDz_ =                    utils::bookHistogram(fileService, name, "d_z", "|d_{z}|", "cm", 500, 0, 50);
     hDzErr_ =                 utils::bookHistogram(fileService, name, "d_z_error", "#sigma(d_{z})", "cm", 400, -20, 20);
     hChi2_ =                  utils::bookHistogram(fileService, name, "chi2", "#chi^{2}", "", 500, 0, 100);
-    hReferencePointRadius_ =  utils::bookHistogram(fileService, name, "RefPointRadius", "radius of the reference point", "", 500, -50, 50);
+    hReferencePointRadius_ =  utils::bookHistogram(fileService, name, "RefPointRadius", "radius of the reference point", "", 500, 0, 100);
     hReferencePointZ_ =       utils::bookHistogram(fileService, name, "RefPointZ", "z of the reference point", "", 500, -50, 50);
     hVertexX_ =               utils::bookHistogram(fileService, name, "VertexX", "x of the vertex of this track", "", 500, -100, 100);
     hVertexY_ =               utils::bookHistogram(fileService, name, "VertexY", "y of the vertex of this track", "", 500, -100, 100);
@@ -56,6 +57,8 @@ public:
   void fillControlPlots(const SmartPropagatorWithIP::IP & ip, const reco::LeafCandidate::Point & vertex)
   {
     hPt_->Fill(ip.pt);
+    if( ip.pt == 0. ) h1OverPt_->Fill(1000000.);
+    else h1OverPt_->Fill(1/ip.pt);
     hEta_->Fill(ip.eta);
     hPhi_->Fill(ip.phi);
     hDxy_->Fill(fabs(ip.dxyValue));
@@ -71,14 +74,8 @@ public:
     hVertexZ_->Fill(vertex.z());
   }
 
-  /**
-   * Propagator type:
-   * 0 is inside the tracker volume
-   * 1 is inside-out
-   * 2 is outside-in
-   */
   template <class T>
-  void fillControlPlots(const T & track, const SmartPropagatorWithIP * smartPropIP = 0, const int type = 0)
+  void fillControlPlots(const T & track, const SmartPropagatorWithIP * smartPropIP = 0)
   {
     hNhits_->Fill(track.recHitsSize());
     hNValidHits_->Fill(track.found());
@@ -87,35 +84,24 @@ public:
     hInnermostHitRadius_->Fill(innermostHitPosition.r());
     hInnermostHitZ_->Fill(innermostHitPosition.z());
     hChi2_->Fill(track.normalizedChi2());
-    hReferencePointRadius_->Fill(sqrt(track.referencePoint().x()+track.referencePoint().y()));
+    hReferencePointRadius_->Fill(sqrt(pow(track.referencePoint().x(),2)+pow(track.referencePoint().y(),2)));
     hReferencePointZ_->Fill(track.referencePoint().z());
     hVertexX_->Fill(track.vertex().x());
     hVertexY_->Fill(track.vertex().y());
     hVertexZ_->Fill(track.vertex().z());
 
-    SmartPropagatorWithIP::IP ip(track.pt(), track.eta(), track.phi(), track.dxy(), track.dxyError(), track.dz(), track.dzError());
+    SmartPropagatorWithIP::IP ip(track.pt(), track.ptError(),
+                                 track.eta(), track.etaError(),
+                                 track.phi(), track.phiError(),
+                                 track.dxy(), track.dxyError(),
+                                 track.dz(), track.dzError());
 
     if( smartPropIP != 0 ) {
-      if( type == INSIDETKVOL ) {
-        std::cout << "propagating inside tk volume" << std::endl;
-        // ip = smartPropIP->computeImpactParametersInsideTkVol(track, GlobalPoint(0,0,0));
-        ip = smartPropIP->computeImpactParameters(track, GlobalPoint(0,0,0));
-      }
-      else if( type == INSIDEOUT ) {
-        std::cout << "propagating inside-out" << std::endl;
-        // ip = smartPropIP->computeImpactParametersInsideOutTkVol(track, GlobalPoint(0,0,0));
-        ip = smartPropIP->computeImpactParameters(track, GlobalPoint(0,0,0));
-      }
-      else if( type == OUTSIDEIN ) {
-        std::cout << "propagating outside-in" << std::endl;
-        // ip = smartPropIP->computeImpactParametersOutsideInTkVol(track, GlobalPoint(0,0,0));
-        ip = smartPropIP->computeImpactParameters(track, GlobalPoint(0,0,0));
-      }
-      else {
-        std::cout << "Unknown propagation type: " << type << " reading IP from the track" << std::endl;
-      }
+      ip = smartPropIP->computeImpactParameters(track, GlobalPoint(0,0,0));
     }
     hPt_->Fill(ip.pt);
+    if( ip.pt == 0. ) h1OverPt_->Fill(1000000.);
+    else h1OverPt_->Fill(1/ip.pt);
     hEta_->Fill(ip.eta);
     hPhi_->Fill(ip.phi);
     hDxy_->Fill(fabs(ip.dxyValue));
@@ -131,20 +117,19 @@ public:
   }
 
   template <class T>
-  void fillControlPlots(const std::vector<T> & collection, const SmartPropagatorWithIP * smartPropIP = 0, const int type = 0)
+  void fillControlPlots(const std::vector<T> & collection, const SmartPropagatorWithIP * smartPropIP = 0)
   {
     typename std::vector<T>::const_iterator it = collection.begin();
     for( ; it != collection.end(); ++it ) {      
-      fillControlPlots(*it, smartPropIP, type);
+      fillControlPlots(*it, smartPropIP);
     }
   }
 
 protected:
-  TH1F *hPt_, *hEta_, *hPhi_, *hNhits_, *hNValidHits_;
+  TH1F *hPt_, *h1OverPt_, *hEta_, *hPhi_, *hNhits_, *hNValidHits_;
   TH1F *hNValidPlusInvalidHits_, *hInnermostHitRadius_, *hInnermostHitZ_;
   TH1F *hDxy_, *hDxyErr_, *hDz_, *hDzErr_, *hChi2_, *hReferencePointRadius_, *hReferencePointZ_;
   TH1F *hVertexX_, *hVertexY_, *hVertexZ_;
-
 
   TH2F *hDxyErrVsNValidHit_, *hDxyErrVsPt_, *hDxyErrVsDxy_;
   TH2F *hDzErrVsNValidHit_, *hDzErrVsPt_, *hDzErrVsDz_;

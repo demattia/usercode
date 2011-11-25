@@ -42,20 +42,20 @@ public:
       typename std::vector<const T2 *>::iterator oppositeMatched = clonedSecond.end();
       double deltaR = maxDeltaR_;
       typename std::vector<const T2 *>::iterator itSecond = clonedSecond.begin();
-      std::cout << "Muon with eta = " << itFirst->eta() << ", phi = " << itFirst->phi() << std::endl;
+      // std::cout << "Muon with eta = " << itFirst->eta() << ", phi = " << itFirst->phi() << std::endl;
       for( ; itSecond != clonedSecond.end(); ++itSecond ) {
-	std::cout << "Track with eta = " << (*itSecond)->eta() << ", phi = " << (*itSecond)->phi() << std::endl;
-	deltaR = reco::deltaR(*itFirst, **itSecond);
-	std::cout << "deltaR = " << deltaR << std::endl;
+        // std::cout << "Track with eta = " << (*itSecond)->eta() << ", phi = " << (*itSecond)->phi() << std::endl;
+        deltaR = reco::deltaR(*itFirst, **itSecond);
+        // std::cout << "deltaR = " << deltaR << std::endl;
         if( deltaR < minDeltaR ) {
           minDeltaR = deltaR;
           matched = itSecond;
         }
         else if( takeOppositeTracks_ ) {
-          std::cout << "taking opposite track" << std::endl;
+          // std::cout << "taking opposite track" << std::endl;
           // if( (deltaR > (3.14 - minDeltaR)) && (deltaR < 3.14 + minDeltaR) ) {
-	  deltaR = sqrt(pow(reco::deltaPhi(itFirst->phi(), (*itSecond)->phi() - 3.141592), 2) + pow(itFirst->eta() + (*itSecond)->eta(), 2));
-	  std::cout << "opposite deltaR = " << deltaR << std::endl;
+          deltaR = sqrt(pow(reco::deltaPhi(itFirst->phi(), (*itSecond)->phi() - 3.141592), 2) + pow(itFirst->eta() + (*itSecond)->eta(), 2));
+          // std::cout << "opposite deltaR = " << deltaR << std::endl;
           // if(deltaR > (3.14 - minDeltaR)) {
           if( deltaR < oppositeMinDeltaR ) {
             oppositeMinDeltaR = deltaR;

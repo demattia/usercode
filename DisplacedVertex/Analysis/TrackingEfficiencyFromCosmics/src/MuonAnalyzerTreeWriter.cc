@@ -1,9 +1,10 @@
+
 // -*- C++ -*-
 //
-// Package:    TrackingEfficiencyFromCosmics
-// Class:      TrackingEfficiencyFromCosmics
-// 
-/**\class TrackingEfficiencyFromCosmics TrackingEfficiencyFromCosmics.cc Analysis/TrackingEfficiencyFromCosmics/src/TrackingEfficiencyFromCosmics.cc
+// Package:    MuonAnalyzerTreeWriter
+// Class:      MuonAnalyzerTreeWriter
+//
+/**\class MuonAnalyzerTreeWriter MuonAnalyzerTreeWriter.cc Analysis/MuonAnalyzerTreeWriter/src/MuonAnalyzerTreeWriter.cc
 
  Description: [one line class summary]
 
@@ -13,7 +14,7 @@
 //
 // Original Author:  Marco De Mattia,40 3-B32,+41227671551,
 //         Created:  Wed May 25 16:44:02 CEST 2011
-// $Id: TrackingEfficiencyFromCosmics.cc,v 1.42 2011/08/03 15:42:09 demattia Exp $
+// $Id: MuonAnalyzerTreeWriter.cc,v 1.42 2011/11/21 16:58:00 demattia Exp $
 //
 //
 
@@ -65,6 +66,8 @@
 #include "Analysis/TrackingEfficiencyFromCosmics/interface/EfficiencyTree.h"
 #include "Analysis/TrackingEfficiencyFromCosmics/interface/SmartPropagatorWithIP.h"
 #include "Analysis/Records/interface/SmartPropagatorWithIPComponentsRecord.h"
+#include "Analysis/TrackingEfficiencyFromCosmics/interface/RootTreeHandler.h"
+#include "Analysis/TrackingEfficiencyFromCosmics/interface/TreeTrack.h"
 
 #include <boost/foreach.hpp>
 
@@ -72,10 +75,10 @@
 // class declaration
 //
 
-class TrackingEfficiencyFromCosmics : public edm::EDAnalyzer {
+class MuonAnalyzerTreeWriter : public edm::EDAnalyzer {
 public:
-  explicit TrackingEfficiencyFromCosmics(const edm::ParameterSet&);
-  ~TrackingEfficiencyFromCosmics();
+  explicit MuonAnalyzerTreeWriter(const edm::ParameterSet&);
+  ~MuonAnalyzerTreeWriter();
 
   static void fillDescriptions(edm::ConfigurationDescriptions& descriptions);
 
@@ -98,12 +101,12 @@ private:
   void fillEfficiencyVsGen( const T1 & tracks, const T2 stableMuon,
                             Efficiency * efficiency,
                             // const double & genDxy, const double & genDz, const MagneticField * mf,
-                            TH1F * hMinToGenDeltaR,
-                            const ControlPlots::propType propagationType = ControlPlots::OUTSIDEIN );
+                            const GlobalPoint & vertex,
+                            TH1F * hMinToGenDeltaR);
   template <class T1, class T2>
   void fillEfficiency(const T1 & staMuons, const T2 & tracks, Efficiency * efficiency,
                       TH1F * hMinDeltaR, ControlDeltaPlots * standAloneTrackDelta,
-		      ControlPlots * matchedStandAlone, ControlPlots * unmatchedStandAlone);
+                      ControlPlots * matchedStandAlone, ControlPlots * unmatchedStandAlone);
 
   void fillEfficiency(const std::map<const reco::Track *, const reco::Track *> & matchesMap,
                       Efficiency * efficiency, ControlDeltaPlots * standAloneTrackDelta,
@@ -111,6 +114,13 @@ private:
 
   void dumpGenParticleInfo(const reco::GenParticle & genParticle);
   void dumpTrackInfo(const reco::Track & track, const unsigned int trackNumber);
+  template <class T1, class T2>
+  void cleanMuons(const T1 & startingCollection, T2 & cleanedCollection);
+  template <class T>
+  void makeExclusive( T & collection );
+  template <class T>
+  void fillTreeTracks( const T & collection, const GlobalPoint & vertex, std::vector<TreeTrack> & tracks );
+  void setGen(std::vector<TreeTrack> & treeTracks, const reco::GenParticle * gen, const SmartPropagatorWithIP::IP & genIP);
 
   // ----------member data ---------------------------
   TH1F * hMinDeltaR_, * hMinCleanedDeltaR_, * hSimMinDeltaR_;
@@ -133,7 +143,7 @@ private:
   std::auto_ptr<ControlPlots> controlPlotsMatchedStandAloneMuons_;
   std::auto_ptr<ControlPlots> controlPlotsUnmatchedStandAloneMuons_;
   std::auto_ptr<ControlPlots> controlPlotsCleanedStandAloneMuons_;
-  std::auto_ptr<ControlPlots> controlPlotsCleanedStandAloneMuonsNoDzCut_;
+  // std::auto_ptr<ControlPlots> controlPlotsCleanedStandAloneMuonsNoDzCut_;
   std::auto_ptr<ControlPlots> controlPlotsMatchedCleanedStandAloneMuons_;
   std::auto_ptr<ControlPlots> controlPlotsUnmatchedCleanedStandAloneMuons_;
 
@@ -192,14 +202,15 @@ private:
   bool countSameSide_;
   bool countOppoSide_;
   unsigned int eventNum_;
-  double dxyCutForNoDzCut_;
   bool phiRegion_;
   double phiMin_;
   double phiMax_;
   bool genInsideTkVol_;
+  boost::shared_ptr<RootTreeHandler> treeHandlerStandAloneMuons_;
+  boost::shared_ptr<RootTreeHandler> treeHandlerCleanedStandAloneMuons_;
 };
 
-TrackingEfficiencyFromCosmics::TrackingEfficiencyFromCosmics(const edm::ParameterSet& iConfig) :
+MuonAnalyzerTreeWriter::MuonAnalyzerTreeWriter(const edm::ParameterSet& iConfig) :
   useMCtruth_(iConfig.getParameter<bool>("UseMCtruth")),
   effDxyMin_(iConfig.getParameter<double>("EffDxyMin")),
   effDxyMax_(iConfig.getParameter<double>("EffDxyMax")),
@@ -236,7 +247,6 @@ TrackingEfficiencyFromCosmics::TrackingEfficiencyFromCosmics(const edm::Paramete
   countSameSide_(iConfig.getParameter<bool>("CountSameSide")),
   countOppoSide_(iConfig.getParameter<bool>("CountOppoSide")),
   eventNum_(0),
-  dxyCutForNoDzCut_(iConfig.getParameter<double>("DxyCutForNoDzCut")),
   phiRegion_(iConfig.getParameter<bool>("PhiRegion")),
   phiMin_(iConfig.getParameter<double>("PhiMinCut")),
   phiMax_(iConfig.getParameter<double>("PhiMaxCut")),
@@ -268,14 +278,25 @@ TrackingEfficiencyFromCosmics::TrackingEfficiencyFromCosmics(const edm::Paramete
     }
   }
   smartPropIP_ = 0;
+
+  treeHandlerStandAloneMuons_.reset(new RootTreeHandler(muonCollection_.label()+".root"));
+  treeHandlerCleanedStandAloneMuons_.reset(new RootTreeHandler("cleaned"+muonCollection_.label()+".root"));
 }
 
-TrackingEfficiencyFromCosmics::~TrackingEfficiencyFromCosmics() {}
+MuonAnalyzerTreeWriter::~MuonAnalyzerTreeWriter()
+{
+  std::cout << "Saving trees" << std::endl;
+  treeHandlerStandAloneMuons_->writeTree();
+  treeHandlerCleanedStandAloneMuons_->writeTree();
+}
 
-void TrackingEfficiencyFromCosmics::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
+void MuonAnalyzerTreeWriter::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 {
   eventNum_ = iEvent.id().event();
   std::cout << "event = " << eventNum_ << std::endl;
+
+  // Vertex with respect to which do all the propagations
+  GlobalPoint vertex(0,0,0);
 
   // Load the transient track builder
   iSetup.get<TransientTrackRecord>().get("TransientTrackBuilder",theB_);
@@ -310,80 +331,25 @@ void TrackingEfficiencyFromCosmics::analyze(const edm::Event& iEvent, const edm:
   edm::Handle<reco::TrackCollection> staMuons;
   iEvent.getByLabel(muonCollection_, staMuons);
 
+  // Fill the track collection for the tree
+  std::vector<TreeTrack> standAloneMuonsTreeTracks;
+  fillTreeTracks(*(staMuons.product()), vertex, standAloneMuonsTreeTracks);
+
   // Select good standAloneMuons (done such that the matching with gen is good)
   reco::TrackCollection cleanedStaMuons;
-  reco::TrackCollection cleanedStaMuonsNoDzCut;
-  reco::TrackCollection::const_iterator it = staMuons->begin();
-  for( ; it != staMuons->end(); ++it ) {
-    if( (it->found() >= minimumValidHits_) &&
-        ( it->hitPattern().dtStationsWithValidHits() + it->hitPattern().cscStationsWithValidHits() > 1 ) &&
-        (it->pt() > standAlonePtCut_) && (fabs(it->eta()) < 2.) && (fabs(it->normalizedChi2()) < chi2Cut_) &&
-        ((!dxyErrorCut_) || (fabs(it->dxyError()) < utils::dxyErrMax(it->pt()))) &&
-        ((!dzErrorCut_) || (fabs(it->dzError()) < utils::dxyErrMax(it->pt()))) ) { // Note the use of the same function is intentional.
-      if( fabs(it->dxy()) < dxyCutForNoDzCut_ ) {
-        cleanedStaMuonsNoDzCut.push_back(*it);
-      }
+  cleanMuons(staMuons, cleanedStaMuons);
+  // keep the muons only if there is exactly 1 (single leg) or 2 (separated legs) muons in the collection.
+  // In the case of two legs also ask for matching if requested in the cfg.
+  makeExclusive(cleanedStaMuons);
 
-      if( (fabs(it->dz()) < dzMaxCut_) && (fabs(it->dz()) > dzMinCut_) && (fabs(it->dxy()) < dxyCut_) ) {
-        cleanedStaMuons.push_back(*it);
-      }
-    }
-  }
-
-  if( singleLegMuon_ ) {
-    // Two legged muon, require only one in the event
-    if( cleanedStaMuons.size() != 1 ) {
-      cleanedStaMuons.clear();
-    }
-  }
-  else {
-    // Single legs, require two in the event
-    if( cleanedStaMuons.size() == 2 ) {
-      // Compare the dxy and dz of the two muons. Accept them only if they match within 1 sigma of the resolution taken by interpolating the MC-truth
-      // resolution on SingleMuPt10 and SingleMuPt100 to a Pt of 25 GeV.
-      if( matchTwoLegs_ ) {
-        double dxy1 = cleanedStaMuons[0].dxy();
-        double dxy2 = cleanedStaMuons[1].dxy();
-        double dz1 = cleanedStaMuons[0].dz();
-        double dz2 = cleanedStaMuons[1].dz();
-        double deltaPhi = reco::deltaPhi(cleanedStaMuons[0].phi(), cleanedStaMuons[1].phi());
-        double deltaPt = cleanedStaMuons[0].pt() - cleanedStaMuons[1].pt();
-
-        // The dxy have opposite sign while the dz have same sign.
-        if( !( (fabs(dxy1 + dxy2) < deltaDxyCut_) &&
-               (fabs(dz1 - dz2)   < deltaDzCut_ ) &&
-               (fabs(deltaPhi)    > deltaPhiCut_) &&
-               (fabs(deltaPt)     < deltaPtCut_ ) ) ) {
-          cleanedStaMuons.clear();
-        }
-      }
-    }
-    else {
-      cleanedStaMuons.clear();
-    }
-  }
+  // Fill the cleaned track collection for the tree
+  std::vector<TreeTrack> cleanedStandAloneMuonsTreeTracks;
+  fillTreeTracks(cleanedStaMuons, vertex, cleanedStandAloneMuonsTreeTracks);
 
   // Fill all control plots
   controlPlotsGeneralTracks_->fillControlPlots(*tracks, smartPropIP_);
   controlPlotsStandAloneMuons_->fillControlPlots(*staMuons, smartPropIP_);
-  controlPlotsCleanedStandAloneMuonsNoDzCut_->fillControlPlots(cleanedStaMuonsNoDzCut, smartPropIP_);
   controlPlotsCleanedStandAloneMuons_->fillControlPlots(cleanedStaMuons, smartPropIP_);
-
-  // // Find the simTracks (for IP)
-  // edm::Handle<edm::SimTrackContainer> simTracks;
-  // iEvent.getByLabel("g4SimHits", simTracks);
-  // std::map<const math::XYZTLorentzVectorD *, const reco::Track *> simMatchesMap;
-  // simAssociatorByDeltaR_->fillAssociationMap(*simTracks, *tracks, simMatchesMap, hSimMinDeltaR_);
-  // Compute efficiency from MC truth
-  // std::map<const math::XYZTLorentzVectorD *, const reco::Track *>::const_iterator it = simMatchesMap.begin();
-  // for( ; it != simMatchesMap.end(); ++it ) {
-  //      variables_[0] = it->first->pt();
-  //      bool found = false;
-  //      if( it->second != 0 ) found = true;
-  //      genEfficiency_->fill(variables_, found);
-  //    }
-
-  GlobalPoint vertex(0,0,0);
 
   SmartPropagatorWithIP::IP tkIp1, tkIp2;
   SmartPropagatorWithIP::IP saIp1, saIp2;
@@ -416,6 +382,10 @@ void TrackingEfficiencyFromCosmics::analyze(const edm::Event& iEvent, const edm:
     // Compute impact parameters for generator particle
     SmartPropagatorWithIP::IP stableMuonIP(computeGenImpactParameters(*stableMuon, stableMuon->vertex(), stableMuon->charge()));
 
+    // Assume one gen particle per event. This is true when using cosmics or particleGun.
+    setGen(standAloneMuonsTreeTracks, stableMuon, stableMuonIP);
+    setGen(cleanedStandAloneMuonsTreeTracks, stableMuon, stableMuonIP);
+
     // Gen muon values
     variables_[0] = fabs(stableMuonIP.dxyValue);
     variables_[1] = fabs(stableMuonIP.dzValue);
@@ -424,13 +394,13 @@ void TrackingEfficiencyFromCosmics::analyze(const edm::Event& iEvent, const edm:
     controlPlotsGenTracks_->fillControlPlots(stableMuonIP, stableMuon->vertex());
 
     // Compute efficiency for track vs MC-truth
-    fillEfficiencyVsGen( *tracks, stableMuonIP, genToTrackEfficiency_.get(),
-                         hMinTrackToGenDeltaR_, ControlPlots::INSIDEOUT );
+    fillEfficiencyVsGen( *tracks, stableMuonIP, genToTrackEfficiency_.get(), vertex,
+                         hMinTrackToGenDeltaR_ );
     // Compute efficiency for standalone vs MC-truth
-    fillEfficiencyVsGen( *(staMuons.product()), stableMuonIP, genToStandAloneEfficiency_.get(),
+    fillEfficiencyVsGen( *(staMuons.product()), stableMuonIP, genToStandAloneEfficiency_.get(), vertex,
                          hMinStaMuonToGenDeltaR_ );
     // Compute efficiency for cleaned standalone vs MC-truth
-    fillEfficiencyVsGen( cleanedStaMuons, stableMuonIP, genToCleanedStandAloneEfficiency_.get(),
+    fillEfficiencyVsGen( cleanedStaMuons, stableMuonIP, genToCleanedStandAloneEfficiency_.get(), vertex,
                          hMinCleanedStaMuonToGenDeltaR_ );
 
     if( tracks->size() > 0 ) {
@@ -453,6 +423,10 @@ void TrackingEfficiencyFromCosmics::analyze(const edm::Event& iEvent, const edm:
     }
   }
 
+  // Fill the trees
+  treeHandlerStandAloneMuons_->saveToTree(standAloneMuonsTreeTracks, iEvent.id().event(), iEvent.run());
+  treeHandlerCleanedStandAloneMuons_->saveToTree(cleanedStandAloneMuonsTreeTracks, iEvent.id().event(), iEvent.id().run());
+
   // Deltas between the two standAloneMuons
   if( !singleLegMuon_ ) {
     if( staMuons->size() == 2 ) {
@@ -469,11 +443,11 @@ void TrackingEfficiencyFromCosmics::analyze(const edm::Event& iEvent, const edm:
   // Efficiency for tracks vs standAlone
   cleaned_ = false;
   fillEfficiency(*staMuons, tracks, efficiency_.get(), hMinDeltaR_, standAloneTrackDelta_.get(),
-		 controlPlotsMatchedStandAloneMuons_.get(), controlPlotsUnmatchedStandAloneMuons_.get());
+         controlPlotsMatchedStandAloneMuons_.get(), controlPlotsUnmatchedStandAloneMuons_.get());
   // Efficiency for tracks vs cleanedStandAlone
   cleaned_ = true;
   fillEfficiency(cleanedStaMuons, tracks, efficiencyCleaned_.get(), hMinCleanedDeltaR_, cleanedStandAloneTrackDelta_.get(),
-		 controlPlotsMatchedCleanedStandAloneMuons_.get(), controlPlotsUnmatchedCleanedStandAloneMuons_.get());
+         controlPlotsMatchedCleanedStandAloneMuons_.get(), controlPlotsUnmatchedCleanedStandAloneMuons_.get());
 
 #ifdef THIS_IS_AN_EVENT_EXAMPLE
   Handle<ExampleData> pIn;
@@ -486,7 +460,7 @@ void TrackingEfficiencyFromCosmics::analyze(const edm::Event& iEvent, const edm:
 #endif
 }
 
-const reco::GenParticle * TrackingEfficiencyFromCosmics::takeStableMuon(const reco::GenParticleCollection & genParticles)
+const reco::GenParticle * MuonAnalyzerTreeWriter::takeStableMuon(const reco::GenParticleCollection & genParticles)
 {
   for( reco::GenParticleCollection::const_iterator it = genParticles.begin();
        it != genParticles.end(); ++it ) {
@@ -497,7 +471,7 @@ const reco::GenParticle * TrackingEfficiencyFromCosmics::takeStableMuon(const re
 }
 
 // ------------ method called once each job just before starting event loop  ------------
-void TrackingEfficiencyFromCosmics::beginJob()
+void MuonAnalyzerTreeWriter::beginJob()
 {
   edm::Service<TFileService> fileService;
   hMinDeltaR_ =                    utils::bookHistogram(fileService, "minDeltaR", "", "#Delta R", "", 500, 0, 5);
@@ -515,7 +489,7 @@ void TrackingEfficiencyFromCosmics::beginJob()
   controlPlotsUnmatchedStandAloneMuons_.reset(new ControlPlots(fileService, "unmatchedStandAloneMuons"));
 
   controlPlotsCleanedStandAloneMuons_.reset(new ControlPlots(fileService, "cleanedStandAloneMuons"));
-  controlPlotsCleanedStandAloneMuonsNoDzCut_.reset(new ControlPlots(fileService, "cleanedStandAloneMuonsNoDzCut"));
+  // controlPlotsCleanedStandAloneMuonsNoDzCut_.reset(new ControlPlots(fileService, "cleanedStandAloneMuonsNoDzCut"));
   controlPlotsMatchedCleanedStandAloneMuons_.reset(new ControlPlots(fileService, "matchedCleanedStandAloneMuons"));
   controlPlotsUnmatchedCleanedStandAloneMuons_.reset(new ControlPlots(fileService, "unmatchedCleanedStandAloneMuons"));
 
@@ -531,7 +505,7 @@ void TrackingEfficiencyFromCosmics::beginJob()
 }
 
 // ------------ method called once each job just after ending the event loop  ------------
-void TrackingEfficiencyFromCosmics::endJob() 
+void MuonAnalyzerTreeWriter::endJob()
 {
 //  TCanvas canvasDxy;
 //  canvasDxy.Draw();
@@ -588,27 +562,27 @@ void TrackingEfficiencyFromCosmics::endJob()
 }
 
 // ------------ method called when starting to processes a run  ------------
-void TrackingEfficiencyFromCosmics::beginRun(edm::Run const&, edm::EventSetup const&)
+void MuonAnalyzerTreeWriter::beginRun(edm::Run const&, edm::EventSetup const&)
 {
 }
 
 // ------------ method called when ending the processing of a run  ------------
-void TrackingEfficiencyFromCosmics::endRun(edm::Run const&, edm::EventSetup const&)
+void MuonAnalyzerTreeWriter::endRun(edm::Run const&, edm::EventSetup const&)
 {
 }
 
 // ------------ method called when starting to processes a luminosity block  ------------
-void TrackingEfficiencyFromCosmics::beginLuminosityBlock(edm::LuminosityBlock const&, edm::EventSetup const&)
+void MuonAnalyzerTreeWriter::beginLuminosityBlock(edm::LuminosityBlock const&, edm::EventSetup const&)
 {
 }
 
 // ------------ method called when ending the processing of a luminosity block  ------------
-void TrackingEfficiencyFromCosmics::endLuminosityBlock(edm::LuminosityBlock const&, edm::EventSetup const&)
+void MuonAnalyzerTreeWriter::endLuminosityBlock(edm::LuminosityBlock const&, edm::EventSetup const&)
 {
 }
 
 // ------------ method fills 'descriptions' with the allowed parameters for the module  ------------
-void TrackingEfficiencyFromCosmics::fillDescriptions(edm::ConfigurationDescriptions& descriptions) {
+void MuonAnalyzerTreeWriter::fillDescriptions(edm::ConfigurationDescriptions& descriptions) {
   //The following says we do not know what parameters are allowed so do no validation
   // Please change this to state exactly what you do use, even if it is no parameters
   edm::ParameterSetDescription desc;
@@ -617,7 +591,7 @@ void TrackingEfficiencyFromCosmics::fillDescriptions(edm::ConfigurationDescripti
 }
 
 template <class T>
-SmartPropagatorWithIP::IP TrackingEfficiencyFromCosmics::computeGenImpactParameters( const T & track, const math::XYZPoint & genVertex,
+SmartPropagatorWithIP::IP MuonAnalyzerTreeWriter::computeGenImpactParameters( const T & track, const math::XYZPoint & genVertex,
                                                                                      const int genCharge )
 {
   SmartPropagatorWithIP::IP ip;
@@ -627,20 +601,20 @@ SmartPropagatorWithIP::IP TrackingEfficiencyFromCosmics::computeGenImpactParamet
   else {
     ip = smartPropIP_->computeGenImpactParametersOutsideTkVol( track, genVertex, genCharge, GlobalPoint(0,0,0) );
   }
-  std::cout << "gen pt before propagation = " << track.pt() << std::endl;
-  std::cout << "gen pt after propagation = " << ip.pt << std::endl;
-  std::cout << "gen dxy = " << ip.dxyValue << std::endl;
+  // std::cout << "gen pt before propagation = " << track.pt() << std::endl;
+  // std::cout << "gen pt after propagation = " << ip.pt << std::endl;
+  // std::cout << "gen dxy = " << ip.dxyValue << std::endl;
   return ip;
 }
 
-void TrackingEfficiencyFromCosmics::dumpGenParticleInfo(const reco::GenParticle & genParticle)
+void MuonAnalyzerTreeWriter::dumpGenParticleInfo(const reco::GenParticle & genParticle)
 {
   std::cout << "pdgid = " << genParticle.pdgId() << std::endl;
   std::cout << "status = " << genParticle.status() << std::endl;
   std::cout << "pt = " << genParticle.pt() << ", eta = " << genParticle.eta() << ", phi = " << genParticle.phi() << std::endl;
 }
 
-void TrackingEfficiencyFromCosmics::dumpTrackInfo(const reco::Track & track, const unsigned int trackNumber)
+void MuonAnalyzerTreeWriter::dumpTrackInfo(const reco::Track & track, const unsigned int trackNumber)
 {
   track.quality(quality_);
   std::stringstream ss;
@@ -662,10 +636,10 @@ void TrackingEfficiencyFromCosmics::dumpTrackInfo(const reco::Track & track, con
 }
 
 template <class T1, class T2>
-void TrackingEfficiencyFromCosmics::fillEfficiencyVsGen( const T1 & tracks, const T2 stableMuonIP,
-                                                         Efficiency * efficiency,
-                                                         TH1F * hMinToGenDeltaR,
-                                                         const ControlPlots::propType propagationType )
+void MuonAnalyzerTreeWriter::fillEfficiencyVsGen( const T1 & tracks, const T2 stableMuonIP,
+                                                  Efficiency * efficiency,
+                                                  const GlobalPoint & vertex,
+                                                  TH1F * hMinToGenDeltaR)
 {
   if( tracks.size() == 0 ) {
     // Do it twice as we expect two standalone muons and we reconstruct none
@@ -685,19 +659,8 @@ void TrackingEfficiencyFromCosmics::fillEfficiencyVsGen( const T1 & tracks, cons
                                  track.dxy(), track.dxyError(),
                                  track.dz(), track.dzError());
     if( recomputeIP_ ) {
-      if( propagationType == ControlPlots::INSIDETKVOL ) {
-        // ip = smartPropIP_->computeImpactParametersInsideTkVol(track, GlobalPoint(0,0,0));
-        ip = smartPropIP_->computeImpactParameters(track, GlobalPoint(0,0,0));
-      }
-      else if( propagationType == ControlPlots::OUTSIDEIN ) {
-        // ip = smartPropIP_->computeImpactParametersOutsideInTkVol(track, GlobalPoint(0,0,0));
-        ip = smartPropIP_->computeImpactParameters(track, GlobalPoint(0,0,0));
-      }
-      else {
-        std::cout << "[TrackingEfficiencyFromCosmics::fillEfficiencyVsGen]: unknown propagation type: " << propagationType << std::endl;
-      }
+      ip = smartPropIP_->computeImpactParameters(track, vertex);
     }
-    // hMinToGenDeltaR->Fill(reco::deltaR(stableMuonIP.eta, stableMuonIP.phi, ip.eta, ip.phi));
     hMinToGenDeltaR->Fill(reco::deltaR(stableMuonIP.eta, stableMuonIP.phi, ip.eta, ip.phi));
     //    hMinToGenDeltaR->Fill(std::min(reco::deltaR(stableMuonIP.eta, stableMuonIP.phi, ip.eta, ip.phi),
     //                                   reco::deltaR(stableMuonIP.eta, stableMuonIP.phi, -ip.eta, ip.phi+TMath::Pi()/2.)));
@@ -705,7 +668,7 @@ void TrackingEfficiencyFromCosmics::fillEfficiencyVsGen( const T1 & tracks, cons
   }
 }
 
-void TrackingEfficiencyFromCosmics::fillEfficiency(const std::map<const reco::Track *, const reco::Track *> & matchesMap,
+void MuonAnalyzerTreeWriter::fillEfficiency(const std::map<const reco::Track *, const reco::Track *> & matchesMap,
                                                    Efficiency * efficiency, ControlDeltaPlots * standAloneTrackDelta,
                                                    ControlPlots * matchedStandAlone, ControlPlots * unmatchedStandAlone)
 {
@@ -765,7 +728,7 @@ void TrackingEfficiencyFromCosmics::fillEfficiency(const std::map<const reco::Tr
 }
 
 template <class T1, class T2>
-void TrackingEfficiencyFromCosmics::fillEfficiency(const T1 & staMuons, const T2 & tracks, Efficiency * efficiency,
+void MuonAnalyzerTreeWriter::fillEfficiency(const T1 & staMuons, const T2 & tracks, Efficiency * efficiency,
                                                    TH1F * hMinDeltaR, ControlDeltaPlots * standAloneTrackDelta,
                                                    ControlPlots * matchedStandAlone, ControlPlots * unmatchedStandAlone)
 {
@@ -783,5 +746,83 @@ void TrackingEfficiencyFromCosmics::fillEfficiency(const T1 & staMuons, const T2
   }
 }
 
+template <class T1, class T2>
+void MuonAnalyzerTreeWriter::cleanMuons( const T1 & startingCollection, T2 & cleanedCollection)
+{
+  reco::TrackCollection::const_iterator it = startingCollection->begin();
+  for( ; it != startingCollection->end(); ++it ) {
+    if( (it->found() >= minimumValidHits_) &&
+        ( it->hitPattern().dtStationsWithValidHits() + it->hitPattern().cscStationsWithValidHits() > 1 ) &&
+        (it->pt() > standAlonePtCut_) && (fabs(it->eta()) < 2.) && (fabs(it->normalizedChi2()) < chi2Cut_) &&
+        ((!dxyErrorCut_) || (fabs(it->dxyError()) < utils::dxyErrMax(it->pt()))) &&
+        ((!dzErrorCut_) || (fabs(it->dzError()) < utils::dxyErrMax(it->pt()))) ) { // Note the use of the same function is intentional.
+      if( (fabs(it->dz()) < dzMaxCut_) && (fabs(it->dz()) > dzMinCut_) && (fabs(it->dxy()) < dxyCut_) ) {
+        cleanedCollection.push_back(*it);
+      }
+    }
+  }
+}
+
+template <class T>
+void MuonAnalyzerTreeWriter::makeExclusive( T & collection )
+{
+  if( singleLegMuon_ ) {
+    // Two legged muon, require only one in the event
+    if( collection.size() != 1 ) {
+      collection.clear();
+    }
+  }
+  else {
+    // Single legs, require two in the event
+    if( collection.size() == 2 ) {
+      // Compare the dxy and dz of the two muons. Accept them only if they match within 1 sigma of the resolution taken by interpolating the MC-truth
+      // resolution on SingleMuPt10 and SingleMuPt100 to a Pt of 25 GeV.
+      if( matchTwoLegs_ ) {
+        // The dxy have opposite sign while the dz have same sign.
+        if( !( (fabs(collection[0].dxy() + collection[1].dxy()) < deltaDxyCut_) &&
+               (fabs(collection[0].dz() - collection[1].dz()) < deltaDzCut_ ) &&
+               (fabs(reco::deltaPhi(collection[0].phi(), collection[1].phi())) > deltaPhiCut_) &&
+               (fabs(collection[0].pt() - collection[1].pt()) < deltaPtCut_ ) ) ) {
+          collection.clear();
+        }
+      }
+    }
+    else {
+      collection.clear();
+    }
+  }
+}
+
+template <class T>
+void MuonAnalyzerTreeWriter::fillTreeTracks( const T & collection, const GlobalPoint & vertex, std::vector<TreeTrack> & tracks )
+{
+  typename T::const_iterator it = collection.begin();
+  for( ; it != collection.end(); ++it ) {
+    SmartPropagatorWithIP::IP ip(it->pt(), it->ptError(), it->eta(), it->etaError(), it->phi(), it->phiError(),
+                                 it->dxy(), it->dxyError(), it->dz(), it->dzError());
+    TreeTrack treeTrack;
+    if( recomputeIP_ ) {
+      ip = smartPropIP_->computeImpactParameters(*it, vertex);
+      utils::fillTrackToTreeTrack(treeTrack, *it, ip);
+      tracks.push_back(treeTrack);
+      // tracks.push_back(TreeTrack(*it, ip));
+    }
+    else {
+      utils::fillTrackToTreeTrack(treeTrack, *it);
+      tracks.push_back(treeTrack);
+      // tracks.push_back(TreeTrack(*it));
+    }
+  }
+}
+
+void MuonAnalyzerTreeWriter::setGen(std::vector<TreeTrack> & treeTracks, const reco::GenParticle * gen, const SmartPropagatorWithIP::IP & genIP)
+{
+  std::vector<TreeTrack>::iterator it = treeTracks.begin();
+  for( ; it != treeTracks.end(); ++it ) {
+    utils::fillGenToTreeTrack(*it, *gen, genIP);
+    // it->setGen(*gen, gen->vertex(), genIP);
+  }
+}
+
 //define this as a plug-in
-DEFINE_FWK_MODULE(TrackingEfficiencyFromCosmics);
+DEFINE_FWK_MODULE(MuonAnalyzerTreeWriter);

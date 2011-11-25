@@ -176,6 +176,7 @@ Propagator* SmartPropagatorWithIP::getGenPropagator() const
 //SmartPropagatorWithIP::IP SmartPropagatorWithIP::computeImpactParametersInsideTkVol( const T & track, const GlobalPoint & vertex ) const
 SmartPropagatorWithIP::IP SmartPropagatorWithIP::computeImpactParametersInsideTkVol( const reco::Track & track, const GlobalPoint & vertex ) const
 {
+  // std::cout << "propagating inside tkVolume" << std::endl;
   const reco::TransientTrack transientTrack = theBuilder_->build(track);
   TrajectoryStateClosestToPoint traj = transientTrack.trajectoryStateClosestToPoint(vertex);
   if( traj.isValid() ) {
@@ -193,10 +194,12 @@ SmartPropagatorWithIP::IP SmartPropagatorWithIP::computeImpactParametersInsideTk
 
 SmartPropagatorWithIP::IP SmartPropagatorWithIP::computeImpactParametersOutsideTkVol(const FreeTrajectoryState & fts, const GlobalPoint & vertex) const
 {
+  // std::cout << "propagating outside tkVolume" << std::endl;
   SteppingHelixPropagator * steppingHelixProp = dynamic_cast<SteppingHelixPropagator*>(theGenProp_);
   if( steppingHelixProp != 0 ) {
     FreeTrajectoryState ftsPCA(steppingHelixProp->propagate(fts, vertex));
     GlobalPoint pca(ftsPCA.position());
+    // Taking only the diagonal terms. This is a semplification, should be checked.
     double dxy = sqrt(pow(pca.x()-vertex.x(), 2) + pow(pca.y()-vertex.y(), 2));
     double dz = pca.z() - vertex.z();
     // Ignore the errors for now
@@ -226,6 +229,7 @@ SmartPropagatorWithIP::IP SmartPropagatorWithIP::computeImpactParametersOutsideI
 {
   TrajectoryStateOnSurface tsos(propagate(fts, *(theTkVolume().get())));
   if( tsos.isValid() ) {
+    // This does not work because the errors are missing. For now use the outsideTkVol.
     // return computeImpactParametersInsideTkVol(*(tsos.freeTrajectoryState()), vertex);
     return computeImpactParametersOutsideTkVol(fts, vertex);
   }
@@ -261,13 +265,16 @@ SmartPropagatorWithIP::IP SmartPropagatorWithIP::computeImpactParameters( const 
 {
   // When the vertex is inside the tkVolume
   if( insideTkVol(vertex) ) {
+    // std::cout << "Vertex inside tkVolume" << std::endl;
     FreeTrajectoryState innerTsos(GlobalPoint(track.innerPosition().x(),track.innerPosition().y(),track.innerPosition().z()),
                                   GlobalVector(track.innerMomentum().x(),track.innerMomentum().y(),track.innerMomentum().z()),
                                   TrackCharge(track.charge()), theField_);
     if( insideTkVol(innerTsos) ) return computeImpactParametersInsideTkVol(track, vertex);
+    // return computeImpactParametersInsideTkVol(track, vertex);
     return computeImpactParametersOutsideInTkVol(innerTsos, vertex);
   }
   else {
+    // std::cout << "Vertex outside tkVolume" << std::endl;
     FreeTrajectoryState outerTsos(GlobalPoint(track.outerPosition().x(),track.outerPosition().y(),track.outerPosition().z()),
                                   GlobalVector(track.outerMomentum().x(),track.outerMomentum().y(),track.outerMomentum().z()),
                                   TrackCharge(track.charge()), theField_);

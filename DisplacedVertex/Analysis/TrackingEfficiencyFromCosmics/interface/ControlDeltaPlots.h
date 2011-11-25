@@ -22,11 +22,14 @@ public:
     hDeltaPhi_ =      utils::bookHistogram(fileService, name, "DeltaPhi", "#Delta #phi", "", 100, -3.4, 3.4);
     hDeltaDxy_ =      utils::bookHistogram(fileService, name, "DeltaDxy", "#Delta d_{0}", "cm", 100, -100, 100);
     hDeltaDz_ =       utils::bookHistogram(fileService, name, "DeltaDz", "#Delta d_{z}", "cm", 100, -100, 100);
-    hDeltaFabsDxy_ =  utils::bookHistogram(fileService, name, "DeltaFabsDxy", "#Delta |d_{0}|", "cm", 100, -100, 100);
-    hDeltaFabsDz_ =   utils::bookHistogram(fileService, name, "DeltaFabsDz", "#Delta |d_{z}|", "cm", 100, -100, 100);
+    hPtPulls_ =       utils::bookHistogram(fileService, name, "PtPulls", "#Delta P_{T}/#sigma(P_{T})", "", 100, -5, 5);
+    hDxyPulls_ =      utils::bookHistogram(fileService, name, "DxyPulls", "#Delta |d_{0}|/#sigma(d_{0})", "", 100, -5, 5);
+    hDzPulls_ =       utils::bookHistogram(fileService, name, "DzPulls", "#Delta |d_{z}|/#sigma(d_{z})", "", 100, -5, 5);
     hDeltaVertexX_ =  utils::bookHistogram(fileService, name, "DeltaVertexX", "#Delta(Vertex X)", "cm", 120, -60, 60);
     hDeltaVertexY_ =  utils::bookHistogram(fileService, name, "DeltaVertexY", "#Delta(Vertex Y)", "cm", 120, -60, 60);
     hDeltaVertexZ_ =  utils::bookHistogram(fileService, name, "DeltaVertexZ", "#Delta(Vertex Z)", "cm", 200, -100, 100);
+    hDeltaFabsDxy_ =  utils::bookHistogram(fileService, name, "DeltaFabsDxy", "#Delta |d_{0}|", "cm", 100, -100, 100);
+    hDeltaFabsDz_ =   utils::bookHistogram(fileService, name, "DeltaFabsDz", "#Delta |d_{z}|", "cm", 100, -100, 100);
   }
   template <class T1, class T2>
   void fillControlPlots(const T1 & track1, const SmartPropagatorWithIP::IP & ip1,
@@ -40,12 +43,18 @@ public:
     // With sign = -1 back-to-back tracks have deltaDxy = 0
     hDeltaDxy_->Fill(ip1.dxyValue - sign_*ip2.dxyValue);
     hDeltaDz_->Fill(ip1.dzValue - ip2.dzValue);
-    hDeltaFabsDxy_->Fill(fabs(ip1.dxyValue) - fabs(ip2.dxyValue));
-    hDeltaFabsDz_->Fill(fabs(ip1.dzValue) - fabs(ip2.dzValue));
+
+    // Using the errors from the track!! Need to compute the errors in the propagator!!
+    hPtPulls_->Fill((ip1.pt - ip2.pt)/track1.ptError());
+    hDxyPulls_->Fill((fabs(ip1.dxyValue) - fabs(ip2.dxyValue))/track1.dxyError());
+    hDzPulls_->Fill((fabs(ip1.dzValue) - fabs(ip2.dzValue))/track1.dzError());
 
     hDeltaVertexX_->Fill(track1.vertex().x() - track2.vertex().x());
     hDeltaVertexY_->Fill(track1.vertex().y() - track2.vertex().y());
     hDeltaVertexZ_->Fill(track1.vertex().z() - track2.vertex().z());
+
+    hDeltaFabsDxy_->Fill(fabs(ip1.dxyValue) - fabs(ip2.dxyValue));
+    hDeltaFabsDz_->Fill(fabs(ip1.dzValue) - fabs(ip2.dzValue));
   }
 
   template <class T1, class T2>
@@ -64,6 +73,7 @@ public:
 
 protected:
   TH1F *hDeltaPt_, *hDeltaPtOverPt_, *hDeltaEta_, *hDeltaPhi_, *hDeltaDxy_, *hDeltaDz_;
+  TH1F *hPtPulls_, *hDxyPulls_, *hDzPulls_;
   TH1F *hDeltaVertexX_, *hDeltaVertexY_, *hDeltaVertexZ_;
   TH1F *hDeltaFabsDxy_, *hDeltaFabsDz_;
   int sign_;
