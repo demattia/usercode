@@ -21,7 +21,8 @@ namespace edm
     // data members
     double fMinPt;
     double fMaxPt;
-    double d0_;
+    double d0Min_;
+    double d0Max_;
   };
 } 
 

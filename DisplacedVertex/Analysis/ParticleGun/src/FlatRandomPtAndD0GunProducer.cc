@@ -1,6 +1,6 @@
 /*
- *  $Date: 2009/02/19 21:52:40 $
- *  $Revision: 1.4 $
+ *  $Date: 2011/11/08 20:43:36 $
+ *  $Revision: 1.1 $
  *  \author Julia Yarba
  */
 
@@ -25,7 +25,8 @@ FlatRandomPtAndD0GunProducer::FlatRandomPtAndD0GunProducer(const ParameterSet& p
   
   fMinPt = pgun_params.getParameter<double>("MinPt");
   fMaxPt = pgun_params.getParameter<double>("MaxPt");
-  d0_ = pgun_params.getParameter<double>("D0");
+  d0Min_ = pgun_params.getParameter<double>("D0Min");
+  d0Max_ = pgun_params.getParameter<double>("D0Max");
 
   produces<HepMCProduct>();
   produces<GenEventInfoProduct>();
@@ -52,7 +53,14 @@ void FlatRandomPtAndD0GunProducer::produce(Event &e, const EventSetup& es)
   //
   // 1st, primary vertex
   //
-  HepMC::GenVertex* Vtx = new HepMC::GenVertex(HepMC::FourVector(d0_,0.,0.));
+  HepMC::GenVertex* Vtx = 0;
+  if( d0Min_ == d0Max_ ) {
+    Vtx = new HepMC::GenVertex(HepMC::FourVector(d0Min_,0.,0.));
+  }
+  else {
+    double d0 = fRandomGenerator->fire(d0Min_, d0Max_);
+    Vtx = new HepMC::GenVertex(HepMC::FourVector(d0,0.,0.));
+  }
 
   // loop over particles
   //
