@@ -9,7 +9,7 @@ class AnalysisSample:
     ############################################################
     # INITIALISATION: read and check sample description cff file
     ############################################################
-    def __init__(self,cff_name):
+    def __init__(self, cff_name):
 
         # first of all, it might be that the argument is *not* a cff file,
         # but an existing working directory. in that case, proceed to
@@ -20,143 +20,246 @@ class AnalysisSample:
 
         # check that the file exists
         if not os.path.isfile(cff_name):
-            print "error: file",cff_name,"not found"
+            print "error: file", cff_name, "not found"
             sys.exit(1)
         # the following is equivalent to os.path.abspath on most systems, but not at RAL...
-        self.cff=os.path.normpath(os.path.join(os.getenv("PWD",""),cff_name))
+        self.cff = os.path.normpath(os.path.join(os.getenv("PWD", ""), cff_name))
         # more RAL specialty...
-        self.cff=self.cff.replace("/net/unixfsrv","/home") 
+        self.cff = self.cff.replace("/net/unixfsrv", "/home")
+
+        # find out where we are logged on
+        self.where_am_i = where_am_i()
 
         # check that CMSSW area is set up
-        self.cmssw_base=os.getenv("CMSSW_BASE","NONE")
+        self.cmssw_base = os.getenv("CMSSW_BASE", "NONE")
         # RAL specialty...
-        self.cmssw_base=self.cmssw_base.replace("/net/unixfsrv","/home") 
-        if self.cmssw_base=="NONE":
+        self.cmssw_base = self.cmssw_base.replace("/net/unixfsrv", "/home")
+        if self.cmssw_base == "NONE":
             print "error: need to run cmsenv beforehand"
             sys.exit(1)
 
         # check that the cff file is actually in the CMSSW area
-        if self.cff.find(self.cmssw_base)!=0:
+        if self.cff.find(self.cmssw_base) != 0:
             print "error: cff file is not in the release area currently set up"
             print self.cff
             print self.cmssw_base
             sys.exit(1)
 
         # initialise variables to be read from sample cff file
-        sampleDataSet=""
-        sampleJSON=""
-        sampleRunRange=[]
-        sampleSimFiles=[]
-        sampleRecoFiles=[]
-        samplePatFiles=[]
-        sampleGeneratorConfig=""
-        sampleGeneratorReference=""
-        sampleCMSEnergy=0
-        sampleGlobalTag=""
-        sampleHLTProcess=""
-        sampleRelease=""
-        sampleNumEvents=0
-        sampleLumiNumberOffset=0
-        sampleType=""
-        sampleSignalPID=0
-        sampleRequireCollision=1
-        sampleRunE=1
-        sampleRunMu=1
+        sampleDataSet = ""
+        sampleJSON = ""
+        sampleRunRange = []
+        sampleSimFiles = []
+        sampleRecoFiles = []
+        samplePatFiles = []
+        sampleGeneratorConfig = ""
+        sampleGeneratorReference = ""
+        sampleCMSEnergy = 0
+        sampleGlobalTag = ""
+        sampleHLTProcess = ""
+        sampleRelease = ""
+        sampleNumEvents = 0
+        sampleLumiNumberOffset = 0
+        sampleType = ""
+        sampleSignalPID = 0
+        sampleRequireCollision = 1
+        sampleRunE = 1
+        sampleRunMu = 1
 
         # read and interpret the file
-        exec(sample_cff_code(self.cff))
+        samplefile = open(self.cff, "r")
+        content = ""
+        for line in samplefile.readlines():
+            content += line
+        samplefile.close()
+        code = compile(content, "<string>", "exec")
+        exec(code)
 
         # check that the mandatory information is there
-        if sampleGlobalTag=="":
-            print "error: sampleGlobalTag not set in",self.cff
+        if sampleGlobalTag == "":
+            print "error: sampleGlobalTag not set in", self.cff
             sys.exit(1)
-        if sampleHLTProcess=="":
-            print "error: sampleHLTProcess not set in",self.cff
+        if sampleHLTProcess == "":
+            print "error: sampleHLTProcess not set in", self.cff
             sys.exit(1)
-        if sampleRelease=="":
-            print "error: sampleRelease not set in",self.cff
+        if sampleRelease == "":
+            print "error: sampleRelease not set in", self.cff
             sys.exit(1)
-        if sampleNumEvents==0:
-            print "error: sampleNumEvents not set in",self.cff
+        if sampleNumEvents == 0:
+            print "error: sampleNumEvents not set in", self.cff
             sys.exit(1)
-        if sampleType!="MC" and sampleType!="DATA":
-            print "error: sampleType must be set to MC or DATA in",self.cff
+        if sampleType != "MC" and sampleType != "DATA":
+            print "error: sampleType must be set to MC or DATA in", self.cff
 
         # store cff information in class members
-        self.sampleDataSet=sampleDataSet
-        self.sampleJSON=sampleJSON
-        self.sampleRunRange=sampleRunRange
-        self.sampleSimFiles=sampleSimFiles
-        self.sampleRecoFiles=sampleRecoFiles
-        self.samplePatFiles=samplePatFiles
-        self.sampleGeneratorConfig=sampleGeneratorConfig
-        self.sampleGeneratorReference=sampleGeneratorReference
-        self.sampleCMSEnergy=sampleCMSEnergy
-        self.sampleGlobalTag=sampleGlobalTag
-        self.sampleRelease=sampleRelease
-        self.sampleNumEvents=sampleNumEvents
-        self.sampleLumiNumberOffset=sampleLumiNumberOffset
-        self.sampleType=sampleType
-        self.sampleSignalPID=sampleSignalPID
-        self.sampleRequireCollision=sampleRequireCollision
-        self.sampleRunE=sampleRunE
-        self.sampleRunMu=sampleRunMu
+        self.sampleDataSet = sampleDataSet
+        self.sampleJSON = sampleJSON
+        self.sampleRunRange = sampleRunRange
+        self.sampleSimFiles = sampleSimFiles
+        self.sampleRecoFiles = sampleRecoFiles
+        self.samplePatFiles = samplePatFiles
+        self.sampleGeneratorConfig = sampleGeneratorConfig
+        self.sampleGeneratorReference = sampleGeneratorReference
+        self.sampleCMSEnergy = sampleCMSEnergy
+        self.sampleGlobalTag = sampleGlobalTag
+        self.sampleRelease = sampleRelease
+        self.sampleNumEvents = sampleNumEvents
+        self.sampleLumiNumberOffset = sampleLumiNumberOffset
+        self.sampleType = sampleType
+        self.sampleSignalPID = sampleSignalPID
+        self.sampleRequireCollision = sampleRequireCollision
+        self.sampleRunE = sampleRunE
+        self.sampleRunMu = sampleRunMu
 
         # create a unique sample ID and get the name of the CMSSW package
-        self.id=self.cff.split("/")[-1].replace("_cff.py","")
-        levels=self.cff.replace(self.cmssw_base,"").strip("/").split("/")
-        self.packageName=levels[1]+"/"+levels[2]
-        self.packageNamePython=self.packageName.replace("/",".")
+        self.id = self.cff.split("/")[-1].replace("_cff.py", "")
+        levels = self.cff.replace(self.cmssw_base, "").strip("/").split("/")
+        self.packageName = levels[1] + "/" + levels[2]
+        self.packageNamePython = self.packageName.replace("/", ".")
 
         # check directories for sim, reco, pat files.
-        self.sampleSimFileDir=get_directory(self.sampleSimFiles)
-        self.sampleRecoFileDir=get_directory(self.sampleRecoFiles)
-        self.samplePatFileDir=get_directory(self.samplePatFiles)
+        self.sampleSimFileDir = self.get_directory(self.sampleSimFiles)
+        self.sampleRecoFileDir = self.get_directory(self.sampleRecoFiles)
+        self.samplePatFileDir = self.get_directory(self.samplePatFiles)
 
         # enforce a clean directory structure: all files from one sample
         # must be in the same directory or at most one directory level below
-        refdir=""
-        for entry in [self.sampleSimFileDir,self.sampleRecoFileDir,\
+        refdir = ""
+        for entry in [self.sampleSimFileDir, self.sampleRecoFileDir,\
                       self.samplePatFileDir]:
-            if len(entry)==0: continue
-            sharedpath=entry[:entry.rfind("/")]
-            if refdir=="": refdir=sharedpath
-            if refdir!=sharedpath:
-                print "inconsistent directory structure:",refdir,sharedpath
-                if self.cff.find("Debug")<0: sys.exit(1)
+            if len(entry) == 0:
+                continue
+            sharedpath = entry[:entry.rfind("/")]
+            if refdir == "":
+                refdir = sharedpath
+            if refdir != sharedpath:
+                print "inconsistent directory structure:", refdir, sharedpath
+                if self.cff.find("Debug") < 0:
+                    sys.exit(1)
 
         # general initialisation
-        self.workdir=""
-        self.driverconf=""
-        
+        self.workdir = ""
+        self.driverconf = ""
+
+    ##################################
+    # CHECK DIRECTORY OF FILES IN LIST
+    ##################################
+    def get_directory(self, filelist):
+        dirname = ""
+        for entry in filelist:
+            newdir = entry[:entry.rfind("/")]
+            if newdir != dirname and dirname != "":
+                print "error: multiple directories in file list"
+                sys.exit(1)
+            dirname = newdir
+        return dirname
+
+    #########################################
+    # GET LIST OF EXISTING FILES IN DIRECTORY
+    #########################################
+    def get_dir_content(self, filelist):
+        dirname = self.get_directory(filelist)
+        existing_files = []
+        if dirname.find("/castor/") >= 0:
+            # this is a castor directory
+            if self.where_am_i == "CERN":
+                # storage on castor requested. check output dir
+                topdir = dirname[:dirname.rfind("/")]
+                lastlevel = dirname[dirname.rfind("/") + 1:]
+                found = 0
+                for entry in os.popen("rfdir " + topdir).readlines():
+                    if entry.split()[-1] == lastlevel:
+                        found = 1
+                if found:
+                    # directory exists. check for existing files
+                    for entry in os.popen("rfdir " + dirname).readlines():
+                        existing_files.append(entry.split()[-1])
+                    os.system("rfchmod 775 " + dirname)
+            else:
+                print "error: cannot check castor dir content from outside CERN"
+                sys.exit(1)
+        elif dirname.find("rl.ac.uk/") > 0:
+            # RAL dCache directory requested
+            if self.where_am_i == "RAL":
+                ensure_grid_proxy()
+                interactive_path = dirname.replace("dcap:", "").replace("srm:", "")
+                interactive_path = interactive_path.replace("//heplnx204.pp.rl.ac.uk", "")
+                interactive_path = interactive_path.replace("//heplnx209.pp.rl.ac.uk", "")
+                interactive_path = interactive_path.replace("//dcap.pp.rl.ac.uk", "")
+                interactive_path = interactive_path.replace(":8443", "")
+                interactive_path = interactive_path.replace("/cms/user/", "/cms/store/user/")
+                if os.path.isdir(interactive_path):
+                    # directory exists. check for existing files
+                    for entry in os.listdir(interactive_path):
+                        existing_files.append(dirname + "/" + entry)
+            else:
+                print "error: cannot check RAL dCache dir content from outside RAL"
+                sys.exit(1)
+        else:
+            # check on local disk (well, or AFS)
+            actual_dir = dirname.replace("file:", "")
+            if os.path.isdir(actual_dir):
+                # directory exists. check for existing files
+                for entry in os.listdir(actual_dir):
+                    existing_files.append(dirname + "/" + entry)
+        return existing_files
 
     ###################################################################
     # CHECK OUTPUT DIRECTORY FOR EXISTING FILES AND CREATE IF NECESSARY
     ###################################################################
-    def check_dir(self,filelist,inout,allow_partial=0):
-        inout=inout.lower()
-        if inout!="input" and inout!="output":
+    def check_dir(self, filelist, inout, allow_partial = 0):
+        inout = inout.lower()
+        if inout != "input" and inout != "output":
             print "error: check_dir argument needs to be \"input\" or \"output\""
             sys.exit(1)
-        dirname=get_directory(filelist)
-        existing=[]
-        filenames=[]
-        for entry in filelist: filenames.append(entry.split("/")[-1])
-        if dirname.find("rl.ac.uk/")>0:
+        dirname = self.get_directory(filelist)
+        existing = []
+        filenames = []
+        for entry in filelist:
+            filenames.append(entry.split("/")[-1])
+        if dirname.find("/castor/") >= 0:
+            # this is a castor directory
+            dirlocation = "CERN"
+            if self.where_am_i == "CERN":
+                # storage on castor requested. check output dir
+                topdir = dirname[:dirname.rfind("/")]
+                lastlevel = dirname[dirname.rfind("/") + 1:]
+                found = 0
+                for entry in os.popen("rfdir " + topdir).readlines():
+                    if entry.split()[-1] == lastlevel: found = 1
+                if found:
+                    # directory exists. check for existing files
+                    for entry in os.popen("rfdir " + dirname).readlines():
+                        if entry.split()[-1] in filenames: existing.append(dirname + "/" + entry.split()[-1])
+                    os.system("rfchmod 775 " + dirname)
+                elif inout == "output":
+                    os.system("rfmkdir " + dirname + " &> /dev/null")
+                    os.system("rfchmod 775 " + dirname)
+            elif self.run_on == "GRID":
+                print "warning: cannot check castor output directory from this site"
+            else:
+                print "error: cannot run non-GRID jobs outside CERN to access castor"
+                sys.exit(1)
+        elif dirname.find("rl.ac.uk/") > 0:
             # storage on RAL dCache requested
-            dirlocation="RAL"
-            interactive_path=dirname.replace("dcap:","").replace("srm:","")
-            interactive_path=interactive_path.replace("//heplnx204.pp.rl.ac.uk","")
-            interactive_path=interactive_path.replace("//heplnx209.pp.rl.ac.uk","")
-            interactive_path=interactive_path.replace("//dcap.pp.rl.ac.uk","")
-            interactive_path=interactive_path.replace(":8443","")
-            interactive_path=interactive_path.replace("/cms/user/","/cms/store/user/")
-            if os.path.isdir(interactive_path):
-                # directory exists. check for existing files
-                for entry in os.listdir(interactive_path):
-                    if entry in filenames: existing.append(dirname+"/"+entry)
+            dirlocation = "RAL"
+            if self.where_am_i == "RAL":
+                interactive_path = dirname.replace("dcap:", "").replace("srm:", "")
+                interactive_path = interactive_path.replace("//heplnx204.pp.rl.ac.uk", "")
+                interactive_path = interactive_path.replace("//heplnx209.pp.rl.ac.uk", "")
+                interactive_path = interactive_path.replace("//dcap.pp.rl.ac.uk", "")
+                interactive_path = interactive_path.replace(":8443", "")
+                interactive_path = interactive_path.replace("/cms/user/", "/cms/store/user/")
+                if os.path.isdir(interactive_path):
+                    # directory exists. check for existing files
+                    for entry in os.listdir(interactive_path):
+                        if entry in filenames:
+                            existing.append(dirname + "/" + entry)
+                else:
+                    # no need to do anything. directory will be created automatically by dCache
                     pass
-                pass
+            elif self.run_on == "GRID":
+                print "warning: cannot check RAL dCache output dir from this site"
             else:
                 # no need to do anything. directory will be created automatically by dCache
                 pass
@@ -194,88 +297,88 @@ class AnalysisSample:
                     addToList = False
         else:
             # store on local disk (well, or AFS)
-            dirlocation="LOCAL"
-            actual_dir=dirname.replace("file:","")
+            dirlocation = "LOCAL"
+            actual_dir = dirname.replace("file:", "")
             if os.path.isdir(actual_dir):
                 # directory exists. check for existing files
                 for entry in os.listdir(actual_dir):
-                    if entry in filenames: existing.append(dirname+"/"+entry)
-            elif inout=="output":
-                os.system("mkdir -p "+actual_dir)
+                    if entry in filenames:
+                        existing.append(dirname + "/" + entry)
+            elif inout == "output":
+                os.system("mkdir -p " + actual_dir)
 
         # interpret result
-        if inout=="input":
-            self.read_from=dirlocation
-            if len(existing)!=len(filelist):
-                if (allow_partial and len(existing)>0) or self.cff.find("Debug")>=0:
-                    print "warning",len(filelist)-len(existing),"missing input files in",dirname
+        if inout == "input":
+            self.read_from = dirlocation
+            if len(existing) != len(filelist):
+                if (allow_partial and len(existing) > 0) or self.cff.find("Debug") >= 0:
+                    print "warning", len(filelist) - len(existing), "missing input files in", dirname
                 else:
-                    print "error:",len(filelist)-len(existing),"missing input files in",dirname
+                    print "error:", len(filelist) - len(existing), "missing input files in", dirname
                     sys.exit(1)
         else:
-            self.store_at=dirlocation
-            if len(existing)>0:
-                print "error:",len(existing),"output files already exist in",dirname
+            self.store_at = dirlocation
+            if len(existing) > 0:
+                print "error:", len(existing), "output files already exist in", dirname
                 sys.exit(1)
         return existing
 
-        
     ##################################
     # MAKE SURE RUN NUMBERS ARE UNIQUE
     ##################################
     def check_run_number(self):
-        cffdir=self.cff[:self.cff.rfind("/")]
+        cffdir = self.cff[:self.cff.rfind("/")]
         for filename in os.listdir(cffdir):
-            if filename[-7:]!="_cff.py": continue
-            sampleLumiNumberOffset=0
-            sampleSimFiles=[]
-            samplefile=open(cffdir+"/"+filename,"r")
-            content=""
+            if filename[-7:] != "_cff.py":
+                continue
+            sampleLumiNumberOffset = 0
+            sampleSimFiles = []
+            samplefile = open(cffdir + "/" + filename, "r")
+            content = ""
             for line in samplefile.readlines():
-                content+=line
+                content += line
             samplefile.close()
-            code=compile(content,"<string>","exec")
+            code = compile(content, "<string>", "exec")
             exec(code)
-            file_lumimin=sampleLumiNumberOffset
-            file_luminums=len(sampleSimFiles) # crab assigns one run number per file
+            file_lumimin = sampleLumiNumberOffset
+            file_luminums = len(sampleSimFiles)  # crab assigns one run number per file
             # special case: different reco variants of sample sample should have same run numbers
-            if filename.replace("_std","").replace("_mod","").replace("_re","")\
-                   ==self.cff.split("/")[-1].replace("_std","").replace("_mod","").replace("_re",""):
-                if file_lumimin!=self.sampleLumiNumberOffset:
-                    print "error: expected same run section offset in",filename
+            if filename.replace("_std", "").replace("_mod", "").replace("_re", "")\
+                   == self.cff.split("/")[-1].replace("_std", "").replace("_mod", "").replace("_re", ""):
+                if file_lumimin != self.sampleLumiNumberOffset:
+                    print "error: expected same run section offset in", filename
                     sys.exit(1)
             # general case: run numbers should not overlap
-            elif abs(file_lumimin-self.sampleLumiNumberOffset)\
-                   <max(file_luminums,len(self.sampleSimFiles)):
-                print "potential lumi section number conflict with",filename
+            elif abs(file_lumimin - self.sampleLumiNumberOffset)\
+                   < max(file_luminums, len(self.sampleSimFiles)):
+                print "potential lumi section number conflict with", filename
                 sys.exit(1)
-
 
     ############################
     # CREATE A WORKING DIRECTORY
     ############################
-    def create_work_dir(self,process):
-        if self.workdir!="":
+    def create_work_dir(self, process):
+        if self.workdir != "":
             print "error: working directory already created"
             return
-        workbasedir=self.cmssw_base+"/src/workdirs/"
+        workbasedir = self.cmssw_base + "/src/workdirs/"
         if not os.path.exists(workbasedir):
-            os.system("mkdir -p "+workbasedir)
-        self.workdir = workbasedir+self.id+"_"+process\
-                       +time.strftime("_%Y%m%d")
+            os.system("mkdir -p " + workbasedir)
+        self.workdir = workbasedir + self.id + "_" + process\
+                       + time.strftime("_%Y%m%d")
         if os.path.exists(self.workdir):
-            num=0
-            while os.path.exists(self.workdir+"_"+str(num)): num+=1
-            self.workdir+="_"+str(num)
-        os.system("mkdir -p "+self.workdir)
-        os.system("cp -p "+self.cff+" "+self.workdir)
-        print "working directory:",self.workdir
-
+            num = 0
+            while os.path.exists(self.workdir + "_" + str(num)):
+                num += 1
+            self.workdir += "_" + str(num)
+        os.system("mkdir -p " + self.workdir)
+        os.system("cp -p " + self.cff + " " + self.workdir)
+        print "working directory:", self.workdir
 
     ##################
     # LAUNCH CMSDRIVER
     ##################
-    def run_cmsDriver(self,configfile,steps,tier,eventcontent):
+    def run_cmsDriver(self, configfile, steps, tier, eventcontent):
 
         # first make sure we have a kerberos ticket (needed for access to CVS)
         if not have_kerberos_ticket():
@@ -284,28 +387,33 @@ class AnalysisSample:
 
         # create a dummy Configuration/Generator package because this is where cmsDriver expects
         # to find the configuration
-        configdir=self.cmssw_base+"/src/Configuration/Generator/python"
+        configdir = self.cmssw_base + "/src/Configuration/Generator/python"
         if os.path.exists(configdir):
-            os.system("mv "+configdir+" "+configdir+".bak")
-            os.system("mkdir -p "+configdir)
+            os.system("mv " + configdir + " " + configdir + ".bak")
+            os.system("mkdir -p " + configdir)
         else:
-            os.system("mkdir -p "+configdir)
-        os.system("cp "+os.getenv("CMSSW_RELEASE_BASE")
-                  +"/src/Configuration/Generator/python/PythiaUESettings_cfi.py "+configdir)
-        os.system("cp "+configfile+" "+self.cmssw_base+"/src/Configuration/Generator/python/")
+            os.system("mkdir -p " + configdir)
+        os.system("cp " + os.getenv("CMSSW_RELEASE_BASE")
+                  + "/src/Configuration/Generator/python/PythiaUESettings_cfi.py " + configdir)
+        os.system("cp " + configfile + " " + self.cmssw_base + "/src/Configuration/Generator/python/")
 
         # make sure we have a working directory ready
-        if self.workdir=="":
+        if self.workdir == "":
             print "error: must create working directory before calling run_cmsDriver"
             sys.exit(1)
 
         # run cmsDriver for this sample
-        os.system("cd "+self.cmssw_base+"; scram b > /dev/null")
-        result=os.popen("cd "+self.workdir+"; cmsDriver.py "+configfile.split("/")[-1]+\
-                        " --step="+steps+\
-                        " --conditions="+self.sampleGlobalTag+" --datatier "+tier+\
-                        " --eventcontent="+eventcontent+\
-                        " --number="+str(self.sampleNumEvents)+" --no_exec").readlines()
+        os.system("cd " + self.cmssw_base + "; scram b > /dev/null")
+        print "Running: cmsDriver.py " + configfile.split("/")[-1] +\
+                  " --step=" + steps +\
+                  " --conditions=" + self.sampleGlobalTag + " --datatier " + tier +\
+                  " --eventcontent=" + eventcontent +\
+                  " --number=" + str(self.sampleNumEvents) + " --no_exec" # ).readlines()
+        result = os.popen("cd " + self.workdir + "; cmsDriver.py " + configfile.split("/")[-1] +\
+                          " --step=" + steps +\
+                          " --conditions=" + self.sampleGlobalTag + " --datatier " + tier +\
+                          " --eventcontent=" + eventcontent +\
+                          " --number=" + str(self.sampleNumEvents) + " --no_exec").readlines()
 
         # remove the dummy Configuration/Generator package
         if os.path.exists(configdir+".bak"):
@@ -422,8 +530,20 @@ class AnalysisSample:
             crabfile.write("storage_path = /srm/managerv2?SFN=/castor/cern.ch/\n")
             crabfile.write("user_remote_dir = "+castordir+"\n")
             crabfile.write("check_user_remote_dir = 0\n")
+        # elif outputfiles[0].find("pp.rl.ac.uk")>0:
+        #     # stageout to RAL dCache
+        #     dcachedir=outputfiles[0][:outputfiles[0].rfind("/")]
+        #     dcachedir=dcachedir.replace("dcap://heplnx209.pp.rl.ac.uk","")
+        #     dcachedir=dcachedir.replace("dcap://dcap.pp.rl.ac.uk","")
+        #     dcachedir=dcachedir.replace("srm://heplnx204.pp.rl.ac.uk","")
+        #     dcachedir=dcachedir.replace(":8443","")
+        #     dcachedir=dcachedir.replace("/cms/store/user/","/cms/user/")
+        #     dcachedir=dcachedir.replace("/pnfs/pp.rl.ac.uk/data/cms/user/harder","")
+        #     # crabfile.write("storage_element = T2_UK_SGrid_RALPP\n")
+        #     crabfile.write("storage_element = T2_UK_SGrid_RALPP\n")
+        #     crabfile.write("user_remote_dir = "+dcachedir+"\n")
         elif outputfiles[0].find("pp.rl.ac.uk")>0:
-            # stageout to RAL dCache
+            # stageout to FNAL dCache
             dcachedir=outputfiles[0][:outputfiles[0].rfind("/")]
             dcachedir=dcachedir.replace("dcap://heplnx209.pp.rl.ac.uk","")
             dcachedir=dcachedir.replace("dcap://dcap.pp.rl.ac.uk","")
@@ -431,13 +551,24 @@ class AnalysisSample:
             dcachedir=dcachedir.replace(":8443","")
             dcachedir=dcachedir.replace("/cms/store/user/","/cms/user/")
             dcachedir=dcachedir.replace("/pnfs/pp.rl.ac.uk/data/cms/user/harder","")
-            crabfile.write("storage_element = T2_UK_SGrid_RALPP\n")
+            crabfile.write("storage_element = T2_US_Purdue\n")
+            # print "sampleDataSet ="+self.sampleDataSet
+            publishName=(self.sampleDataSet[:self.sampleDataSet.rfind("/")]).replace("/", "_")
+            # print "publishName = "+publishName
+            if publishName.startswith("_"):
+                publishName = publishName[1:]
+                # print "Reduced publishName = "+publishName
+            if dcachedir.endswith("pat"):
+                publishName = publishName+"_PAT_v1"
+            crabfile.write("publish_data_name = "+publishName+"\n")
             crabfile.write("user_remote_dir = "+dcachedir+"\n")
+            crabfile.write("dbs_url_for_publication = https://cmsdbsprod.cern.ch:8443/cms_dbs_ph_analysis_01_writer/servlet/DBSServlet\n")
         else:
             # oops?
             print "error: unsupported destination for output files of crab job"
             sys.exit(1)
-        crabfile.write("eMail = Kristian.Harder@stfc.ac.uk\n")
+        # crabfile.write("eMail = Kristian.Harder@stfc.ac.uk\n")
+        crabfile.write("eMail = marco.de.mattia@cern.ch\n")
         crabfile.write("thresholdLevel = 50\n")
         crabfile.write("publish_data=0\n")
         crabfile.write("[CRAB]\n")
@@ -453,10 +584,11 @@ class AnalysisSample:
             crabfile.write("\n")
         else:
             # this is probably a generator job without input. restrict that to RAL
-            crabfile.write("[GRID]\n")
-            crabfile.write("ce_white_list = T2_UK_SGrid_RALPP\n")
+            # crabfile.write("[GRID]\n")
+            # crabfile.write("ce_white_list = T2_UK_SGrid_RALPP\n")
+            pass
         crabfile.close()
-             
+
 
         # get data quality definition if applicable
         if self.sampleJSON!="":
@@ -464,9 +596,11 @@ class AnalysisSample:
 
         # create and submit the jobs
         print "creating crab jobs..."
-        os.system("cd "+self.workdir+"; source ~/bin/setup_crab ; crab -create -cfg crab.cfg")
+        os.system("cd "+self.workdir+" ; crab -create -cfg crab.cfg")
+        # os.system("cd "+self.workdir+"; source ~/bin/setup_crab ; crab -create -cfg crab.cfg")
         print "submitting jobs..."
-        os.system("cd "+self.workdir+"; source ~/bin/setup_crab ; crab -submit -c "+crabdir)
+        os.system("cd "+self.workdir+"; crab -submit -c "+crabdir)
+        # os.system("cd "+self.workdir+"; source ~/bin/setup_crab ; crab -submit -c "+crabdir)
         print "crab submission done!"
 
 
@@ -710,12 +844,27 @@ def have_kerberos_ticket():
 # CHECK FOR GRID PROXY
 ######################
 def ensure_grid_proxy():
-    result=os.popen("source ~/bin/setup_crab &> /dev/null ; voms-proxy-info -vo").readlines()
+    # result=os.popen("source ~/bin/setup_crab &> /dev/null ; voms-proxy-info -vo").readlines()
+    result=os.popen("voms-proxy-info -vo").readlines()
     valid=0
     for line in result:
         if line.strip("\n").strip().lower()=="cms": valid=1
     if not valid:
-        os.system("source ~/bin/setup_crab &> /dev/null ; voms-proxy-init --voms cms")
+        # os.system("source ~/bin/setup_crab &> /dev/null ; voms-proxy-init --voms cms")
+        os.system("voms-proxy-init --voms cms")
+
+
+#########################
+# IDENTIFY LOGON LOCATION
+#########################
+def where_am_i():
+    host=os.popen("/bin/hostname").readlines()[0].strip()
+    if host.find("heplnx")==0 and host.find("pp.rl.ac.uk")>0:
+        return "RAL"
+    elif host.find("lxplus")==0 and host.find("cern.ch")>0:
+        return "CERN"
+    else:
+        return "UNKNOWN"
 
 
 ##########################
@@ -738,13 +887,24 @@ def read_attempt(filename):
         numevents=checkedm_retNOEDM
     return numevents
 
-def check_edm_file(filename):
+def check_edm_file(filename,where_am_i):
+    # check on castor
+    if filename.find("/castor/cern.ch")>=0:
+        if where_am_i=="CERN":
+            result=os.popen("rfdir "+filename).readlines()
+            if len(result)==0: return checkedm_retMISSING
+            return read_attempt(filename)
+        else:
+            return checkedm_retCANNOTCHECK
     # check at RAL
-    if filename.find("pp.rl.ac.uk")>=0:
-        ensure_grid_proxy()
-        result=os.popen("srmls "+srm_path(filename)+" 2>/dev/null").readlines()
-        if len(result)==0: return checkedm_retMISSING
-        return read_attempt(filename)
+    elif filename.find("pp.rl.ac.uk")>=0:
+        if where_am_i=="RAL":
+            ensure_grid_proxy()
+            result=os.popen("srmls "+srm_path(filename)+" 2>/dev/null").readlines()
+            if len(result)==0: return checkedm_retMISSING
+            return read_attempt(filename)
+        else:
+            return checkedm_retCANNOTCHECK
     # check local file
     elif filename.find("file:")>=0:
         if not os.path.isfile(filename.replace("file:","")): return checkedm_retMISSING
@@ -757,29 +917,22 @@ def check_edm_file(filename):
 ### SCAN SAMPLE DESCRIPTION FILE
 #############################################
 
-def sample_cff_code(file_or_dir):
-    # is this a file or a directory?
-    if file_or_dir.find("_cff.py")>0 and os.path.exists(file_or_dir):
-        sample_cff=file_or_dir
-    elif os.path.isdir(file_or_dir):
-        sample_cff = ""
-        for filename in os.listdir(file_or_dir):
-            if filename.find("_cff.py")>0:
-                sample_cff=filename
-                pass
+def sample_cff_code(workdir):
+    # find sample description file
+    if not os.path.isdir(workdir):
+        print "ERROR: directory",workdir,"does not exist"
+        sys.exit(1)
+    sample_cff = ""
+    for filename in os.listdir(workdir):
+        if filename.find("_cff.py")>0:
+            sample_cff=filename
             pass
-        if sample_cff=="":
-            print "ERROR: sample description file not found in",file_or_dir
-            sys.exit(1)
-            pass
-        sample_cff=file_or_dir+"/"+sample_cff
         pass
-    else:
-        print "ERROR: no sample description file",file_or_dir
+    if sample_cff=="":
+        print "ERROR: sample description file not found in",workdir
         sys.exit(1)
         pass
-
-    samplefile=open(sample_cff,"r")
+    samplefile=open(workdir+"/"+sample_cff,"r")
     content=""
     for line in samplefile.readlines():
         content+=line
@@ -819,11 +972,20 @@ def job_watcher_batch(workdir):
         joblist.append(entry.strip())
     numjobs=len(joblist)
 
+    # check which batch system to use
+    if where_am_i()=="CERN":
+        lsf=1
+    else:
+        lsf=0
+
     # wait for jobs to finish
     nfound=len(joblist)
     print "waiting for batch jobs to be processed...."
     while nfound>0:
-        result=os.popen("qstat -u $USER").readlines()
+        if lsf:
+            result=os.popen("bjobs").readlines()
+        else:
+            result=os.popen("qstat -u $USER").readlines()
         nqueued=0
         nrunning=0
         nfound=0
@@ -836,7 +998,9 @@ def job_watcher_batch(workdir):
                 if entry.find(jobid)>=0: found=1
             if found:
                 nfound+=1
-                if line.find(" R ")>0:
+                if lsf and line.find("RUN")>0:
+                    nrunning+=1
+                elif (not lsf) and line.find(" R ")>0:
                     nrunning+=1
                 else:
                     nqueued+=1
@@ -845,32 +1009,45 @@ def job_watcher_batch(workdir):
         if nfound>0: time.sleep(60)
 
 
-    # clean up job output.
-    # for the RAL batch system all we need to do is gzip the log files
-    # and check for jobs that were killed due to timeouts caused by slow dCache access
-    killed_jobs=[]
-    for i in range(numjobs):
-        os.system("gzip "+workdir+"/job"+str(i+1)+".sh.* &>/dev/null")
-        log=os.popen("gunzip -c `ls -1rt "+workdir+"/job"+str(i+1)+".sh.e*|tail -1`|grep \"job killed\"").readlines()
-        killed=0
-        for line in log:
-            if line.find("job killed")>0: killed=1
-            pass
-        if killed: killed_jobs.append(i+1)
-        pass
-    if len(killed_jobs)>0:
-        print "KILLED JOBS:",killed_jobs
-        badjobfile=open(workdir+"/KILLED_JOBS","w")
-        for jobnum in killed_jobs:
-            badjobfile.write("qsub -q prod -l walltime=48:00:00 job"+str(jobnum)+".sh\n")
-            pass
-        badjobfile.close()
-        # make no attempt to merge histogram files yet
-        sys.exit(1)
+    # clean up job output
+    if lsf:
+        # clean up LSFJOB_* directories (save logfiles!)
+        for jobid in joblist:
+            lsfdir=workdir+"/LSFJOB_"+jobid
+            if not os.path.isfile(lsfdir+"/LSFJOB"): continue
+            lsffile=open(lsfdir+"/LSFJOB","r")
+            for line in lsffile.readlines():
+                if line.find(id)>0:
+                    jobnum=line[line.rfind("_")+1:]
+                    jobnum=jobnum.replace(".sh'","")
+                    jobnum=jobnum.strip()
+            lsffile.close()
+            if os.path.exists(lsfdir+"/STDOUT"):
+                os.system("mv "+lsfdir+"/STDOUT "+workdir+"/"+id+"_"+str(jobnum)+".log")
+                os.system("gzip "+workdir+"/"+id+"_"+str(jobnum)+".log")
+            os.system("rm -rf "+lsfdir)
+    else:
+        # for the RAL batch system all we need to do is gzip the log files
+        # and check for jobs that were killed due to timeouts caused by slow dCache access
+        killed_jobs=[]
+        for i in range(numjobs):
+            os.system("gzip "+workdir+"/job"+str(i+1)+".sh.* &>/dev/null")
+            log=os.popen("gunzip -c `ls -1rt "+workdir+"/job"+str(i+1)+".sh.e*|tail -1`|grep \"job killed\"").readlines()
+            killed=0
+            for line in log:
+                if line.find("job killed")>0: killed=1
+            if killed: killed_jobs.append(i+1)
+        if len(killed_jobs)>0:
+            print "KILLED JOBS:",killed_jobs
+            badjobfile=open(workdir+"/KILLED_JOBS","w")
+            for jobnum in killed_jobs:
+                badjobfile.write("qsub -q prod -l walltime=48:00:00 job"+str(jobnum)+".sh\n")
+            badjobfile.close()
+            # make no attempt to merge histogram files yet
+            sys.exit(1)
 
     # check whether any histogram files were produced in this set of jobs
     has_histograms=0
-    histlist=""
     for filename in os.listdir(workdir):
         if filename.find("histograms_")>=0 and filename[-5:]==".root":
             has_histograms=1
@@ -895,7 +1072,7 @@ def job_watcher_batch(workdir):
         print "ERROR: sample description file does not contain samplePatFiles"
         sys.exit(1)
         pass
-    
+
     # check if there are any prefilter files in this directory. skip rest if not
     print "copying prefilter root file from dCache"
     os.system("srmcp "+srm_path(sampleBaseDir)+"/prefilter.root file:///"+workdir+"/prefilter.root")
@@ -915,13 +1092,14 @@ def job_watcher_grid(workdir,only_once=0):
         print "error: ui_working_dir not defined in crab.cfg"
         sys.exit(1)
     crabdir=result[0].split("=")[1].strip()
-    
+
 
     # wait for jobs to finish
     notready=999
     print "waiting for grid jobs to be processed...."
     while notready>0:
-        result=os.popen("source ~/bin/setup_crab ; crab -status -c "+workdir+"/"+crabdir).readlines()
+        # result=os.popen("source ~/bin/setup_crab ; crab -status -c "+workdir+"/"+crabdir).readlines()
+        result=os.popen("crab -status -c "+workdir+"/"+crabdir).readlines()
         current_job=1
         notready=0
         request_status=[]
@@ -942,7 +1120,7 @@ def job_watcher_grid(workdir,only_once=0):
                     if len(items)>5:
                         exe_status=items[4]
                         job_status=items[5]
-                        if exe_status!="0" or (job_status!="0"):
+                        if exe_status!="0" or (job_status!="0" and job_status!="60303"):
                             print "  job",current_job,"status",exe_status,job_status
                             failed_jobs.append(current_job)
                     else:
@@ -957,7 +1135,8 @@ def job_watcher_grid(workdir,only_once=0):
             joblist=str(request_status[0])
             for i in range(len(request_status)-1):
                 joblist+=","+str(request_status[i+1])
-            os.system("source ~/bin/setup_crab &> /dev/null; crab -get "+joblist+" -c "\
+            # os.system("source ~/bin/setup_crab &> /dev/null; crab -get "+joblist+" -c "\
+            os.system("crab -get "+joblist+" -c "\
                       +workdir+"/"+crabdir+" &> /dev/null")
         if len(failed_jobs)>0:
             joblist=str(failed_jobs[0])
@@ -978,7 +1157,7 @@ def job_watcher_grid(workdir,only_once=0):
 
 def grid_cleanup(workdir):
     from xml.dom.minidom import parseString
-    
+
     # check argument
     filename=workdir+"/crab.cfg"
     if not os.path.isfile(filename):
@@ -990,14 +1169,16 @@ def grid_cleanup(workdir):
         print "error: ui_working_dir not defined in crab.cfg"
         sys.exit(1)
     crabdir=result[0].split("=")[1].strip()
-    
+
     # retrieve job output
     print "retrieving job log files..."
-    result=os.popen("source ~/bin/setup_crab ; crab -get -c "+workdir+"/"+crabdir).readlines()
+    # result=os.popen("source ~/bin/setup_crab ; crab -get -c "+workdir+"/"+crabdir).readlines()
+    result=os.popen("crab -get -c "+workdir+"/"+crabdir).readlines()
 
     # retrieve job status (this was mandatory before crab -report at least in mid-2010)
     print "updating job status..."
-    result=os.popen("source ~/bin/setup_crab ; crab -status -c "+workdir+"/"+crabdir).readlines()
+    # result=os.popen("source ~/bin/setup_crab ; crab -status -c "+workdir+"/"+crabdir).readlines()
+    result=os.popen("crab -status -c "+workdir+"/"+crabdir).readlines()
 
     # get list of successful jobs that corresponds to lumiSummary.json content
     # (from crab_fjr.xml files)
@@ -1009,7 +1190,7 @@ def grid_cleanup(workdir):
     filelist=os.popen("ls -1 "+workdir+"/"+crabdir+"/res/crab_fjr*.xml").\
               readlines()
     patfiles={}
-    prefilterfiles={}
+    prefilterfiles=[]
     joblist=[]
     goodjobs=[]
     for entry in filelist:
@@ -1047,58 +1228,18 @@ def grid_cleanup(workdir):
         patfiles[jobnum]=fjr.getElementsByTagName("File")[0].\
                           getElementsByTagName("LFN")[0].firstChild.data.strip()
         try:
-            prefilterfiles[jobnum]=fjr.getElementsByTagName("AnalysisFile")[0].\
-                                    getElementsByTagName("LFN")[0].\
-                                    getAttribute("Value").strip()
+            prefilterfiles.append(fjr.getElementsByTagName("AnalysisFile")[0].\
+                                  getElementsByTagName("LFN")[0].\
+                                  getAttribute("Value").strip())
         except:
             pass
         pass
 
-    # compare list of files with what is actually on disk (to account for
-    # files lost later on, or successful jobs declared bad by crab)
-    dcacheDir="dcap://dcap.pp.rl.ac.uk/pnfs/pp.rl.ac.uk/data/cms/"
-    if len(goodjobs)>0:
-        # pick one of the output files to determine the output directory from
-        example_output_file=dcacheDir+patfiles[goodjobs[0]]
-    else:
-        # we have no crab reports and thus no output file names whatsoever.
-        # in this case the simplest alternative is to get the name from the
-        # sample cff file
-        exec(sample_cff_code(workdir))
-        example_output_file=samplePatFiles[0]
-        pass
-    file_list=check_job_output_dir([example_output_file])
-    
-    jobnums_on_disk=[]
-    for entry in file_list:
-        [jobID,retryID,basename]=get_file_qualifiers(entry)
-        jobnums_on_disk.append(jobID)
-        if not jobID in prefilterfiles.keys():
-            patfiles[jobID]=entry[entry.find("/store/"):]
-            prefilterfiles[jobID]=patfiles[jobID].replace("PATtuple","prefilter")
-            pass
-        pass
-    remaining_goodjobs=[]
-    for jobnum in goodjobs:
-        if jobnum in jobnums_on_disk:
-            remaining_goodjobs.append(jobnum)
-        else:
-            print "WARNING: lost file for job",jobnum
-            pass
-        pass
-    for jobnum in jobnums_on_disk:
-        if not jobnum in remaining_goodjobs:
-            print "WARNING: crab ignores successful job",jobnum
-            remaining_goodjobs.append(jobnum)
-            pass
-        pass
-    goodjobs=remaining_goodjobs
-    
     # create list of PAT files for sample description file
     goodjobs.sort()
     baseDir=""
     if len(goodjobs)>0:
-        name=patfiles[goodjobs[0]]
+        name=patfiles[joblist[0]]
         baseDir=name[:name.rfind("/")]
         baseDir=baseDir[:baseDir.rfind("/")]
         pass
@@ -1115,33 +1256,33 @@ def grid_cleanup(workdir):
         pass
     logfile.close()
 
-    # merge prefilter files
-    dcacheDir="dcap://dcap.pp.rl.ac.uk/pnfs/pp.rl.ac.uk/data/cms/"
+    tmpDir = "/tmp/demattia/" + workdir.split("/")[-1]
+    # now merge prefilter files (in batches of 100 each, to increase reliability)
+    # dcacheDir="dcap://dcap.pp.rl.ac.uk/pnfs/pp.rl.ac.uk/data/cms/"
+    dcacheDir="srm://srm-dcache.rcac.purdue.edu:8443/srm/managerv2?SFN=/store/user/demattia/"
+    os.system("rm "+tmpDir+"prefilterfile*")
     if len(prefilterfiles)>0:
-        # copy prefilter files from dcache into working directory. this is necessary
-        # to get around limitations in the number of simultaneously open files on dCache
-        print "copying prefilter files from dCache to local disk..."
-        for jobnum in goodjobs:
-            command="lcg-cp "+srm_path(dcacheDir+"/"+prefilterfiles[jobnum])+" file:$CMSSW_BASE/src/"\
-                     +workdir+"/"+prefilterfiles[jobnum].split("/")[-1]
-            os.system(command)
-            pass
-        # now merge prefilter files (in batches of 100 each, to increase reliability)
         rootdir=os.getenv("ROOTSYS")
-        numbatches=int(len(goodjobs)/100.+0.9999)
+        numbatches=int(len(prefilterfiles)/100.+0.9999)
         processed_files=[]
-        print "merging prefilter files (%i batches for %i files)..."%(numbatches,len(goodjobs))
+        tmpPrefilterFileName=[]
+        print "merging prefilter files (%i batches for %i files)..."%(numbatches,len(prefilterfiles))
         for ibatch in range(numbatches):
             command="cd "+workdir+"; "+rootdir+"/bin/hadd -f prefilter_%i.root"%ibatch
             print "range",ibatch*100+0,"-",ibatch*100+99
-            for i in range(ibatch*100,min(ibatch*100+100,len(goodjobs))):
-                command+=" "+prefilterfiles[goodjobs[i]].split("/")[-1]
-                processed_files.append(prefilterfiles[goodjobs[i]])
+            for i in range(ibatch*100,min(ibatch*100+100,len(prefilterfiles))):
+                tmpPrefilterFileName.append(tmpDir+"prefilterfile_"+str(i)+".root")
+                print "Copying "+prefilterfiles[i]+" to "+tmpPrefilterFileName[i]
+                # FIXME: uncomment
+                os.system("srmcp -2 \"srm://srm-dcache.rcac.purdue.edu:8443/srm/managerv2?SFN="+prefilterfiles[i]+"\" \"file:///"+tmpPrefilterFileName[i]+"\"")
+                # # command+=" "+dcacheDir+"/"+prefilterfiles[i]
+                command+=" "+tmpPrefilterFileName[i]
+                processed_files.append(prefilterfiles[i])
                 pass
             os.system(command)
             pass
         # double-check we got all files
-        if len(goodjobs)!=len(processed_files):
+        if len(prefilterfiles)!=len(processed_files):
             print "ERROR: coding bug led to not all prefilter files being processed"
             sys.exit(1)
             pass
@@ -1150,23 +1291,30 @@ def grid_cleanup(workdir):
         for ibatch in range(numbatches):
             command+=" prefilter_%i.root"%ibatch
             pass
+        # FIXME: uncomment
         os.system(command)
 
         # now copy merged prefilter file back to dCache
-        dcachename="srm://heplnx204.pp.rl.ac.uk:8443/pnfs/pp.rl.ac.uk/data/cms"\
+        # dcachename="srm://heplnx204.pp.rl.ac.uk:8443/pnfs/pp.rl.ac.uk/data/cms"\
+        #             +baseDir+"/prefilter.root"
+        dcachename="srm://srm-dcache.rcac.purdue.edu:8443/srm/managerv2?SFN="\
                     +baseDir+"/prefilter.root"
+        print "Merged file is ready, copy it to "+dcachename
         result=os.popen("srmrm "+dcachename)
         time.sleep(2)
-        os.system("lcg-cp "+workdir+"/prefilter.root "+dcachename)
+        # # os.system("lcg-cp "+workdir+"/prefilter.root "+dcachename)
+        print "srmcp -2 \"file:///"+workdir+"/prefilter.root\" \""+dcachename+"\""
+        # FIXME: uncomment
+        os.system("srmcp -2 \"file:///"+workdir+"/prefilter.root\" \""+dcachename+"\"")
 
     # if we used a json file, then we conclude this is a data job -> get lumi
     if os.path.exists(workdir+"/json.txt"):
 
         # create lumiSummary.json
         print "creating crab report..."
-        result=os.popen("source ~/bin/setup_crab ; crab -report -c "+workdir+"/"+crabdir).readlines()
+        # result=os.popen("source ~/bin/setup_crab ; crab -report -c "+workdir+"/"+crabdir).readlines()
+        result=os.popen("crab -report -c "+workdir+"/"+crabdir).readlines()
         lumiSummary=workdir+"/"+crabdir+"/res/lumiSummary.json "
-        
         # query delivered luminosity
         print "querying luminosity overview..."
         lumiOverview=workdir+"/lumiOverview.csv"
@@ -1194,11 +1342,16 @@ def grid_cleanup(workdir):
         # copy lumiSummary.json and DB query results to output directory
         print "copying luminosity info to dCache..."
         for filename in [lumiSummary,lumiOverview,lumiDetails]:
-            dcachename="srm://heplnx204.pp.rl.ac.uk:8443/pnfs/pp.rl.ac.uk"+\
-                        "/data/cms"+baseDir+"/"+filename.split("/")[-1]
+            # dcachename="srm://heplnx204.pp.rl.ac.uk:8443/pnfs/pp.rl.ac.uk"+\
+            #             "/data/cms"+baseDir+"/"+filename.split("/")[-1]
+            dcachename="srm://srm-dcache.rcac.purdue.edu:8443/srm/managerv2?SFN="\
+                        +baseDir+"/"+filename.split("/")[-1]
             result=os.popen("srmrm "+dcachename)
             time.sleep(2)
-            os.system("lcg-cp "+filename+" "+dcachename)
+            # os.system("lcg-cp "+filename+" "+dcachename)
+            print "Copy the luminosity info to dCache"
+            print "srmcp -2 \"file:///"+filename+"\" \""+dcachename+"\""
+            os.system("srmcp -2 \"file:///"+filename+"\" \""+dcachename+"\"")
             pass
         pass
     return
