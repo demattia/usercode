@@ -1,0 +1,14 @@
+<library   name="DisplacedLeptonsSamples_plugins" file="*.cc">
+  <use   name="FWCore/Framework"/>
+  <use   name="FWCore/ParameterSet"/>
+  <use   name="FWCore/MessageLogger"/>
+  <use   name="FWCore/MessageService"/>
+  <use   name="FWCore/Utilities"/>
+  <use   name="DataFormats/Common"/>
+  <use   name="DataFormats/Candidate"/>
+  <use   name="DataFormats/HepMCCandidate"/>
+  <use   name="SimDataFormats/GeneratorProducts"/>
+  <use   name="HarderAnalysisTools/Histograms"/>
+  <use   name="DisplacedLeptons/Samples"/>
+  <use   name="clhep"/>
+</library>
