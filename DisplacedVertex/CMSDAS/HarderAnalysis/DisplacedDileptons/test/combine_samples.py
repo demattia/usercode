@@ -11,10 +11,20 @@ log_plots=1
 import os,sys,math
 import ROOT
 import time
-import datetime
-import tempfile
 
 from DisplacedLeptons.Samples.sampletools import srm_path
+
+def modifyString(line):
+    modifiedString = ""
+    foundQuote = False
+    for char in line:
+        if char == "\"":
+            foundQuote = not foundQuote
+        if char == "," and foundQuote:
+            modifiedString += "###"
+        else:
+            modifiedString += char
+    return modifiedString
 
 def mergeHistogramsFiles(workdirs):
     for dir in workdirs:
@@ -33,7 +43,6 @@ def mergeHistogramsFiles(workdirs):
 #############################################
 ### DEFINE SAMPLES TO USE
 #############################################
-
 
 
 # define workdir area
@@ -147,12 +156,24 @@ mergeHistogramsFiles(workdirs_benchmark_mu)
 mergeHistogramsFiles(workdirs_benchmark_e)
 mergeHistogramsFiles(workdirs_signal)
 
+
 ############################################################################
 ### DEFINE ANALYSIS CHANNELS
 ############################################################################
 
 muAnalysis="muTrackAnalysis"
 eAnalysis="eTrackAnalysis"
+
+ePtCut33=36
+ePtCut38=41
+ePtCut43=46
+muPtCut23=25 # <- note this was lower!
+muPtCut30=33
+# ePtCut33=36
+# ePtCut38=41
+# ePtCut43=46
+# muPtCut23=26
+# muPtCut30=33
 
 
 ############################################################################
@@ -448,6 +469,58 @@ histColour["WZ_"]=        ROOT.kCyan    -9
 histColour["ZZ_"]=        ROOT.kGreen   +3
 
 
+# ==================================================================================
+# ==================================================================================
+
+
+#############################################
+### TOOLS: PLOT DECORATION
+#############################################
+
+def CMSPlotDecoration(channel,lumisum=0):
+    info=ROOT.TLatex()
+    info.SetNDC()
+    if lumisum>0:
+        info.DrawLatex(0.18,0.95,\
+                       "CMS Preliminary #sqrt{s}=7 TeV L=%3.1f fb^{-1}"%(lumisum/1000.))
+    else:
+        info.DrawLatex(0.18,0.95,\
+                       "CMS Simulation")
+        pass
+    if channel.find("mu")>=0:
+        info.DrawLatex(0.18,0.83,"#mu^{+}#mu^{-}")
+    else:
+        info.DrawLatex(0.18,0.83,"e^{+}e^{-}")
+        pass
+    return
+
+
+#############################################
+### TOOLS: DRAW OVERFLOW BIN IN HISTOGRAM
+#############################################
+
+def drawhist(h,opt):
+
+    if draw_overflow:
+        # get overflow bin content
+        of=h.GetBinContent(h.GetNbinsX()+1)
+        ofe=h.GetBinError(h.GetNbinsX()+1)
+        # get last bin content
+        lb=h.GetBinContent(h.GetNbinsX())
+        lbe=h.GetBinError(h.GetNbinsX())
+        # add them both up in last bin
+        h.SetBinContent(h.GetNbinsX(),lb+of)
+        h.SetBinError(h.GetNbinsX(),math.sqrt(lbe*lbe+ofe*ofe))
+        pass
+    h.Draw(opt)
+    return
+
+
+# ==================================================================================
+# ==================================================================================
+
+
+
 #############################################
 ### DRAW EFFICIENCY HISTOGRAM
 #############################################
@@ -520,7 +593,7 @@ def efficiencyPlot(workdir,histname1,histname2,filename,title,xlabel):
     effi.SetMinimum(0)
     effi.SetMaximum(1.1)
     effi.Draw()
-    CMSPrelim(filename,1)
+    CMSPlotDecoration(filename)
     canv.Update()
     canv.Print(filename)
     canv.Clear()
@@ -533,58 +606,110 @@ def efficiencyPlot(workdir,histname1,histname2,filename,title,xlabel):
 
 
 #############################################
-### PLOT DECORATION
+### EFFICIENCY PLOTS FROM MC
 #############################################
 
-def CMSPrelim(channel,MConly=0):
-    info=ROOT.TLatex()
-    info.SetNDC()
-    if channel.find("mu")>=0 and not MConly:
-        info.DrawLatex(0.18,0.95,\
-                       "CMS Preliminary #sqrt{s}=7 TeV L=1.2 fb^{-1}")
-    elif not MConly:
-        info.DrawLatex(0.18,0.95,\
-                       "CMS Preliminary #sqrt{s}=7 TeV L=1.1 fb^{-1}")
-    else:
-        info.DrawLatex(0.18,0.95,\
-                       "CMS Simulation")
+def makeEfficiencyPlots():
+
+    print "-----------------------------------------------"
+    print "--- making plots of uncorrected MC efficiencies"
+    print "-----------------------------------------------"
+    begintime=time.time()
+    
+    # tracking efficiency for electrons
+    for workdir in workdirs_benchmark_e:
+        sampleID=workdir.split("/")[-1].replace("_analysis","")
+        efficiencyPlot(workdir,eAnalysis+"/leptons/trueLeptonRadWithTrack",
+                       eAnalysis+"/gen/leptonProdVtxRadius2D",
+                       benchmarkfolder+"/track_effi_electrons.pdf",
+                       "track reconstruction efficiency as function of impact parameter",
+                       "d_{0} [cm]")
         pass
-    if channel.find("mu")>=0:
-        info.DrawLatex(0.18,0.83,"#mu^{+}#mu^{-}")
-    else:
-        info.DrawLatex(0.18,0.83,"e^{+}e^{-}")
+
+    # tracking efficiency for muons
+    for workdir in workdirs_benchmark_mu:
+        sampleID=workdir.split("/")[-1].replace("_analysis","")
+        efficiencyPlot(workdir,muAnalysis+"/leptons/trueLeptonRadWithTrack",
+                       muAnalysis+"/gen/leptonProdVtxRadius2D",
+                       benchmarkfolder+"/track_effi_muons.pdf",
+                       "track reconstruction efficiency as function of impact parameter",
+                       "d_{0} [cm]")
         pass
+
+    # displaced lepton reconstruction efficiency
+    for workdir in workdirs_benchmark_e:
+        sampleID=workdir.split("/")[-1].replace("_analysis","")
+        efficiencyPlot(workdir,
+                       eAnalysis+"/electrons/trueProdVtxRad",
+                       eAnalysis+"/gen/leptonProdVtxRadius2D",
+                       benchmarkfolder+"/electron_effi_"+sampleID+".pdf",
+                       "electron reconstruction efficiency as function of impact parameter",
+                       "d_{0} [cm]")
+        pass
+    for workdir in workdirs_benchmark_mu:
+        sampleID=workdir.split("/")[-1].replace("_analysis","")
+        efficiencyPlot(workdir,
+                       muAnalysis+"/muons/trueProdVtxRad",
+                       muAnalysis+"/gen/leptonProdVtxRadius2D",
+                       benchmarkfolder+"/muon_effi_"+sampleID+".pdf",
+                       "muon reconstruction efficiency as function of impact parameter",
+                       "d_{0} [cm]")
+        pass
+
+    # dilepton reconstruction efficiency plots as function of 2d decay length
+    # these are uncorrected efficiencies
+    # and taking the average efficiency from this plot will overestimate the
+    # actual average efficiency somewhat because these plots cut off the low
+    # efficiency region beyond 100cm radius.
+    for workdir in workdirs_signal:
+        sampleID=workdir.split("/")[-1].replace("_analysis","")
+        efficiencyPlot(workdir,
+                       muAnalysis+"/dileptons/trueDecayLength2D_1",
+                       "isoTrackPrefilter/decayLength2D_1muon",
+                       benchmarkfolder+"/dimuon1_effi_"+sampleID+".pdf",
+                       "dimuon reconstruction efficiency"+
+                       " as function of decay length, 1 dimuon",
+                       "L_{xy} [cm]")
+        
+        efficiencyPlot(workdir,
+                       muAnalysis+"/dileptons/trueDecayLength2D_2",
+                       "isoTrackPrefilter/decayLength2D_2muon",
+                       benchmarkfolder+"/dimuon2_effi_"+sampleID+".pdf",
+                       "dimuon reconstruction efficiency"+
+                       " as function of decay length, 2 dimuons",
+                       "L_{xy} [cm]")
+        
+        efficiencyPlot(workdir,
+                       eAnalysis+"/dileptons/trueDecayLength2D_1",
+                       "isoTrackPrefilter/decayLength2D_1elec",
+                       benchmarkfolder+"/dielectron1_effi_"+sampleID+".pdf",
+                       "dielectron reconstruction efficiency"+
+                       " as function of decay length, 1 dielectron",
+                       "L_{xy} [cm]")
+    
+        efficiencyPlot(workdir,
+                       eAnalysis+"/dileptons/trueDecayLength2D_2",
+                       "isoTrackPrefilter/decayLength2D_2elec",
+                       benchmarkfolder+"/dielectron2_effi_"+sampleID+".pdf",
+                       "dielectron reconstruction efficiency"+
+                       " as function of decay length, 2 dielectrons",
+                       "L_{xy} [cm]")
+        pass
+
+    endtime=time.time()
+    print "+++this took",endtime-begintime,"seconds"
     return
 
 
-#############################################
-### DRAW OVERFLOW BIN IN HISTOGRAM
-#############################################
-
-def drawhist(h,opt):
-
-    if draw_overflow:
-        # get overflow bin content
-        of=h.GetBinContent(h.GetNbinsX()+1)
-        ofe=h.GetBinError(h.GetNbinsX()+1)
-        # get last bin content
-        lb=h.GetBinContent(h.GetNbinsX())
-        lbe=h.GetBinError(h.GetNbinsX())
-        # add them both up in last bin
-        h.SetBinContent(h.GetNbinsX(),lb+of)
-        h.SetBinError(h.GetNbinsX(),math.sqrt(lbe*lbe+ofe*ofe))
-        pass
-    h.Draw(opt)
-    return
-
-
+# ==================================================================================
+# ==================================================================================
 
 #############################################
 ### DRAW DATA/MC OVERLAY PLOT FROM HISTOGRAMS
 #############################################
 
 def overlayPlot(SampleTriggerCombination,backgrounddirs,weights,\
-                histname,filename,use_color=1):
+                histname,filename,lumisum,use_color=1):
     if len(backgrounddirs)!=len(weights):
         print "overlayPlot: list of weights does not match list of workdirs"
         sys.exit(1)
@@ -598,10 +723,19 @@ def overlayPlot(SampleTriggerCombination,backgrounddirs,weights,\
     if len(mctriggers)==0:
         mctriggers.append("anyTrigger")
     if len(mctriggers)!=1:
-        print "ERROR: more than one MC trigger requested."
-        print "       This means using the same events several times."
-        print "       And most likely the normalization is done per trigger."
-        sys.exit(1)
+        # need to trim list of MC triggers down to one.
+        # pick the one with highest p_t threshold.
+        # this threshold needs to be exceeded by an offline cut!
+        highestpt=0
+        highestpttrigger=""
+        for trigger in mctriggers:
+            if trigger_threshold(trigger)>highestpt:
+                highestpt=trigger_threshold(trigger)
+                highestpttrigger=trigger
+                pass
+            pass
+        mctriggers=[highestpttrigger]
+        pass
     # construct corresponding sample/trigger combinations for MC
     MCSampleTriggerCombination=[]
     for i in range(len(backgrounddirs)):
@@ -778,7 +912,7 @@ def overlayPlot(SampleTriggerCombination,backgrounddirs,weights,\
         valLegend.AddEntry(datahisto,"data","p")
         pass
     valLegend.Draw()
-    CMSPrelim(histname.split("/")[0])
+    CMSPlotDecoration(histname.split("/")[0],lumisum)
     canv.Update()
     canv.Print(filename)
 
@@ -799,7 +933,7 @@ def overlayPlot(SampleTriggerCombination,backgrounddirs,weights,\
 # or TTree::Draw seems to be associated with massive memory leaks, leading
 # to crashes of this script when running into the 4G memory limit per process...
 
-def get_histogram(workdir,treedir,varname,nbins,minval,maxval,minmass,maxmass):
+def get_histogram(workdir,treedir,varname,nbins,minval,maxval,minmass,maxmass,ptCut):
     # get temporary root file name
     tempfilename="/tmp/temproot_"+os.getenv("USER","default")+".root"
     
@@ -814,13 +948,33 @@ def get_histogram(workdir,treedir,varname,nbins,minval,maxval,minmass,maxmass):
              +str(100)+","+str(minmass)+","+str(maxmass)+");\n"\
              +"TH1F* massfailhist = new TH1F(\"massfailhist\",\"massfailhist\","\
              +str(100)+","+str(minmass)+","+str(maxmass)+");\n"\
-             +"tree->Project(\"valhist\",\""+varname+"\",\"_weight*(passesAllOtherCuts)\");\n"\
-             +"tree->Project(\"vhloose\",\""+varname+"\",\"_weight*(passesAllOtherCutsIgnoreLifetime)\");\n"\
-             +"tree->Project(\"masspasshist\",\"mass\",\"_weight*("+varname+"_pass && passesAllOtherCuts)\");\n"
-    if maxmass<10:
-        command+="tree->Project(\"massfailhist\",\"mass\",\"_weight*(passesAllOtherCuts)\");\n"
+             +"vector<string> conditions;\n"\
+             +"TObjArray* branches = tree->GetListOfBranches();\n"\
+             +"for (int i=0; i<branches->GetEntries(); i++) {\n"\
+             +" const char* branchName=branches->At(i)->GetName();\n"\
+             +" if (strstr(branchName,\"_pass\")) conditions.push_back(branchName);\n"\
+             +"}\n"\
+             +"string passesAllOtherCuts=\"\";\n"\
+             +"string passesAllOtherCutsIgnoreLifetime=\"\";\n"\
+             +"for (int i=0; i<conditions.size(); i++) {\n"\
+             +" if (!strstr(conditions[i].c_str(),\""+varname+"\")) passesAllOtherCuts+=conditions[i]+\" && \";\n"\
+             +" bool lifetimecut=false;\n"\
+             +" lifetimecut|=(strstr(conditions[i].c_str(),\"leptonT0\")!=0);\n"\
+             +" lifetimecut|=(strstr(conditions[i].c_str(),\"leptonD0\")!=0);\n"\
+             +" lifetimecut|=(strstr(conditions[i].c_str(),\"leptonAbsD0\")!=0);\n"\
+             +" lifetimecut|=(strstr(conditions[i].c_str(),\"decayLength\")!=0);\n"\
+             +" lifetimecut|=(strstr(conditions[i].c_str(),\"dPhi\")!=0);\n"\
+             +" if (!lifetimecut) passesAllOtherCutsIgnoreLifetime+=conditions[i]+\" && \";\n"\
+             +"}\n"\
+             +"passesAllOtherCuts+=\"leptonPtL>"+str(ptCut)+"\";\n"\
+             +"passesAllOtherCutsIgnoreLifetime+=\"leptonPtL>"+str(ptCut)+"\";\n"\
+             +"tree->Project(\"valhist\",\""+varname+"\",(\"_weight*(\"+passesAllOtherCuts+\")\").c_str());\n"\
+             +"tree->Project(\"vhloose\",\""+varname+"\",(\"_weight*(\"+passesAllOtherCutsIgnoreLifetime+\")\").c_str());\n"\
+             +"tree->Project(\"masspasshist\",\"_mass\",\"_weight*(passesAllCuts)\");\n"
+    if maxmass<10 or varname[0]=="_":
+        command+="tree->Project(\"massfailhist\",\"_mass\",(\"_weight*(\"+passesAllOtherCuts+\")\").c_str());\n"
     else:
-        command+="tree->Project(\"massfailhist\",\"mass\",\"_weight*(!"+varname+"_pass && passesAllOtherCutsIgnoreLifetime)\");\n"
+        command+="tree->Project(\"massfailhist\",\"_mass\",(\"_weight*(!"+varname+"_pass && \"+passesAllOtherCutsIgnoreLifetime+\")\").c_str());\n"
         pass
     command+="valhist->Write();\n"\
              +"vhloose->Write();\n"\
@@ -829,7 +983,7 @@ def get_histogram(workdir,treedir,varname,nbins,minval,maxval,minmass,maxmass):
              +"outfile.Close();\n"\
              +"infile.Close();\n"\
              +"gApplication->Terminate();\n"
-    os.system("root -b -l << EOF\n"+command+"\nEOF\n")
+    result=os.popen("root -b -l << EOF\n"+command+"\nEOF\n").readlines()
     histfile=ROOT.TFile.Open(tempfilename)
     valhist=histfile.Get("valhist")
     clonedvalhist=valhist.Clone("tmpval")
@@ -852,7 +1006,7 @@ def get_masses(workdir,treedir,weight=1.0):
     command="TFile* infile = new TFile(\""+workdir+"/histograms.root\");\n"\
              +"TTree* tree = infile->Get(\""+treedir+"/bigTree\");\n"\
              +"tree->SetScanField(0);\n"\
-             +"tree->Scan(\"mass:_weight\","\
+             +"tree->Scan(\"_mass:_weight\","\
              +"\"passesAllCuts\"\n);"\
              +"infile.Close();\n"\
              +"gApplication->Terminate();\n"
@@ -877,7 +1031,7 @@ def get_masses(workdir,treedir,weight=1.0):
 
 
 def treeOverlayPlot(SampleTriggerCombination,backgrounddirs,signaldirs,weights,\
-                    signalWeights,lepton_name,treedir,varname,filename,
+                    signalWeights,lepton_name,treedir,varname,filename,ptCut,lumisum,
                     efficiencyListData=[],
                     efficiencyListMC=[],efficiencyListSignal=[]):
     if len(backgrounddirs)!=len(weights):
@@ -910,10 +1064,19 @@ def treeOverlayPlot(SampleTriggerCombination,backgrounddirs,signaldirs,weights,\
         mctrig=replacementTrigger[trigger]
         if not mctrig in mctriggers: mctriggers.append(mctrig)
     if len(mctriggers)!=1:
-        print "ERROR: more than one MC trigger requested."
-        print "       This means using the same events several times."
-        print "       And most likely the normalization is done per trigger."
-        sys.exit(1)
+        # need to trim list of MC triggers down to one.
+        # pick the one with highest p_t threshold.
+        # this threshold needs to be exceeded by an offline cut!
+        highestpt=0
+        highestpttrigger=""
+        for trigger in mctriggers:
+            if trigger_threshold(trigger)>highestpt:
+                highestpt=trigger_threshold(trigger)
+                highestpttrigger=trigger
+                pass
+            pass
+        mctriggers=[highestpttrigger]
+        pass
     # construct corresponding sample/trigger combinations for MC
     MCSampleTriggerCombination=[]
     for i in range(len(backgrounddirs)):
@@ -1020,7 +1183,7 @@ def treeOverlayPlot(SampleTriggerCombination,backgrounddirs,signaldirs,weights,\
     # fill histogram for data samples
     for [workdir,trigger,lumi] in SampleTriggerCombination:
             
-        [valhist,valhist_loose,masspasshist,massfailhist]=get_histogram(workdir,treedir.replace("TRIGGER",trigger),varname,nbins,histMinValue,histMaxValue,histMinMass,histMaxMass)
+        [valhist,valhist_loose,masspasshist,massfailhist]=get_histogram(workdir,treedir.replace("TRIGGER",trigger),varname,nbins,histMinValue,histMaxValue,histMinMass,histMaxMass,ptCut)
         datahisto.Add(valhist)
         datahisto_loose.Add(valhist_loose)
         datahistoMassPass.Add(masspasshist)
@@ -1086,7 +1249,7 @@ def treeOverlayPlot(SampleTriggerCombination,backgrounddirs,signaldirs,weights,\
                   
              #print "\n", varname.replace("_background",type).replace("TRIGGER",trigger), "\n"
 
-             [tempvalhist,tempvalhist_loose,tempmasspasshist,tempmassfailhist]=get_histogram(workdir,treedir.replace("_background",type).replace("TRIGGER",trigger),varname,nbins,histMinValue,histMaxValue,histMinMass,histMaxMass)
+             [tempvalhist,tempvalhist_loose,tempmasspasshist,tempmassfailhist]=get_histogram(workdir,treedir.replace("_background",type).replace("TRIGGER",trigger),varname,nbins,histMinValue,histMaxValue,histMinMass,histMaxMass,ptCut)
 
              
              if type == "_background":
@@ -1346,7 +1509,7 @@ def treeOverlayPlot(SampleTriggerCombination,backgrounddirs,signaldirs,weights,\
     drawhist(datahisto,"esame")
     valLegend.AddEntry(datahisto,"data","p")
     valLegend.Draw()
-    CMSPrelim(lepton_name)
+    CMSPlotDecoration(lepton_name,lumisum)
     canv.Update()
     canv.Print(filename)
 
@@ -1391,7 +1554,7 @@ def treeOverlayPlot(SampleTriggerCombination,backgrounddirs,signaldirs,weights,\
     datahisto_loose.SetMarkerStyle(21)
     drawhist(datahisto_loose,"esame")
     valLegend.Draw()
-    CMSPrelim(lepton_name)
+    CMSPlotDecoration(lepton_name,lumisum)
     canv.Update()
     canv.Print(filename.replace(".","_prompt."))
 
@@ -1460,7 +1623,7 @@ def treeOverlayPlot(SampleTriggerCombination,backgrounddirs,signaldirs,weights,\
         drawhist(datahistoMassPass,"esame")
         massPassLegend.AddEntry(datahistoMassPass,"data","p")
         massPassLegend.Draw()
-        CMSPrelim(lepton_name)
+        CMSPlotDecoration(lepton_name,lumisum)
         canv.Update()
         if filename.find("deltaRBetweenLeptons")<0:
             canv.Print(filename.replace("decayLengthSignificance2D","massDisplaced"))
@@ -1509,7 +1672,7 @@ def treeOverlayPlot(SampleTriggerCombination,backgrounddirs,signaldirs,weights,\
         drawhist(datahistoMassFail,"esame")
         massFailLegend.AddEntry(datahistoMassFail,"data","p")
         massFailLegend.Draw()
-        CMSPrelim(lepton_name)
+        CMSPlotDecoration(lepton_name,lumisum)
         canv.Update()
         canv.Print(filename.replace("decayLengthSignificance2D","massPrompt").replace("deltaRBetweenLeptons","massDisplacedNoDeltaR"))
         pass
@@ -1702,11 +1865,24 @@ def get_sample_weight(mcworkdir):
     return sampleweight
     
 
+def trigger_threshold(hltpath):
+    barename=hltpath.replace("HLT_","")
+    if barename.find("_v")>0: barename=barename[:barename.find("_v")]
+    specifiers=barename.split("_")
+    threshold=-1
+    for entry in specifiers:
+        if not entry[-1].isdigit(): continue
+        pos=-2
+        while entry[pos].isdigit() and abs(pos)<len(entry): pos-=1
+        threshold=int(entry[pos+1:])
+    return threshold
+
+
 #############################################
 ### PROCESS INDIVIDUAL DATASET
 #############################################
 
-def process_dataset(dataworkdir,lepton_name,analysis_directory):
+def analyze_lumi_and_trigger(dataworkdir,lepton_name,analysis_directory):
 
     # get dCache directory of this sample from sample description file
     sampleBaseDir=""
@@ -1760,10 +1936,10 @@ def process_dataset(dataworkdir,lepton_name,analysis_directory):
     # get luminosity information
     lumiOverview=dataworkdir+"/lumiOverview.csv"
     lumiDetails=dataworkdir+"/lumiResult.csv"
-    os.system("rm -f "+lumiOverview+" "+lumiDetails)
-    print "srmcp -2 \""+sampleBaseDir.replace("root://xrootd.rcac.purdue.edu", "srm://srm-dcache.rcac.purdue.edu:8443/srm/managerv2?SFN=")+"/lumiOverview.csv\" \"file:///"+lumiOverview+"\""
-    os.system("srmcp -2 \""+sampleBaseDir.replace("root://xrootd.rcac.purdue.edu", "srm://srm-dcache.rcac.purdue.edu:8443/srm/managerv2?SFN=")+"/lumiOverview.csv\" \"file:///"+lumiOverview+"\"")
-    # os.system("dccp "+sampleBaseDir+"/lumiOverview.csv "+lumiOverview+" &> /dev/null")
+    if not os.path.exists(lumiOverview):
+        os.system("dccp "+sampleBaseDir+"/lumiOverview.csv "\
+                      +lumiOverview+" &> /dev/null")
+        pass
     if not os.path.exists(lumiOverview):
         # ok, for some reason we cannot get these files from dcache.
         # check whether the make_pat working directory still exists
@@ -1776,8 +1952,10 @@ def process_dataset(dataworkdir,lepton_name,analysis_directory):
                       +lumiOverview+" &> /dev/null")
             pass
         pass
-    os.system("srmcp -2 \""+sampleBaseDir.replace("root://xrootd.rcac.purdue.edu", "srm://srm-dcache.rcac.purdue.edu:8443/srm/managerv2?SFN=")+"/lumiResult.csv\" \"file:///"+lumiDetails+"\"")
-    # os.system("dccp "+sampleBaseDir+"/lumiResult.csv "+lumiDetails+" &> /dev/null")
+    if not os.path.exists(lumiDetails):
+        os.system("dccp "+sampleBaseDir+"/lumiResult.csv "\
+                      +lumiDetails+" &> /dev/null")
+        pass
     if not os.path.exists(lumiDetails):
         # same procedure as above
         patdirs=os.popen("ls -1rtd "+dataworkdir[:dataworkdir.find("_analysis")]\
@@ -1800,16 +1978,21 @@ def process_dataset(dataworkdir,lepton_name,analysis_directory):
     lumi_recorded=0.0
     recLumiPerRun={}
     for line in lumiCSV.readlines():
-        if len(line.split(","))==4:
-            # old lumiCalc format
-            (run,dlumi,rlumi,hlumi)=line.split(",")
-        else:
-            # lumiCalc2.py format
-            entries=line.split(",")
-            run=entries[0]
-            dlumi=entries[2]
-            rlumi=entries[-1]
-            pass
+        # if len(line.split(","))==4:
+        #     # old lumiCalc format
+        #     (run,dlumi,rlumi,hlumi)=line.split(",")
+        # else:
+        # lumiCalc2.py format
+        #     entries=line.split(",")
+        #     run=entries[0]
+        #     dlumi=entries[2]
+        #     rlumi=entries[-1]
+        #     pass
+        modifiedString = modifyString(line)
+        entries=modifiedString.split(",")
+        run=entries[0].replace("###", ",")
+        dlumi=entries[2].replace("###", ",")
+        rlumi=entries[-1].replace("###", ",")
         try:
             run=int(run)
             dlumi=float(dlumi)/1e6 # convert from /microbarn to /picobarn
@@ -1839,49 +2022,22 @@ def process_dataset(dataworkdir,lepton_name,analysis_directory):
     previousBestTrigger="None"
     triggerWithMaxLumi={}
     for line in lumiCSV.readlines():
-        if line.startswith("Run"):
-            continue
         # read line from csv
-        if len(line.split(","))==3:
-            # old style lumiCalc result
-            (run,hltpath,lumi)=line.split(",")
-        else:
-            # new style lumiCalc2.py
-            # print "line = "+line
-            modifiedString = ""
-            foundQuote = False
-            for char in line:
-                if char == "\"":
-                    foundQuote = not foundQuote
-                if char == "," and foundQuote:
-                    modifiedString += "###"
-                else:
-                    modifiedString += char
-            # modifiedString = modifiedString.split(",")
-            # print "modifiedString = "+modifiedString
-            # for elem in modifiedString:
-            #     print elem.replace("###", ",")
-        
-            
-            # beforeLS = line.split("[")[0]
-            # afterLS = line.split("]")[-1]
-            # print "beforeLS = "+beforeLS
-            # print "afterLS = "+afterLS
-            # run = beforeLS.split(",")[0]
-            # print afterLS.split(',')
-            (run, lumiSL, recorded, hltpath, l1bit, lumi) = modifiedString.split(",")
-            run = run.replace("###", ",")
-            lumiSL = lumiSL.replace("###", ",")
-            recorded = recorded.replace("###", ",")
-            hltpath = hltpath.replace("###", ",")
-            l1bit = l1bit.replace("###", ",")
-            lumi = lumi.replace("###", ",")
-            # print run
-            # print hltpath
-            # print l1bit
-            # print lumi
-            # (run,selectedLS,recorded,hltpath,l1bit,lumi)=line.split(",")
-            pass
+        # if len(line.split(","))==3:
+        #     # old style lumiCalc result
+        #     (run,hltpath,lumi)=line.split(",")
+        # else:
+        #     # new style lumiCalc2.py
+        #     (run,hltpath,l1bit,lumi)=line.split(",")
+        #     pass
+        modifiedString = modifyString(line)
+        (run, lumiSL, recorded, hltpath, l1bit, lumi) = modifiedString.split(",")
+        run = run.replace("###", ",")
+        lumiSL = lumiSL.replace("###", ",")
+        recorded = recorded.replace("###", ",")
+        hltpath = hltpath.replace("###", ",").split("(")[0]
+        l1bit = l1bit.replace("###", ",")
+        lumi = lumi.replace("###", ",")
         if not hltpath in selectedHLTPaths: continue
         try:
             run=int(run)
@@ -1919,6 +2075,12 @@ def process_dataset(dataworkdir,lepton_name,analysis_directory):
             maxLumi[run]=lumi
             triggerWithMaxLumi[run]=hltpath
             pass
+        # if there is more than one option, take the one with lower threshold
+        if lumi==maxLumi[run] and trigger_threshold(hltpath)<trigger_threshold(triggerWithMaxLumi[run]):
+            triggerWithMaxLumi[run]=hltpath
+            pass
+            
+        # always give preference to the trigger that we used beforehand
         if lumi==maxLumi[run] and hltpath==previousBestTrigger:
             triggerWithMaxLumi[run]=hltpath
         previousBestTrigger=triggerWithMaxLumi[run]
@@ -1932,8 +2094,10 @@ def process_dataset(dataworkdir,lepton_name,analysis_directory):
             firstRun[trigger]=0
             lastRun[trigger]=0
             pass
-        print "  recorded lumi for %40s : %10.8f in run range %i-%i"\
-              %(trigger,lumiPerTrigger[trigger],firstRun[trigger],lastRun[trigger])
+        if lumiPerTrigger[trigger]>0:
+            print "  recorded lumi for %40s : %10.8f in run range %i-%i"\
+                  %(trigger,lumiPerTrigger[trigger],firstRun[trigger],lastRun[trigger])
+            pass
         pass
     # add dummy trigger
     lumiPerTrigger["anyTrigger"]=lumi_recorded
@@ -1972,701 +2136,44 @@ def process_dataset(dataworkdir,lepton_name,analysis_directory):
     return [lumisum,best_triggers,best_trigger_lumi]
 
 
+
 #############################################
-### PREPARE DATA/MC OVERLAY PLOTS
+### MAKE REWEIGHTED EFFICIENCY TEXT FILES
 #############################################
 
+def dump_reweighted_efficiencies(lepton_name,ptCut,limitfolder):
 
-def makePlots(SampleTriggerCombination,workdirs_background,workdirs_signal,
-              mcweights,mcSignalWeights,
-              lepton_name,analysis_directory,plotfolder,limitfolder):
+    # ctau factors for lifetime reweighting
+    # here we use k=3 and k=1./3
+    ctfact_list=[1./30.,1./20.,1./10.,1./3.,0.5,2.0,3.,10.,20.,30.]
 
 
-    # get total luminosity for this set of samples
-    lumisum=0.0
-    for [dataworkdir,trigger,lumi] in SampleTriggerCombination:
-        lumisum+=lumi
-        sampleID=dataworkdir.split("/")[-1].replace("_analysis","")+"_"+trigger
+    # corrected efficiencies, systematics
+    leptrack_effi1=[]
+    leptrack_effi2=[]
+    leptrack_effi1_pileupuncertainty=[]
+    leptrack_effi2_pileupuncertainty=[]
+    leptrack_effi1_statisticaluncertainty=[]
+    leptrack_effi2_statisticaluncertainty=[]
+    leptrack_effi1_uncorrected=[]
+    leptrack_effi2_uncorrected=[]
+    leptrack_effi1_lifetime=[]
+    leptrack_effi2_lifetime=[]
+    leptrack_effi1_lifetime_statuncert=[]
+    leptrack_effi2_lifetime_statuncert=[]
+    for entry in ctfact_list:
+        leptrack_effi1_lifetime.append([])
+        leptrack_effi2_lifetime.append([])
+        leptrack_effi1_lifetime_statuncert.append([])
+        leptrack_effi2_lifetime_statuncert.append([])
         pass
 
-    # corresponding normalization for background samples
-    mcfactors=[]
-    for weight in mcweights:
-        mcfactors.append(weight*lumisum)
-        pass
-
-#################################################################
-    # corresponding normalization for signal samples
-    mcfactorsSignal=[]
-    for weight in mcSignalWeights:
-        mcfactorsSignal.append(weight*lumisum)
-        pass
-#################################################################
-
-    # Make directory to store plots
-    folder = plotfolder + "/" + sampleID + "/"
-    if not os.path.isdir(folder):
-        os.mkdir(folder)
-        pass
-
-    print "preparing plots for the following samples and triggers:"
-    for [dataworkdir,trigger,lumi] in SampleTriggerCombination:
-        print "   ",trigger,"in",dataworkdir
-    print "-> using directory",folder
-        
-    #---------------------
-    # PLOTS
-    #---------------------
-
-    # primary vertex distributions
-    for plot in ["numPV_central","numPV_low","numPV_high","numPV_veryhigh"]:
-        overlayPlot(SampleTriggerCombination,workdirs_background,mcfactors,
-                    analysis_directory+"/weights/"+plot,
-                    folder+lepton_name+"_"+plot+".pdf",0)
-        pass
-
-    # fraction of actual true leptons in candidate (MC only)
-    overlayPlot([],workdirs_background,mcfactors,
-                analysis_directory+"/dileptons/number_of_actual_leptons",
-                folder+"number_of_actual_"+lepton_name+"s.pdf",0)
-    
-    # Lists to store all the required data about the cut efficiencies
-    efficiencyListData = []
-    efficiencyListMC = []
-    efficiencyListSignal = []
-           
-    # decay length significance. we treat this cut in a special way
-    # because its inversion gives us the control distribution of prompt
-    # candidates, and thus we want additional plots/diagnostics here
-    [datamasslist,bkgmasslist]=treeOverlayPlot(SampleTriggerCombination,
-                                               workdirs_background,workdirs_signal,mcfactors,
-                                               mcfactorsSignal,
-                                               lepton_name,
-                                               analysis_directory+\
-                                               "/dileptons_background_TRIGGER/",
-                                               "decayLengthSignificance2D",
-                                               folder+"di"+lepton_name+\
-                                               "_decayLengthSignificance2D.pdf",
-                                               efficiencyListData,efficiencyListMC,
-                                               efficiencyListSignal)
-    
-    # store mass lists for limit calculation
-    minmass=999
-    maxmass=0
-    datalistfile=open(limitfolder+"/masses_data_"+lepton_name+".txt","w")
-    for entry in datamasslist:
-        datalistfile.write("%10.4f %10.4f\n"%(entry[0],entry[1]))
-        if entry[0]>maxmass: maxmass=entry[0]
-        if entry[0]<minmass: minmass=entry[0]
-        pass
-    datalistfile.close()
-    bkglistfile=open(limitfolder+"/masses_backgroundMC_"+lepton_name+".txt","w")
-    for entry in bkgmasslist:
-        bkglistfile.write("%10.4f %10.4f\n"%(entry[0],entry[1]))
-        if entry[0]>maxmass: maxmass=entry[0]
-        if entry[0]<minmass: minmass=entry[0]
-        pass
-    bkglistfile.close()
-    # now also create histograms
-    datahist=ROOT.TH1F("datamass","mass distribution of candidates in data",
-                       100,minmass*0.9,maxmass*1.1)
-    for entry in datamasslist: datahist.Fill(entry[0],entry[1])
-    outfile=ROOT.TFile.Open(limitfolder+"/masses_data_"+lepton_name+".root",
-                            "RECREATE")
-    datahist.Write()
-    outfile.Close()
-    bkghist=ROOT.TH1F("backgroundmass","mass distribution of candidates in MC",
-                       100,minmass*0.9,maxmass*1.1)
-    for entry in bkgmasslist: bkghist.Fill(entry[0],entry[1])
-    outfile=ROOT.TFile.Open(limitfolder+"/masses_backgroundMC_"+lepton_name+".root",
-                            "RECREATE")
-    bkghist.Write()
-    outfile.Close()
-
-    # get list of all quantities that are available to plot
-    cutNames=[]
-    for [workdir,trigger,lumi] in SampleTriggerCombination:
-        histfile=ROOT.TFile.Open(workdir+"/histograms.root")
-        for analysisDir in [eAnalysis,muAnalysis]:
-            if histfile.Get("/"+analysisDir+"/dileptons_background_"+trigger):
-                histfile.cd("/"+analysisDir+"/dileptons_background_"+trigger)
-                keylist=ROOT.gDirectory.GetListOfKeys()
-                for key in keylist:
-                    entry=key.GetName()
-                    if not key.ReadObj().IsA().InheritsFrom("TTree"):
-                        continue
-                    # exclude certain entries we definitely do not want
-                    if entry in ["decayLengthSignificance2D", # already done
-                                 "bigTree", # different format
-                                 "dPhitriggerCorr",
-                                 "differentTrigObjects",
-                                 "leptonQualityL",
-                                 "leptonQualityH",
-                                 "mass_calocorr", # masses taken from elsewhere
-                                 "mass_corr",
-                                 "mass_scalecorr",
-                                 "mass_triggercorr",
-                                 "validTracks",
-                                 "validVertex"]: continue
-                    if not entry in cutNames: cutNames.append(entry)
-                    pass
-                pass
-            pass
-        histfile.Close()
-        pass
-
-
-    if not do_all_plots:
-        # only do the most important plots (for the PAS)
-        cutNames=["trackerIsolationL","trackerIsolationH","dPhicorr"]
-        pass
-    
-    for cutName in cutNames:
-        treeOverlayPlot(SampleTriggerCombination,workdirs_background,workdirs_signal,
-                        mcfactors,mcfactorsSignal,lepton_name,
-                        analysis_directory+"/dileptons_background_TRIGGER/",cutName,
-                        folder+"di"+lepton_name+"_"+cutName+".pdf",efficiencyListData,
-                        efficiencyListMC,efficiencyListSignal)
-        pass
-
-    listOfCuts=[
-        "eta_cand_pass",
-        "numStandAloneMuons_pass",
-        "leptonPtL_pass && leptonPtH_pass",
-        "leptonEtaL_pass && leptonEtaH_pass",
-        "leptonAbsD0significanceL_pass && leptonAbsD0significanceH_pass",
-        "trackerIsolationL_pass && trackerIsolationH_pass",
-        "oppositeCharge_pass",
-        "vetoBackToBack_pass",
-        "deltaRBetweenLeptons_pass",
-        "numCaloMatches_pass",
-        "numTrigMatches_pass",
-        "differentTrigObjects_pass",
-        "validTracks_pass && validVertex_pass && vertexChi2_pass",
-        "dPhicorr_pass",
-        "maxHitsBeforeVertex_pass",
-        "decayLengthSignificance2D_pass",
-        "passesAllCuts"
-        ]
-    if analysis_directory.find("mu")>=0:
-        listOfCuts.remove("numCaloMatches_pass")
-        pass
-
-    print "==========efficiency output for data,",analysis_directory
-    appliedCuts="eta_cand_pass"
-    for additionalCut in listOfCuts:
-        appliedCuts+=" && "+additionalCut
-        sum=number_of_surviving_candidates(SampleTriggerCombination,"background",
-                                           analysis_directory,appliedCuts)
-        print "%-50s"%additionalCut,sum
-        pass
-    print "======================================"
-
-    # now measure efficiency to find a matching supercluster
-    # for candidates passing all cuts except trigger match
-    if analysis_directory[0]=="e":
-        print "==========efficiency to match supercluster in data"
-        appliedCuts="eta_cand_pass"
-        for additionalCut in listOfCuts:
-            if additionalCut=="numTrigMatches_pass": continue
-            if additionalCut=="numCaloMatches_pass": continue
-            if additionalCut=="differentTrigObjects_pass": continue
-            if additionalCut=="decayLengthSignificance2D_pass": continue
-            if additionalCut.find("leptonAbsD0significance")>=0: continue
-            if additionalCut=="dPhicorr_pass": continue
-            if additionalCut=="passesAllCuts": continue
-            appliedCuts+=" && "+additionalCut
-            pass
-        sum1=number_of_surviving_candidates(SampleTriggerCombination,
-                                            "background",
-                                            analysis_directory,appliedCuts)
-        appliedCuts+=" && numCaloMatches_pass"
-        sum2=number_of_surviving_candidates(SampleTriggerCombination,
-                                            "background",
-                                            analysis_directory,appliedCuts)
-        print "fraction of candidates with matching supercluster:",\
-              sum2,"/",sum1
-        print "======================================"
-        pass
-
-    # find list of triggers for MC
-    mctriggers=[]
-    for [dataworkdir,trigger,lumi] in SampleTriggerCombination:
-        mctrig=replacementTrigger[trigger]
-        if not mctrig in mctriggers: mctriggers.append(mctrig)
-    if len(mctriggers)==0:
-        mctriggers.append("anyTrigger")
-    if len(mctriggers)!=1:
-        print "ERROR: more than one MC trigger requested."
-        print "       This means using the same events several times."
-        print "       And most likely the normalization is done per trigger."
-        sys.exit(1)
-    # construct corresponding sample/trigger combinations for background MC
-    MCSampleTriggerCombination=[]
-    for i in range(len(workdirs_background)):
-        for trigger in mctriggers:
-            MCSampleTriggerCombination.append([workdirs_background[i],trigger,mcfactors[i]])
- 
-    print "==========efficiency output for background MC,",analysis_directory
-    appliedCuts="eta_cand_pass"
-    for additionalCut in listOfCuts:
-        appliedCuts+=" && "+additionalCut
-        sum=number_of_surviving_candidates(MCSampleTriggerCombination,
-                                           "background",
-                                           analysis_directory,appliedCuts)
-        print "%-50s"%additionalCut,sum
-        pass
-    print "======================================"
-
-    # construct corresponding sample/trigger combinations for signal MC
-    for i in range(len(workdirs_signal)):
-        MCSampleTriggerCombination=[]
-        for trigger in mctriggers:
-            MCSampleTriggerCombination.append([workdirs_signal[i],trigger,1.0])
-            pass
-        print "==========efficiency output for "+workdirs_signal[i].split("/")[-1],",",analysis_directory
-        appliedCuts="eta_cand_pass"
-        for additionalCut in listOfCuts:
-            appliedCuts+=" && "+additionalCut
-            sum=number_of_surviving_candidates(MCSampleTriggerCombination,
-                                               "signal",
-                                               analysis_directory,appliedCuts)
-            print "%-50s"%additionalCut,sum
-            pass
-        print "======================================"
-        pass
-    
-    
-    #---------------------
-    # Efficiency Output
-    #---------------------
-
-    #Widths of each column
-    col1Width = 26
-    col2Width = 25
-    col3Width = 30
-    col4Width = 21
-
-    #Print header for efficiency table
-    print "\n"
-    print "CUT EFFICIENCIES: DATA",lepton_name
-    print " "*(col1Width - len("CutName"))                        +"CutName",
-    print " "*(10 + col2Width - len("PassesThisAndAllOtherCuts"))+"PassesThisAndAllOtherCuts",
-    print " "*(-6 + col3Width - len("PassesAllOtherCuts"))       +"PassesAllOtherCuts",
-    print " "*(-4 + col4Width - len("Efficiency"))               +"Efficiency"
-    print "#"*104
-
-    #Print the efficiency data
-    for data in efficiencyListData:
-
-        #The string below contains a single row of the table with all elements alligned
-        formattedStr = " "*(col1Width - len(data['cutName']))+str(data['cutName'])
-        formattedStr+= " "*(col2Width - len(str(data['passesThisAndAllOtherCuts'])))
-        formattedStr+= str(data['passesThisAndAllOtherCuts'])
-        formattedStr+= " "*(col3Width - len(str(data['passesAllOtherCuts'])))+str(data['passesAllOtherCuts'])
-        formattedStr+= " "*(col4Width - len(str(float("%.2e"%data['efficiency']))))
-        formattedStr+= str(float("%.2e"%data['efficiency']))+"%"    
-        print formattedStr
-    
-    #Print header for efficiency table
-    print "\n"
-    print "CUT EFFICIENCIES: BACKGROUND MC", lepton_name
-    print " "*(col1Width - len("CutName"))                        +"CutName",
-    print " "*(10 + col2Width - len("PassesThisAndAllOtherCuts"))+"PassesThisAndAllOtherCuts",
-    print " "*(-6 + col3Width - len("PassesAllOtherCuts"))       +"PassesAllOtherCuts",
-    print " "*(-4 + col4Width - len("Efficiency"))               +"Efficiency"
-    print "#"*104
-
-    #Print the efficiency data
-    for data in efficiencyListMC:
-
-        #The string below contains a single row of the table with all elements alligned
-        formattedStr = " "*(col1Width - len(data['cutName']))+str(data['cutName'])
-        formattedStr+= " "*(col2Width - len(str(data['passesThisAndAllOtherCuts'])))
-        formattedStr+= str(data['passesThisAndAllOtherCuts'])
-        formattedStr+= " "*(col3Width - len(str(data['passesAllOtherCuts'])))+str(data['passesAllOtherCuts'])
-        formattedStr+= " "*(col4Width - len(str(float("%.2e"%data['efficiency']))))
-        formattedStr+= str(float("%.2e"%data['efficiency']))+"%"    
-        print formattedStr
-    
-    #Print header for efficiency table
-    print "\n"
-    print "CUT EFFICIENCIES: SIGNAL MC", lepton_name
-    print " "*(col1Width - len("CutName"))                        +"CutName",
-    print " "*(10 + col2Width - len("PassesThisAndAllOtherCuts"))+"PassesThisAndAllOtherCuts",
-    print " "*(-6 + col3Width - len("PassesAllOtherCuts"))       +"PassesAllOtherCuts",
-    print " "*(-4 + col4Width - len("Efficiency"))               +"Efficiency"
-    print "#"*104
-
-    #Print the efficiency data
-    for data in efficiencyListSignal:
-
-        #The string below contains a single row of the table with all elements alligned
-        formattedStr = " "*(col1Width - len(data['cutName']))+str(data['cutName'])
-        formattedStr+= " "*(col2Width - len(str(data['passesThisAndAllOtherCuts'])))
-        formattedStr+= str(data['passesThisAndAllOtherCuts'])
-        formattedStr+= " "*(col3Width - len(str(data['passesAllOtherCuts'])))+str(data['passesAllOtherCuts'])
-        formattedStr+= " "*(col4Width - len(str(float("%.2e"%data['efficiency']))))
-        formattedStr+= str(float("%.2e"%data['efficiency']))+"%"    
-        print formattedStr
-    
-    return
-
-
-
-# trigger efficiency measurements on unbiased sample
-def triggerEfficiency(SampleTriggerCombination,treeDir):
-    
-    # Initialise the count of the number of events for the different triggers
-    sumTrig = 0
-    anyTrig = 0
-
-    curDir = ""
-    
-    for [workdir,trigger,lumi] in SampleTriggerCombination:
-        if curDir != workdir: #Check the file is not already open
-            f = ROOT.TFile.Open(workdir + "/histograms.root")
-            anyTrig += f.Get(treeDir+"/dileptons_background_anyTrigger/"
-                             +"numTrigMatches").GetEntries("passesAllOtherCutsIgnoreLifetime")
-            curDir = workdir
-            pass
-        
-        sumTrig += f.Get(treeDir+"/dileptons_background_"+trigger+"/"
-                         +"numTrigMatches").GetEntries("passesAllOtherCutsIgnoreLifetime")
-        pass
-
-    # Calculate the trigger efficiency
-    if (anyTrig > 0):
-        efficiency = 100.*float(sumTrig)/float(anyTrig)
-        pass
+    if lepton_name.find("mu")>=0:
+        treename=muAnalysis+"/dileptons_signal_MC_L2DoubleMu30_NoVertex_v1/bigTree"
     else:
-        efficiency = 0
+        treename=eAnalysis+"/dileptons_signal_MC_DoublePhoton38_v2/bigTree"
         pass
-    
-    # Print filename
-    print "\nTrigger efficiency results\n"
-   
-    # Print header for efficiency table
-    print " "*(8  - len("sumTrig"))    + "sumTrig",
-    print " "*(6  - len("anyTig"))     + "anyTrig",
-    print " "*(11 - len("Efficiency")) + "Efficiency"
-    print "#"*28
 
-    # Print the efficiency data
-    outputStr =  " "*(8  - len(str(sumTrig)))+ str(sumTrig)
-    outputStr+=  " "*(8  - len(str(anyTrig)))+ str(anyTrig)
-    outputStr+=  " "*(11 - len(str(float("%.2e"%efficiency))))+ str(float("%.2e"%efficiency))+"%\n"
-    print outputStr
-
-    f.Close()
-    return
-    
-
-#=======================================================================
-#=======================================================================
-#==== MAIN
-#=======================================================================
-#=======================================================================
-
-
-    
-#############################################
-### PREPARATIONS
-#############################################
-
-ROOT.gROOT.Reset()
-ROOT.gROOT.SetBatch()
-ROOT.TH1.SetDefaultSumw2()
-ROOT.gErrorIgnoreLevel = ROOT.kWarning
-ROOT.gROOT.Macro( 'HarderAnalysis/DisplacedDileptons/test/tdrstyle.C' )
-#ROOT.gStyle.SetOptTitle(1)
-ROOT.gStyle.SetPadTopMargin(0.1);
-ROOT.gStyle.SetPadLeftMargin(0.15);
-ROOT.gStyle.SetPadRightMargin(0.05);
-#ROOT.gStyle.SetTitleYOffset(1.5)
-
-
-#############################################
-### OBTAIN BACKGROUND MC SCALE FACTORS
-#############################################
-
-print "====================================="
-print "EVALUATING MC SAMPLE WEIGHTS"
-print "====================================="
-mcweights_e=[]
-for workdir in workdirs_background_e:
-    mcweights_e.append(get_sample_weight(workdir))
-mcweights_mu=[]
-for workdir in workdirs_background_mu:
-    mcweights_mu.append(get_sample_weight(workdir))
-mcweights_sig=[]
-for workdir in workdirs_signal:
-    # signal cross-section unknown, but we define some value
-    # for making signal drawn on top of background MC look good
-    mcweights_sig.append(get_sample_weight(workdir))
-print "\n"
-
-
-##############################################
-### LUMI+TRIGGER ANALYSIS FOR ALL DATA SAMPLES
-##############################################
-
-lumisum=0.0
-eSampleTriggerCombination1=[]
-eSampleTriggerCombination2=[]
-eTriggerInMuSampleCombination1=[]
-for workdir in workdirs_data_e:
-    print "====================================="
-    print "DATA:",workdir
-    print "====================================="
-    [lumi,best_triggers,best_trigger_lumi]=process_dataset(workdir,"electron",eAnalysis)
-    # now put the sample/trigger combinations into categories that are being treated together
-    for i in range(len(best_triggers)):
-        if best_triggers[i].find("DoublePhoton33")>=0:
-            eSampleTriggerCombination1.append([workdir,best_triggers[i],best_trigger_lumi[i]])
-            eTriggerInMuSampleCombination1.append([workdirs_data_mu[workdirs_data_e.index(workdir)],best_triggers[i],best_trigger_lumi[i]])
-        else:
-            eSampleTriggerCombination2.append([workdir,best_triggers[i],best_trigger_lumi[i]])
-    lumisum+=lumi
-    print "\n"
-    pass
-print "------ total lumi processed in electron channel:",lumisum,"/pb --------\n\n"
-
-lumisum=0.0
-muSampleTriggerCombination1=[]
-muSampleTriggerCombination2=[]
-for workdir in workdirs_data_mu:
-    print "====================================="
-    print "DATA:",workdir
-    print "====================================="
-    [lumi,best_triggers,best_trigger_lumi]=process_dataset(workdir,"muon",muAnalysis)
-    # now put the sample/trigger combinations into categories that are being treated together
-    for i in range(len(best_triggers)):
-        if best_triggers[i].find("HLT_L2DoubleMu23_NoVertex")>=0:
-            muSampleTriggerCombination1.append([workdir,best_triggers[i],best_trigger_lumi[i]])
-        else:
-            muSampleTriggerCombination2.append([workdir,best_triggers[i],best_trigger_lumi[i]])
-    lumisum+=lumi
-    print "\n"
-    pass
-print "------ total lumi processed in muon channel:",lumisum,"/pb --------\n\n"
-
-
-##############################################
-### OUTPUT DIRECTORY STRUCTURE
-##############################################
-
-# Get current date to use for a folder name
-t = datetime.datetime.now()
-curDate = str(t.year) + "_" + str(t.month) + "_" + str(t.day)
-plotfolder="Analysis/"+curDate
-if os.path.exists(plotfolder):
-    num=0
-    while os.path.exists(plotfolder+"_rev"+str(num)): num+=1
-    plotfolder+="_rev"+str(num)
-    pass
-# Check the analysis folder exists
-if not os.path.isdir("Analysis"):
-    os.mkdir("Analysis")
-    pass
-# Make a folder with the current date if it does not exist
-if not os.path.isdir(plotfolder):
-    os.mkdir(plotfolder)
-    pass
-# subfolder for all the stuff needed for limit calculation
-limitfolder=plotfolder+"/limits"
-if not os.path.isdir(limitfolder):
-    os.mkdir(limitfolder)
-# subfolder for various efficiency and benchmark plots
-benchmarkfolder=plotfolder+"/benchmarks"
-if not os.path.isdir(benchmarkfolder):
-    os.mkdir(benchmarkfolder)
-
-
-##############################################
-### DATA/MC PLOTS FOR SELECTED DATA/TRIGGERS
-##############################################
-
-if len(eSampleTriggerCombination1)>0:
-    makePlots(eSampleTriggerCombination1,workdirs_background_e,
-              workdirs_signal,mcweights_e,mcweights_sig,
-              "electron",eAnalysis,plotfolder,limitfolder)
-    pass
-if len(eSampleTriggerCombination2)>0:
-    makePlots(eSampleTriggerCombination2,workdirs_background_e,
-              workdirs_signal,mcweights_e,mcweights_sig,
-              "electron",eAnalysis,plotfolder,limitfolder)
-    pass
-if len(muSampleTriggerCombination1)>0:
-    makePlots(muSampleTriggerCombination1,workdirs_background_mu,
-              workdirs_signal,mcweights_mu,mcweights_sig,
-              "muon",muAnalysis,plotfolder,limitfolder)
-    pass
-if len(muSampleTriggerCombination2)>0:
-    makePlots(muSampleTriggerCombination2,workdirs_background_mu,
-              workdirs_signal,mcweights_mu,mcweights_sig,
-              "muon",muAnalysis,plotfolder,limitfolder)
-    pass
-
-
-#############################################
-### EFFICIENCY PLOTS FROM MC
-#############################################
-
-# tracking efficiency for electrons
-for workdir in workdirs_benchmark_e:
-    sampleID=workdir.split("/")[-1].replace("_analysis","")
-    efficiencyPlot(workdir,eAnalysis+"/leptons/trueLeptonRadWithTrack",
-                   eAnalysis+"/gen/leptonProdVtxRadius2D",
-                   benchmarkfolder+"/track_effi_electrons.pdf",
-                   "track reconstruction efficiency as function of impact parameter",
-                   "d_{0} [cm]")
-    pass
-
-# tracking efficiency for muons
-for workdir in workdirs_benchmark_mu:
-    sampleID=workdir.split("/")[-1].replace("_analysis","")
-    efficiencyPlot(workdir,muAnalysis+"/leptons/trueLeptonRadWithTrack",
-                   muAnalysis+"/gen/leptonProdVtxRadius2D",
-                   benchmarkfolder+"/track_effi_muons.pdf",
-                   "track reconstruction efficiency as function of impact parameter",
-                   "d_{0} [cm]")
-    pass
-
-# displaced lepton efficiency before and after rereco
-for workdir in workdirs_benchmark_e:
-    sampleID=workdir.split("/")[-1].replace("_analysis","")
-    efficiencyPlot(workdir,
-                   eAnalysis+"/electrons/trueProdVtxRad",
-                   eAnalysis+"/gen/leptonProdVtxRadius2D",
-                   benchmarkfolder+"/electron_effi_"+sampleID+".pdf",
-                   "electron reconstruction efficiency as function of impact parameter",
-                   "d_{0} [cm]")
-    pass
-for workdir in workdirs_benchmark_mu:
-    sampleID=workdir.split("/")[-1].replace("_analysis","")
-    efficiencyPlot(workdir,
-                   muAnalysis+"/muons/trueProdVtxRad",
-                   muAnalysis+"/gen/leptonProdVtxRadius2D",
-                   benchmarkfolder+"/muon_effi_"+sampleID+".pdf",
-                   "muon reconstruction efficiency as function of impact parameter",
-                   "d_{0} [cm]")
-    pass
-
-# dilepton reconstruction efficiency plots as function of 2d decay length
-# these are uncorrected efficiencies
-# and taking the average efficiency from this plot will overestimate the
-# actual average efficiency somewhat because these plots cut off the low
-# efficiency region beyond 100cm radius.
-for workdir in workdirs_signal:
-    sampleID=workdir.split("/")[-1].replace("_analysis","")
-    efficiencyPlot(workdir,
-                   muAnalysis+"/dileptons/trueDecayLength2D_1",
-                   "isoTrackPrefilter/decayLength2D_1muon",
-                   benchmarkfolder+"/dimuon1_effi_"+sampleID+".pdf",
-                   "dimuon reconstruction efficiency"+
-                   " as function of decay length, 1 dimuon",
-                   "L_{xy} [cm]")
-
-    efficiencyPlot(workdir,
-                   muAnalysis+"/dileptons/trueDecayLength2D_2",
-                   "isoTrackPrefilter/decayLength2D_2muon",
-                   benchmarkfolder+"/dimuon2_effi_"+sampleID+".pdf",
-                   "dimuon reconstruction efficiency"+
-                   " as function of decay length, 2 dimuons",
-                   "L_{xy} [cm]")
-    
-    efficiencyPlot(workdir,
-                   eAnalysis+"/dileptons/trueDecayLength2D_1",
-                   "isoTrackPrefilter/decayLength2D_1elec",
-                   benchmarkfolder+"/dielectron1_effi_"+sampleID+".pdf",
-                   "dielectron reconstruction efficiency"+
-                   " as function of decay length, 1 dielectron",
-                   "L_{xy} [cm]")
-    
-    efficiencyPlot(workdir,
-                   eAnalysis+"/dileptons/trueDecayLength2D_2",
-                   "isoTrackPrefilter/decayLength2D_2elec",
-                   benchmarkfolder+"/dielectron2_effi_"+sampleID+".pdf",
-                   "dielectron reconstruction efficiency"+
-                   " as function of decay length, 2 dielectrons",
-                   "L_{xy} [cm]")
-    pass
-
-# trigger efficiency in MC
-mctriggers=[]
-for datatrigger,mctrigger in replacementTrigger.iteritems():
-    if not mctrigger in mctriggers: mctriggers.append(mctrigger)
-for workdir in workdirs_signal:
-    [edenom,edenom_loose,dm1,dm2]=get_histogram(workdir,eAnalysis\
-                                   +"/dileptons_signal_anyTrigger/numTrigMatches",
-                                   1,-10,10,0,3000)
-    [mudenom,mudenom_loose,dm1,dm2]=get_histogram(workdir,muAnalysis\
-                                    +"/dileptons_signal_anyTrigger/numTrigMatches",
-                                    1,-10,10,0,3000)
-    for mctrigger in mctriggers:
-        if mctrigger.find("Photon")>=0 and edenom.Integral()>0:
-            [enum,enum_loose,em1,em2]=get_histogram(workdir,eAnalysis\
-                                         +"/dileptons_signal_%s/numTrigMatches"%mctrigger,
-                                         1,-10,10,0,3000)
-            print "MC trigger efficiency of",mctrigger,"in",eAnalysis,\
-                  "channel of",workdir.split("/")[-1],\
-                  ":",enum.Integral()/edenom.Integral()
-        elif mctrigger.find("Mu")>=0 and mudenom.Integral()>0:
-            [enum,enum_loose,em1,em2]=get_histogram(workdir,muAnalysis\
-                                         +"/dileptons_signal_%s/numTrigMatches"%mctrigger,
-                                         1,-10,10,0,3000)
-            print "MC trigger efficiency of",mctrigger,"in",muAnalysis,\
-                  "channel of",workdir.split("/")[-1],\
-                  ":",enum.Integral()/mudenom.Integral()
-            pass
-        pass
-    pass
-
-# ctau factors for lifetime reweighting
-# here we use k=3 and k=1./3
-ctfact_list=[1./30.,1./20.,1./10.,1./3.,0.5,2.0,3.,10.,20.,30.]
-
-
-# corrected efficiencies, systematics
-mutrack_effi1=[]
-mutrack_effi2=[]
-etrack_effi1=[]
-etrack_effi2=[]
-mutrack_effi1_pileupuncertainty=[]
-mutrack_effi2_pileupuncertainty=[]
-etrack_effi1_pileupuncertainty=[]
-etrack_effi2_pileupuncertainty=[]
-mutrack_effi1_statisticaluncertainty=[]
-mutrack_effi2_statisticaluncertainty=[]
-etrack_effi1_statisticaluncertainty=[]
-etrack_effi2_statisticaluncertainty=[]
-mutrack_effi1_uncorrected=[]
-mutrack_effi2_uncorrected=[]
-etrack_effi1_uncorrected=[]
-etrack_effi2_uncorrected=[]
-mutrack_effi1_lifetime=[]
-mutrack_effi2_lifetime=[]
-etrack_effi1_lifetime=[]
-etrack_effi2_lifetime=[]
-mutrack_effi1_lifetime_statuncert=[]
-mutrack_effi2_lifetime_statuncert=[]
-etrack_effi1_lifetime_statuncert=[]
-etrack_effi2_lifetime_statuncert=[]
-for entry in ctfact_list:
-    mutrack_effi1_lifetime.append([])
-    mutrack_effi2_lifetime.append([])
-    etrack_effi1_lifetime.append([])
-    etrack_effi2_lifetime.append([])
-    mutrack_effi1_lifetime_statuncert.append([])
-    mutrack_effi2_lifetime_statuncert.append([])
-    etrack_effi1_lifetime_statuncert.append([])
-    etrack_effi2_lifetime_statuncert.append([])
-    pass
-
-for treename in\
-        eAnalysis+"/dileptons_signal_HLT_DoublePhoton33_v2/phi_cand",\
-        muAnalysis+"/dileptons_signal_HLT_L2DoubleMu23_NoVertex_v1/phi_cand":
     for numDecays in [1,2]:
         for workdir in workdirs_signal:
             # extract ctau from DBS name
@@ -2685,10 +2192,10 @@ for treename in\
             enumfile=ROOT.TFile.Open(workdir+"/histograms.root")
             enumtree=enumfile.Get(treename)
             # uncorrected, and central value with pile-up correction
-            enumtree.Project("valhist","value",\
+            enumtree.Project("valhist","phi_cand",\
                              #"weight*(passesAllCuts"+\
-                             "(0.5*(weight_up+weight_down))*(passesAllCuts"+\
-                             " && numDecays==%i)"%numDecays)
+                             "(0.5*(_weight_up+_weight_down))*(passesAllCuts"+\
+                             " && _numDecays==%i && leptonPtL>%f)"%(numDecays,ptCut))
             enum_uncorrected=enumfile.Get("valhist").GetEntries()
             enum_central=enumfile.Get("valhist").Integral()
             try:
@@ -2697,12 +2204,12 @@ for treename in\
                 enum_central_relerr=0
                 pass
             # pile-up variation up and down
-            enumtree.Project("valhist","value",
-                             "weight_up*(passesAllCuts"+\
-                             " && numDecays==%i)"%numDecays)
+            enumtree.Project("valhist","phi_cand",
+                             "_weight_up*(passesAllCuts"+\
+                             " && _numDecays==%i && leptonPtL>%f)"%(numDecays,ptCut))
             enum_up=enumfile.Get("valhist").Integral()
-            enumtree.Project("valhist","value","weight_down*(passesAllCuts"+\
-                             " && numDecays==%i)"%numDecays)
+            enumtree.Project("valhist","phi_cand","_weight_down*(passesAllCuts"+\
+                             " && _numDecays==%i && leptonPtL>%f)"%(numDecays,ptCut))
             enum_down=enumfile.Get("valhist").Integral()
             # lifetime variation up and down
             # weight (from Ian): (1/newCtau)*exp(-ctau/newCtau)/(1/oldCtau)/exp(-ctau/oldCtau)
@@ -2713,14 +2220,14 @@ for treename in\
             enum_list=[]
             enum_relerr_list=[]
             for ctfact in ctfact_list:
-                project="(0.5*(weight_up+weight_down)"+\
-                         "*1./%f*exp(-ctau1/%f/%f)"%(ctfact,ctfact,ctau)+\
-                         "/exp(-ctau1/%f)"%ctau+\
-                         "*1./%f*exp(-ctau2/%f/%f)"%(ctfact,ctfact,ctau)+\
-                         "/exp(-ctau2/%f))"%ctau+\
+                project="(0.5*(_weight_up+_weight_down)"+\
+                         "*1./%f*exp(-_ctau1/%f/%f)"%(ctfact,ctfact,ctau)+\
+                         "/exp(-_ctau1/%f)"%ctau+\
+                         "*1./%f*exp(-_ctau2/%f/%f)"%(ctfact,ctfact,ctau)+\
+                         "/exp(-_ctau2/%f))"%ctau+\
                          "*(passesAllCuts"+\
-                         " && numDecays==%i)"%numDecays
-                enumtree.Project("valhist","value",project)
+                         " && _numDecays==%i && leptonPtL>%f)"%(numDecays,ptCut)
+                enumtree.Project("valhist","phi_cand",project)
                 enum_list.append(enumfile.Get("valhist").Integral())
                 try:
                     enum_relerr_list.append(1./math.sqrt(enumfile.Get("valhist").GetEffectiveEntries()))
@@ -2739,11 +2246,11 @@ for treename in\
                 denomhist=denomfile.Get("isoTrackPrefilter/numSignalMu")
                 pass
             denom_uncorrected=denomhist.GetBinContent(numDecays+1)*numDecays
-
+            
             # and get overall normalization correction due to lumi weights
             # from prefilter.root
             pileuphist=denomfile.Get("isoTrackPrefilter/pileup_3bx")
-
+                
             pileup_weights_MC=[ 0.104109,
                                 0.0703573,
                                 0.0698445,
@@ -2895,7 +2402,7 @@ for treename in\
                 pweight_up.append(1.0)
                 pweight_down.append(1.0)
                 pass
-
+            
             # note: denominator for lifetime reweighting is simply whatever
             # we get with central lumi weights. ctau weights should preserve
             # normalization.
@@ -2931,7 +2438,7 @@ for treename in\
             effi_statisticalerror="%-50s %10.4f %10.4f"%(sampleID,
                                                          effi*enum_central_relerr,
                                                          -effi*enum_central_relerr)
-
+            
             effi_lifetime=[]
             effi_lifetime_staterror=[]
             for i in range(len(enum_list)):
@@ -2945,155 +2452,758 @@ for treename in\
                                                  -effi*enum_relerr))
                 pass
             
-            if treename[0]=="e" and numDecays==1:
-                etrack_effi1.append(effi_corrected)
-                etrack_effi1_uncorrected.append(effi_uncorrected)
+            if numDecays==1:
+                leptrack_effi1.append(effi_corrected)
+                leptrack_effi1_uncorrected.append(effi_uncorrected)
                 for i in range(len(effi_lifetime)):
-                    etrack_effi1_lifetime[i].append(effi_lifetime[i])
-                    etrack_effi1_lifetime_statuncert[i].append(effi_lifetime_staterror[i])
+                    leptrack_effi1_lifetime[i].append(effi_lifetime[i])
+                    leptrack_effi1_lifetime_statuncert[i].append(effi_lifetime_staterror[i])
                     pass
-                etrack_effi1_pileupuncertainty.append(effi_pileuperror)
-                etrack_effi1_statisticaluncertainty.append(effi_statisticalerror)
-            elif treename[0]=="e" and numDecays==2:
-                etrack_effi2.append(effi_corrected)
-                etrack_effi2_uncorrected.append(effi_uncorrected)
+                leptrack_effi1_pileupuncertainty.append(effi_pileuperror)
+                leptrack_effi1_statisticaluncertainty.append(effi_statisticalerror)
+            elif numDecays==2:
+                leptrack_effi2.append(effi_corrected)
+                leptrack_effi2_uncorrected.append(effi_uncorrected)
                 for i in range(len(effi_lifetime)):
-                    etrack_effi2_lifetime[i].append(effi_lifetime[i])
-                    etrack_effi2_lifetime_statuncert[i].append(effi_lifetime_staterror[i])
+                    leptrack_effi2_lifetime[i].append(effi_lifetime[i])
+                    leptrack_effi2_lifetime_statuncert[i].append(effi_lifetime_staterror[i])
                     pass
-                etrack_effi2_pileupuncertainty.append(effi_pileuperror)
-                etrack_effi2_statisticaluncertainty.append(effi_statisticalerror)
-            elif treename[0]=="m" and numDecays==1:
-                mutrack_effi1.append(effi_corrected)
-                mutrack_effi1_uncorrected.append(effi_uncorrected)
-                for i in range(len(effi_lifetime)):
-                    mutrack_effi1_lifetime[i].append(effi_lifetime[i])
-                    mutrack_effi1_lifetime_statuncert[i].append(effi_lifetime_staterror[i])
-                    pass
-                mutrack_effi1_pileupuncertainty.append(effi_pileuperror)
-                mutrack_effi1_statisticaluncertainty.append(effi_statisticalerror)
-            elif treename[0]=="m" and numDecays==2:
-                mutrack_effi2.append(effi_corrected)
-                mutrack_effi2_uncorrected.append(effi_uncorrected)
-                for i in range(len(effi_lifetime)):
-                    mutrack_effi2_lifetime[i].append(effi_lifetime[i])
-                    mutrack_effi2_lifetime_statuncert[i].append(effi_lifetime_staterror[i])
-                    pass
-                mutrack_effi2_pileupuncertainty.append(effi_pileuperror)
-                mutrack_effi2_statisticaluncertainty.append(effi_statisticalerror)
+                leptrack_effi2_pileupuncertainty.append(effi_pileuperror)
+                leptrack_effi2_statisticaluncertainty.append(effi_statisticalerror)
                 pass
             pass
         pass
-    pass
+    
+    lep1file=open(limitfolder+"/efficiencies_di"+lepton_name+"1.txt","w")
+    for entry in leptrack_effi1: lep1file.write("%s\n"%entry)
+    lep1file.close()
+    lep2file=open(limitfolder+"/efficiencies_di"+lepton_name+"2.txt","w")
+    for entry in leptrack_effi2: lep2file.write("%s\n"%entry)
+    lep2file.close()
 
-mu1file=open(limitfolder+"/efficiencies_dimuon1.txt","w")
-for entry in mutrack_effi1: mu1file.write("%s\n"%entry)
-mu1file.close()
-mu2file=open(limitfolder+"/efficiencies_dimuon2.txt","w")
-for entry in mutrack_effi2: mu2file.write("%s\n"%entry)
-mu2file.close()
-e1file=open(limitfolder+"/efficiencies_dielectron1.txt","w")
-for entry in etrack_effi1: e1file.write("%s\n"%entry)
-e1file.close()
-e2file=open(limitfolder+"/efficiencies_dielectron2.txt","w")
-for entry in etrack_effi2: e2file.write("%s\n"%entry)
-e2file.close()
+    for i in range(len(ctfact_list)):
+        filespec="ctaufact_%.3f"%ctfact_list[i]
+        lep1file=open(limitfolder+"/efficiencies_di"+lepton_name+"1_"+filespec+".txt","w")
+        for entry in leptrack_effi1_lifetime[i]: lep1file.write("%s\n"%entry)
+        lep1file.close()
+        lep2file=open(limitfolder+"/efficiencies_di"+lepton_name+"2_"+filespec+".txt","w")
+        for entry in leptrack_effi2_lifetime[i]: lep2file.write("%s\n"%entry)
+        lep2file.close()
+        
+        lep1file=open(limitfolder+"/efficiencies_di"+lepton_name+"1_"+filespec+"_statistical_uncertainty.txt","w")
+        for entry in leptrack_effi1_lifetime_statuncert[i]: lep1file.write("%s\n"%entry)
+        lep1file.close()
+        lep2file=open(limitfolder+"/efficiencies_di"+lepton_name+"2_"+filespec+"_statistical_uncertainty.txt","w")
+        for entry in leptrack_effi2_lifetime_statuncert[i]: lep2file.write("%s\n"%entry)
+        lep2file.close()
+        pass
 
-for i in range(len(ctfact_list)):
-    filespec="ctaufact_%.3f"%ctfact_list[i]
-    mu1file=open(limitfolder+"/efficiencies_dimuon1_"+filespec+".txt","w")
-    for entry in mutrack_effi1_lifetime[i]: mu1file.write("%s\n"%entry)
-    mu1file.close()
-    mu2file=open(limitfolder+"/efficiencies_dimuon2_"+filespec+".txt","w")
-    for entry in mutrack_effi2_lifetime[i]: mu2file.write("%s\n"%entry)
-    mu2file.close()
-    e1file=open(limitfolder+"/efficiencies_dielectron1_"+filespec+".txt","w")
-    for entry in etrack_effi1_lifetime[i]: e1file.write("%s\n"%entry)
-    e1file.close()
-    e2file=open(limitfolder+"/efficiencies_dielectron2_"+filespec+".txt","w")
-    for entry in etrack_effi2_lifetime[i]: e2file.write("%s\n"%entry)
-    e2file.close()
+    lep1file=open(limitfolder+"/efficiencies_di"+lepton_name+"1_uncorrected.txt","w")
+    for entry in leptrack_effi1_uncorrected: lep1file.write("%s\n"%entry)
+    lep1file.close()
+    lep2file=open(limitfolder+"/efficiencies_di"+lepton_name+"2_uncorrected.txt","w")
+    for entry in leptrack_effi2_uncorrected: lep2file.write("%s\n"%entry)
+    lep2file.close()
 
-    mu1file=open(limitfolder+"/efficiencies_dimuon1_"+filespec+"_statistical_uncertainty.txt","w")
-    for entry in mutrack_effi1_lifetime_statuncert[i]: mu1file.write("%s\n"%entry)
-    mu1file.close()
-    mu2file=open(limitfolder+"/efficiencies_dimuon2_"+filespec+"_statistical_uncertainty.txt","w")
-    for entry in mutrack_effi2_lifetime_statuncert[i]: mu2file.write("%s\n"%entry)
-    mu2file.close()
-    e1file=open(limitfolder+"/efficiencies_dielectron1_"+filespec+"_statistical_uncertainty.txt","w")
-    for entry in etrack_effi1_lifetime_statuncert[i]: e1file.write("%s\n"%entry)
-    e1file.close()
-    e2file=open(limitfolder+"/efficiencies_dielectron2_"+filespec+"_statistical_uncertainty.txt","w")
-    for entry in etrack_effi2_lifetime_statuncert[i]: e2file.write("%s\n"%entry)
-    e2file.close()
-    pass
+    lep1file=open(limitfolder+"/efficiencies_di"+lepton_name+"1_pileup_uncertainty.txt","w")
+    for entry in leptrack_effi1_pileupuncertainty: lep1file.write("%s\n"%entry)
+    lep1file.close()
+    lep2file=open(limitfolder+"/efficiencies_di"+lepton_name+"2_pileup_uncertainty.txt","w")
+    for entry in leptrack_effi2_pileupuncertainty: lep2file.write("%s\n"%entry)
+    lep2file.close()
 
-mu1file=open(limitfolder+"/efficiencies_dimuon1_uncorrected.txt","w")
-for entry in mutrack_effi1_uncorrected: mu1file.write("%s\n"%entry)
-mu1file.close()
-mu2file=open(limitfolder+"/efficiencies_dimuon2_uncorrected.txt","w")
-for entry in mutrack_effi2_uncorrected: mu2file.write("%s\n"%entry)
-mu2file.close()
-e1file=open(limitfolder+"/efficiencies_dielectron1_uncorrected.txt","w")
-for entry in etrack_effi1_uncorrected: e1file.write("%s\n"%entry)
-e1file.close()
-e2file=open(limitfolder+"/efficiencies_dielectron2_uncorrected.txt","w")
-for entry in etrack_effi2_uncorrected: e2file.write("%s\n"%entry)
-e2file.close()
+    lep1file=open(limitfolder+"/efficiencies_di"+lepton_name+"1_statistical_uncertainty.txt","w")
+    for entry in leptrack_effi1_statisticaluncertainty: lep1file.write("%s\n"%entry)
+    lep1file.close()
+    lep2file=open(limitfolder+"/efficiencies_di"+lepton_name+"2_statistical_uncertainty.txt","w")
+    for entry in leptrack_effi2_statisticaluncertainty: lep2file.write("%s\n"%entry)
+    lep2file.close()
 
-mu1file=open(limitfolder+"/efficiencies_dimuon1_pileup_uncertainty.txt","w")
-for entry in mutrack_effi1_pileupuncertainty: mu1file.write("%s\n"%entry)
-mu1file.close()
-mu2file=open(limitfolder+"/efficiencies_dimuon2_pileup_uncertainty.txt","w")
-for entry in mutrack_effi2_pileupuncertainty: mu2file.write("%s\n"%entry)
-mu2file.close()
-e1file=open(limitfolder+"/efficiencies_dielectron1_pileup_uncertainty.txt","w")
-for entry in etrack_effi1_pileupuncertainty: e1file.write("%s\n"%entry)
-e1file.close()
-e2file=open(limitfolder+"/efficiencies_dielectron2_pileup_uncertainty.txt","w")
-for entry in etrack_effi2_pileupuncertainty: e2file.write("%s\n"%entry)
-e2file.close()
+    return
 
-mu1file=open(limitfolder+"/efficiencies_dimuon1_statistical_uncertainty.txt","w")
-for entry in mutrack_effi1_statisticaluncertainty: mu1file.write("%s\n"%entry)
-mu1file.close()
-mu2file=open(limitfolder+"/efficiencies_dimuon2_statistical_uncertainty.txt","w")
-for entry in mutrack_effi2_statisticaluncertainty: mu2file.write("%s\n"%entry)
-mu2file.close()
-e1file=open(limitfolder+"/efficiencies_dielectron1_statistical_uncertainty.txt","w")
-for entry in etrack_effi1_statisticaluncertainty: e1file.write("%s\n"%entry)
-e1file.close()
-e2file=open(limitfolder+"/efficiencies_dielectron2_statistical_uncertainty.txt","w")
-for entry in etrack_effi2_statisticaluncertainty: e2file.write("%s\n"%entry)
-e2file.close()
+
+
+#############################################
+### HISTOGRAMS OF RECONSTRUCTED SIGNAL SHAPE
+#############################################
+
+def dump_signal_shape_histos(lepton_name,ptCut,limitfolder):
+
+    # signal shape for limit setting code
+    for workdir in workdirs_signal:
+        sampleID=workdir.split("/")[-1].replace("_analysis","")
+        masspeak=float(sampleID.split("_")[2].replace("F","").replace("L",""))
+        lowerbound=0.5*masspeak
+        if lowerbound<50: lowerbound=0
+        upperbound=1.5*masspeak
+        if upperbound<100: upperbound=2*masspeak
+        histfile=ROOT.TFile.Open(workdir+"/histograms.root")
+        if lepton_name.find("mu")>=0:
+            treedir=muAnalysis+"/dileptons_signal_HLT_L2DoubleMu23_NoVertex_v1"
+        else:
+            treedir=eAnalysis+"/dileptons_signal_HLT_DoublePhoton33_v2"
+            pass
+        [valhist,valhist_loose,masshist,rejecthist]=get_histogram(workdir,treedir,"_mass",
+                                                                  100,0,100,
+                                                                  lowerbound,upperbound,
+                                                                  ptCut)
+        masshist.SetTitle("di"+lepton_name+" mass distribution, signal")
+        masshist.SetName("dileptonmass_signal")
+        outfile=ROOT.TFile.Open(limitfolder+"/signal_shape_"+lepton_name+"_"+sampleID+".root",
+                                "RECREATE")
+        masshist.Write()
+        outfile.Close()
+
+        histfile.Close()
+        pass
+    return
+
+
+#############################################
+### PREPARE DATA/MC OVERLAY PLOTS
+#############################################
+
+
+def makePlots(SampleTriggerCombination,ptCut,
+              workdirs_background,workdirs_signal,
+              mcweights,mcSignalWeights,
+              lepton_name,analysis_directory,plotfolder):
+
+
+    begintime=time.time()
+
+    # get total luminosity for this set of samples
+    lumisum=0.0
+    for [dataworkdir,trigger,lumi] in SampleTriggerCombination:
+        lumisum+=lumi
+        sampleID=lepton_name+"_pt%i"%ptCut
+        pass
+
+    # corresponding normalization for background samples
+    mcfactors=[]
+    for weight in mcweights:
+        mcfactors.append(weight*lumisum)
+        pass
+
+#################################################################
+    # corresponding normalization for signal samples
+    mcfactorsSignal=[]
+    for weight in mcSignalWeights:
+        mcfactorsSignal.append(weight*lumisum)
+        pass
+#################################################################
+
+    # Make directory to store plots
+    folder = plotfolder + "/" + sampleID + "/"
+    if not os.path.isdir(folder):
+        os.mkdir(folder)
+        pass
+    # subfolder for outputs related to limit calculation
+    limitfolder=folder+"/limits"
+    if not os.path.isdir(limitfolder):
+        os.mkdir(limitfolder)
+        pass
+
+
+    print "preparing plots for the following samples and triggers:"
+    for [dataworkdir,trigger,lumi] in SampleTriggerCombination:
+        print "   ",trigger,"in",dataworkdir
+        pass
+    print "corresponding integrated luminosity:",lumisum
+    print "-> using directory",folder
+        
+    #----------------------
+    # EFFICIENCY TEXT FILES
+    #----------------------
+
+    dump_reweighted_efficiencies(lepton_name,ptCut,limitfolder)
+    dump_signal_shape_histos(lepton_name,ptCut,limitfolder)
+
+    #---------------------
+    # PLOTS
+    #---------------------
+
+    # primary vertex distributions
+    for plot in ["numPV_central","numPV_low","numPV_high","numPV_veryhigh"]:
+        overlayPlot(SampleTriggerCombination,workdirs_background,mcfactors,
+                    analysis_directory+"/weights/"+plot,
+                    folder+lepton_name+"_"+plot+".pdf",lumisum,0)
+        pass
+
+    # fraction of actual true leptons in candidate (MC only)
+    overlayPlot([],workdirs_background,mcfactors,
+                analysis_directory+"/dileptons/number_of_actual_leptons",
+                folder+"number_of_actual_"+lepton_name+"s.pdf",0)
+    
+    # Lists to store all the required data about the cut efficiencies
+    efficiencyListData = []
+    efficiencyListMC = []
+    efficiencyListSignal = []
+           
+    # decay length significance. we treat this cut in a special way
+    # because its inversion gives us the control distribution of prompt
+    # candidates, and thus we want additional plots/diagnostics here
+    [datamasslist,bkgmasslist]=treeOverlayPlot(SampleTriggerCombination,
+                                               workdirs_background,
+                                               workdirs_signal,mcfactors,
+                                               mcfactorsSignal,
+                                               lepton_name,
+                                               analysis_directory+\
+                                               "/dileptons_background_TRIGGER/",
+                                               "decayLengthSignificance2D",
+                                               folder+"di"+lepton_name+\
+                                               "_decayLengthSignificance2D.pdf",
+                                               ptCut,lumisum,
+                                               efficiencyListData,
+                                               efficiencyListMC,
+                                               efficiencyListSignal)
+    
+    # store mass lists for limit calculation
+    minmass=999
+    maxmass=0
+    datalistfile=open(limitfolder+"/masses_data_"+lepton_name+".txt","w")
+    for entry in datamasslist:
+        datalistfile.write("%10.4f %10.4f\n"%(entry[0],entry[1]))
+        if entry[0]>maxmass: maxmass=entry[0]
+        if entry[0]<minmass: minmass=entry[0]
+        pass
+    datalistfile.close()
+    bkglistfile=open(limitfolder+"/masses_backgroundMC_"+lepton_name+".txt","w")
+    for entry in bkgmasslist:
+        bkglistfile.write("%10.4f %10.4f\n"%(entry[0],entry[1]))
+        if entry[0]>maxmass: maxmass=entry[0]
+        if entry[0]<minmass: minmass=entry[0]
+        pass
+    bkglistfile.close()
+    # now also create histograms
+    datahist=ROOT.TH1F("datamass","mass distribution of candidates in data",
+                       100,minmass*0.9,maxmass*1.1)
+    for entry in datamasslist: datahist.Fill(entry[0],entry[1])
+    outfile=ROOT.TFile.Open(limitfolder+"/masses_data_"+lepton_name+".root",
+                            "RECREATE")
+    datahist.Write()
+    outfile.Close()
+    bkghist=ROOT.TH1F("backgroundmass","mass distribution of candidates in MC",
+                       100,minmass*0.9,maxmass*1.1)
+    for entry in bkgmasslist: bkghist.Fill(entry[0],entry[1])
+    outfile=ROOT.TFile.Open(limitfolder+"/masses_backgroundMC_"+lepton_name+".root",
+                            "RECREATE")
+    bkghist.Write()
+    outfile.Close()
+
+    # get list of all quantities that are available to plot
+    cutNames=[]
+    for [workdir,trigger,lumi] in SampleTriggerCombination:
+        histfile=ROOT.TFile.Open(workdir+"/histograms.root")
+        for analysisDir in [eAnalysis,muAnalysis]:
+            if histfile.Get("/"+analysisDir+"/dileptons_background_"+trigger):
+                histfile.cd("/"+analysisDir+"/dileptons_background_"+trigger)
+                branchlist=ROOT.gDirectory.Get("bigTree").GetListOfBranches()
+                for branch in branchlist:
+                    entry=branch.GetName()
+                    if entry[0]=="_": continue
+                    if entry.find("_pass")>0: continue
+                    # exclude certain entries we definitely do not want
+                    if entry in ["decayLengthSignificance2D", # already done
+                                 "dPhitriggerCorr",
+                                 "differentTrigObjects",
+                                 "leptonQualityL",
+                                 "leptonQualityH",
+                                 "passesAllCuts",
+                                 "passesAllCutsIgnoreLifetime",
+                                 "mass_calocorr", # masses taken from elsewhere
+                                 "mass_corr",
+                                 "mass_scalecorr",
+                                 "mass_triggercorr",
+                                 "validTracks",
+                                 "validVertex"]: continue
+                    if not entry in cutNames: cutNames.append(entry)
+                    pass
+                pass
+            pass
+        histfile.Close()
+        pass
+
+
+    if not do_all_plots:
+        # only do the most important plots (for the PAS)
+        cutNames=["trackerIsolationL","trackerIsolationH","dPhicorr"]
+        pass
+    
+    for cutName in cutNames:
+        treeOverlayPlot(SampleTriggerCombination,workdirs_background,workdirs_signal,
+                        mcfactors,mcfactorsSignal,lepton_name,
+                        analysis_directory+"/dileptons_background_TRIGGER/",cutName,
+                        folder+"di"+lepton_name+"_"+cutName+".pdf",ptCut,lumisum,
+                        efficiencyListData,
+                        efficiencyListMC,efficiencyListSignal)
+        pass
+
+    listOfCuts=[
+        "eta_cand_pass",
+        "numStandAloneMuons_pass",
+        "leptonPtL_pass && leptonPtH_pass",
+        "leptonEtaL_pass && leptonEtaH_pass",
+        "leptonAbsD0significanceL_pass && leptonAbsD0significanceH_pass",
+        "trackerIsolationL_pass && trackerIsolationH_pass",
+        "oppositeCharge_pass",
+        "vetoBackToBack_pass",
+        "deltaRBetweenLeptons_pass",
+        "numCaloMatches_pass",
+        "numTrigMatches_pass",
+        "differentTrigObjects_pass",
+        "validTracks_pass && validVertex_pass && vertexChi2_pass",
+        "dPhicorr_pass",
+        "maxHitsBeforeVertex_pass",
+        "decayLengthSignificance2D_pass",
+        "passesAllCuts"
+        ]
+    if analysis_directory.find("mu")>=0:
+        listOfCuts.remove("numCaloMatches_pass")
+        pass
+
+    print "==========efficiency output for data,",analysis_directory
+    appliedCuts="eta_cand_pass"
+    for additionalCut in listOfCuts:
+        appliedCuts+=" && "+additionalCut
+        sum=number_of_surviving_candidates(SampleTriggerCombination,"background",
+                                           analysis_directory,appliedCuts)
+        print "%-50s"%additionalCut,sum
+        pass
+    print "======================================"
+
+    # now measure efficiency to find a matching supercluster
+    # for candidates passing all cuts except trigger match
+    if analysis_directory[0]=="e":
+        print "==========efficiency to match supercluster in data"
+        appliedCuts="eta_cand_pass"
+        for additionalCut in listOfCuts:
+            if additionalCut=="numTrigMatches_pass": continue
+            if additionalCut=="numCaloMatches_pass": continue
+            if additionalCut=="differentTrigObjects_pass": continue
+            if additionalCut=="decayLengthSignificance2D_pass": continue
+            if additionalCut.find("leptonAbsD0significance")>=0: continue
+            if additionalCut=="dPhicorr_pass": continue
+            if additionalCut=="passesAllCuts": continue
+            appliedCuts+=" && "+additionalCut
+            pass
+        sum1=number_of_surviving_candidates(SampleTriggerCombination,
+                                            "background",
+                                            analysis_directory,appliedCuts)
+        appliedCuts+=" && numCaloMatches_pass"
+        sum2=number_of_surviving_candidates(SampleTriggerCombination,
+                                            "background",
+                                            analysis_directory,appliedCuts)
+        print "fraction of candidates with matching supercluster:",\
+              sum2,"/",sum1
+        print "======================================"
+        pass
+
+    # find list of triggers for MC
+    mctriggers=[]
+    for [dataworkdir,trigger,lumi] in SampleTriggerCombination:
+        mctrig=replacementTrigger[trigger]
+        if not mctrig in mctriggers: mctriggers.append(mctrig)
+    if len(mctriggers)==0:
+        mctriggers.append("anyTrigger")
+    if len(mctriggers)!=1:
+        # need to trim list of MC triggers down to one.
+        # pick the one with highest p_t threshold.
+        # this threshold needs to be exceeded by an offline cut!
+        highestpt=0
+        highestpttrigger=""
+        for trigger in mctriggers:
+            if trigger_threshold(trigger)>highestpt:
+                highestpt=trigger_threshold(trigger)
+                highestpttrigger=trigger
+                pass
+            pass
+        mctriggers=[highestpttrigger]
+        pass
+    # construct corresponding sample/trigger combinations for background MC
+    MCSampleTriggerCombination=[]
+    for i in range(len(workdirs_background)):
+        for trigger in mctriggers:
+            MCSampleTriggerCombination.append([workdirs_background[i],trigger,mcfactors[i]])
+ 
+    print "==========efficiency output for background MC,",analysis_directory
+    appliedCuts="eta_cand_pass"
+    for additionalCut in listOfCuts:
+        appliedCuts+=" && "+additionalCut
+        sum=number_of_surviving_candidates(MCSampleTriggerCombination,
+                                           "background",
+                                           analysis_directory,appliedCuts)
+        print "%-50s"%additionalCut,sum
+        pass
+    print "======================================"
+
+    # construct corresponding sample/trigger combinations for signal MC
+    for i in range(len(workdirs_signal)):
+        MCSampleTriggerCombination=[]
+        for trigger in mctriggers:
+            MCSampleTriggerCombination.append([workdirs_signal[i],trigger,1.0])
+            pass
+        print "==========efficiency output for "+workdirs_signal[i].split("/")[-1],",",analysis_directory
+        appliedCuts="eta_cand_pass"
+        for additionalCut in listOfCuts:
+            appliedCuts+=" && "+additionalCut
+            sum=number_of_surviving_candidates(MCSampleTriggerCombination,
+                                               "signal",
+                                               analysis_directory,appliedCuts)
+            print "%-50s"%additionalCut,sum
+            pass
+        print "======================================"
+        pass
+    
+    
+    #---------------------
+    # Efficiency Output
+    #---------------------
+
+    #Widths of each column
+    col1Width = 26
+    col2Width = 25
+    col3Width = 30
+    col4Width = 21
+
+    #Print header for efficiency table
+    print "\n"
+    print "CUT EFFICIENCIES: DATA",lepton_name
+    print " "*(col1Width - len("CutName"))                        +"CutName",
+    print " "*(10 + col2Width - len("PassesThisAndAllOtherCuts"))+"PassesThisAndAllOtherCuts",
+    print " "*(-6 + col3Width - len("PassesAllOtherCuts"))       +"PassesAllOtherCuts",
+    print " "*(-4 + col4Width - len("Efficiency"))               +"Efficiency"
+    print "#"*104
+
+    #Print the efficiency data
+    for data in efficiencyListData:
+
+        #The string below contains a single row of the table with all elements alligned
+        formattedStr = " "*(col1Width - len(data['cutName']))+str(data['cutName'])
+        formattedStr+= " "*(col2Width - len(str(data['passesThisAndAllOtherCuts'])))
+        formattedStr+= str(data['passesThisAndAllOtherCuts'])
+        formattedStr+= " "*(col3Width - len(str(data['passesAllOtherCuts'])))+str(data['passesAllOtherCuts'])
+        formattedStr+= " "*(col4Width - len(str(float("%.2e"%data['efficiency']))))
+        formattedStr+= str(float("%.2e"%data['efficiency']))+"%"    
+        print formattedStr
+    
+    #Print header for efficiency table
+    print "\n"
+    print "CUT EFFICIENCIES: BACKGROUND MC", lepton_name
+    print " "*(col1Width - len("CutName"))                        +"CutName",
+    print " "*(10 + col2Width - len("PassesThisAndAllOtherCuts"))+"PassesThisAndAllOtherCuts",
+    print " "*(-6 + col3Width - len("PassesAllOtherCuts"))       +"PassesAllOtherCuts",
+    print " "*(-4 + col4Width - len("Efficiency"))               +"Efficiency"
+    print "#"*104
+
+    #Print the efficiency data
+    for data in efficiencyListMC:
+
+        #The string below contains a single row of the table with all elements alligned
+        formattedStr = " "*(col1Width - len(data['cutName']))+str(data['cutName'])
+        formattedStr+= " "*(col2Width - len(str(data['passesThisAndAllOtherCuts'])))
+        formattedStr+= str(data['passesThisAndAllOtherCuts'])
+        formattedStr+= " "*(col3Width - len(str(data['passesAllOtherCuts'])))+str(data['passesAllOtherCuts'])
+        formattedStr+= " "*(col4Width - len(str(float("%.2e"%data['efficiency']))))
+        formattedStr+= str(float("%.2e"%data['efficiency']))+"%"    
+        print formattedStr
+    
+    #Print header for efficiency table
+    print "\n"
+    print "CUT EFFICIENCIES: SIGNAL MC", lepton_name
+    print " "*(col1Width - len("CutName"))                        +"CutName",
+    print " "*(10 + col2Width - len("PassesThisAndAllOtherCuts"))+"PassesThisAndAllOtherCuts",
+    print " "*(-6 + col3Width - len("PassesAllOtherCuts"))       +"PassesAllOtherCuts",
+    print " "*(-4 + col4Width - len("Efficiency"))               +"Efficiency"
+    print "#"*104
+
+    #Print the efficiency data
+    for data in efficiencyListSignal:
+
+        #The string below contains a single row of the table with all elements alligned
+        formattedStr = " "*(col1Width - len(data['cutName']))+str(data['cutName'])
+        formattedStr+= " "*(col2Width - len(str(data['passesThisAndAllOtherCuts'])))
+        formattedStr+= str(data['passesThisAndAllOtherCuts'])
+        formattedStr+= " "*(col3Width - len(str(data['passesAllOtherCuts'])))+str(data['passesAllOtherCuts'])
+        formattedStr+= " "*(col4Width - len(str(float("%.2e"%data['efficiency']))))
+        formattedStr+= str(float("%.2e"%data['efficiency']))+"%"    
+        print formattedStr
+        pass
+    
+    endtime=time.time()
+    print "+++this took",endtime-begintime,"seconds"
+    return
+
+
+
+# trigger efficiency measurements on unbiased sample
+def triggerEfficiency(SampleTriggerCombination,treeDir):
+    
+    # Initialise the count of the number of events for the different triggers
+    sumTrig = 0
+    anyTrig = 0
+
+    curDir = ""
+    
+    for [workdir,trigger,lumi] in SampleTriggerCombination:
+        if curDir != workdir: #Check the file is not already open
+            f = ROOT.TFile.Open(workdir + "/histograms.root")
+            anyTrig += f.Get(treeDir+"/dileptons_background_anyTrigger/"
+                             +"numTrigMatches").GetEntries("passesAllOtherCutsIgnoreLifetime")
+            curDir = workdir
+            pass
+        
+        sumTrig += f.Get(treeDir+"/dileptons_background_"+trigger+"/"
+                         +"numTrigMatches").GetEntries("passesAllOtherCutsIgnoreLifetime")
+        pass
+
+    # Calculate the trigger efficiency
+    if (anyTrig > 0):
+        efficiency = 100.*float(sumTrig)/float(anyTrig)
+        pass
+    else:
+        efficiency = 0
+        pass
+    
+    # Print filename
+    print "\nTrigger efficiency results\n"
+   
+    # Print header for efficiency table
+    print " "*(8  - len("sumTrig"))    + "sumTrig",
+    print " "*(6  - len("anyTig"))     + "anyTrig",
+    print " "*(11 - len("Efficiency")) + "Efficiency"
+    print "#"*28
+
+    # Print the efficiency data
+    outputStr =  " "*(8  - len(str(sumTrig)))+ str(sumTrig)
+    outputStr+=  " "*(8  - len(str(anyTrig)))+ str(anyTrig)
+    outputStr+=  " "*(11 - len(str(float("%.2e"%efficiency))))+ str(float("%.2e"%efficiency))+"%\n"
+    print outputStr
+
+    f.Close()
+    return
+    
+
+#=======================================================================
+#=======================================================================
+#==== MAIN
+#=======================================================================
+#=======================================================================
+
 
     
-# signal shape for limit setting code
+#############################################
+### PREPARATIONS
+#############################################
+
+ROOT.gROOT.Reset()
+ROOT.gROOT.SetBatch()
+ROOT.TH1.SetDefaultSumw2()
+ROOT.gErrorIgnoreLevel = ROOT.kWarning
+ROOT.gROOT.Macro( 'HarderAnalysis/DisplacedDileptons/test/tdrstyle.C' )
+ROOT.gStyle.SetPadTopMargin(0.1);
+ROOT.gStyle.SetPadLeftMargin(0.15);
+ROOT.gStyle.SetPadRightMargin(0.05);
+#ROOT.gStyle.SetOptTitle(1)
+#ROOT.gStyle.SetTitleYOffset(1.5)
+
+
+#############################################
+### OBTAIN BACKGROUND MC SCALE FACTORS
+#############################################
+
+print "=============================================="
+print "EVALUATING MC SAMPLE WEIGHTS: ELECTRON CHANNEL"
+print "=============================================="
+mcweights_e=[]
+for workdir in workdirs_background_e:
+    mcweights_e.append(get_sample_weight(workdir))
+print "=============================================="
+print "EVALUATING MC SAMPLE WEIGHTS: MUON CHANNEL"
+print "=============================================="
+mcweights_mu=[]
+for workdir in workdirs_background_mu:
+    mcweights_mu.append(get_sample_weight(workdir))
+print "=============================================="
+print "EVALUATING MC SAMPLE WEIGHTS: SIGNAL MC"
+print "=============================================="
+mcweights_sig=[]
 for workdir in workdirs_signal:
-    sampleID=workdir.split("/")[-1].replace("_analysis","")
-    masspeak=float(sampleID.split("_")[2].replace("F","").replace("L",""))
-    lowerbound=0.5*masspeak
-    if lowerbound<50: lowerbound=0
-    upperbound=1.5*masspeak
-    if upperbound<100: upperbound=2*masspeak
-    histfile=ROOT.TFile.Open(workdir+"/histograms.root")
-    [valhist,valhist_loose,masshist,rejecthist]=get_histogram(workdir,
-                                                muAnalysis+"/dileptons_signal_HLT_L2DoubleMu23_NoVertex_v1/mass_corr",100,0,100,lowerbound,upperbound)
-    masshist.SetTitle("dimuon mass distribution, signal")
-    masshist.SetName("dileptonmass_signal")
-    outfile=ROOT.TFile.Open(limitfolder+"/signal_shape_muon_"+sampleID+".root","RECREATE")
-    masshist.Write()
-    outfile.Close()
-    [valhist,valhist_loose,masshist,rejecthist]=get_histogram(workdir,
-                                                eAnalysis+"/dileptons_signal_HLT_DoublePhoton33_v2/mass_corr",100,0,100,lowerbound,upperbound)
-    masshist.SetTitle("dielectron mass distribution, signal")
-    masshist.SetName("dileptonmass_signal")
-    outfile=ROOT.TFile.Open(limitfolder+"/signal_shape_electron_"+sampleID+".root","RECREATE")
-    masshist.Write()
-    outfile.Close()
+    # signal cross-section unknown, but we define some value
+    # for making signal drawn on top of background MC look good
+    mcweights_sig.append(get_sample_weight(workdir))
+endtime=time.time()
+print "\n"
 
 
-    histfile.Close()
+##############################################
+### LUMI+TRIGGER ANALYSIS FOR ALL DATA SAMPLES
+##############################################
+
+begintime=time.time()
+lumisum=0.0
+eSampleTriggerCombination33=[]
+eSampleTriggerCombination38=[]
+eSampleTriggerCombination43=[]
+for workdir in workdirs_data_e:
+    print "====================================="
+    print "DATA:",workdir
+    print "====================================="
+    [lumi,best_triggers,best_trigger_lumi]=analyze_lumi_and_trigger(workdir,
+                                                                    "electron",
+                                                                    eAnalysis)
+    # now put the sample/trigger combinations into
+    # categories that are being treated together
+    for i in range(len(best_triggers)):
+        if best_triggers[i].find("DoublePhoton33")>=0:
+            eSampleTriggerCombination33.append([workdir,best_triggers[i],
+                                                best_trigger_lumi[i]])
+            eSampleTriggerCombination38.append([workdir,best_triggers[i],
+                                                best_trigger_lumi[i]])
+            eSampleTriggerCombination43.append([workdir,best_triggers[i],
+                                                best_trigger_lumi[i]])
+        elif best_triggers[i].find("DoublePhoton38")>=0:
+            eSampleTriggerCombination38.append([workdir,best_triggers[i],
+                                                best_trigger_lumi[i]])
+            eSampleTriggerCombination43.append([workdir,best_triggers[i],
+                                                best_trigger_lumi[i]])
+        else:
+            eSampleTriggerCombination43.append([workdir,best_triggers[i],
+                                                best_trigger_lumi[i]])
+            pass
+        pass
+    lumisum+=lumi
+    print "\n"
+    pass
+print "------ total lumi processed in electron channel:",lumisum,"/pb ------"
+endtime=time.time()
+print "------ processing time:",endtime-begintime,"seconds\n\n"
+
+
+begintime=time.time()
+lumisum=0.0
+muSampleTriggerCombination23=[]
+muSampleTriggerCombination30=[]
+for workdir in workdirs_data_mu:
+    print "====================================="
+    print "DATA:",workdir
+    print "====================================="
+    [lumi,best_triggers,best_trigger_lumi]=analyze_lumi_and_trigger(workdir,
+                                                                    "muon",
+                                                                    muAnalysis)
+    # now put the sample/trigger combinations into
+    # categories that are being treated together
+    for i in range(len(best_triggers)):
+        if best_triggers[i].find("HLT_L2DoubleMu23_NoVertex")>=0:
+            muSampleTriggerCombination23.append([workdir,best_triggers[i],
+                                                 best_trigger_lumi[i]])
+            muSampleTriggerCombination30.append([workdir,best_triggers[i],
+                                                 best_trigger_lumi[i]])
+        else:
+            muSampleTriggerCombination30.append([workdir,best_triggers[i],
+                                                 best_trigger_lumi[i]])
+            pass
+        pass
+    lumisum+=lumi
+    print "\n"
+    pass
+print "------ total lumi processed in muon channel:",lumisum,"/pb --------\n\n"
+endtime=time.time()
+print "+++this took",endtime-begintime,"seconds"
+
+
+##############################################
+### OUTPUT DIRECTORY STRUCTURE
+##############################################
+
+# Get current date to use for a folder name
+plotfolder="Analysis/"+time.strftime("%Y%m%d")
+if os.path.exists(plotfolder):
+    num=0
+    while os.path.exists(plotfolder+"_rev%03i"%num): num+=1
+    plotfolder+="_rev%03i"%num
+    pass
+# Check the analysis folder exists
+if not os.path.isdir("Analysis"):
+    os.mkdir("Analysis")
+    pass
+# Make a folder with the current date if it does not exist
+if not os.path.isdir(plotfolder):
+    os.mkdir(plotfolder)
+    pass
+# subfolder for various efficiency and benchmark plots
+benchmarkfolder=plotfolder+"/benchmarks"
+if not os.path.isdir(benchmarkfolder):
+    os.mkdir(benchmarkfolder)
+
+
+##############################################
+### DATA/MC PLOTS FOR SELECTED DATA/TRIGGERS
+##############################################
+
+if len(eSampleTriggerCombination33)>0:
+    print "Doing the 33 GeV photon trigger"
+    makePlots(eSampleTriggerCombination33,ePtCut33,workdirs_background_e,
+              workdirs_signal,mcweights_e,mcweights_sig,
+              "electron",eAnalysis,plotfolder)
+    pass
+if len(eSampleTriggerCombination38)>0:
+    print "Doing the 38 GeV photon trigger"
+    makePlots(eSampleTriggerCombination38,ePtCut38,workdirs_background_e,
+              workdirs_signal,mcweights_e,mcweights_sig,
+              "electron",eAnalysis,plotfolder)
+    pass
+if len(eSampleTriggerCombination43)>0:
+    print "Doing the 43 GeV photon trigger"
+    makePlots(eSampleTriggerCombination43,ePtCut43,workdirs_background_e,
+              workdirs_signal,mcweights_e,mcweights_sig,
+              "electron",eAnalysis,plotfolder)
+    pass
+if len(muSampleTriggerCombination23)>0:
+    print "Doing the 23 GeV muon trigger"
+    makePlots(muSampleTriggerCombination23,muPtCut23,workdirs_background_mu,
+              workdirs_signal,mcweights_mu,mcweights_sig,
+              "muon",muAnalysis,plotfolder)
+    pass
+if len(muSampleTriggerCombination30)>0:
+    print "Doing the 30 GeV muon trigger"
+    makePlots(muSampleTriggerCombination30,muPtCut30,workdirs_background_mu,
+              workdirs_signal,mcweights_mu,mcweights_sig,
+              "muon",muAnalysis,plotfolder)
+    pass
+
+
+makeEfficiencyPlots()
+
+# trigger efficiency in MC
+mctriggers=[]
+for datatrigger,mctrigger in replacementTrigger.iteritems():
+    if not mctrigger in mctriggers: mctriggers.append(mctrigger)
+for workdir in workdirs_signal:
+    [edenom,edenom_loose,dm1,dm2]=get_histogram(workdir,eAnalysis\
+                                   +"/dileptons_signal_anyTrigger","numTrigMatches",
+                                   1,-10,10,0,3000,ePtCut38)
+    [mudenom,mudenom_loose,dm1,dm2]=get_histogram(workdir,muAnalysis\
+                                    +"/dileptons_signal_anyTrigger","numTrigMatches",
+                                    1,-10,10,0,3000,muPtCut30)
+    for mctrigger in mctriggers:
+        if mctrigger.find("Photon")>=0 and edenom.Integral()>0:
+            [enum,enum_loose,em1,em2]=get_histogram(workdir,eAnalysis\
+                                         +"/dileptons_signal_%s"%mctrigger,"numTrigMatches",
+                                         1,-10,10,0,3000,ePtCut38)
+            print "MC trigger efficiency of",mctrigger,"in",eAnalysis,\
+                  "channel of",workdir.split("/")[-1],\
+                  ":",enum.Integral()/edenom.Integral()
+        elif mctrigger.find("Mu")>=0 and mudenom.Integral()>0:
+            [enum,enum_loose,em1,em2]=get_histogram(workdir,muAnalysis\
+                                         +"/dileptons_signal_%s"%mctrigger,"numTrigMatches",
+                                         1,-10,10,0,3000,muPtCut30)
+            print "MC trigger efficiency of",mctrigger,"in",muAnalysis,\
+                  "channel of",workdir.split("/")[-1],\
+                  ":",enum.Integral()/mudenom.Integral()
+            pass
+        pass
+    pass
 
 
     
@@ -3102,26 +3212,27 @@ for workdir in workdirs_signal:
 #############################################
 
 # deltaR between muons. potential problem region for trigger at small deltaR
-for workdir in workdirs_signal:
-    histfile=ROOT.TFile.Open(workdir+"/histograms.root")
-    deltaRtree=histfile.Get(muAnalysis+"/dileptons_signal_anyTrigger/deltaRBetweenLeptons")
-    canv=ROOT.TCanvas()
-    deltaRtree.Draw("value","passesAllOtherCutsIgnoreLifetime")
-    hist=0
-    for item in canv.GetListOfPrimitives():
-        if item.IsA().InheritsFrom("TH1"): hist=item
-        pass
-    if hist:
-        hist.GetXaxis().SetTitle("deltaR")
-        title="#Delta R btw leptons, "+workdir.split("/")[-1]
-        title=title[:title.find("_analysis")]
-        hist.SetTitle(title)
-        pass
-    CMSPrelim(muAnalysis,1)
-    canv.Update()
-    canv.Print(benchmarkfolder+"/deltaR_"+workdir.split("/")[-1]+".pdf")
-    histfile.Close()
-    pass
+#print ""
+#for workdir in workdirs_signal:
+#    histfile=ROOT.TFile.Open(workdir+"/histograms.root")
+#    treename=histfile.Get(muAnalysis+"/dileptons_signal_anyTrigger/deltaRBetweenLeptons")
+#    canv=ROOT.TCanvas()
+#    treename.Draw("deltaRBetweenLeptons","passesAllOtherCutsIgnoreLifetime")
+#    hist=0
+#    for item in canv.GetListOfPrimitives():
+#        if item.IsA().InheritsFrom("TH1"): hist=item
+#        pass
+#    if hist:
+#        hist.GetXaxis().SetTitle("deltaR")
+#        title="#Delta R btw leptons, "+workdir.split("/")[-1]
+#        title=title[:title.find("_analysis")]
+#        hist.SetTitle(title)
+#        pass
+#    CMSPlotDecoration(muAnalysis)
+#    canv.Update()
+#    canv.Print(benchmarkfolder+"/deltaR_"+workdir.split("/")[-1]+".pdf")
+#    histfile.Close()
+#    pass
     
 
 # track isolation distributions
@@ -3148,7 +3259,7 @@ for workdir in workdirs_signal:
                     pass
                 hist.SetTitle(title)
                 pass
-            CMSPrelim(analysisDir,1)
+            CMSPlotDecoration(analysisDir)
             canv.Update()
             canv.Print(benchmarkfolder+"/isolation_"+analysisDir+"_"+workdir.split("/")[-1]+".pdf")
             pass
@@ -3176,7 +3287,7 @@ for workdir in workdirs_signal:
         hist.SetTitle(title)
         hist.Draw()
         canv.Update()
-        CMSPrelim(analysisDir,1)
+        CMSPlotDecoration(analysisDir)
         canv.Print(benchmarkfolder+"/isolationVsPileup_"+analysisDir+"_"+workdir.split("/")[-1]+".pdf")
         pass
     histfile.Close()
@@ -3216,7 +3327,7 @@ for workdir in workdirs_benchmark_mu:
     line.Draw("same")
     pt_vs_radius_matched.SetMarkerColor(ROOT.kRed)
     pt_vs_radius_matched.Draw("same")
-    CMSPrelim(muAnalysis,1)
+    CMSPlotDecoration(muAnalysis)
     canv.Update()
     canv.Print(benchmarkfolder+"/muon_momentum_vs_radius_"+workdir.split("/")[-1]+".pdf")
     canv.Close()
