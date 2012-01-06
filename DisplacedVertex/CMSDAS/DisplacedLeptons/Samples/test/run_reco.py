@@ -28,7 +28,7 @@ if len(sample.sampleSimFiles)>0 and sample.sampleDataSet!="":
 if sample.sampleDataSet!="":
     sample.run_on="GRID"
 else:
-    sample.run_on="RAL"
+    sample.run_on=sample.where_am_i
 
 # make sure input files exist and are accessible
 if len(sample.sampleSimFiles)>0: sample.check_dir(sample.sampleSimFiles,"input")
@@ -113,11 +113,14 @@ if sample.sampleDataSet!="":
         print "error: GRID processing requested with output to local files"
         sys.exit(1)
     sample.run_on="GRID"
-elif (sample.read_from=="RAL" or sample.read_from=="LOCAL")\
+elif sample.where_am_i=="RAL" and (sample.read_from=="RAL" or sample.read_from=="LOCAL")\
          and (sample.store_at=="RAL" or sample.store_at=="LOCAL"):
     sample.run_on="RAL"
+elif sample.where_am_i=="CERN" and (sample.read_from=="CERN" or sample.read_from=="LOCAL")\
+         and (sample.store_at=="CERN" or sample.store_at=="LOCAL"):
+    sample.run_on="CERN"
 else:
-    print "error: reading from",sample.read_from,\
+    print "error: running at",sample.where_am_i,"to read from",sample.read_from,\
           "and store at",sample.store_to,"does not work!"
     sys.exit(1)
 
