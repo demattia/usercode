@@ -1,0 +1,33 @@
+how to generate a Monte Carlo sample
+====================================
+
+the entire production process from the beginning to analysis-ready pat tuples is highly
+automatised with a small number of complex python scripts. these scripts are encoding my
+knowledge about MC production in a more useful way than writing everything down in a logbook,
+but they may not treat every special situation properly. Their main purpose is therefore not
+to create a black box analysis, but to allow rerunning the entire analysis most easily over and
+over again *once you understood what is being done*.
+
+The procedure:
+- create or check generator configuration in python/generator (see Configuration/Generator
+  on CVS for examples)
+- create or check sample description in python/samples
+- run_gen_sim.py sample_cff.py will create simulation jobs and submit them to the grid
+- if you have time, check the resulting output files on castor using check_edm_files.py castordir
+  because there seem to be many ways in which you can end up with a corrupt root file on
+  castor
+- run_reco.py sample_cff.py will run the reconstruction part (standard or modified based on
+  file names of sample_cff.py and output root file names) using lsf batch jobs
+
+
+open issues with Monte Carlo:
+=============================
+
+- decay handling by Pythia: aren't we neglecting material interactions in these events?
+  (could be a serious problem for electron final states)
+- pile-up: currently no pile-up selected (this is chosen by cmsDriver - see the generated
+  config files. not sure whether we can influence it, but there are lots of pile-up configs
+  in Configuration/StandardSequences)
+- vertex smearing: currently using a 10TeV smearing setup (chosen by cmsDriver). found
+  hypernews message saying that the 7TeV setup is deemed to be very similar to the 10TeV one,
+  and therefore they did not create a 7TeV one.

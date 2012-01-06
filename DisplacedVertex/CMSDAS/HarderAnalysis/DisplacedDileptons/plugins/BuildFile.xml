@@ -1,0 +1,25 @@
+<export>
+</export>
+<library   name="HarderAnalysisDisplacedDileptons_plugins" file="*.cc">
+  <use   name="FWCore/Framework"/>
+  <use   name="FWCore/ParameterSet"/>
+  <use   name="FWCore/MessageLogger"/>
+  <use   name="FWCore/MessageService"/>
+  <use   name="FWCore/Utilities"/>
+  <use   name="DataFormats/Common"/>
+  <use   name="DataFormats/PatCandidates"/>
+  <use   name="PhysicsTools/PatAlgos"/>
+  <use   name="PhysicsTools/PatUtils"/>
+  <use   name="RecoVertex/KalmanVertexFit"/>
+  <use   name="SimGeneral/HepPDTRecord"/>
+  <use   name="SimDataFormats/GeneratorProducts"/>
+  <use   name="HarderAnalysis/DisplacedDileptons"/>
+  <use   name="DisplacedLeptons/Samples"/>
+  <use   name="HarderAnalysisTools/Histograms"/>
+  <use   name="HarderAnalysisTools/GenParticleInfo"/>
+  <use   name="HarderAnalysisTools/CutManager"/>
+  <use   name="HarderAnalysisTools/CheckHitPattern"/>
+  <use   name="hepmc"/>
+  <use   name="root"/>
+  <lib   name="DCache"/>
+</library>
