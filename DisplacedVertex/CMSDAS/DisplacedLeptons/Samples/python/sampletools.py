@@ -133,7 +133,7 @@ class AnalysisSample:
             if refdir == "":
                 refdir = sharedpath
             if refdir != sharedpath:
-                print "inconsistent directory structure:", refdir, sharedpath
+                # print "inconsistent directory structure:", refdir, sharedpath
                 if self.cff.find("Debug") < 0:
                     sys.exit(1)
 
@@ -259,7 +259,8 @@ class AnalysisSample:
                     # no need to do anything. directory will be created automatically by dCache
                     pass
             elif self.run_on == "GRID":
-                print "warning: cannot check RAL dCache output dir from this site"
+                # print "warning: cannot check RAL dCache output dir from this site"
+				pass
             else:
                 # no need to do anything. directory will be created automatically by dCache
                 pass
