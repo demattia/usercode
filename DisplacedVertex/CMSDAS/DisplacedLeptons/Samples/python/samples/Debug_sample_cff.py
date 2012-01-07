@@ -27,15 +27,16 @@ sampleLumiNumberOffset = 120009
 # release used to generate (if applicable) and reconstruct this sample
 sampleRelease = "CMSSW_4_2_7"
 
-sampleBaseDir = "dcap://dcap.pp.rl.ac.uk/pnfs/pp.rl.ac.uk/data/cms/store/user/"\
-                +"harder/longlived/"+sampleRelease+"/Pythia_HtoAA_150GeV_100mm_emutau"
+#sampleBaseDir = "dcap://dcap.pp.rl.ac.uk/pnfs/pp.rl.ac.uk/data/cms/store/user/"\
+#                +"harder/longlived/"+sampleRelease+"/Pythia_HtoAA_150GeV_100mm_emutau"
+sampleBaseDir = "root://xrootd.rcac.purdue.edu//store/user/demattia/DisplacedVertex/longlived"
 
 sampleSimFiles = [
-  sampleBaseDir+"/gen/Pythia_H0_pyupda_cfi_py_GEN_SIM_DIGI_L1_DIGI2RAW_HLT_1_1_Xqg.root"
+  sampleBaseDir+"/Generation/Pythia_H0_pyupda_cfi_py_GEN_SIM_DIGI_L1_DIGI2RAW_HLT.root"
   ]
 
 sampleRecoFiles = [
-    sampleBaseDir+"/stdreco/Pythia_H0_pyupda_cfi_py_RAW2DIGI_RECO_1.root"
+    sampleBaseDir+"/Reconstruction/Pythia_H0_pyupda_cfi_py_GEN_SIM_DIGI_L1_RAW2DIGI_RECO.root"
     ]
 
 samplePatFiles = [ "file:/opt/ppd/scratch/harder/PATtuple_stdreco.root" ]
