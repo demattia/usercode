@@ -28,6 +28,8 @@ echo "./run_analysis.py $LOCALRT/src/DisplacedLeptons/Samples/python/samples/QCD
 # ./run_analysis.py $LOCALRT/src/DisplacedLeptons/Samples/python/samples/QCDem470_cff.py
 # echo "./run_analysis.py $LOCALRT/src/DisplacedLeptons/Samples/python/samples/QCDem600_cff.py"
 # ./run_analysis.py $LOCALRT/src/DisplacedLeptons/Samples/python/samples/QCDem600_cff.py
+# echo "./run_analysis.py $LOCALRT/src/DisplacedLeptons/Samples/python/samples/QCDem800_cff.py"
+# ./run_analysis.py $LOCALRT/src/DisplacedLeptons/Samples/python/samples/QCDem800_cff.py
 # echo "./run_analysis.py $LOCALRT/src/DisplacedLeptons/Samples/python/samples/QCDem1000_cff.py"
 # ./run_analysis.py $LOCALRT/src/DisplacedLeptons/Samples/python/samples/QCDem1000_cff.py
 # echo "./run_analysis.py $LOCALRT/src/DisplacedLeptons/Samples/python/samples/QCDem1400_cff.py"
