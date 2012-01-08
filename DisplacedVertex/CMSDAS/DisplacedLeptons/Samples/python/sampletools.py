@@ -765,7 +765,7 @@ class AnalysisSample:
                 condorScriptFile.write("Output = condor_"+cfgFileName+"_$(Cluster)_$(Process).stdout\n")
                 condorScriptFile.write("Error = condor_"+cfgFileName+"_$(Cluster)_$(Process).stderr\n")
                 condorScriptFile.write("Log = condor_"+cfgFileName+"_$(Cluster)_$(Process).log\n")
-                condorScriptFile.write("notify_user = demattia@FNAL.GOV\n")
+                #condorScriptFile.write("notify_user = demattia@FNAL.GOV\n")
                 condorScriptFile.write("Queue 1\n")
                 condorScriptFile.close()
                 batchcommand="cd "+self.workdir+"; condor_submit "+condorScriptName
