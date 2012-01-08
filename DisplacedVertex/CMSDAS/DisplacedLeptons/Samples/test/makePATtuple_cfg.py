@@ -10,7 +10,7 @@ from PhysicsTools.PatAlgos.patTemplate_cfg import *
 sampleRequireCollision=1
 sampleSignalPID=0
 from DisplacedLeptons.Samples.samples.Debug_sample_cff import *
-rereco=1
+rereco=0
 prefilter=1
 
 process.source.fileNames = sampleRecoFiles
