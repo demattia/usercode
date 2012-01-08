@@ -29,7 +29,8 @@ filelist=sample.check_dir(sample.samplePatFiles,"input",1)
 # SET UP CMSSW CONFIG FILE
 ##########################
 
-sample.create_work_dir("analysis")
+# sample.create_work_dir("analysis")
+sample.create_work_dir_temp("analysis", "/uscmst1b_scratch/lpc1/3DayLifetime/"+os.environ["USER"])
 infile=open(sample.cmssw_base+"/src/HarderAnalysis/DisplacedDileptons"\
             +"/test/main_cfg.py","r")
 sample.driverconf=sample.workdir+"/main_cfg.py"
