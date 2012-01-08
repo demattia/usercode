@@ -376,6 +376,28 @@ class AnalysisSample:
         os.system("cp -p " + self.cff + " " + self.workdir)
         print "working directory:", self.workdir
 
+    ############################
+    # CREATE A WORKING DIRECTORY
+    ############################
+    def create_work_dir_temp(self, process, tempDir):
+        if self.workdir != "":
+            print "error: working directory already created"
+            return
+        workbasedir = tempDir
+        if not os.path.exists(workbasedir):
+            os.system("mkdir -p " + workbasedir)
+        self.workdir = workbasedir + self.id + "_" + process\
+                       + time.strftime("_%Y%m%d")
+        if os.path.exists(self.workdir):
+            num = 0
+            while os.path.exists(self.workdir + "_" + str(num)):
+                num += 1
+            self.workdir += "_" + str(num)
+        os.system("mkdir -p " + self.workdir)
+        os.system("cp -p " + self.cff + " " + self.workdir)
+        print "working directory:", self.workdir
+
+
     ##################
     # LAUNCH CMSDRIVER
     ##################
