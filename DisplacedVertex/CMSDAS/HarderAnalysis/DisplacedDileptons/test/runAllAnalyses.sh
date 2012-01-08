@@ -2,12 +2,12 @@
 
 echo "running analysis over all samples"
 
-# echo "./run_analysis.py $LOCALRT/src/DisplacedLeptons/Samples/python/samples/Data_Mu_Run2011A1_cff.py"
-# ./run_analysis.py $LOCALRT/src/DisplacedLeptons/Samples/python/samples/Data_Mu_Run2011A1_cff.py
+echo "./run_analysis.py $LOCALRT/src/DisplacedLeptons/Samples/python/samples/Data_Mu_Run2011A1_cff.py"
+./run_analysis.py $LOCALRT/src/DisplacedLeptons/Samples/python/samples/Data_Mu_Run2011A1_cff.py
 # echo "./run_analysis.py $LOCALRT/src/DisplacedLeptons/Samples/python/samples/Data_Mu_Run2011A2_cff.py"
 # ./run_analysis.py $LOCALRT/src/DisplacedLeptons/Samples/python/samples/Data_Mu_Run2011A2_cff.py
-# echo "./run_analysis.py $LOCALRT/src/DisplacedLeptons/Samples/python/samples/Data_Photon_Run2011A1_cff.py"
-# ./run_analysis.py $LOCALRT/src/DisplacedLeptons/Samples/python/samples/Data_Photon_Run2011A1_cff.py
+echo "./run_analysis.py $LOCALRT/src/DisplacedLeptons/Samples/python/samples/Data_Photon_Run2011A1_cff.py"
+./run_analysis.py $LOCALRT/src/DisplacedLeptons/Samples/python/samples/Data_Photon_Run2011A1_cff.py
 # echo "./run_analysis.py $LOCALRT/src/DisplacedLeptons/Samples/python/samples/Data_Photon_Run2011A2_cff.py"
 # ./run_analysis.py $LOCALRT/src/DisplacedLeptons/Samples/python/samples/Data_Photon_Run2011A2_cff.py
 
@@ -21,8 +21,8 @@ echo "running analysis over all samples"
 
 echo "./run_analysis.py $LOCALRT/src/DisplacedLeptons/Samples/python/samples/QCDem170_cff.py"
 ./run_analysis.py $LOCALRT/src/DisplacedLeptons/Samples/python/samples/QCDem170_cff.py
-echo "./run_analysis.py $LOCALRT/src/DisplacedLeptons/Samples/python/samples/QCDem300_cff.py"
-./run_analysis.py $LOCALRT/src/DisplacedLeptons/Samples/python/samples/QCDem300_cff.py
+# echo "./run_analysis.py $LOCALRT/src/DisplacedLeptons/Samples/python/samples/QCDem300_cff.py"
+# ./run_analysis.py $LOCALRT/src/DisplacedLeptons/Samples/python/samples/QCDem300_cff.py
 
 # echo "./run_analysis.py $LOCALRT/src/DisplacedLeptons/Samples/python/samples/QCDem470_cff.py"
 # ./run_analysis.py $LOCALRT/src/DisplacedLeptons/Samples/python/samples/QCDem470_cff.py
@@ -64,8 +64,8 @@ echo "./run_analysis.py $LOCALRT/src/DisplacedLeptons/Samples/python/samples/QCD
 # ./run_analysis.py $LOCALRT/src/DisplacedLeptons/Samples/python/samples/Signal_120_050F_cff.py
 # echo "./run_analysis.py $LOCALRT/src/DisplacedLeptons/Samples/python/samples/Signal_200_020F_cff.py"
 # ./run_analysis.py $LOCALRT/src/DisplacedLeptons/Samples/python/samples/Signal_200_020F_cff.py
-# echo "./run_analysis.py $LOCALRT/src/DisplacedLeptons/Samples/python/samples/Signal_200_050F_cff.py"
-# ./run_analysis.py $LOCALRT/src/DisplacedLeptons/Samples/python/samples/Signal_200_050F_cff.py
+echo "./run_analysis.py $LOCALRT/src/DisplacedLeptons/Samples/python/samples/Signal_200_050F_cff.py"
+./run_analysis.py $LOCALRT/src/DisplacedLeptons/Samples/python/samples/Signal_200_050F_cff.py
 
 # echo "./run_analysis.py $LOCALRT/src/DisplacedLeptons/Samples/python/samples/Signal_400_005L_cff.py # <- needs to be run"
 # ./run_analysis.py $LOCALRT/src/DisplacedLeptons/Samples/python/samples/Signal_400_005L_cff.py # <- needs to be run
@@ -102,8 +102,8 @@ echo "./run_analysis.py $LOCALRT/src/DisplacedLeptons/Samples/python/samples/QCD
 # ./run_analysis.py $LOCALRT/src/DisplacedLeptons/Samples/python/samples/ZeeJets50_cff.py
 # echo "./run_analysis.py $LOCALRT/src/DisplacedLeptons/Samples/python/samples/ZeeJets80_cff.py"
 # ./run_analysis.py $LOCALRT/src/DisplacedLeptons/Samples/python/samples/ZeeJets80_cff.py
-# echo "./run_analysis.py $LOCALRT/src/DisplacedLeptons/Samples/python/samples/Zee_cff.py"
-# ./run_analysis.py $LOCALRT/src/DisplacedLeptons/Samples/python/samples/Zee_cff.py
+echo "./run_analysis.py $LOCALRT/src/DisplacedLeptons/Samples/python/samples/Zee_cff.py"
+./run_analysis.py $LOCALRT/src/DisplacedLeptons/Samples/python/samples/Zee_cff.py
 # echo "./run_analysis.py $LOCALRT/src/DisplacedLeptons/Samples/python/samples/Zmumu10_cff.py"
 # ./run_analysis.py $LOCALRT/src/DisplacedLeptons/Samples/python/samples/Zmumu10_cff.py
 # echo "./run_analysis.py $LOCALRT/src/DisplacedLeptons/Samples/python/samples/ZmumuJets120_cff.py"
@@ -122,7 +122,7 @@ echo "./run_analysis.py $LOCALRT/src/DisplacedLeptons/Samples/python/samples/QCD
 # ./run_analysis.py $LOCALRT/src/DisplacedLeptons/Samples/python/samples/ZmumuJets50_cff.py
 # echo "./run_analysis.py $LOCALRT/src/DisplacedLeptons/Samples/python/samples/ZmumuJets80_cff.py"
 # ./run_analysis.py $LOCALRT/src/DisplacedLeptons/Samples/python/samples/ZmumuJets80_cff.py
-# echo "./run_analysis.py $LOCALRT/src/DisplacedLeptons/Samples/python/samples/Zmumu_cff.py"
-# ./run_analysis.py $LOCALRT/src/DisplacedLeptons/Samples/python/samples/Zmumu_cff.py
+echo "./run_analysis.py $LOCALRT/src/DisplacedLeptons/Samples/python/samples/Zmumu_cff.py"
+./run_analysis.py $LOCALRT/src/DisplacedLeptons/Samples/python/samples/Zmumu_cff.py
 # echo "./run_analysis.py $LOCALRT/src/DisplacedLeptons/Samples/python/samples/Ztautau_cff.py"
 # ./run_analysis.py $LOCALRT/src/DisplacedLeptons/Samples/python/samples/Ztautau_cff.py
