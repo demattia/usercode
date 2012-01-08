@@ -4,7 +4,7 @@ from DataFormats.FWLite import Events, Handle
 
 # Reminder: the generation is H0 -> A0 A0, with the A0 forced to decay to leptons. The H0 is 35 and the A0 is 36.
 events = Events ('Pythia_H0_pyupda_cfi_py_GEN_SIM_DIGI_L1_RAW2DIGI_RECO.root')
-
+#events = Events ('root://xrootd.rcac.purdue.edu//store/user/demattia/DisplacedVertex/longlived/Reconstruction/Pythia_H0_pyupda_cfi_py_GEN_SIM_DIGI_L1_RAW2DIGI_RECO.root')
 # create handle outside of loop
 handleTrack  = Handle ('std::vector<reco::Track>')
 handleStandAlone  = Handle ('std::vector<reco::Track>')
