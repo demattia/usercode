@@ -720,7 +720,7 @@ class AnalysisSample:
             jobscript.write("cd "+self.cmssw_base+"/src\n")
             jobscript.write("eval `scramv1 runtime -sh`\n")
             jobscript.write("cmsRun "+self.workdir+"/job"+str(i+1)+"_cfg.py\n")
-            jobscript.write("cp "+tmp_dir+"/histograms_"+str(i+1)+".root "+self.workdir)
+            jobscript.write("cp "+tmp_dir+"/histograms_"+str(i+1)+".root "+self.workdir+"\n")
             if runmode=="CERN" and has_output:
                 jobscript.write("rfcp "+tmp_dir+"/"+outputfilename+" "\
                                 +outputfiles[i].replace("rfio:","").replace("///","/")+"\n")
@@ -731,6 +731,17 @@ class AnalysisSample:
                                     +srm_path(outputfiles[i].replace(outputfilename,prefilterfile))+"\n")
                 jobscript.write("lcg-cp "+tmp_dir+"/"+outputfilename+" "\
                                 +srm_path(outputfiles[i])+"\n")
+            elif runmode=="FNAL" and has_output:
+                srmOutput = srm_path(outputfiles[i]).replace("root://xrootd.rcac.purdue.edu", "srm://srm-dcache.rcac.purdue.edu:8443/srm/managerv2?SFN=")
+                srmOutputPath = srmOutput.split(srmOutput.split("/")[-1])[0]
+                # jobscript.write("source /uscmst1/prod/grid/gLite_SL5.sh\n")
+                # jobscript.write("source /uscmst1/prod/grid/CRAB/crab.sh\n")
+                # Do it only for the first file
+                if srmOutput.split("_")[-1].split(".root")[0] == "1":
+                    os.system("srmmkdir -2 "+srmOutputPath)
+                if has_prefilter:
+                    jobscript.write("/opt/d-cache/srm/bin/srmcp -2 \"file:///"+tmp_dir+"/"+prefilterfile+"\" \""+srmOutput.replace(outputfilename,prefilterfile)+"\"\n")
+                jobscript.write("/opt/d-cache/srm/bin/srmcp -2 \"file:///"+tmp_dir+"/"+outputfilename+"\" \""+srmOutput+"\"\n")
             elif has_output:
                 print "error: no idea how to run jobs at",runmode
                 sys.exit(1)
