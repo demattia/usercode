@@ -49,76 +49,76 @@ def mergeHistogramsFiles(workdirs):
 # define workdir area
 #myDir = "/net/unixfsrv/ppd/ryd54680/CMSSW_4_2_4_patch1/src/workdirs/"
 #myDir = "/home/ppd/pff62257/CMS/CMSSW_4_2_8_patch7/src/workdirs/"
-myDir = "/uscms_data/d3/demattia/CMSDAS/CMSSW_4_2_7/src/workdirs/"
+myDir = "$LOCALRT/src/workdirs/"
 
 
 workdirs_data_mu = [
     myDir + "Data_Mu_Run2011A1_analysis_20120103",
-    myDir + "Data_Mu_Run2011A2_analysis_20120103",
+    # myDir + "Data_Mu_Run2011A2_analysis_20120103",
     # myDir + "Data_Mu_Run2011A3_analysis_20111215",
     # myDir + "Data_Mu_Run2011A4_analysis_20111215",
     # myDir + "Data_Mu_Run2011B1_analysis_20111215",
     ]
 workdirs_data_e = [
     myDir + "Data_Photon_Run2011A1_analysis_20120103",
-    myDir + "Data_Photon_Run2011A2_analysis_20120104",
+    # myDir + "Data_Photon_Run2011A2_analysis_20120104",
     # myDir + "Data_Photon_Run2011A3_analysis_20111215",
     # myDir + "Data_Photon_Run2011A4_analysis_20111215",
     # myDir + "Data_Photon_Run2011B1_analysis_20111215",
     ]
 
 workdirs_background_mu = [
-    myDir + "QCDmu15_analysis_20120104",
-    myDir + "QCDmu20_analysis_20120104",
-    myDir + "QCDmu30_analysis_20120104",
-    myDir + "QCDmu50_analysis_20120104",
-    myDir + "QCDmu80_analysis_20120104",
-    myDir + "QCDmu120_analysis_20120104",
+    # myDir + "QCDmu15_analysis_20120104",
+    # myDir + "QCDmu20_analysis_20120104",
+    # myDir + "QCDmu30_analysis_20120104",
+    # myDir + "QCDmu50_analysis_20120104",
+    # myDir + "QCDmu80_analysis_20120104",
+    # myDir + "QCDmu120_analysis_20120104",
     myDir + "QCDmu150_analysis_20120107",
-    myDir + "TTbar_analysis_20120104_0",
+    # myDir + "TTbar_analysis_20120104_0",
     myDir + "Zmumu_analysis_20120104",
-    myDir + "Zmumu10_analysis_20120104",
-    myDir + "ZmumuJets20_analysis_20120104",
-    myDir + "ZmumuJets30_analysis_20120104",
-    myDir + "ZmumuJets50_analysis_20120104",
-    myDir + "ZmumuJets80_analysis_20120104",
-    myDir + "ZmumuJets120_analysis_20120104",
-    myDir + "ZmumuJets170_analysis_20120104",
-    myDir + "ZmumuJets230_analysis_20120104",
-    myDir + "ZmumuJets300_analysis_20120104",
-    myDir + "Ztautau_analysis_20120104",
-    myDir + "WW_analysis_20120104",
-    myDir + "WZ_analysis_20120104",
-    myDir + "ZZ_analysis_20120104"
+    # myDir + "Zmumu10_analysis_20120104",
+    # myDir + "ZmumuJets20_analysis_20120104",
+    # myDir + "ZmumuJets30_analysis_20120104",
+    # myDir + "ZmumuJets50_analysis_20120104",
+    # myDir + "ZmumuJets80_analysis_20120104",
+    # myDir + "ZmumuJets120_analysis_20120104",
+    # myDir + "ZmumuJets170_analysis_20120104",
+    # myDir + "ZmumuJets230_analysis_20120104",
+    # myDir + "ZmumuJets300_analysis_20120104",
+    # myDir + "Ztautau_analysis_20120104",
+    # myDir + "WW_analysis_20120104",
+    # myDir + "WZ_analysis_20120104",
+    # myDir + "ZZ_analysis_20120104"
     ]
 
 workdirs_background_e = [
     # myDir + "QCDem20_analysis_20120104",
     # myDir + "QCDem30_analysis_20120101",
-    myDir + "QCDem80_analysis_20120104",
+    # myDir + "QCDem80_analysis_20120104",
     myDir + "QCDem170_analysis_20120107_0",
-    myDir + "QCDem300_analysis_20120107_0",
-    myDir + "QCDem470_analysis_20120104",
-    myDir + "QCDem600_analysis_20120104",
+    # myDir + "QCDem300_analysis_20120107_0",
+    # myDir + "QCDem470_analysis_20120104",
+    # myDir + "QCDem600_analysis_20120104",
     # myDir + "QCDem800_analysis_20120104",
-    myDir + "QCDem1000_analysis_20120104",
-    myDir + "QCDem1400_analysis_20120104",
-    myDir + "QCDem1800_analysis_20120104",
-    myDir + "TTbar_analysis_20120104_0",
+    # myDir + "QCDem1000_analysis_20120104",
+    # myDir + "QCDem1400_analysis_20120104",
+    # myDir + "QCDem1800_analysis_20120104",
+    # myDir + "TTbar_analysis_20120104_0",
     myDir + "Zee_analysis_20120104",
-    myDir + "Zee10_analysis_20120104",
-    myDir + "ZeeJets20_analysis_20120104",
-    myDir + "ZeeJets30_analysis_20120104",
-    myDir + "ZeeJets50_analysis_20120104",
-    myDir + "ZeeJets80_analysis_20120104",
-    myDir + "ZeeJets120_analysis_20120104",
-    myDir + "ZeeJets170_analysis_20120104",
-    myDir + "ZeeJets230_analysis_20120104",
-    myDir + "ZeeJets300_analysis_20120104",
-    myDir + "Ztautau_analysis_20120104",
-    myDir + "WW_analysis_20120104",
-    myDir + "WZ_analysis_20120104",
-    myDir + "ZZ_analysis_20120104"
+    # myDir + "Zee10_analysis_20120104",
+    # myDir + "ZeeJets20_analysis_20120104",
+    # myDir + "ZeeJets30_analysis_20120104",
+    # myDir + "ZeeJets50_analysis_20120104",
+    # myDir + "ZeeJets80_analysis_20120104",
+    # myDir + "ZeeJets120_analysis_20120104",
+    # myDir + "ZeeJets170_analysis_20120104",
+    # myDir + "ZeeJets230_analysis_20120104",
+    # myDir + "ZeeJets300_analysis_20120104",
+    # myDir + "Ztautau_analysis_20120104",
+    # myDir + "WW_analysis_20120104",
+    # myDir + "WZ_analysis_20120104",
+    # myDir + "ZZ_analysis_20120104"
     ]
 
 workdirs_benchmark_e = [
@@ -134,18 +134,18 @@ workdirs_benchmark_mu = [
     ]
 
 workdirs_signal = [
-    myDir + "Signal_120_020F_analysis_20120104",
-    myDir + "Signal_120_050F_analysis_20120104",
-    myDir + "Signal_200_020F_analysis_20120104",
+    # myDir + "Signal_120_020F_analysis_20120104",
+    # myDir + "Signal_120_050F_analysis_20120104",
+    # myDir + "Signal_200_020F_analysis_20120104",
     myDir + "Signal_200_050F_analysis_20120104",
     # myDir + "Signal_400_005L_analysis_20120104",
     # myDir + "Signal_400_020F_analysis_20120104",
-    myDir + "Signal_400_050F_analysis_20120104",
-    myDir + "Signal_400_150F_analysis_20120104",
-    myDir + "Signal_1000_020F_analysis_20120104",
-    myDir + "Signal_1000_050F_analysis_20120104",
-    myDir + "Signal_1000_150F_analysis_20120104",
-    myDir + "Signal_1000_350F_analysis_20120104"
+    # myDir + "Signal_400_050F_analysis_20120104",
+    # myDir + "Signal_400_150F_analysis_20120104",
+    # myDir + "Signal_1000_020F_analysis_20120104",
+    # myDir + "Signal_1000_050F_analysis_20120104",
+    # myDir + "Signal_1000_150F_analysis_20120104",
+    # myDir + "Signal_1000_350F_analysis_20120104"
     ]
 
 # Check if histograms.root was created for all the dirs
