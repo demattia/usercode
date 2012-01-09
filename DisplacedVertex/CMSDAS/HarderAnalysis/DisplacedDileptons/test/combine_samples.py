@@ -49,7 +49,7 @@ def mergeHistogramsFiles(workdirs):
 # define workdir area
 #myDir = "/net/unixfsrv/ppd/ryd54680/CMSSW_4_2_4_patch1/src/workdirs/"
 #myDir = "/home/ppd/pff62257/CMS/CMSSW_4_2_8_patch7/src/workdirs/"
-myDir = "$LOCALRT/src/workdirs/"
+myDir = os.environ["LOCALRT"]+"/src/workdirs/"
 # myDir = "/uscmst1b_scratch/lpc1/3DayLifetime/"+os.environ["USER"]
 
 workdirs_data_mu = [
