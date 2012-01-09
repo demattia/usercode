@@ -112,12 +112,12 @@ print "processing:", sample_list
 
     
 ldir = os.environ['LOCALRT'] + "/src/DisplacedLeptons/Samples/python/samples/"
+sdir = os.environ['LOCALRT'] + "/src/HarderAnalysis/DisplacedDileptons/test/"
 
 for fn in sample_list :
-    cmd = "./run_analysis.py " + ldir + fn + "_cff.py"
+    cmd = sdir + "run_analysis.py " + ldir + fn + "_cff.py"
     print cmd
     os.system(cmd)
-
 
 print "Done submitting."
 
