@@ -21,12 +21,12 @@ labelMuon = ("muons")
 # Create histograms, etc.
 ROOT.gROOT.SetStyle('Plain') # white background
 # Note that the genParticle distances are in mm
-vertexRadiusTrackHist = ROOT.TH1F ("vertexRadiusTrackHist", "Vertex radius", 500, 0, 200)
-vertexRadiusTrackHist.GetXaxis().SetTitle("Vertex radius (cm)");
-vertexRadiusStandAloneHist = ROOT.TH1F ("vertexRadiusStandAloneHist", "Vertex radius", 500, 0, 200)
-vertexRadiusStandAloneHist.GetXaxis().SetTitle("Vertex radius (cm)");
-vertexRadiusMuonHist = ROOT.TH1F ("vertexRadiusMuonHist", "Vertex radius", 500, 0, 200)
-vertexRadiusMuonHist.GetXaxis().SetTitle("Vertex radius (cm)");
+vertexRadiusTrackHist = ROOT.TH1F ("vertexRadiusTrackHist", "Transverse impact parameter", 500, 0, 200)
+vertexRadiusTrackHist.GetXaxis().SetTitle("Transverse impact parameter (cm)");
+vertexRadiusStandAloneHist = ROOT.TH1F ("vertexRadiusStandAloneHist", "Transverse impact parameter", 500, 0, 200)
+vertexRadiusStandAloneHist.GetXaxis().SetTitle("Transverse impact parameter (cm)");
+vertexRadiusMuonHist = ROOT.TH1F ("vertexRadiusMuonHist", "Transverse impact parameter", 500, 0, 200)
+vertexRadiusMuonHist.GetXaxis().SetTitle("Transverse impact parameter (cm)");
 
 # loop over events
 for event in events:
@@ -50,13 +50,13 @@ for event in events:
 # make a canvas, draw, and save it
 c1 = ROOT.TCanvas()
 vertexRadiusTrackHist.Draw()
-c1.Print ("vertexRadiusTrack.png")
+c1.Print ("impactParameterTrack.png")
 
 c2 = ROOT.TCanvas()
 vertexRadiusStandAloneHist.Draw()
-c2.Print ("vertexRadiusStandAlone.png")
+c2.Print ("impactParameterStandAlone.png")
 
 c3 = ROOT.TCanvas()
 vertexRadiusMuonHist.Draw()
-c3.Print ("vertexRadiusMuon.png")
+c3.Print ("impactParameterMuon.png")
 
