@@ -3,7 +3,6 @@
 import os
 
 electrons = []
-# tupleE = "200_020_0.231", 0.00075798, 0.000349523875602226
 electrons.append(("200_020_0.231", 0.00075798, 0.000349523875602226))
 electrons.append(("200_020_0.35", 0.0008532, 0.000302306824931228))
 electrons.append(("200_020_0.7", 0.00086998, 0.000233980817196624))
@@ -220,7 +219,8 @@ def submit(leptype, leptons):
         jobFileName = 'job_'+tag+'.sh'
 
         jobFile = open(leptype+'/'+jobFileName, 'w')
-        jobFile.write('source /uscms_data/d3/demattia/CMSDAS/CMSSW_4_2_7/src/HarderAnalysis/DisplacedDileptons/test/LLlimits/setup.sh\n')
+        jobFile.write('source '+os.getcwd()+'/setup.sh\n')
+        jobFile.write('cd '+os.getcwd()+'\n')
         jobFile.write('python mainSigmaBayesian.py '+mass+' '+leptype+' '+eff+' '+effErr+' '+tag+' > /dev/null 2>&1\n')
         jobFile.close()
         os.system('chmod +x '+jobFileName)
