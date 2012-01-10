@@ -222,7 +222,7 @@ def submit(leptype, leptons):
         jobFileName = dirName+'/'+leptype+'_job_'+tag+'.sh'
 
         jobFile = open(jobFileName, 'w')
-        jobFile.write('source '+os.getcwd()+'/StatisticalTools/RooStatsRoutines/setup/cmslpc_standalone_setup.sh\n')
+        jobFile.write('source '+os.getcwd()+'/cmslpc_standalone_setup.sh\n')
         jobFile.write('cd '+os.getcwd()+'\n')
         jobFile.write('python mainSigmaCLs.py '+mass+' '+leptype+' '+eff+' '+effErr+' '+tag+'\n')
         jobFile.close()
@@ -236,7 +236,7 @@ def submit(leptype, leptons):
         condorFile.write('Should_Transfer_Files = YES\n')
         condorFile.write('Transfer_Input_Files = '+jobFileName+'\n')
         condorFile.write('WhenToTransferOutput = ON_EXIT\n')
-        condorFile.write('Log = condor_job1_cfg.py_$(Cluster)_$(Process).log\n')
+        # condorFile.write('Log = condor_job1_cfg.py_$(Cluster)_$(Process).log\n')
         # condorFile.write('Output = condor_rereco_pp_$(Cluster)_$(Process).stdout\n')
         # condorFile.write('Error = condor_rereco_pp_$(Cluster)_$(Process).stderr\n')
         condorFile.write('notify_user = '+os.environ["USER"]+'@FNAL.GOV\n')

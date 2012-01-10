@@ -11,9 +11,13 @@ r.RooMsgService.instance().deleteStream(1)
 M = float(sys.argv[1])
 LeptonType = sys.argv[2]
 
+dirName = LeptonType+"BayesianMass"
+fileName = dirName+"/"+str(M)
+
+os.system('mkdir -p '+dirName)
 
 # w = GetWorkspace(M,LeptonType)
 # GetLimit(w,LeptonType,str(M))
 
 # GetLimit(M, eff, efferr, LeptonType, fileName):
-GetLimit(M, LeptonType, str(M))
+GetLimit(M, LeptonType, fileName)

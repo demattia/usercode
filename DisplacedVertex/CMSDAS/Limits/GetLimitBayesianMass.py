@@ -159,16 +159,16 @@ def GetLimit(M,LeptonType,fileName):
 	# to Gaussian you'll need to change this code here.
 
 	## Whoa is this a hack!
-	if (fileName.find("/") > -1):
-		eff = w.obj("SigEff").getVal()
-		efferr = (w.obj("SigEffE").getVal()-1)*eff
-		lum = w.obj("Lumi").getVal()
-		lumerr = (w.obj("LumiE").getVal()-1)*lum
-	else:
-		eff = 1
-		efferr = 0
-		lum = 1
-		lumerr = 0
+	# if (fileName.find("/") > -1):
+	# 	eff = w.obj("SigEff").getVal()
+	# 	efferr = (w.obj("SigEffE").getVal()-1)*eff
+	# 	lum = w.obj("Lumi").getVal()
+	# 	lumerr = (w.obj("LumiE").getVal()-1)*lum
+	# else:
+	eff = 1
+	efferr = 0
+	lum = 1
+	lumerr = 0
 
 	if LeptonType == "Muons":
 		# massrange = mass.getMax() - mass.getMin()

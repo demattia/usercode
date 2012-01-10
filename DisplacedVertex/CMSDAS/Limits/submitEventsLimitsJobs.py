@@ -6,8 +6,8 @@ def submit(leptype):
     counter = 0
     os.system('mkdir -p '+leptype)
     for mass in range(20,505,5):
-        if counter == 2:
-            break
+        # if counter == 2:
+        #     break
         counter += 1
         jobFileName = leptype+'/'+leptype+'_job_'+str(mass)+'.sh'
         jobFile = open(jobFileName, 'w')
