@@ -1,5 +1,5 @@
 from GetWorkspace import *
-from GetLimitBayesian import *
+from GetLimitBayesianMass import *
 import ROOT as r
 import sys,os.path
 
@@ -12,5 +12,8 @@ M = float(sys.argv[1])
 LeptonType = sys.argv[2]
 
 
-w = GetWorkspace(M,LeptonType)
-GetLimit(w,LeptonType,str(M))
+# w = GetWorkspace(M,LeptonType)
+# GetLimit(w,LeptonType,str(M))
+
+# GetLimit(M, eff, efferr, LeptonType, fileName):
+GetLimit(M, LeptonType, str(M))
