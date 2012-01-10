@@ -1,0 +1,9 @@
+universe = vanilla
+Executable = ElectronsBayesian/Electrons_job_1000_020_0.0495.sh
+Requirements = Memory >= 199 &&OpSys == "LINUX"&& (Arch != "DUMMY" )&& Disk > 1000000
+Should_Transfer_Files = YES
+Transfer_Input_Files = ElectronsBayesian/Electrons_job_1000_020_0.0495.sh
+WhenToTransferOutput = ON_EXIT
+Log = condor_job1_cfg.py_$(Cluster)_$(Process).log
+notify_user = demattia@FNAL.GOV
+Queue 1
