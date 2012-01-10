@@ -41,6 +41,17 @@ def mergeHistogramsFiles(workdirs):
         print "merging histograms files in "+dir
         os.system(command)
 
+def checkPrefilterFiles(workdirs):
+    if prefilter and not os.path.exists(workdir+"/prefilter.root"):
+        # Try copying it from dCache
+        print "ERROR: missing file",workdir+"/prefilter.root, trying to copy it from dcache"
+        print "srmcp -2 \"srm://srm-dcache.rcac.purdue.edu:8443/srm/managerv2?SFN=/store/user/demattia/longlived/CMSSW_4_2_7/"+workdir.split("/")[-1].split("_analysis")[0]+"/prefilter.root\" \"file:///"+workdir+"/prefilter.root\""
+        os.system("srmcp -2 \"srm://srm-dcache.rcac.purdue.edu:8443/srm/managerv2?SFN=/store/user/demattia/longlived/CMSSW_4_2_7/"+workdir.split("/")[-1].split("_analysis")[0]+"/prefilter.root\" \"file:///"+workdir+"/prefilter.root\"")
+        if not os.path.exists(workdir+"/prefilter.root"):
+            print "ERROR: prefilter.root copy from dCache failed"
+            return -1
+
+
 #############################################
 ### DEFINE SAMPLES TO USE
 #############################################
@@ -156,6 +167,14 @@ mergeHistogramsFiles(workdirs_background_e)
 mergeHistogramsFiles(workdirs_benchmark_mu)
 mergeHistogramsFiles(workdirs_benchmark_e)
 mergeHistogramsFiles(workdirs_signal)
+
+checkPrefilterFiles(workdirs_data_mu)
+checkPrefilterFiles(workdirs_data_e)
+checkPrefilterFiles(workdirs_background_mu)
+checkPrefilterFiles(workdirs_background_e)
+checkPrefilterFiles(workdirs_benchmark_mu)
+checkPrefilterFiles(workdirs_benchmark_e)
+checkPrefilterFiles(workdirs_signal)
 
 
 ############################################################################
