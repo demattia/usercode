@@ -39,7 +39,7 @@ process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )
 
 process.source = cms.Source("PoolSource",
     fileNames = cms.untracked.vstring(
-    'file:/home/demattia/Simulation/CosmicSimulation/reco_RAW2DIGI_L1Reco_RECOSIM_DQM_1.root'
+    'root://xrootd.rcac.purdue.edu//store/user/demattia/DisplacedVertex/Cosmics/Simulation/Run170547//reco_RAW2DIGI_L1Reco_RECO_DQM_1.root'
     )
 )
 
@@ -140,7 +140,7 @@ process.demo = cms.EDAnalyzer('TrackingEfficiencyFromCosmics',
                               DeltaPhiCut = cms.double(1),  # only if matching two legs
                               MinimumValidHits = cms.int32(0),
 
-                              UseMCtruth = cms.bool(True),
+                              UseMCtruth = cms.bool(False),
 
                               EffOutputFileName = cms.string("Efficiency.root"),
                               EffCleanedOutputFileName = cms.string("EfficiencyCleaned.root"),
@@ -164,7 +164,10 @@ process.demo = cms.EDAnalyzer('TrackingEfficiencyFromCosmics',
                               UseTrackParameters = cms.bool(False), # Use track parameters for matched standalone
                               DxyErrorCut = cms.bool(False),
                               DzErrorCut = cms.bool(False),
-                              DxyCutForNoDzCut = cms.double(4)
+                              DxyCutForNoDzCut = cms.double(4),
+
+                              # The propagator used is different outside and inside the Tracker volume
+                              GenInsideTkVol = cms.bool(False)
                               )
 
 # process.demo = cms.EDAnalyzer('TrackingEfficiencyFromCosmics',
