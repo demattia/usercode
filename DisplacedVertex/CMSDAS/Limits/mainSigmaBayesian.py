@@ -18,5 +18,7 @@ else:
 	fileName = str(M)
 
 
-w = GetWorkspaceSigma(M,LeptonType,eff,efferr)
-GetLimit(w,LeptonType,fileName)
+# w = GetWorkspaceSigma(M,LeptonType,eff,efferr)
+# GetLimit(w,LeptonType,fileName)
+
+GetLimit(M, eff, efferr, LeptonType, fileName)
