@@ -233,7 +233,7 @@ SmartPropagatorWithIP::IP SmartPropagatorWithIP::computeImpactParametersOutsideI
     // return computeImpactParametersInsideTkVol(*(tsos.freeTrajectoryState()), vertex);
     return computeImpactParametersOutsideTkVol(fts, vertex);
   }
-  std::cout << "Mixed propagation failed, trying again with stepping helix only" << std::endl;
+  // std::cout << "Mixed propagation failed, trying again with stepping helix only" << std::endl;
   return computeImpactParametersOutsideTkVol(fts, vertex);
 }
 
@@ -250,7 +250,7 @@ SmartPropagatorWithIP::IP SmartPropagatorWithIP::computeImpactParametersInsideOu
   if( tsos.isValid() ) {
     return computeImpactParametersOutsideTkVol(*(tsos.freeTrajectoryState()), vertex);
   }
-  std::cout << "Mixed propagation failed, trying again with stepping helix only" << std::endl;
+  // std::cout << "Mixed propagation failed, trying again with stepping helix only" << std::endl;
   return computeImpactParametersOutsideTkVol(fts, vertex);
 }
 
