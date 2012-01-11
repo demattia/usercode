@@ -151,7 +151,7 @@ process.demo = cms.EDAnalyzer('TrackingEfficiencyFromCosmics',
 
                               SingleLegMuon = cms.bool(True),
                               CountOppoSide = cms.bool(True),
-                              CountSameSide = cms.bool(True)
+                              CountSameSide = cms.bool(True),
                               PhiRegion = cms.bool(False),
                               PhiMinCut = cms.double(-3.2),
                               PhiMaxCut = cms.double(0),
