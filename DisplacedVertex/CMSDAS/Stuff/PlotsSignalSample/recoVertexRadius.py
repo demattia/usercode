@@ -75,7 +75,7 @@ for event in events:
     genParticles = handle.product()
 
     for genParticle in genParticles:
-	if abs(genParticle.pdgId()) == 13:
+	if abs(genParticle.pdgId()) == 13 and genParticle.status()==1 and genParticle.pt() > 3:
 		ptGenMuHist.Fill(genParticle.pt())
 		VertexGenMuHist.Fill( math.sqrt(genParticle.vx()**2 + genParticle.vy()**2) )
 		if genParticle.pt()>25:
