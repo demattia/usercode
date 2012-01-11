@@ -11,9 +11,11 @@ log_plots=1
 import os,sys,math
 import ROOT
 import time
-import pileupReweighting
 
+from HarderAnalysis.DisplacedDileptons.mergeSamples import *
+from HarderAnalysis.DisplacedDileptons.pileupReweighting import *
 from DisplacedLeptons.Samples.sampletools import srm_path
+
 
 def modifyString(line):
     modifiedString = ""
@@ -27,155 +29,31 @@ def modifyString(line):
             modifiedString += char
     return modifiedString
 
-def mergeHistogramsFiles(workdirs):
-    for dir in workdirs:
-        if os.path.isfile(dir+"/histograms.root"):
-            continue
-        command = "cd "+dir+"; hadd histograms.root"
-        listDir = os.listdir(dir)
-        for fileName in listDir:
-            # print fileName
-            if fileName.startswith("histograms_") > 0:
-                # print "found file: "+fileName
-                command += " "+fileName
-        print "merging histograms files in "+dir
-        os.system(command)
-
-def checkPrefilterFiles(workdirs):
-    for workdir in workdirs:
-        if not os.path.exists(workdir+"/prefilter.root"):
-            # Try copying it from dCache
-            print "ERROR: missing file",workdir+"/prefilter.root, trying to copy it from dcache"
-            print "srmcp -2 \"srm://srm-dcache.rcac.purdue.edu:8443/srm/managerv2?SFN=/store/user/demattia/longlived/CMSSW_4_2_7/"+workdir.split("/")[-1].split("_analysis")[0]+"/prefilter.root\" \"file:///"+workdir+"/prefilter.root\""
-            os.system("srmcp -2 \"srm://srm-dcache.rcac.purdue.edu:8443/srm/managerv2?SFN=/store/user/demattia/longlived/CMSSW_4_2_7/"+workdir.split("/")[-1].split("_analysis")[0]+"/prefilter.root\" \"file:///"+workdir+"/prefilter.root\"")
-            if not os.path.exists(workdir+"/prefilter.root"):
-                print "ERROR: prefilter.root copy from dCache failed"
-                return -1
-
 
 #############################################
 ### DEFINE SAMPLES TO USE
 #############################################
 
-
-# define workdir area
-#myDir = "/net/unixfsrv/ppd/ryd54680/CMSSW_4_2_4_patch1/src/workdirs/"
-#myDir = "/home/ppd/pff62257/CMS/CMSSW_4_2_8_patch7/src/workdirs/"
 myDir = os.environ["LOCALRT"]+"/src/workdirs/"
-# myDir = "/uscmst1b_scratch/lpc1/3DayLifetime/"+os.environ["USER"]
 
-workdirs_data_mu = [
-    myDir + "Data_Mu_Run2011A1_analysis_20120103",
-    # myDir + "Data_Mu_Run2011A2_analysis_20120103",
-    # myDir + "Data_Mu_Run2011A3_analysis_20111215",
-    # myDir + "Data_Mu_Run2011A4_analysis_20111215",
-    # myDir + "Data_Mu_Run2011B1_analysis_20111215",
-    ]
-workdirs_data_e = [
-    myDir + "Data_Photon_Run2011A1_analysis_20120103",
-    # myDir + "Data_Photon_Run2011A2_analysis_20120104",
-    # myDir + "Data_Photon_Run2011A3_analysis_20111215",
-    # myDir + "Data_Photon_Run2011A4_analysis_20111215",
-    # myDir + "Data_Photon_Run2011B1_analysis_20111215",
-    ]
+#mergeSamples.
+get_samples(myDir)
 
-workdirs_background_mu = [
-    # myDir + "QCDmu15_analysis_20120104",
-    # myDir + "QCDmu20_analysis_20120104",
-    # myDir + "QCDmu30_analysis_20120104",
-    # myDir + "QCDmu50_analysis_20120104",
-    # myDir + "QCDmu80_analysis_20120104",
-    # myDir + "QCDmu120_analysis_20120104",
-    myDir + "QCDmu150_analysis_20120107",
-    # myDir + "TTbar_analysis_20120104_0",
-    myDir + "Zmumu_analysis_20120104",
-    # myDir + "Zmumu10_analysis_20120104",
-    # myDir + "ZmumuJets20_analysis_20120104",
-    # myDir + "ZmumuJets30_analysis_20120104",
-    # myDir + "ZmumuJets50_analysis_20120104",
-    # myDir + "ZmumuJets80_analysis_20120104",
-    # myDir + "ZmumuJets120_analysis_20120104",
-    # myDir + "ZmumuJets170_analysis_20120104",
-    # myDir + "ZmumuJets230_analysis_20120104",
-    # myDir + "ZmumuJets300_analysis_20120104",
-    # myDir + "Ztautau_analysis_20120104",
-    # myDir + "WW_analysis_20120104",
-    # myDir + "WZ_analysis_20120104",
-    # myDir + "ZZ_analysis_20120104"
-    ]
+wdir = getWorkdirs(myDir)
 
-workdirs_background_e = [
-    # myDir + "QCDem20_analysis_20120104",
-    # myDir + "QCDem30_analysis_20120101",
-    # myDir + "QCDem80_analysis_20120104",
-    myDir + "QCDem170_analysis_20120107_0",
-    # myDir + "QCDem300_analysis_20120107_0",
-    # myDir + "QCDem470_analysis_20120104",
-    # myDir + "QCDem600_analysis_20120104",
-    # myDir + "QCDem800_analysis_20120104",
-    # myDir + "QCDem1000_analysis_20120104",
-    # myDir + "QCDem1400_analysis_20120104",
-    # myDir + "QCDem1800_analysis_20120104",
-    # myDir + "TTbar_analysis_20120104_0",
-    myDir + "Zee_analysis_20120104",
-    # myDir + "Zee10_analysis_20120104",
-    # myDir + "ZeeJets20_analysis_20120104",
-    # myDir + "ZeeJets30_analysis_20120104",
-    # myDir + "ZeeJets50_analysis_20120104",
-    # myDir + "ZeeJets80_analysis_20120104",
-    # myDir + "ZeeJets120_analysis_20120104",
-    # myDir + "ZeeJets170_analysis_20120104",
-    # myDir + "ZeeJets230_analysis_20120104",
-    # myDir + "ZeeJets300_analysis_20120104",
-    # myDir + "Ztautau_analysis_20120104",
-    # myDir + "WW_analysis_20120104",
-    # myDir + "WZ_analysis_20120104",
-    # myDir + "ZZ_analysis_20120104"
-    ]
+workdirs_data_mu       =  wdir.workdirs_data_mu
+workdirs_data_e        =  wdir.workdirs_data_e
+workdirs_background_mu =  wdir.workdirs_background_mu
+workdirs_background_e  =  wdir.workdirs_background_e
+workdirs_signal        =  wdir.workdirs_signal
+workdirs_benchmark     =  wdir.workdirs_signal
 
-workdirs_benchmark_e = [
-    # myDir.replace("4_2_7","4_2_5")+"DisplacedE_50GeV_stdRECO_analysis_20110808", # <- generating
-    # myDir.replace("4_2_7","4_2_5")+"DisplacedE_50GeV_modRECO_analysis_20110808",
-    #myDir.replace("4_2_7","4_2_5")+"DisplacedE_50GeV_reRECO_analysis_20110808"
-    ]
+workdirs_benchmark_mu  =  wdir.workdirs_benchmark_mu
+workdirs_benchmark_e   =  wdir.workdirs_benchmark_e 
 
-workdirs_benchmark_mu = [
-    # myDir.replace("4_2_7","4_2_5")+"DisplacedMu_50GeV_stdRECO_analysis_20110808", # <- generating
-    # myDir.replace("4_2_7","4_2_5")+"DisplacedMu_50GeV_modRECO_analysis_20110808",
-    #myDir.replace("4_2_7","4_2_5")+"DisplacedMu_50GeV_reRECO_analysis_20110808"
-    ]
+print_s(workdirs_signal,"signal")
 
-workdirs_signal = [
-    # myDir + "Signal_120_020F_analysis_20120104",
-    # myDir + "Signal_120_050F_analysis_20120104",
-    # myDir + "Signal_200_020F_analysis_20120104",
-    myDir + "Signal_200_050F_analysis_20120104",
-    # myDir + "Signal_400_005L_analysis_20120104",
-    # myDir + "Signal_400_020F_analysis_20120104",
-    # myDir + "Signal_400_050F_analysis_20120104",
-    # myDir + "Signal_400_150F_analysis_20120104",
-    # myDir + "Signal_1000_020F_analysis_20120104",
-    # myDir + "Signal_1000_050F_analysis_20120104",
-    # myDir + "Signal_1000_150F_analysis_20120104",
-    # myDir + "Signal_1000_350F_analysis_20120104"
-    ]
-
-# Check if histograms.root was created for all the dirs
-mergeHistogramsFiles(workdirs_data_mu)
-mergeHistogramsFiles(workdirs_data_e)
-mergeHistogramsFiles(workdirs_background_mu)
-mergeHistogramsFiles(workdirs_background_e)
-mergeHistogramsFiles(workdirs_benchmark_mu)
-mergeHistogramsFiles(workdirs_benchmark_e)
-mergeHistogramsFiles(workdirs_signal)
-
-checkPrefilterFiles(workdirs_data_mu)
-checkPrefilterFiles(workdirs_data_e)
-checkPrefilterFiles(workdirs_background_mu)
-checkPrefilterFiles(workdirs_background_e)
-checkPrefilterFiles(workdirs_benchmark_mu)
-checkPrefilterFiles(workdirs_benchmark_e)
-checkPrefilterFiles(workdirs_signal)
+sys.exit(20)
 
 
 ############################################################################
@@ -2263,7 +2141,8 @@ def makePlots(SampleTriggerCombination,ptCut,
     # EFFICIENCY TEXT FILES
     #----------------------
 
-    pileupReweighting.dump_reweighted_efficiencies(lepton_name,ptCut,limitfolder,eAnalysis,muAnalysis,workdirs_signal)
+    #pileupReweighting.
+    dump_reweighted_efficiencies(lepton_name,ptCut,limitfolder,eAnalysis,muAnalysis,workdirs_signal)
     dump_signal_shape_histos(lepton_name,ptCut,limitfolder)
 
     #---------------------
@@ -2647,7 +2526,7 @@ ROOT.gROOT.Reset()
 ROOT.gROOT.SetBatch()
 ROOT.TH1.SetDefaultSumw2()
 ROOT.gErrorIgnoreLevel = ROOT.kWarning
-ROOT.gROOT.Macro( 'HarderAnalysis/DisplacedDileptons/test/tdrstyle.C' )
+ROOT.gROOT.Macro( os.environ["LOCALRT"]+'/src/HarderAnalysis/DisplacedDileptons/test/tdrstyle.C' )
 ROOT.gStyle.SetPadTopMargin(0.1);
 ROOT.gStyle.SetPadLeftMargin(0.15);
 ROOT.gStyle.SetPadRightMargin(0.05);

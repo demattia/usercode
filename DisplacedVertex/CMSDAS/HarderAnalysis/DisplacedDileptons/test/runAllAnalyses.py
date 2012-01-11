@@ -86,11 +86,17 @@ mc_qcd = [
     "QCDmu80",
     ]
 
+mc_benchmark = [
+    "DisplacedMu_50GeV_stdRECO",
+    "DisplacedE_50GeV_stdRECO"
+    ]
+
 mc_background = []
 mc_background += mc_vv
 mc_background += mc_qcd
 
-sample_test = [ "Data_Mu_Run2011A1", "Data_Photon_Run2011A1", "Signal_1000_020F", "TTbar"]
+sample_test = [ 
+#sample_test = [ "Data_Mu_Run2011A1", "Data_Photon_Run2011A1", "Signal_1000_020F", "TTbar"]
 
 sample_list = []
 
@@ -103,6 +109,7 @@ if sys.argv[1] == "all" :
     sample_list += data
     sample_list += mc_signal
     sample_list += mc_background
+    sample_list += mc_displaced
 elif sys.argv[1] == "data" :
     sample_list += data
 elif sys.argv[1] == "signal" :
