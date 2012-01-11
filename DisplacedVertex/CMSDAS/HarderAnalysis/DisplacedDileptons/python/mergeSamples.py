@@ -110,12 +110,12 @@ def getWorkdirs(mydir):
     return wdir
 
 
-#myDir = os.environ["LOCALRT"]+"/src/workdirs/"
+myDir = os.environ["LOCALRT"]+"/src/workdirs/"
 #myDir = os.environ["PWD"]
-#print myDir
 
-#getWorkdirs(myDir)
+    
+samples = get_samples(myDir)
 
-#mergeHistogramsFiles(samples)
-#checkPrefilterFiles(samples)
+mergeHistogramsFiles(samples)
+checkPrefilterFiles(samples)
 
