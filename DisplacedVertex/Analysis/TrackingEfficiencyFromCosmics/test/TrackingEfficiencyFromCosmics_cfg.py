@@ -142,10 +142,10 @@ process.demo = cms.EDAnalyzer('TrackingEfficiencyFromCosmics',
 
                               UseMCtruth = cms.bool(False),
 
-                              EffOutputFileName = cms.string("Efficiency_NUMBER.root"),
-                              EffCleanedOutputFileName = cms.string("EfficiencyCleaned_NUMBER.root"),
-                              GenToStandAloneEffOutputFileName = cms.string("GenToStandAloneEfficiency_NUMBER.root"),
-                              GenToTrackEffOutputFileName = cms.string("GenToTrackEfficiency_NUMBER.root"),
+                              EffOutputFileName = cms.string("Efficiency.root"),
+                              EffCleanedOutputFileName = cms.string("EfficiencyCleaned.root"),
+                              GenToStandAloneEffOutputFileName = cms.string("GenToStandAloneEfficiency.root"),
+                              GenToTrackEffOutputFileName = cms.string("GenToTrackEfficiency.root"),
 
                               RecomputeIP = cms.bool(False),
 
