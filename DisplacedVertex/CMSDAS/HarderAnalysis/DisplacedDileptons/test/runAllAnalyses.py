@@ -35,7 +35,7 @@ mc_signal = [
     ]
 
 
-mc_background = [
+mc_vv = [
     "TTbar", 
     "WW", 
     "WZ", 
@@ -63,6 +63,9 @@ mc_background = [
     "Ztautau",
    #"DisplacedE_50GeV_stdRECO", 
    #"DisplacedMu_50GeV_stdRECO", 
+    ]
+
+mc_qcd = [
     "QCDem1000", 
     "QCDem1400", 
     "QCDem170", 
@@ -83,11 +86,15 @@ mc_background = [
     "QCDmu80",
     ]
 
-sample_test = ["TTbar"]
+mc_background = []
+mc_background += mc_vv
+mc_background += mc_qcd
+
+sample_test = [ "Data_Mu_Run2011A1", "Data_Photon_Run2011A1", "Signal_1000_020F", "TTbar"]
 
 sample_list = []
 
-nn = "enter one of:\n\tdata \n\tsignal \n\tbackground \n\tall \n\ttest" 
+nn = "enter one of:\n\tdata \n\tsignal \n\tbackground \n\tqcd \n\tvectorboson \n\tall \n\ttest" 
 if len(sys.argv)!=2:
     print nn
     sys.exit(1)
@@ -102,6 +109,10 @@ elif sys.argv[1] == "signal" :
     sample_list += mc_signal
 elif sys.argv[1] == "background" :
     sample_list += mc_background
+elif sys.argv[1] == "qcd" :
+    sample_list += mc_qcd
+elif sys.argv[1] == "vectorboson" :
+    sample_list += mc_vv
 elif sys.argv[1] == "test" :
     sample_list += sample_test
 else :
@@ -118,6 +129,7 @@ for fn in sample_list :
     cmd = sdir + "run_analysis.py " + ldir + fn + "_cff.py"
     print cmd
     os.system(cmd)
+
 
 print "Done submitting."
 
