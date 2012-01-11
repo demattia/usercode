@@ -1,3 +1,0 @@
-'/store/data/Commissioning11/MinimumBias/RAW/v1/000/157/956/FA53F855-5239-E011-939B-001D09F29114.root',
-'/store/data/Commissioning11/MinimumBias/RAW/v1/000/157/956/50457AF0-5739-E011-BE14-0019DB29C5FC.root',
-'/store/data/Commissioning11/MinimumBias/RAW/v1/000/157/956/06C78657-5239-E011-8AF6-0015C5FDE067.root'

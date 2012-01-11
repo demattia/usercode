@@ -1,7 +1,0 @@
-<use name="FWCore/Framework">
-<use name="boost">
-<export>
-  <use name="FWCore/Framework">
-  <use name="boost">
-  <lib name="CondToolsUnitTester">
-</export>

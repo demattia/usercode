@@ -1,3 +1,0 @@
-Scripts for production of events with CERN batch queues.
-
-The Prepare.sh script can be used to create new directories for the QCD. It uses the QCD_170-230 dirctory as a template.
