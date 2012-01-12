@@ -108,7 +108,7 @@ if sys.argv[1] == "all" :
     sample_list += data
     sample_list += mc_signal
     sample_list += mc_background
-    sample_list += mc_displaced
+    sample_list += mc_benchmark
 elif sys.argv[1] == "data" :
     sample_list += data
 elif sys.argv[1] == "signal" :

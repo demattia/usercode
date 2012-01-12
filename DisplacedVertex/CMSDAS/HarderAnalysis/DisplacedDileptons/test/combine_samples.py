@@ -15,32 +15,25 @@ import time
 from HarderAnalysis.DisplacedDileptons.mergeSamples import *
 from HarderAnalysis.DisplacedDileptons.pileupReweighting import *
 from DisplacedLeptons.Samples.sampletools import srm_path
+from HarderAnalysis.DisplacedDileptons.common import *
+#from common import CMSPlotDecoration,setAxisRange, setHistNBins, setHistXLegend, setHistTitle, setAxisTitle, setLegendEntry, setHistColour
+#from common import replace_trig_name, set_ana_folder
 
 
-def modifyString(line):
-    modifiedString = ""
-    foundQuote = False
-    for char in line:
-        if char == "\"":
-            foundQuote = not foundQuote
-        if char == "," and foundQuote:
-            modifiedString += "###"
-        else:
-            modifiedString += char
-    return modifiedString
+#set desired plot format
+fformat = ".gif"
 
+#set folder structure
+folder = set_ana_folder()
+benchmarkfolder = folder[0]
+plotfolder      = folder[1]
 
-#############################################
-### DEFINE SAMPLES TO USE
-#############################################
+#get list of samples to use:
 
 myDir = os.environ["LOCALRT"]+"/src/workdirs/"
-
-#mergeSamples.
 get_samples(myDir)
 
 wdir = getWorkdirs(myDir)
-
 workdirs_data_mu       =  wdir.workdirs_data_mu
 workdirs_data_e        =  wdir.workdirs_data_e
 workdirs_background_mu =  wdir.workdirs_background_mu
@@ -51,14 +44,12 @@ workdirs_benchmark     =  wdir.workdirs_signal
 workdirs_benchmark_mu  =  wdir.workdirs_benchmark_mu
 workdirs_benchmark_e   =  wdir.workdirs_benchmark_e 
 
-print_s(workdirs_signal,"signal")
-
-#sys.exit(20)
+#print_s(workdirs_signal,"signal")
 
 
-############################################################################
-### DEFINE ANALYSIS CHANNELS
-############################################################################
+
+
+# define analysis channels
 
 muAnalysis="muTrackAnalysis"
 eAnalysis="eTrackAnalysis"
@@ -68,553 +59,23 @@ ePtCut38=41
 ePtCut43=46
 muPtCut23=25 # <- note this was lower!
 muPtCut30=33
-# ePtCut33=36
-# ePtCut38=41
-# ePtCut43=46
-# muPtCut23=26
-# muPtCut30=33
 
 
-############################################################################
-### DEFINE REPLACEMENT TRIGGERS TO BE USED WHEN ACTUAL TRIGGER MISSING IN MC
-############################################################################
+#replace trigger names for mc
+replacementTrigger=replace_trig_name()
 
-replacementTrigger={}
-replacementTrigger["HLT_L2DoubleMu23_NoVertex_v1"]="HLT_L2DoubleMu23_NoVertex_v1"
-replacementTrigger["HLT_L2DoubleMu23_NoVertex_v2"]="HLT_L2DoubleMu23_NoVertex_v1"
-replacementTrigger["HLT_L2DoubleMu23_NoVertex_v3"]="HLT_L2DoubleMu23_NoVertex_v1"
-replacementTrigger["HLT_L2DoubleMu23_NoVertex_v4"]="HLT_L2DoubleMu23_NoVertex_v1"
-replacementTrigger["HLT_L2DoubleMu23_NoVertex_v5"]="HLT_L2DoubleMu23_NoVertex_v1"
-replacementTrigger["HLT_L2DoubleMu23_NoVertex_v6"]="HLT_L2DoubleMu23_NoVertex_v1"
-replacementTrigger["HLT_L2DoubleMu23_NoVertex_v7"]="HLT_L2DoubleMu23_NoVertex_v1"
-replacementTrigger["HLT_L2DoubleMu30_NoVertex_v1"]="MC_L2DoubleMu30_NoVertex_v1"
-replacementTrigger["HLT_L2DoubleMu30_NoVertex_v2"]="MC_L2DoubleMu30_NoVertex_v1"
-replacementTrigger["HLT_L2DoubleMu30_NoVertex_v3"]="MC_L2DoubleMu30_NoVertex_v1"
-replacementTrigger["HLT_L2DoubleMu30_NoVertex_v4"]="MC_L2DoubleMu30_NoVertex_v1"
-
-replacementTrigger["HLT_DoublePhoton33_v1"]="HLT_DoublePhoton33_v2"
-replacementTrigger["HLT_DoublePhoton33_v2"]="HLT_DoublePhoton33_v2"
-replacementTrigger["HLT_DoublePhoton33_v3"]="HLT_DoublePhoton33_v2"
-replacementTrigger["HLT_DoublePhoton33_v4"]="HLT_DoublePhoton33_v2"
-replacementTrigger["HLT_DoublePhoton33_v5"]="HLT_DoublePhoton33_v2"
-replacementTrigger["HLT_DoublePhoton33_HEVT_v1"]="HLT_DoublePhoton33_v2"
-replacementTrigger["HLT_DoublePhoton33_HEVT_v2"]="HLT_DoublePhoton33_v2"
-replacementTrigger["HLT_DoublePhoton33_HEVT_v3"]="HLT_DoublePhoton33_v2"
-replacementTrigger["HLT_DoublePhoton33_HEVT_v4"]="HLT_DoublePhoton33_v2"
-replacementTrigger["HLT_DoublePhoton38_HEVT_v1"]="MC_DoublePhoton38_v2"
-replacementTrigger["HLT_DoublePhoton38_HEVT_v2"]="MC_DoublePhoton38_v2"
-replacementTrigger["HLT_DoublePhoton38_HEVT_v3"]="MC_DoublePhoton38_v2"
-replacementTrigger["HLT_DoublePhoton43_HEVT_v1"]="MC_DoublePhoton43_v2"
-
-
-#############################################
-### DEFINE HISTOGRAM PROPERTIES
-#############################################
-
-axisRange={}
-boolrange=[-0.1,1.1]
-axisRange["mass"]=[0,500]
-axisRange["mass_corr"]=[0,500]
-axisRange["mass_triggercorr"]=[0,500]
-axisRange["mass_scalecorr"]=[0,500]
-axisRange["leptonEtaL"]=[-5,5]
-axisRange["leptonEtaH"]=[-5,5]
-axisRange["leptonD0L"]=[0,5]
-axisRange["leptonD0H"]=[0,5]
-axisRange["leptonD0significanceL"]=[-10,10]
-axisRange["leptonD0significanceH"]=[-10,10]
-axisRange["leptonAbsD0significanceL"]=[0,10]
-axisRange["leptonAbsD0significanceH"]=[0,10]
-axisRange["decayLengthSignificance2D"]=[0,20]
-axisRange["decayLength2D"]=[0,100]
-axisRange["cosThetaStar"]=[-1.1,1.1]
-axisRange["leptonQualityL"]=boolrange
-axisRange["leptonQualityH"]=boolrange
-axisRange["leptonPtL"]=[0,100]
-axisRange["leptonPtH"]=[0,100]
-axisRange["trackerIsolationL"]=[0,20.]
-axisRange["trackerIsolationH"]=[0,20.]
-axisRange["oppositeCharge"]=boolrange
-axisRange["validTracks"]=boolrange
-axisRange["validVertex"]=boolrange
-axisRange["vetoBackToBack"]=[-1.1,1.1]
-axisRange["dPhi"]=[0,1.0]
-axisRange["dPhicorr"]=[0,1.0]
-axisRange["dPhitriggerCorr"]=[0,1.0]
-axisRange["maxHitsBeforeVertex"]=[-1,5]
-axisRange["maxHitsMissedAfterVertex"]=[-1,5]
-axisRange["vertexChi2"]=[0,20]
-axisRange["eta_cand"]=[-5,5]
-axisRange["phi_cand"]=[-6.5,6.5]
-axisRange["numCaloMatches"]=[-0.2,2.2]
-axisRange["numTrigMatches"]=[-0.2,2.2]
-axisRange["numStandAloneMuons"]=[-0.2,2.2]
-axisRange["numPrimaryVertices"]=[0,25]
-axisRange["deltaRBetweenLeptons"]=[0,6.4]
-
-histNBins={}
-histNBins["mass"]=100
-histNBins["mass_corr"]=100
-histNBins["mass_triggercorr"]=100
-histNBins["mass_scalecorr"]=100
-histNBins["leptonD0L"]=25
-histNBins["leptonD0H"]=25
-histNBins["leptonD0significanceL"]=25
-histNBins["leptonD0significanceH"]=25
-histNBins["leptonAbsD0significanceL"]=25
-histNBins["leptonAbsD0significanceH"]=25
-histNBins["decayLengthSignificance2D"]=25
-histNBins["decayLength2D"]=25
-histNBins["cosThetaStar"]=25
-histNBins["leptonQualityL"]=12
-histNBins["leptonQualityH"]=12
-histNBins["leptonPtL"]=100
-histNBins["leptonPtH"]=100
-histNBins["trackerIsolationL"]=50
-histNBins["trackerIsolationH"]=50
-histNBins["oppositeCharge"]=12
-histNBins["validTracks"]=12
-histNBins["validVertex"]=12
-histNBins["vetoBackToBack"]=25
-histNBins["dPhi"]=25
-histNBins["dPhicorr"]=25
-histNBins["dPhitriggerCorr"]=25
-histNBins["maxHitsBeforeVertex"]=6
-histNBins["maxHitsMissedAfterVertex"]=6
-histNBins["vertexChi2"]=20
-histNBins["leptonEtaL"]=50
-histNBins["leptonEtaH"]=50
-histNBins["eta_cand"]=50
-histNBins["phi_cand"]=50
-histNBins["numCaloMatches"]=24
-histNBins["numTrigMatches"]=24
-histNBins["numStandAloneMuons"]=24
-histNBins["numPrimaryVertices"]=25
-histNBins["deltaRBetweenLeptons"]=32
-
-histXLegend={}
-histXLegend["massPrompt"]=0.7
-histXLegend["mass"]=0.33
-histXLegend["mass_corr"]=0.33
-histXLegend["mass_triggercorr"]=0.33
-histXLegend["mass_scalecorr"]=0.33
-histXLegend["leptonD0L"]=0.6
-histXLegend["leptonD0H"]=0.6
-histXLegend["leptonD0significanceL"]=0.6
-histXLegend["leptonD0significanceH"]=0.6
-histXLegend["leptonAbsD0significanceL"]=0.6
-histXLegend["leptonAbsD0significanceH"]=0.6
-histXLegend["decayLengthSignificance2D"]=0.6
-histXLegend["decayLength2D"]=0.6
-histXLegend["cosThetaStar"]=0.6
-histXLegend["leptonQualityL"]=0.3
-histXLegend["leptonQualityH"]=0.3
-histXLegend["leptonPtL"]=0.6
-histXLegend["leptonPtH"]=0.6
-histXLegend["trackerIsolationL"]=0.6
-histXLegend["trackerIsolationH"]=0.6
-histXLegend["oppositeCharge"]=0.3
-histXLegend["validTracks"]=0.3
-histXLegend["validVertex"]=0.3
-histXLegend["vetoBackToBack"]=0.6
-histXLegend["dPhi"]=0.6
-histXLegend["dPhicorr"]=0.6
-histXLegend["dPhitriggerCorr"]=0.6
-histXLegend["maxHitsBeforeVertex"]=0.6
-histXLegend["maxHitsMissedAfterVertex"]=0.6
-histXLegend["vertexChi2"]=0.6
-histXLegend["leptonEtaL"]=0.6
-histXLegend["leptonEtaH"]=0.6
-histXLegend["eta_cand"]=0.6
-histXLegend["phi_cand"]=0.6
-histXLegend["numCaloMatches"]=0.3
-histXLegend["numTrigMatches"]=0.3
-histXLegend["numStandAloneMuons"]=0.3
-histXLegend["numPrimaryVertices"]=0.6
-histXLegend["numPV_central"]=0.6
-histXLegend["numPV_low"]=0.6
-histXLegend["numPV_high"]=0.6
-histXLegend["numPV_veryhigh"]=0.6
-histXLegend["deltaRBetweenLeptons"]=0.6
-histXLegend["number_of_actual_leptons"]=0.2
-
-histTitle={}
-histTitle["mass"]="dilepton invariant mass"
-histTitle["mass_corr"]="dilepton invariant mass"
-histTitle["mass_triggercorr"]="dilepton invariant mass"
-histTitle["mass_scalecorr"]="dilepton invariant mass"
-histTitle["leptonD0L"]="lepton d_{xy}"
-histTitle["leptonD0H"]="lepton d_{xy}"
-histTitle["leptonD0significanceL"]="lepton d_{xy}/#sigma"
-histTitle["leptonD0significanceH"]="lepton d_{xy}/#sigma"
-histTitle["leptonAbsD0significanceL"]="lepton |d_{xy}/#sigma|"
-histTitle["leptonAbsD0significanceH"]="lepton |d_{xy}/#sigma|"
-histTitle["decayLengthSignificance2D"]="transverse decay length significance"
-histTitle["decayLength2D"]="transverse decay length"
-histTitle["cosThetaStar"]="cos(decay helicity angle)"
-histTitle["leptonQualityL"]="lepton quality cuts, lower p_t"
-histTitle["leptonQualityH"]="lepton quality cuts, higher p_t"
-histTitle["leptonPtL"]="lower lepton p_t"
-histTitle["leptonPtH"]="higher lepton p_t"
-histTitle["trackerIsolationL"]="tracker isolation, lower p_t"
-histTitle["trackerIsolationH"]="tracker isolation, higher p_t"
-histTitle["oppositeCharge"]="opposite charge"
-histTitle["validTracks"]="valid tracks"
-histTitle["validVertex"]="valid vertex"
-histTitle["vetoBackToBack"]="cos(angle between leptons)"
-histTitle["dPhi"]="#Delta #varphi"
-histTitle["dPhicorr"]="p_t corrected #Delta #varphi"
-histTitle["dPhitriggerCorr"]="trigger corrected #Delta #varphi"
-histTitle["maxHitsBeforeVertex"]="number of hits before vertex"
-histTitle["maxHitsMissedAfterVertex"]="missed hits after vertex"
-histTitle["vertexChi2"]="vertex #chi^{2}/NDF"
-histTitle["leptonEtaL"]="lepton #eta"
-histTitle["leptonEtaH"]="lepton #eta"
-histTitle["eta_cand"]="dilepton #eta"
-histTitle["phi_cand"]="dilepton #varphi"
-histTitle["numCaloMatches"]="number of matched superclusters"
-histTitle["numTrigMatches"]="number of matched trigger objects"
-histTitle["numStandAloneMuons"]="number of standalone muons in candidate"
-histTitle["numPrimaryVertices"]="number of primary vertices"
-histTitle["numPV_central"]="number of primary vertices"
-histTitle["numPV_low"]="number of primary vertices, MC low"
-histTitle["numPV_high"]="number of primary vertices, MC high"
-histTitle["numPV_veryhigh"]="number of primary vertices, MC very high"
-histTitle["deltaRBetweenLeptons"]="#Delta R between leptons"
-histTitle["number_of_actual_leptons"]="number of true leptons in candidate"
-
-axisTitle={}
-axisTitle["mass"]="mass [GeV/c^{2}]"
-axisTitle["mass_corr"]="mass [GeV/c^{2}]"
-axisTitle["mass_triggercorr"]="mass [GeV/c^{2}]"
-axisTitle["mass_scalecorr"]="mass [GeV/c^{2}]"
-axisTitle["leptonD0L"]="lepton d_{xy} (cm)"
-axisTitle["leptonD0H"]="lepton d_{xy} (cm)"
-axisTitle["leptonD0significanceL"]="d_{xy}/#sigma"
-axisTitle["leptonD0significanceH"]="d_{xy}/#sigma"
-axisTitle["leptonAbsD0significanceL"]="|d_{xy}/#sigma|"
-axisTitle["leptonAbsD0significanceH"]="|d_{xy}/#sigma|"
-axisTitle["decayLengthSignificance2D"]="L_{xy}/#sigma"
-axisTitle["decayLength2D"]="L_{xy} [cm]"
-axisTitle["cosThetaStar"]="cos(#Theta*)"
-axisTitle["leptonQualityL"]="result"
-axisTitle["leptonQualityH"]="result"
-axisTitle["leptonPtL"]="p_{t} [GeV/c]"
-axisTitle["leptonPtH"]="p_{t} [GeV/c]"
-axisTitle["trackerIsolationL"]="#Sigma p_{t} [GeV/c]"
-axisTitle["trackerIsolationH"]="#Sigma p_{t} [GeV/c]"
-axisTitle["oppositeCharge"]="result"
-axisTitle["validTracks"]="result"
-axisTitle["validVertex"]="result"
-axisTitle["vetoBackToBack"]="cos(#alpha)"
-axisTitle["dPhi"]="#Delta #varphi"
-axisTitle["dPhicorr"]="#Delta #varphi"
-axisTitle["dPhitriggerCorr"]="#Delta #varphi"
-axisTitle["maxHitsBeforeVertex"]="number of hits"
-axisTitle["maxHitsMissedAfterVertex"]="number of hits"
-axisTitle["vertexChi2"]="#chi^{2}/NDF"
-axisTitle["leptonEtaL"]="#eta"
-axisTitle["leptonEtaH"]="#eta"
-axisTitle["eta_cand"]="#eta"
-axisTitle["phi_cand"]="#varphi"
-axisTitle["numCaloMatches"]="number of matched superclusters"
-axisTitle["numTrigMatches"]="number of matched trigger objects"
-axisTitle["numStandAloneMuons"]="number of standalone muons"
-axisTitle["numPrimaryVertices"]="number of primary vertices"
-axisTitle["numPV_central"]="number of primary vertices"
-axisTitle["numPV_low"]="number of primary vertices"
-axisTitle["numPV_high"]="number of primary vertices"
-axisTitle["numPV_veryhigh"]="number of primary vertices"
-axisTitle["deltaRBetweenLeptons"]="#Delta R"
-axisTitle["number_of_actual_leptons"]="number of leptons"
-
-legendEntry={}
-legendEntry["Zee_"]="Z/#gamma* #rightarrow ee"
-legendEntry["Zmumu_"]="Z/#gamma* #rightarrow #mu#mu"
-legendEntry["Ztautau_"]="Z/#gamma* #rightarrow #tau#tau"
-legendEntry["ZeeJets_"]="Z/#gamma* #rightarrow ee + jet"
-legendEntry["ZmumuJets_"]="Z/#gamma* #rightarrow #mu#mu + jet"
-legendEntry["QCDmu_"]="QCD"
-legendEntry["QCDem_"]="QCD"
-legendEntry["TTbar_"]="tt"
-legendEntry["WW_"]="WW"
-legendEntry["WZ_"]="WZ"
-legendEntry["ZZ_"]="ZZ"
-legendEntry["Signal_120_020F_"] = "H(120) #rightarrow_XX(20), 1 pb"
-legendEntry["Signal_120_050F_"] = "H(120) #rightarrow XX(50), 1 pb"
-legendEntry["Signal_200_020F_"] = "H(200) #rightarrow XX(20), 1 pb"
-legendEntry["Signal_200_050F_"] = "H(200) #rightarrow XX(50), 1 pb"
-legendEntry["Signal_400_005L_"] = "H(400) #rightarrow XX(5), 1 pb"
-legendEntry["Signal_400_020F_"] = "H(400) #rightarrow XX(20), 1 pb"
-legendEntry["Signal_400_050F_"] = "H(400) #rightarrow XX(50), 1 pb"
-legendEntry["Signal_400_150F_"] = "H(400) #rightarrow XX(150), 1 pb"
-legendEntry["Signal_1000_020F_"] = "H(1000) #rightarrow XX(20), 1 pb"
-legendEntry["Signal_1000_050F_"] = "H(1000) #rightarrow XX(50), 1 pb"
-legendEntry["Signal_1000_150F_"] = "H(1000) #rightarrow XX(150), 1 pb"
-legendEntry["Signal_1000_350F_"] = "H(1000) #rightarrow XX(350), 1 pb"
-
-
-histColour={}
-histColour["Zee_"]=       ROOT.kRed
-histColour["Zmumu_"]=     ROOT.kRed
-histColour["Ztautau_"]=   ROOT.kOrange  +7
-histColour["ZeeJets_"]=   ROOT.kYellow
-histColour["ZmumuJets_"]= ROOT.kYellow
-histColour["QCDmu_"]=     ROOT.kBlue
-histColour["QCDem_"]=     ROOT.kBlue
-histColour["TTbar_"]=     ROOT.kSpring  -9
-histColour["WW_"]=        ROOT.kMagenta +1
-histColour["WZ_"]=        ROOT.kCyan    -9
-histColour["ZZ_"]=        ROOT.kGreen   +3
-
-
-# ==================================================================================
-# ==================================================================================
-
-
-#############################################
-### TOOLS: PLOT DECORATION
-#############################################
-
-def CMSPlotDecoration(channel,lumisum=0):
-    info=ROOT.TLatex()
-    info.SetNDC()
-    if lumisum>0:
-        info.DrawLatex(0.18,0.95,\
-                       "CMS Preliminary #sqrt{s}=7 TeV L=%3.1f fb^{-1}"%(lumisum/1000.))
-    else:
-        info.DrawLatex(0.18,0.95,\
-                       "CMS Simulation")
-        pass
-    if channel.find("mu")>=0:
-        info.DrawLatex(0.18,0.83,"#mu^{+}#mu^{-}")
-    else:
-        info.DrawLatex(0.18,0.83,"e^{+}e^{-}")
-        pass
-    return
-
-
-#############################################
-### TOOLS: DRAW OVERFLOW BIN IN HISTOGRAM
-#############################################
-
-def drawhist(h,opt):
-
-    if draw_overflow:
-        # get overflow bin content
-        of=h.GetBinContent(h.GetNbinsX()+1)
-        ofe=h.GetBinError(h.GetNbinsX()+1)
-        # get last bin content
-        lb=h.GetBinContent(h.GetNbinsX())
-        lbe=h.GetBinError(h.GetNbinsX())
-        # add them both up in last bin
-        h.SetBinContent(h.GetNbinsX(),lb+of)
-        h.SetBinError(h.GetNbinsX(),math.sqrt(lbe*lbe+ofe*ofe))
-        pass
-    h.Draw(opt)
-    return
-
-
-# ==================================================================================
-# ==================================================================================
+#set up tools for plot decoration
+axisRange=setAxisRange()
+histNBins=setHistNBins()
+histXLegend=setHistXLegend()
+histTitle=setHistTitle()
+axisTitle=setAxisTitle()
+legendEntry=setLegendEntry()
+histColour=setHistColour()
 
 
 
-#############################################
-### DRAW EFFICIENCY HISTOGRAM
-#############################################
-
-def efficiencyPlot(workdir,histname1,histname2,filename,title,xlabel):
-
-    # check whether normalization histogram is in prefilter file
-    prefilter=0
-    if histname2.find("Prefilter")>=0: prefilter=1
-
-    # check whether files exist
-    if not os.path.exists(workdir+"/histograms.root"):
-        print "ERROR: missing file",workdir+"/histograms.root"
-        return -1
-    if prefilter and not os.path.exists(workdir+"/prefilter.root"):
-        # Try copying it from dCache
-        print "ERROR: missing file",workdir+"/prefilter.root, trying to copy it from dcache"
-        print "srmcp -2 \"srm://srm-dcache.rcac.purdue.edu:8443/srm/managerv2?SFN=/store/user/demattia/longlived/CMSSW_4_2_7/"+workdir.split("/")[-1].split("_analysis")[0]+"/prefilter.root\" \"file:///"+workdir+"/prefilter.root\""
-        os.system("srmcp -2 \"srm://srm-dcache.rcac.purdue.edu:8443/srm/managerv2?SFN=/store/user/demattia/longlived/CMSSW_4_2_7/"+workdir.split("/")[-1].split("_analysis")[0]+"/prefilter.root\" \"file:///"+workdir+"/prefilter.root\"")
-        if not os.path.exists(workdir+"/prefilter.root"):
-            print "ERROR: prefilter.root copy from dCache failed"
-            return -1
-    # if prefilter and not os.path.exists(workdir+"/prefilter.root"):
-    #     print "ERROR: missing file",workdir+"/prefilter.root"
-    #     return -1
-
-    # get histograms
-    histfile=ROOT.TFile.Open(workdir+"/histograms.root")
-    enum=histfile.Get(histname1)
-    if prefilter:
-        prefilterfile=ROOT.TFile.Open(workdir+"/prefilter.root")
-        denom=prefilterfile.Get(histname2)
-    else:
-        denom=histfile.Get(histname2)
-    try:
-        nref=denom.Integral()
-    except:
-        if prefilter:
-            print "ERROR: histogram",histname2,"not found in",\
-                  workdir+"/prefilter.root"
-        else:
-            print "ERROR: histogram",histname2,"not found in",\
-                  workdir+"/histograms.root"
-            pass
-        return -1
-    try:
-        nsel=enum.Integral()
-    except:
-        nsel=0
-        pass
-    print workdir.split("/")[-1],title,"average efficiency:",nsel/nref
-    canv=ROOT.TCanvas()
-    try:
-        effi=enum.Clone()
-        if enum.GetNbinsX()<denom.GetNbinsX():
-            denom.Rebin(denom.GetNbinsX()/enum.GetNbinsX())
-            pass
-    except:
-        effi=denom.Clone()
-        effi.Reset()
-        pass
-    effi.Divide(denom)
-    for i in range(effi.GetNbinsX()):
-        n=denom.GetBinContent(i+1)
-        if n>0:
-            p=effi.GetBinContent(i+1)
-            if p<0 or p>1:
-                print "ERROR: efficiency",p,"in bin",i+1
-            effi.SetBinError(i+1,math.sqrt(p*(1-p)/n))
-        else:
-            effi.SetBinError(i+1,0)
-            pass
-        pass
-    effi.SetTitle(title)
-    effi.GetXaxis().SetTitle(xlabel)
-    effi.GetYaxis().SetTitle("efficiency")
-    effi.SetMarkerStyle(20)
-    effi.SetMinimum(0)
-    effi.SetMaximum(1.1)
-    effi.Draw()
-    CMSPlotDecoration(filename)
-    canv.Update()
-    canv.Print(filename)
-    canv.Clear()
-    histfile.Close()
-    if nref>0:
-         return nsel/nref
-    else:
-        return -1
-    pass
-
-
-#############################################
-### EFFICIENCY PLOTS FROM MC
-#############################################
-
-def makeEfficiencyPlots():
-
-    print "-----------------------------------------------"
-    print "--- making plots of uncorrected MC efficiencies"
-    print "-----------------------------------------------"
-    begintime=time.time()
-    
-    # tracking efficiency for electrons
-    for workdir in workdirs_benchmark_e:
-        sampleID=workdir.split("/")[-1].replace("_analysis","")
-        efficiencyPlot(workdir,eAnalysis+"/leptons/trueLeptonRadWithTrack",
-                       eAnalysis+"/gen/leptonProdVtxRadius2D",
-                       benchmarkfolder+"/track_effi_electrons.pdf",
-                       "track reconstruction efficiency as function of impact parameter",
-                       "d_{0} [cm]")
-        pass
-
-    # tracking efficiency for muons
-    for workdir in workdirs_benchmark_mu:
-        sampleID=workdir.split("/")[-1].replace("_analysis","")
-        efficiencyPlot(workdir,muAnalysis+"/leptons/trueLeptonRadWithTrack",
-                       muAnalysis+"/gen/leptonProdVtxRadius2D",
-                       benchmarkfolder+"/track_effi_muons.pdf",
-                       "track reconstruction efficiency as function of impact parameter",
-                       "d_{0} [cm]")
-        pass
-
-    # displaced lepton reconstruction efficiency
-    for workdir in workdirs_benchmark_e:
-        sampleID=workdir.split("/")[-1].replace("_analysis","")
-        efficiencyPlot(workdir,
-                       eAnalysis+"/electrons/trueProdVtxRad",
-                       eAnalysis+"/gen/leptonProdVtxRadius2D",
-                       benchmarkfolder+"/electron_effi_"+sampleID+".pdf",
-                       "electron reconstruction efficiency as function of impact parameter",
-                       "d_{0} [cm]")
-        pass
-    for workdir in workdirs_benchmark_mu:
-        sampleID=workdir.split("/")[-1].replace("_analysis","")
-        efficiencyPlot(workdir,
-                       muAnalysis+"/muons/trueProdVtxRad",
-                       muAnalysis+"/gen/leptonProdVtxRadius2D",
-                       benchmarkfolder+"/muon_effi_"+sampleID+".pdf",
-                       "muon reconstruction efficiency as function of impact parameter",
-                       "d_{0} [cm]")
-        pass
-
-    # dilepton reconstruction efficiency plots as function of 2d decay length
-    # these are uncorrected efficiencies
-    # and taking the average efficiency from this plot will overestimate the
-    # actual average efficiency somewhat because these plots cut off the low
-    # efficiency region beyond 100cm radius.
-    for workdir in workdirs_signal:
-        sampleID=workdir.split("/")[-1].replace("_analysis","")
-        efficiencyPlot(workdir,
-                       muAnalysis+"/dileptons/trueDecayLength2D_1",
-                       "isoTrackPrefilter/decayLength2D_1muon",
-                       benchmarkfolder+"/dimuon1_effi_"+sampleID+".pdf",
-                       "dimuon reconstruction efficiency"+
-                       " as function of decay length, 1 dimuon",
-                       "L_{xy} [cm]")
-        
-        efficiencyPlot(workdir,
-                       muAnalysis+"/dileptons/trueDecayLength2D_2",
-                       "isoTrackPrefilter/decayLength2D_2muon",
-                       benchmarkfolder+"/dimuon2_effi_"+sampleID+".pdf",
-                       "dimuon reconstruction efficiency"+
-                       " as function of decay length, 2 dimuons",
-                       "L_{xy} [cm]")
-        
-        efficiencyPlot(workdir,
-                       eAnalysis+"/dileptons/trueDecayLength2D_1",
-                       "isoTrackPrefilter/decayLength2D_1elec",
-                       benchmarkfolder+"/dielectron1_effi_"+sampleID+".pdf",
-                       "dielectron reconstruction efficiency"+
-                       " as function of decay length, 1 dielectron",
-                       "L_{xy} [cm]")
-    
-        efficiencyPlot(workdir,
-                       eAnalysis+"/dileptons/trueDecayLength2D_2",
-                       "isoTrackPrefilter/decayLength2D_2elec",
-                       benchmarkfolder+"/dielectron2_effi_"+sampleID+".pdf",
-                       "dielectron reconstruction efficiency"+
-                       " as function of decay length, 2 dielectrons",
-                       "L_{xy} [cm]")
-        pass
-
-    endtime=time.time()
-    print "+++this took",endtime-begintime,"seconds"
-    return
-
-
-# ==================================================================================
-# ==================================================================================
-
-#############################################
-### DRAW DATA/MC OVERLAY PLOT FROM HISTOGRAMS
-#############################################
-
+# draw data/mc overlay plot from histograms
 def overlayPlot(SampleTriggerCombination,backgrounddirs,weights,\
                 histname,filename,lumisum,use_color=1):
     if len(backgrounddirs)!=len(weights):
@@ -937,6 +398,7 @@ def get_masses(workdir,treedir,weight=1.0):
 #############################################
 
 
+
 def treeOverlayPlot(SampleTriggerCombination,backgrounddirs,signaldirs,weights,\
                     signalWeights,lepton_name,treedir,varname,filename,ptCut,lumisum,
                     efficiencyListData=[],
@@ -984,6 +446,7 @@ def treeOverlayPlot(SampleTriggerCombination,backgrounddirs,signaldirs,weights,\
             pass
         mctriggers=[highestpttrigger]
         pass
+
     # construct corresponding sample/trigger combinations for MC
     MCSampleTriggerCombination=[]
     for i in range(len(backgrounddirs)):
@@ -1421,7 +884,7 @@ def treeOverlayPlot(SampleTriggerCombination,backgrounddirs,signaldirs,weights,\
     canv.Print(filename)
 
     # also dump these histograms into a root file
-    plotfile=ROOT.TFile.Open(filename.replace(".pdf",".root"),"RECREATE")
+    plotfile=ROOT.TFile.Open(filename.replace(fformat,".root"),"RECREATE")
     datahisto.Write()
     for group in groupList:
         if group.find("Signal")>=0:
@@ -1466,7 +929,7 @@ def treeOverlayPlot(SampleTriggerCombination,backgrounddirs,signaldirs,weights,\
     canv.Print(filename.replace(".","_prompt."))
 
     # also dump these histograms into a root file
-    plotfile=ROOT.TFile.Open(filename.replace(".","_prompt.").replace(".pdf",".root"),"RECREATE")
+    plotfile=ROOT.TFile.Open(filename.replace(".","_prompt.").replace(fformat,".root"),"RECREATE")
     datahisto_loose.Write()
     for group in groupList:
         if group.find("Signal")>=0:
@@ -1789,6 +1252,19 @@ def trigger_threshold(hltpath):
 ### PROCESS INDIVIDUAL DATASET
 #############################################
 
+
+def modifyString(line):
+    modifiedString = ""
+    foundQuote = False
+    for char in line:
+        if char == "\"":
+            foundQuote = not foundQuote
+        if char == "," and foundQuote:
+            modifiedString += "###"
+        else:
+            modifiedString += char
+    return modifiedString
+
 def analyze_lumi_and_trigger(dataworkdir,lepton_name,analysis_directory):
 
     # get dCache directory of this sample from sample description file
@@ -1840,15 +1316,21 @@ def analyze_lumi_and_trigger(dataworkdir,lepton_name,analysis_directory):
         sys.exit(1)
     histfile.Close()
 
+
+
+    
     # get luminosity information
     lumiOverview=dataworkdir+"/lumiOverview.csv"
     lumiDetails=dataworkdir+"/lumiResult.csv"
-    # FIXME: uncomment
-    os.system("rm -f "+lumiOverview+" "+lumiDetails)
-    print "srmcp -2 \""+sampleBaseDir.replace("root://xrootd.rcac.purdue.edu", "srm://srm-dcache.rcac.purdue.edu:8443/srm/managerv2?SFN=")+"/lumiOverview.csv\" \"file:///"+lumiOverview+"\""
 
     # FIXME: uncomment
-    os.system("srmcp -2 \""+sampleBaseDir.replace("root://xrootd.rcac.purdue.edu", "srm://srm-dcache.rcac.purdue.edu:8443/srm/managerv2?SFN=")+"/lumiOverview.csv\" \"file:///"+lumiOverview+"\"")
+    #os.system("rm -f "+lumiOverview+" "+lumiDetails)
+
+    if not os.path.exists(lumiOverview):
+        cmd = "srmcp -2 \""+sampleBaseDir.replace("root://xrootd.rcac.purdue.edu", "srm://srm-dcache.rcac.purdue.edu:8443/srm/managerv2?SFN=")+"/lumiOverview.csv\" \"file:///"+lumiOverview+"\""
+        print cmd
+        os.system(cmd)
+    
     if not os.path.exists(lumiOverview):
         # ok, for some reason we cannot get these files from dcache.
         # check whether the make_pat working directory still exists
@@ -1863,7 +1345,10 @@ def analyze_lumi_and_trigger(dataworkdir,lepton_name,analysis_directory):
         pass
 
     # FIXME: uncomment
-    os.system("srmcp -2 \""+sampleBaseDir.replace("root://xrootd.rcac.purdue.edu", "srm://srm-dcache.rcac.purdue.edu:8443/srm/managerv2?SFN=")+"/lumiResult.csv\" \"file:///"+lumiDetails+"\"")
+    if not os.path.exists(lumiDetails):
+        cmd = "srmcp -2 \""+sampleBaseDir.replace("root://xrootd.rcac.purdue.edu", "srm://srm-dcache.rcac.purdue.edu:8443/srm/managerv2?SFN=")+"/lumiResult.csv\" \"file:///"+lumiDetails+"\""
+        os.system(cmd)
+    
     if not os.path.exists(lumiDetails):
         # same procedure as above
         patdirs=os.popen("ls -1rtd "+dataworkdir[:dataworkdir.find("_analysis")]\
@@ -2153,13 +1638,13 @@ def makePlots(SampleTriggerCombination,ptCut,
     for plot in ["numPV_central","numPV_low","numPV_high","numPV_veryhigh"]:
         overlayPlot(SampleTriggerCombination,workdirs_background,mcfactors,
                     analysis_directory+"/weights/"+plot,
-                    folder+lepton_name+"_"+plot+".pdf",lumisum,0)
+                    folder+lepton_name+"_"+plot+fformat,lumisum,0)
         pass
 
     # fraction of actual true leptons in candidate (MC only)
     overlayPlot([],workdirs_background,mcfactors,
                 analysis_directory+"/dileptons/number_of_actual_leptons",
-                folder+"number_of_actual_"+lepton_name+"s.pdf",0)
+                folder+"number_of_actual_"+lepton_name+"s"+fformat,0)
     
     # Lists to store all the required data about the cut efficiencies
     efficiencyListData = []
@@ -2178,7 +1663,7 @@ def makePlots(SampleTriggerCombination,ptCut,
                                                "/dileptons_background_TRIGGER/",
                                                "decayLengthSignificance2D",
                                                folder+"di"+lepton_name+\
-                                               "_decayLengthSignificance2D.pdf",
+                                               "_decayLengthSignificance2D"+fformat,
                                                ptCut,lumisum,
                                                efficiencyListData,
                                                efficiencyListMC,
@@ -2260,7 +1745,7 @@ def makePlots(SampleTriggerCombination,ptCut,
         treeOverlayPlot(SampleTriggerCombination,workdirs_background,workdirs_signal,
                         mcfactors,mcfactorsSignal,lepton_name,
                         analysis_directory+"/dileptons_background_TRIGGER/",cutName,
-                        folder+"di"+lepton_name+"_"+cutName+".pdf",ptCut,lumisum,
+                        folder+"di"+lepton_name+"_"+cutName+fformat,ptCut,lumisum,
                         efficiencyListData,
                         efficiencyListMC,efficiencyListSignal)
         pass
@@ -2638,29 +2123,6 @@ endtime=time.time()
 print "+++this took",endtime-begintime,"seconds"
 
 
-##############################################
-### OUTPUT DIRECTORY STRUCTURE
-##############################################
-
-# Get current date to use for a folder name
-plotfolder="Analysis/"+time.strftime("%Y%m%d")
-if os.path.exists(plotfolder):
-    num=0
-    while os.path.exists(plotfolder+"_rev%03i"%num): num+=1
-    plotfolder+="_rev%03i"%num
-    pass
-# Check the analysis folder exists
-if not os.path.isdir("Analysis"):
-    os.mkdir("Analysis")
-    pass
-# Make a folder with the current date if it does not exist
-if not os.path.isdir(plotfolder):
-    os.mkdir(plotfolder)
-    pass
-# subfolder for various efficiency and benchmark plots
-benchmarkfolder=plotfolder+"/benchmarks"
-if not os.path.isdir(benchmarkfolder):
-    os.mkdir(benchmarkfolder)
 
 
 ##############################################
@@ -2699,7 +2161,7 @@ if len(muSampleTriggerCombination30)>0:
     pass
 
 
-makeEfficiencyPlots()
+#makeEfficiencyPlots()
 
 # trigger efficiency in MC
 mctriggers=[]
@@ -2756,7 +2218,7 @@ for workdir in workdirs_signal:
 #        pass
 #    CMSPlotDecoration(muAnalysis)
 #    canv.Update()
-#    canv.Print(benchmarkfolder+"/deltaR_"+workdir.split("/")[-1]+".pdf")
+#    canv.Print(benchmarkfolder+"/deltaR_"+workdir.split("/")[-1]+fformat)
 #    histfile.Close()
 #    pass
     
@@ -2787,7 +2249,7 @@ for workdir in workdirs_signal:
                 pass
             CMSPlotDecoration(analysisDir)
             canv.Update()
-            canv.Print(benchmarkfolder+"/isolation_"+analysisDir+"_"+workdir.split("/")[-1]+".pdf")
+            canv.Print(benchmarkfolder+"/isolation_"+analysisDir+"_"+workdir.split("/")[-1]+fformat)
             pass
         pass
     histfile.Close()
@@ -2814,7 +2276,7 @@ for workdir in workdirs_signal:
         hist.Draw()
         canv.Update()
         CMSPlotDecoration(analysisDir)
-        canv.Print(benchmarkfolder+"/isolationVsPileup_"+analysisDir+"_"+workdir.split("/")[-1]+".pdf")
+        canv.Print(benchmarkfolder+"/isolationVsPileup_"+analysisDir+"_"+workdir.split("/")[-1]+fformat)
         pass
     histfile.Close()
     pass
@@ -2855,6 +2317,6 @@ for workdir in workdirs_benchmark_mu:
     pt_vs_radius_matched.Draw("same")
     CMSPlotDecoration(muAnalysis)
     canv.Update()
-    canv.Print(benchmarkfolder+"/muon_momentum_vs_radius_"+workdir.split("/")[-1]+".pdf")
+    canv.Print(benchmarkfolder+"/muon_momentum_vs_radius_"+workdir.split("/")[-1]+fformat)
     canv.Close()
     pass
