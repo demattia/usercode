@@ -53,7 +53,7 @@ workdirs_benchmark_e   =  wdir.workdirs_benchmark_e
 
 print_s(workdirs_signal,"signal")
 
-sys.exit(20)
+#sys.exit(20)
 
 
 ############################################################################
