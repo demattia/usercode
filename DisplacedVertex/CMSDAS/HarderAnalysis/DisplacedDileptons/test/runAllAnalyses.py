@@ -95,8 +95,7 @@ mc_background = []
 mc_background += mc_vv
 mc_background += mc_qcd
 
-sample_test = [ 
-#sample_test = [ "Data_Mu_Run2011A1", "Data_Photon_Run2011A1", "Signal_1000_020F", "TTbar"]
+sample_test = [ "DisplacedMu_50GeV_stdRECO", "Zmumu", "Data_Mu_Run2011A1", "Data_Photon_Run2011A1", "Signal_1000_350F"]
 
 sample_list = []
 
