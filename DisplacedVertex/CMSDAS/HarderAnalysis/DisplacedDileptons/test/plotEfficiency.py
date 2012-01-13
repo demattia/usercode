@@ -7,10 +7,14 @@ import time
 from HarderAnalysis.DisplacedDileptons.mergeSamples import *
 from HarderAnalysis.DisplacedDileptons.common import CMSPlotDecoration, set_ana_folder
 
+test = False
+if len(sys.argv) == 2 and sys.argv[1] == "test":
+    test = True
+
 myDir = os.environ["LOCALRT"]+"/src/workdirs/"
 get_samples(myDir)
 
-wdir = getWorkdirs(myDir)
+wdir = getWorkdirs(myDir, test)
 workdirs_benchmark_e   =  wdir.workdirs_benchmark_e 
 workdirs_benchmark_mu  =  wdir.workdirs_benchmark_mu 
 workdirs_signal        =  wdir.workdirs_signal 

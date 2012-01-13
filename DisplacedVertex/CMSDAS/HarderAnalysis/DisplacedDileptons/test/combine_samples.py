@@ -48,12 +48,7 @@ workdirs_benchmark     =  wdir.workdirs_signal
 workdirs_benchmark_mu  =  wdir.workdirs_benchmark_mu
 workdirs_benchmark_e   =  wdir.workdirs_benchmark_e 
 
-sys.exit(1)
-
 #print_s(workdirs_signal,"signal")
-
-
-
 
 # define analysis channels
 
