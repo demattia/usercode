@@ -138,9 +138,6 @@ def getWorkdirs(mydir, test):
         print_s(wdir.workdirs_benchmark_mu,"workdirs_benchmark_mu")
         print_s(wdir.workdirs_benchmark_e,"workdirs_benchmark_e")
 
-
-    sys.exit(1)
-
     return wdir
 
 

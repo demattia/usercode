@@ -8,13 +8,13 @@ do_all_plots=0
 draw_overflow=1
 log_plots=1
 
-test = False
-if len(sys.argv) == 2 and sys.argv[1] == "test":
-    test = True
-
 import os,sys,math
 import ROOT
 import time
+
+test = False
+if len(sys.argv) == 2 and sys.argv[1] == "test":
+    test = True
 
 from HarderAnalysis.DisplacedDileptons.mergeSamples import *
 from HarderAnalysis.DisplacedDileptons.pileupReweighting import *
