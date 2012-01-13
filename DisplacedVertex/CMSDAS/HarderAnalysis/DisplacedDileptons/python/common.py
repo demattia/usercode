@@ -369,7 +369,7 @@ def replace_trig_name():
 # tools: draw overflow bin in histogram
 
 def drawhist(h,opt):
-
+    draw_overflow=1
     if draw_overflow:
         # get overflow bin content
         of=h.GetBinContent(h.GetNbinsX()+1)
