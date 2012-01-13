@@ -31,14 +31,15 @@ def get_samples(mdir):
 
 def checkPrefilterFiles(workdirs):
     for workdir in workdirs:
-        if not os.path.exists(workdir+"/prefilter.root"):
-            # Try copying it from dCache
-            print "ERROR: missing file",workdir+"/prefilter.root, trying to copy it from dcache"
-            print "srmcp -2 \"srm://srm-dcache.rcac.purdue.edu:8443/srm/managerv2?SFN=/store/user/demattia/longlived/CMSSW_4_2_7/"+workdir.split("/")[-1].split("_analysis")[0]+"/prefilter.root\" \"file:///"+workdir+"/prefilter.root\""
-            os.system("srmcp -2 \"srm://srm-dcache.rcac.purdue.edu:8443/srm/managerv2?SFN=/store/user/demattia/longlived/CMSSW_4_2_7/"+workdir.split("/")[-1].split("_analysis")[0]+"/prefilter.root\" \"file:///"+workdir+"/prefilter.root\"")
+        if workdir.find("Displaced") < 0:
             if not os.path.exists(workdir+"/prefilter.root"):
-                print "ERROR: prefilter.root copy from dCache failed"
-                return -1
+                # Try copying it from dCache
+                print "ERROR: missing file",workdir+"/prefilter.root, trying to copy it from dcache"
+                print "srmcp -2 \"srm://srm-dcache.rcac.purdue.edu:8443/srm/managerv2?SFN=/store/user/demattia/longlived/CMSSW_4_2_7/"+workdir.split("/")[-1].split("_analysis")[0]+"/prefilter.root\" \"file:///"+workdir+"/prefilter.root\""
+                os.system("srmcp -2 \"srm://srm-dcache.rcac.purdue.edu:8443/srm/managerv2?SFN=/store/user/demattia/longlived/CMSSW_4_2_7/"+workdir.split("/")[-1].split("_analysis")[0]+"/prefilter.root\" \"file:///"+workdir+"/prefilter.root\"")
+                if not os.path.exists(workdir+"/prefilter.root"):
+                    print "ERROR: prefilter.root copy from dCache failed"
+                    return -1
 
 def mergeHistogramsFiles(workdirs):
     for dir in workdirs:
