@@ -37,7 +37,7 @@ plotfolder      = folder[1]
 myDir = os.environ["LOCALRT"]+"/src/workdirs/"
 get_samples(myDir)
 
-wdir = getWorkdirs(myDir)
+wdir = getWorkdirs(myDir, test)
 workdirs_data_mu       =  wdir.workdirs_data_mu
 workdirs_data_e        =  wdir.workdirs_data_e
 workdirs_background_mu =  wdir.workdirs_background_mu
@@ -47,30 +47,6 @@ workdirs_benchmark     =  wdir.workdirs_signal
 
 workdirs_benchmark_mu  =  wdir.workdirs_benchmark_mu
 workdirs_benchmark_e   =  wdir.workdirs_benchmark_e 
-
-print wordirs_data_mu
-print wordirs_data_e
-print workdirs_signal
-print workdirs_background_e
-print workdirs_bakcground_mu
-
-if test:
-    index = workdirs_data_mu.find("Data_Mu_Run2011A1"):
-        if index != -1:
-            workdirs_data_mu = [workdirs_data_mu[index]]
-    index = workdirs_data_e.find("Data_Photon_Run2011A1"):
-        if index != -1:
-            workdirs_data_e = [workdirs_data_e[index]]
-    index = workdirs_signal.find("Signal_1000_020F"):
-        if index != -1:
-            workdirs_signal = [workdirs_signal[index]]
-    index = workdirs_background_e.find("Zee"):
-        if index != -1:
-            workdirs_background_e = [workdirs_background_e[index]]
-    index = workdirs_background_mu.find("Zmumu"):
-        if index != -1:
-            workdirs_background_mu = [workdirs_background_mu[index]]
-
 
 sys.exit(1)
 

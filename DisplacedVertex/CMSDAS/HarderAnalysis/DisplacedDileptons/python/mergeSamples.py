@@ -73,7 +73,7 @@ class Workdirs:
     workdirs_benchmark_mu = []
     workdirs_benchmark_e = []
 
-def getWorkdirs(mydir):
+def getWorkdirs(mydir, test):
 
     samples = get_samples(mydir)
     wdir = Workdirs()
@@ -107,6 +107,24 @@ def getWorkdirs(mydir):
         print_s(wdir.workdirs_signal,"workdirs_signal")
         print_s(wdir.workdirs_benchmark_mu,"workdirs_benchmark_mu")
         print_s(wdir.workdirs_benchmark_e,"workdirs_benchmark_e")
+
+    if test:
+        index = workdirs_data_mu.find("Data_Mu_Run2011A1"):
+            if index != -1:
+                workdirs_data_mu = [workdirs_data_mu[index]]
+                index = workdirs_data_e.find("Data_Photon_Run2011A1"):
+            if index != -1:
+                workdirs_data_e = [workdirs_data_e[index]]
+                index = workdirs_signal.find("Signal_1000_020F"):
+            if index != -1:
+                workdirs_signal = [workdirs_signal[index]]
+                index = workdirs_background_e.find("Zee"):
+            if index != -1:
+                workdirs_background_e = [workdirs_background_e[index]]
+                index = workdirs_background_mu.find("Zmumu"):
+            if index != -1:
+                workdirs_background_mu = [workdirs_background_mu[index]]
+
 
     return wdir
 
