@@ -8,6 +8,10 @@ do_all_plots=0
 draw_overflow=1
 log_plots=1
 
+test = False
+if len(sys.argv) == 2 and sys.argv[1] == "test":
+    test = True
+
 import os,sys,math
 import ROOT
 import time
@@ -44,6 +48,32 @@ workdirs_benchmark     =  wdir.workdirs_signal
 workdirs_benchmark_mu  =  wdir.workdirs_benchmark_mu
 workdirs_benchmark_e   =  wdir.workdirs_benchmark_e 
 
+print wordirs_data_mu
+print wordirs_data_e
+print workdirs_signal
+print workdirs_background_e
+print workdirs_bakcground_mu
+
+if test:
+    index = workdirs_data_mu.find("Data_Mu_Run2011A1"):
+        if index != -1:
+            workdirs_data_mu = [workdirs_data_mu[index]]
+    index = workdirs_data_e.find("Data_Photon_Run2011A1"):
+        if index != -1:
+            workdirs_data_e = [workdirs_data_e[index]]
+    index = workdirs_signal.find("Signal_1000_020F"):
+        if index != -1:
+            workdirs_signal = [workdirs_signal[index]]
+    index = workdirs_background_e.find("Zee"):
+        if index != -1:
+            workdirs_background_e = [workdirs_background_e[index]]
+    index = workdirs_background_mu.find("Zmumu"):
+        if index != -1:
+            workdirs_background_mu = [workdirs_background_mu[index]]
+
+
+sys.exit(1)
+
 #print_s(workdirs_signal,"signal")
 
 
@@ -54,7 +84,7 @@ workdirs_benchmark_e   =  wdir.workdirs_benchmark_e
 muAnalysis="muTrackAnalysis"
 eAnalysis="eTrackAnalysis"
 
-ePtCut33=36
+ePtCut33=38
 ePtCut38=41
 ePtCut43=46
 muPtCut23=25 # <- note this was lower!
