@@ -62,6 +62,16 @@ def print_s(sample,name):
     for s in sample:
         print "\t", s
 
+def findSample(sampleList, name):
+    print "finding name: "+name
+    index = 0
+    for sample in sampleList:
+        print sample
+        if sample.find(name) != -1:
+            print "found: "+str(index)
+            return index
+        index = index + 1
+    return -1
 
 class Workdirs:
     workdirs_data_mu = []
@@ -99,6 +109,26 @@ def getWorkdirs(mydir, test):
     wdir.workdirs_background_mu += wdir.workdirs_other    
     wdir.workdirs_background_e  += wdir.workdirs_other    
 
+    if test:
+        print "Running in test mode"
+        index = findSample(wdir.workdirs_data_mu, "Data_Mu_Run2011A1")
+        print index
+        if index != -1:
+            wdir.workdirs_data_mu = [wdir.workdirs_data_mu[index]]
+        index = findSample(wdir.workdirs_data_e, "Data_Photon_Run2011A1")
+        if index != -1:
+            wdir.workdirs_data_e = [wdir.workdirs_data_e[index]]
+        index = findSample(wdir.workdirs_signal, "Signal_1000_020F")
+        if index != -1:
+            wdir.workdirs_signal = [wdir.workdirs_signal[index]]
+        index = findSample(wdir.workdirs_background_e, "Zee")
+        if index != -1:
+            wdir.workdirs_background_e = [wdir.workdirs_background_e[index]]
+        index = findSample(wdir.workdirs_background_mu, "Zmumu")
+        if index != -1:
+            wdir.workdirs_background_mu = [wdir.workdirs_background_mu[index]]
+
+
     if printit:
         print_s(wdir.workdirs_data_mu,"workdirs_data_mu")
         print_s(wdir.workdirs_data_e,"workdirs_data_e")
@@ -108,23 +138,8 @@ def getWorkdirs(mydir, test):
         print_s(wdir.workdirs_benchmark_mu,"workdirs_benchmark_mu")
         print_s(wdir.workdirs_benchmark_e,"workdirs_benchmark_e")
 
-    if test:
-        index = workdirs_data_mu.find("Data_Mu_Run2011A1"):
-            if index != -1:
-                workdirs_data_mu = [workdirs_data_mu[index]]
-                index = workdirs_data_e.find("Data_Photon_Run2011A1"):
-            if index != -1:
-                workdirs_data_e = [workdirs_data_e[index]]
-                index = workdirs_signal.find("Signal_1000_020F"):
-            if index != -1:
-                workdirs_signal = [workdirs_signal[index]]
-                index = workdirs_background_e.find("Zee"):
-            if index != -1:
-                workdirs_background_e = [workdirs_background_e[index]]
-                index = workdirs_background_mu.find("Zmumu"):
-            if index != -1:
-                workdirs_background_mu = [workdirs_background_mu[index]]
 
+    sys.exit(1)
 
     return wdir
 
@@ -134,6 +149,10 @@ myDir = os.environ["LOCALRT"]+"/src/workdirs/"
 
     
 samples = get_samples(myDir)
+
+# test = True
+# getWorkdirs(myDir, test)
+
 
 mergeHistogramsFiles(samples)
 checkPrefilterFiles(samples)
