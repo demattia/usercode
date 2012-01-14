@@ -1,33 +1,3 @@
-sampleDataSet = '/DoubleMu/Run2011B-PromptReco-v1/AOD'
-sampleNumEvents = 23929546 # according to DBS, as of 08 November 2011
-
-# global tag needs to be chosen to match release, trigger menu and alignment conditions.
-# see https://twiki.cern.ch/twiki/bin/view/CMS/SWGuideFrontierConditions
-sampleGlobalTag = 'GR_R_42_V21A::All'
-sampleHLTProcess = '*'
-
-# data quality run/lumi section selection
-sampleJSON = "https://cms-service-dqm.web.cern.ch/cms-service-dqm/CAF/certification/Collisions11/7TeV/Prompt/Cert_160404-180252_7TeV_PromptReco_Collisions11_JSON_MuonPhys.txt"
-
-# restrict run range (mainly to get a sample with consistent trigger configuration)
-sampleRunRange = [160000,999999]
-
-# use checkAllFilesOpened whenever possible, and noDuplicateCheck when necessary
-sampleDuplicateCheckMode = "checkAllFilesOpened"
-
-# "DATA" or "MC"
-sampleType = "DATA"
-
-sampleRelease = "CMSSW_4_2_8_patch6" # original (i.e. RECO file) release,
-                              # not the one we plan to process them with
-
-sampleProcessRelease = "CMSSW_4_2_8_patch7" # release used to create new files with
-
-sampleBaseDir = "root://xrootd.rcac.purdue.edu//store/user/demattia/longlived/"+sampleProcessRelease+"/Data_Mu_Run2011B1"
-
-sampleRecoFiles = []
-
-samplePatFiles = [
   sampleBaseDir+"/pat/PATtuple_1_1_W6J.root",
   sampleBaseDir+"/pat/PATtuple_2_1_6tZ.root",
   sampleBaseDir+"/pat/PATtuple_3_1_NyV.root",
@@ -156,5 +126,4 @@ samplePatFiles = [
   sampleBaseDir+"/pat/PATtuple_127_1_IF6.root",
   sampleBaseDir+"/pat/PATtuple_128_1_Ni2.root",
   sampleBaseDir+"/pat/PATtuple_129_1_yQz.root",
-  sampleBaseDir+"/pat/PATtuple_130_1_bNY.root"
-]
+  sampleBaseDir+"/pat/PATtuple_130_1_bNY.root",
