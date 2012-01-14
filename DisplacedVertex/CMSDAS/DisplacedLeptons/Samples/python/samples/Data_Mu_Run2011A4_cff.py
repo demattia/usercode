@@ -18,10 +18,10 @@ sampleDuplicateCheckMode = "checkAllFilesOpened"
 # "DATA" or "MC"
 sampleType = "DATA"
 
-sampleRelease = "CMSSW_4_2_8_patch3" # original (i.e. RECO file) release,
+sampleRelease = "CMSSW_4_2_7" # original (i.e. RECO file) release,
                               # not the one we plan to process them with
 
-sampleProcessRelease = "CMSSW_4_2_8_patch7" # release used to create new files with
+sampleProcessRelease = "CMSSW_4_2_7" # release used to create new files with
 
 sampleBaseDir = "root://xrootd.rcac.purdue.edu//store/user/demattia/longlived/"+sampleProcessRelease+"/Data_Mu_Run2011A4"
 
