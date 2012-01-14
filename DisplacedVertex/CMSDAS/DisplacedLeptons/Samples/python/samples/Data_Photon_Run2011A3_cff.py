@@ -18,8 +18,7 @@ sampleDuplicateCheckMode = "checkAllFilesOpened"
 # "DATA" or "MC"
 sampleType = "DATA"
 
-sampleRelease = "CMSSW_4_2_7" # original (i.e. RECO file) release,
-                                     # not the one we plan to process them with
+sampleRelease = "CMSSW_4_2_7" # original (i.e. RECO file) release, not the one we plan to process them with
 
 sampleProcessRelease = "CMSSW_4_2_7" # release used to create new files with
 
