@@ -1,0 +1,12 @@
+<use   name="FWCore/Framework"/>
+<use   name="FWCore/ParameterSet"/>
+<use   name="DataFormats/SiStripDetId"/>
+<use   name="DataFormats/SiPixelDetId"/>
+<use   name="DataFormats/TrackReco"/>
+<use   name="Geometry/CommonDetUnit"/>
+<use   name="Geometry/TrackerGeometryBuilder"/>
+<use   name="Geometry/Records"/>
+<use   name="RecoVertex/VertexPrimitives"/>
+<export>
+  <lib   name="1"/>
+</export>
