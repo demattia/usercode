@@ -22,10 +22,11 @@
 
 TList *FileList;
 TFile *Target;
+TFile *DiffTarget;
 unsigned int countDifferences = 0;
 unsigned int totalComparedHistograms = 0;
 
-void CompareRootfile( TDirectory *target, TList *sourcelist );
+void CompareRootfile( TDirectory *target, TDirectory *diffTarget, TList *sourcelist );
 
 void CompareHistograms() {
   // in an interactive ROOT session, edit the file names
@@ -36,23 +37,25 @@ void CompareHistograms() {
   gROOT->SetBatch(true);
 
   Target = TFile::Open( "compared.root", "RECREATE" );
+  DiffTarget = TFile::Open( "differencies.root", "RECREATE" );
 
   FileList = new TList();
 
   // ************************************************************
   // List of Files
   FileList->Add( TFile::Open("Default/4.17_RunMinBias2011A+RunMinBias2011A+RECOD+HARVESTD+SKIMD/DQM_V0001_R000165121__Global__CMSSW_X_Y_Z__RECO.root") );    // 1
+  // FileList->Add( TFile::Open("Default/AnotherTest/4.17_RunMinBias2011A+RunMinBias2011A+RECOD+HARVESTD+SKIMD/DQM_V0001_R000165121__Global__CMSSW_X_Y_Z__RECO.root") );    // 1
   FileList->Add( TFile::Open("RunInfoRemoval/4.17_RunMinBias2011A+RunMinBias2011A+RECOD+HARVESTD+SKIMD/DQM_V0001_R000165121__Global__CMSSW_X_Y_Z__RECO.root") );    // 2
   // FileList->Add( TFile::Open("SiStripDetCablingChange/4.17_RunMinBias2011A+RunMinBias2011A+RECOD+HARVESTD+SKIMD/DQM_V0001_R000165121__Global__CMSSW_X_Y_Z__RECO.root") );    // 2
   // FileList->Add( TFile::Open("CrossCheck/4.17_RunMinBias2011A+RunMinBias2011A+RECOD+HARVESTD+SKIMD/DQM_V0001_R000165121__Global__CMSSW_X_Y_Z__RECO.root") );    // 2
 
-  CompareRootfile( Target, FileList );
+  CompareRootfile( Target, DiffTarget, FileList );
 
   cout << endl << "Number of histograms compared: " << totalComparedHistograms << endl;
   cout << endl << "Number of different histograms: " << countDifferences << endl;
 }
 
-void CompareRootfile( TDirectory *target, TList *sourcelist ) {
+void CompareRootfile( TDirectory *target, TDirectory *diffTarget, TList *sourcelist ) {
 
   // Create a THStack to draw the histograms superimposed
   THStack * comp = 0;
@@ -69,11 +72,14 @@ void CompareRootfile( TDirectory *target, TList *sourcelist ) {
   Bool_t status = TH1::AddDirectoryStatus();
   TH1::AddDirectory(kFALSE);
 
+  bool wasDifferent = false;
+
   // loop over all keys in this directory
   TIter nextkey( current_sourcedir->GetListOfKeys() );
   TKey *key, *oldkey=0;
   while ( (key = (TKey*)nextkey())) {
 
+    wasDifferent = false;
     //keep only the highest cycle number for each key
     if (oldkey && !strcmp(oldkey->GetName(),key->GetName())) continue;
 
@@ -131,6 +137,7 @@ void CompareRootfile( TDirectory *target, TList *sourcelist ) {
           if( diff != 0 ) {
 	    cout << h1->GetName() << " difference = " << diff << endl;
 	    ++countDifferences;
+	    wasDifferent = true;
 	  }
         }
         nextsource = (TFile*)sourcelist->After( nextsource );
@@ -154,7 +161,7 @@ void CompareRootfile( TDirectory *target, TList *sourcelist ) {
 	// newdir is now the starting point of another round of merging
 	// newdir still knows its depth within the target file via
 	// GetPath(), so we can still figure out where we are in the recursion
-	CompareRootfile( newdir, sourcelist );
+	CompareRootfile( newdir, diffTarget, sourcelist );
       }
     }
 //     else {
@@ -178,6 +185,11 @@ void CompareRootfile( TDirectory *target, TList *sourcelist ) {
 	  comp->Draw("nostack");
 	  canvas.Write();
 	  comp->Write();
+	  if( wasDifferent ) {
+	    diffTarget->cd();
+	    canvas.Write();
+	    comp->Write();
+	  }
 	}
       }
     }
@@ -186,5 +198,6 @@ void CompareRootfile( TDirectory *target, TList *sourcelist ) {
 
   // save modifications to target file
   target->SaveSelf(kTRUE);
+  diffTarget->SaveSelf(kTRUE);
   TH1::AddDirectory(status);
 }
