@@ -36,5 +36,7 @@
 <use name="root"/>
 <use name="rootrflx"/>
 <use name="rootgraphics"/>
-<use name="Analysis/TrackingEfficiencyFromCosmics"/>
+<use name="Analysis/SmartPropagatorWithIP"/>
+<use name="Analysis/RootTreeProducers"/>
 <flags EDM_PLUGIN="1"/>
+
