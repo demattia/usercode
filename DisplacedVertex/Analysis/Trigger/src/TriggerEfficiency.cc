@@ -13,7 +13,7 @@
 //
 // Original Author:  Marco De Mattia,40 3-B32,+41227671551,
 //         Created:  Wed May 25 16:44:02 CEST 2011
-// $Id: TriggerEfficiency.cc,v 1.1 2012/03/01 11:22:13 demattia Exp $
+// $Id: TriggerEfficiency.cc,v 1.3 2012/03/07 13:55:29 demattia Exp $
 //
 //
 
@@ -147,6 +147,9 @@ Track TriggerEfficiency::fillTrack(const T & itTrk)
   t.nValidPlusInvalidHits = itTrk->found()+itTrk->lost();
   t.innermostHitRadius = itTrk->innerPosition().r();
   t.innermostHitZ = itTrk->innerPosition().z();
+  t.muonStationsWithAnyHits = itTrk->hitPattern().muonStationsWithAnyHits();
+  t.dtStationsWithAnyHits = itTrk->hitPattern().dtStationsWithAnyHits();
+  t.cscStationsWithAnyHits = itTrk->hitPattern().cscStationsWithAnyHits();
   return t;
 }
 
