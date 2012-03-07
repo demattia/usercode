@@ -36,4 +36,7 @@
 <use name="root"/>
 <use name="rootrflx"/>
 <use name="rootgraphics"/>
-<flags EDM_PLUGIN="1"/>
+<use name="Analysis/SmartPropagatorWithIP"/>
+<export>
+  <lib   name="1"/>
+</export>

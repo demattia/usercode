@@ -12,7 +12,7 @@
 #include "CommonTools/UtilAlgos/interface/TFileService.h"
 
 #include "Analysis/TrackingEfficiencyFromCosmics/interface/Utils.h"
-#include "Analysis/TrackingEfficiencyFromCosmics/interface/SmartPropagatorWithIP.h"
+#include "Analysis/SmartPropagatorWithIP/interface/SmartPropagatorWithIP.h"
 #include "Analysis/TrackingEfficiencyFromCosmics/interface/TreeTrack.h"
 #include "DataFormats/HepMCCandidate/interface/GenParticle.h"
 

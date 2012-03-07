@@ -111,8 +111,8 @@ TriggerEfficiency::TriggerEfficiency(const edm::ParameterSet& iConfig) :
   useMCtruth_(iConfig.getParameter<bool>("UseMCtruth"))
 {
   treeHandler_.reset(new RootTreeHandler(trackCollection_.label()+".root", "L2Muons"));
-  treeHandler_->addBranch("tracks", "std::vector<TreeTrack>", &tracks_);
-  treeHandler_->addBranch("genParticles", "std::vector<TreeTrack>", &genParticles_);
+  treeHandler_->addBranch("tracks", "std::vector<Track>", &tracks_);
+  treeHandler_->addBranch("genParticles", "std::vector<GenParticle>", &genParticles_);
 }
 
 TriggerEfficiency::~TriggerEfficiency()
@@ -182,7 +182,6 @@ void TriggerEfficiency::analyze(const edm::Event& iEvent, const edm::EventSetup&
   iSetup.get<SmartPropagatorWithIPComponentsRecord>().get("SmartPropagatorWithIP", smartPropIPHandle);
   smartPropIP_ = dynamic_cast<const SmartPropagatorWithIP*>(&*smartPropIPHandle);
 
-  // std::vector<Track> tracks;
   try {
     edm::Handle<reco::TrackCollection> allTracks;
     iEvent.getByLabel(trackCollection_, allTracks);
@@ -190,7 +189,6 @@ void TriggerEfficiency::analyze(const edm::Event& iEvent, const edm::EventSetup&
     for( ; itTrk != allTracks->end(); ++itTrk ) {
       tracks_.push_back(fillTrack(itTrk));
     }
-    // treeHandler_->fill("tracks", tracks);
   }
   catch (cms::Exception & ex) {
     std::cerr << ex;
@@ -200,7 +198,6 @@ void TriggerEfficiency::analyze(const edm::Event& iEvent, const edm::EventSetup&
   edm::Handle<reco::GenParticleCollection> genParticles;
   if( useMCtruth_ ) {
     iEvent.getByLabel("genParticles", genParticles);
-    // std::vector<GenParticle> treeGenParticles;
     for( auto it = genParticles->begin(); it != genParticles->end(); ++it ) {
       if( it->status() == 1 && fabs(it->pdgId()) == 13 ) {
         // Compute impact parameters for generator particle
@@ -215,11 +212,6 @@ void TriggerEfficiency::analyze(const edm::Event& iEvent, const edm::EventSetup&
         genParticles_.push_back(fillGenParticle(it, ip));
       }
     }
-
-
-    // treeHandler_->fill("tracks", tracks);
-    // treeHandler_->fill("genParticles", treeGenParticles);
-
   }
 
   treeHandler_->saveToTree(iEvent.id().event(), iEvent.run());
@@ -265,3 +257,6 @@ void TriggerEfficiency::fillDescriptions(edm::ConfigurationDescriptions& descrip
   desc.setUnknown();
   descriptions.addDefault(desc);
 }
+
+//define this as a plug-in
+DEFINE_FWK_MODULE(TriggerEfficiency);

@@ -29,27 +29,10 @@ public:
   * map and to add a branch to the tree.
   */
   template <class T>
-  void addBranch(const TString & name, const TString & collectionType, T* pointer)
+  void addBranch(const TString & name, const TString & collectionType, T* pointer, const int splitlevel = 0)
   {
-//    tree_->Branch("tracks", vectorName+object.GetName()+">", &objects_[name]);
-//    T object;
-//    if( !object.InheritsFrom("TObject") ) {
-//      std::cout << "Error: object type does not inherit from TObject" << std::endl;
-//      throw;
-//    }
-//    TString vectorName("std::vector<");
-//    objects_.insert(std::pair<TString, std::vector<T>*>(name, 0));
-//    std::cout << "collection name = " << vectorName+object.GetName()+">" << std::endl;
-//    tree_->Branch("tracks", vectorName+object.GetName()+">", &objects_[name]);
-    tree_->Branch(name, collectionType, pointer);
+    tree_->Branch(name, collectionType, pointer, 32000, splitlevel);
   }
-
-//  template <class T>
-//  void fill( const TString & name, const std::vector<T> & collection )
-//  {
-//    objects_[name] = &collection;
-//  }
-
 
   void saveToTree( const unsigned int eventNumber, const unsigned int runNumber );
   void writeTree();
@@ -59,7 +42,6 @@ protected:
   TTree * tree_;
   unsigned int eventNumber_;
   unsigned int runNumber_;
-  // std::map<TString, std::vector<TObject>* > objects_;
 };
 
 #endif // ROOTTREEHANDLER_H

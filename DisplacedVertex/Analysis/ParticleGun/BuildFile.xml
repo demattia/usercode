@@ -5,7 +5,4 @@
 <use   name="clhep"/>
 <use   name="hepmc"/>
 <use   name="heppdt"/>
-<flags   EDM_PLUGIN="1"/>
-<export>
-  <lib   name="1"/>
-</export>
+<flags EDM_PLUGIN="1"/>

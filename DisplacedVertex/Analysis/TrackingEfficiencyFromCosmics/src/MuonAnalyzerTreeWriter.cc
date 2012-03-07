@@ -6,7 +6,7 @@
 //
 /**\class MuonAnalyzerTreeWriter MuonAnalyzerTreeWriter.cc Analysis/MuonAnalyzerTreeWriter/src/MuonAnalyzerTreeWriter.cc
 
- Description: [one line class summary]
+ Description: Can be used to save the information in a tree. The tracks can then be accessed with the macros under test/Macros.
 
  Implementation:
      [Notes on implementation]
@@ -14,7 +14,7 @@
 //
 // Original Author:  Marco De Mattia,40 3-B32,+41227671551,
 //         Created:  Wed May 25 16:44:02 CEST 2011
-// $Id: MuonAnalyzerTreeWriter.cc,v 1.42 2011/11/21 16:58:00 demattia Exp $
+// $Id: MuonAnalyzerTreeWriter.cc,v 1.1 2011/11/25 09:30:44 demattia Exp $
 //
 //
 
@@ -64,7 +64,7 @@
 #include "Analysis/TrackingEfficiencyFromCosmics/interface/ControlDeltaPlots.h"
 #include "Analysis/TrackingEfficiencyFromCosmics/interface/Efficiency.h"
 #include "Analysis/TrackingEfficiencyFromCosmics/interface/EfficiencyTree.h"
-#include "Analysis/TrackingEfficiencyFromCosmics/interface/SmartPropagatorWithIP.h"
+#include "Analysis/SmartPropagatorWithIP/interface/SmartPropagatorWithIP.h"
 #include "Analysis/Records/interface/SmartPropagatorWithIPComponentsRecord.h"
 #include "Analysis/TrackingEfficiencyFromCosmics/interface/RootTreeHandler.h"
 #include "Analysis/TrackingEfficiencyFromCosmics/interface/TreeTrack.h"
@@ -592,7 +592,7 @@ void MuonAnalyzerTreeWriter::fillDescriptions(edm::ConfigurationDescriptions& de
 
 template <class T>
 SmartPropagatorWithIP::IP MuonAnalyzerTreeWriter::computeGenImpactParameters( const T & track, const math::XYZPoint & genVertex,
-                                                                                     const int genCharge )
+                                                                              const int genCharge )
 {
   SmartPropagatorWithIP::IP ip;
   if( genInsideTkVol_ ) {

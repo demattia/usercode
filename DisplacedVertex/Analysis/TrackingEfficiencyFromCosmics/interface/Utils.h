@@ -7,7 +7,7 @@
 #include <TH1F.h>
 #include <TH2F.h>
 #include "Analysis/TrackingEfficiencyFromCosmics/interface/TreeTrack.h"
-#include "Analysis/TrackingEfficiencyFromCosmics/interface/SmartPropagatorWithIP.h"
+#include "Analysis/SmartPropagatorWithIP/interface/SmartPropagatorWithIP.h"
 //#include "DataFormats/TrackReco/interface/Track.h"
 #include "DataFormats/HepMCCandidate/interface/GenParticle.h"
 

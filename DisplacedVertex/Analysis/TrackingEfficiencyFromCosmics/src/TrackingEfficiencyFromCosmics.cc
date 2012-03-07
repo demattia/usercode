@@ -13,7 +13,7 @@
 //
 // Original Author:  Marco De Mattia,40 3-B32,+41227671551,
 //         Created:  Wed May 25 16:44:02 CEST 2011
-// $Id: TrackingEfficiencyFromCosmics.cc,v 1.42 2011/08/03 15:42:09 demattia Exp $
+// $Id: TrackingEfficiencyFromCosmics.cc,v 1.46 2011/11/25 09:30:06 demattia Exp $
 //
 //
 
@@ -63,7 +63,7 @@
 #include "Analysis/TrackingEfficiencyFromCosmics/interface/ControlDeltaPlots.h"
 #include "Analysis/TrackingEfficiencyFromCosmics/interface/Efficiency.h"
 #include "Analysis/TrackingEfficiencyFromCosmics/interface/EfficiencyTree.h"
-#include "Analysis/TrackingEfficiencyFromCosmics/interface/SmartPropagatorWithIP.h"
+#include "Analysis/SmartPropagatorWithIP/interface/SmartPropagatorWithIP.h"
 #include "Analysis/Records/interface/SmartPropagatorWithIPComponentsRecord.h"
 
 #include <boost/foreach.hpp>

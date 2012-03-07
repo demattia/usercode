@@ -5,7 +5,7 @@
 #include <TH1F.h>
 #include "DataFormats/Math/interface/deltaPhi.h"
 #include "Analysis/TrackingEfficiencyFromCosmics/interface/Utils.h"
-#include "Analysis/TrackingEfficiencyFromCosmics/interface/SmartPropagatorWithIP.h"
+#include "Analysis/SmartPropagatorWithIP/interface/SmartPropagatorWithIP.h"
 
 /**
   * Fill a set of control plots for the differences between two tracks. 

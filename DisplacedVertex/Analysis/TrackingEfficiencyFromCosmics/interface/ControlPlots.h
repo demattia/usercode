@@ -6,7 +6,7 @@
 #include <sstream>
 
 #include "Analysis/TrackingEfficiencyFromCosmics/interface/Utils.h"
-#include "Analysis/TrackingEfficiencyFromCosmics/interface/SmartPropagatorWithIP.h"
+#include "Analysis/SmartPropagatorWithIP/interface/SmartPropagatorWithIP.h"
 
 /**
   * Fill a set of control plots for all the tracks in a given collection.
