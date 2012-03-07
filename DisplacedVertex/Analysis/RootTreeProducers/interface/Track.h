@@ -22,6 +22,9 @@ public:
   double referencePointRadius, referencePointZ;
   int nHits, nValidHits, nValidPlusInvalidHits;
   double innermostHitRadius, innermostHitZ;
+  int muonStationsWithAnyHits;
+  int dtStationsWithAnyHits;
+  int cscStationsWithAnyHits;
 
   ClassDef(Track, 1)
 };
