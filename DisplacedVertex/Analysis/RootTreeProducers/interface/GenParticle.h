@@ -17,7 +17,7 @@ public:
 
   double pt, eta, phi;
   int charge;
-  double dxy, dz;
+  double dxy, dxyError, dz, dzError; // They have an error because they are the result of a propagation.
   double referencePointRadius, referencePointZ;
   double vx, vy, vz;
   int pid;

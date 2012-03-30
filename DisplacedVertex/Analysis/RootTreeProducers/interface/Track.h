@@ -25,6 +25,8 @@ public:
   int muonStationsWithAnyHits;
   int dtStationsWithAnyHits;
   int cscStationsWithAnyHits;
+  int trackAlgorithm;
+  bool trackQuality;
 
   ClassDef(Track, 1)
 };
