@@ -1,6 +1,6 @@
-#include <Analysis/TrackingEfficiencyFromCosmics/interface/RootTreeHandler.h>
+#include <Analysis/TrackingEfficiencyFromCosmics/interface/RootTreeHandlerForTkEff.h>
 
-RootTreeHandler::RootTreeHandler(const TString & fileName)
+RootTreeHandlerForTkEff::RootTreeHandlerForTkEff(const TString & fileName)
 {
   file_ = new TFile(fileName, "RECREATE");
   tree_ = new TTree("T", "Muons");
@@ -9,14 +9,14 @@ RootTreeHandler::RootTreeHandler(const TString & fileName)
   tree_->Branch("tracks", "std::vector<TreeTrack>", &tracks_);
 }
 
-// RootTreeHandler::~RootTreeHandler()
-void RootTreeHandler::writeTree()
+// RootTreeHandlerForTkEff::~RootTreeHandlerForTkEff()
+void RootTreeHandlerForTkEff::writeTree()
 {
   file_->Write();
   file_->Close();
 }
 
-void RootTreeHandler::saveToTree( const std::vector<TreeTrack> & tracks, const unsigned int eventNumber, const unsigned int runNumber )
+void RootTreeHandlerForTkEff::saveToTree( const std::vector<TreeTrack> & tracks, const unsigned int eventNumber, const unsigned int runNumber )
 {
   std::cout << "Filling tree with " << tracks.size() << " tracks" << std::endl;
   eventNumber_ = eventNumber;

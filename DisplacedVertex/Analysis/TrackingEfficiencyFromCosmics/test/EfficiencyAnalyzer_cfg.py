@@ -24,7 +24,7 @@ process.demo = cms.EDAnalyzer('EfficiencyAnalyzer',
                               # InputFileName = cms.string("Efficiency.root"),
                               # InputFileName = cms.string("GenToTrackEfficiency.root"),
                               # InputFileName = cms.string("GenToStandAloneEfficiency.root"),
-                              Rebin = cms.uint32(4)
+                              Rebin = cms.uint32(1)
                               )
 
 process.p = cms.Path(process.demo)

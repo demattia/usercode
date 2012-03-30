@@ -13,7 +13,7 @@
 //
 // Original Author:  Marco De Mattia,40 3-B32,+41227671551,
 //         Created:  Wed May 25 16:44:02 CEST 2011
-// $Id: TrackingEfficiencyFromCosmics.cc,v 1.46 2011/11/25 09:30:06 demattia Exp $
+// $Id: TrackingEfficiencyFromCosmics.cc,v 1.47 2012/03/07 13:55:29 demattia Exp $
 //
 //
 
@@ -157,6 +157,7 @@ private:
   double effDxyMin_, effDxyMax_;
   double effDzMin_, effDzMax_;
   double effPtMin_, effPtMax_;
+  double effEtaMin_, effEtaMax_;
   std::string effOutputFileName_;
   std::string effCleanedOutputFileName_;
   std::string genToStandAloneEffOutputFileName_;
@@ -191,7 +192,7 @@ private:
   bool cleaned_;
   bool countSameSide_;
   bool countOppoSide_;
-  unsigned int eventNum_;
+  // unsigned int eventNum_;
   double dxyCutForNoDzCut_;
   bool phiRegion_;
   double phiMin_;
@@ -207,6 +208,8 @@ TrackingEfficiencyFromCosmics::TrackingEfficiencyFromCosmics(const edm::Paramete
   effDzMax_(iConfig.getParameter<double>("EffDzMax")),
   effPtMin_(iConfig.getParameter<double>("EffPtMin")),
   effPtMax_(iConfig.getParameter<double>("EffPtMax")),
+  effEtaMin_(iConfig.getParameter<double>("EffEtaMin")),
+  effEtaMax_(iConfig.getParameter<double>("EffEtaMax")),
   effOutputFileName_(iConfig.getParameter<std::string>("EffOutputFileName")),
   effCleanedOutputFileName_(iConfig.getParameter<std::string>("EffCleanedOutputFileName")),
   genToStandAloneEffOutputFileName_(iConfig.getParameter<std::string>("GenToStandAloneEffOutputFileName")),
@@ -235,7 +238,7 @@ TrackingEfficiencyFromCosmics::TrackingEfficiencyFromCosmics(const edm::Paramete
   cleaned_(true),
   countSameSide_(iConfig.getParameter<bool>("CountSameSide")),
   countOppoSide_(iConfig.getParameter<bool>("CountOppoSide")),
-  eventNum_(0),
+  // eventNum_(0),
   dxyCutForNoDzCut_(iConfig.getParameter<double>("DxyCutForNoDzCut")),
   phiRegion_(iConfig.getParameter<bool>("PhiRegion")),
   phiMin_(iConfig.getParameter<double>("PhiMinCut")),
@@ -247,19 +250,20 @@ TrackingEfficiencyFromCosmics::TrackingEfficiencyFromCosmics(const edm::Paramete
   else associatorByDeltaR_.reset(new AssociatorByDeltaR(iConfig.getParameter<double>("MaxDeltaR")));
   simAssociatorByDeltaR_.reset(new AssociatorByDeltaR(iConfig.getParameter<double>("SimMaxDeltaR"), false));
 
-  nBins_ = 100;
+  nBins_ = 20;
 
   // Build the object to compute the efficiency
   std::vector<Efficiency::Parameters> pars;
   pars.push_back(Efficiency::Parameters("dxy", nBins_, effDxyMin_, effDxyMax_));
   pars.push_back(Efficiency::Parameters("dz", nBins_, effDzMin_, effDzMax_));
   pars.push_back(Efficiency::Parameters("pt", nBins_, effPtMin_, effPtMax_));
+  pars.push_back(Efficiency::Parameters("eta", nBins_, effEtaMin_, effEtaMax_));
   genToStandAloneEfficiency_.reset(new Efficiency(pars));
   genToCleanedStandAloneEfficiency_.reset(new Efficiency(pars));
   genToTrackEfficiency_.reset(new Efficiency(pars));
   efficiency_.reset(new Efficiency(pars));
   efficiencyCleaned_.reset(new Efficiency(pars));
-  variables_.reset(new double[3]);
+  variables_.reset(new double[4]);
 
   // Initialize the nullCovariance matrix
   for( unsigned int i=0; i<5; ++i ) {
@@ -274,8 +278,8 @@ TrackingEfficiencyFromCosmics::~TrackingEfficiencyFromCosmics() {}
 
 void TrackingEfficiencyFromCosmics::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 {
-  eventNum_ = iEvent.id().event();
-  std::cout << "event = " << eventNum_ << std::endl;
+  // eventNum_ = iEvent.id().event();
+  // std::cout << "event = " << eventNum_ << std::endl;
 
   // Load the transient track builder
   iSetup.get<TransientTrackRecord>().get("TransientTrackBuilder",theB_);
@@ -319,7 +323,7 @@ void TrackingEfficiencyFromCosmics::analyze(const edm::Event& iEvent, const edm:
         ( it->hitPattern().dtStationsWithValidHits() + it->hitPattern().cscStationsWithValidHits() > 1 ) &&
         (it->pt() > standAlonePtCut_) && (fabs(it->eta()) < 2.) && (fabs(it->normalizedChi2()) < chi2Cut_) &&
         ((!dxyErrorCut_) || (fabs(it->dxyError()) < utils::dxyErrMax(it->pt()))) &&
-        ((!dzErrorCut_) || (fabs(it->dzError()) < utils::dxyErrMax(it->pt()))) ) { // Note the use of the same function is intentional.
+        ((!dzErrorCut_) || (fabs(it->dzError()) < utils::dxyErrMax(it->pt()))) ) { // Note: the use of the same function is intentional.
       if( fabs(it->dxy()) < dxyCutForNoDzCut_ ) {
         cleanedStaMuonsNoDzCut.push_back(*it);
       }
@@ -420,6 +424,7 @@ void TrackingEfficiencyFromCosmics::analyze(const edm::Event& iEvent, const edm:
     variables_[0] = fabs(stableMuonIP.dxyValue);
     variables_[1] = fabs(stableMuonIP.dzValue);
     variables_[2] = stableMuonIP.pt;
+    variables_[3] = stableMuonIP.eta;
 
     controlPlotsGenTracks_->fillControlPlots(stableMuonIP, stableMuon->vertex());
 
@@ -620,17 +625,10 @@ template <class T>
 SmartPropagatorWithIP::IP TrackingEfficiencyFromCosmics::computeGenImpactParameters( const T & track, const math::XYZPoint & genVertex,
                                                                                      const int genCharge )
 {
-  SmartPropagatorWithIP::IP ip;
   if( genInsideTkVol_ ) {
-    ip = smartPropIP_->computeGenImpactParametersInsideTkVol( track, genVertex, genCharge, GlobalPoint(0,0,0) );
+    return( smartPropIP_->computeGenImpactParametersInsideTkVol( track, genVertex, genCharge, GlobalPoint(0,0,0) ) );
   }
-  else {
-    ip = smartPropIP_->computeGenImpactParametersOutsideTkVol( track, genVertex, genCharge, GlobalPoint(0,0,0) );
-  }
-  std::cout << "gen pt before propagation = " << track.pt() << std::endl;
-  std::cout << "gen pt after propagation = " << ip.pt << std::endl;
-  std::cout << "gen dxy = " << ip.dxyValue << std::endl;
-  return ip;
+  return( smartPropIP_->computeGenImpactParametersOutsideTkVol( track, genVertex, genCharge, GlobalPoint(0,0,0) ) );
 }
 
 void TrackingEfficiencyFromCosmics::dumpGenParticleInfo(const reco::GenParticle & genParticle)
@@ -722,16 +720,17 @@ void TrackingEfficiencyFromCosmics::fillEfficiency(const std::map<const reco::Tr
       // ip1 = smartPropIP_->computeImpactParametersOutsideInTkVol(*(it->first), GlobalPoint(0,0,0));
       ip1 = smartPropIP_->computeImpactParameters(*(it->first), GlobalPoint(0,0,0));
     }
-    SmartPropagatorWithIP::IP ip2;
     variables_[0] = fabs(ip1.dxyValue);
     variables_[1] = fabs(ip1.dzValue);
     variables_[2] = ip1.pt;
+    variables_[3] = ip1.eta;
 
+    SmartPropagatorWithIP::IP ip2;
     if( it->second == 0 ) {
       found = false;
-      if( cleaned_ ) {
-        std::cout << "No match found in this event: " << eventNum_ << std::endl;
-      }
+      // if( cleaned_ ) {
+      //   std::cout << "No match found in this event: " << eventNum_ << std::endl;
+      // }
     }
     else {
       found = true;
@@ -750,6 +749,7 @@ void TrackingEfficiencyFromCosmics::fillEfficiency(const std::map<const reco::Tr
         variables_[0] = ip2.dxyValue;
         variables_[1] = ip2.dzValue;
         variables_[2] = ip2.pt;
+        variables_[3] = ip2.eta;
       }
     }
     efficiency->fill(variables_, found);

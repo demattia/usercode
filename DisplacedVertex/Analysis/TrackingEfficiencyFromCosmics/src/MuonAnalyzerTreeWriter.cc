@@ -14,7 +14,7 @@
 //
 // Original Author:  Marco De Mattia,40 3-B32,+41227671551,
 //         Created:  Wed May 25 16:44:02 CEST 2011
-// $Id: MuonAnalyzerTreeWriter.cc,v 1.1 2011/11/25 09:30:44 demattia Exp $
+// $Id: MuonAnalyzerTreeWriter.cc,v 1.2 2012/03/07 13:55:29 demattia Exp $
 //
 //
 
@@ -66,7 +66,7 @@
 #include "Analysis/TrackingEfficiencyFromCosmics/interface/EfficiencyTree.h"
 #include "Analysis/SmartPropagatorWithIP/interface/SmartPropagatorWithIP.h"
 #include "Analysis/Records/interface/SmartPropagatorWithIPComponentsRecord.h"
-#include "Analysis/TrackingEfficiencyFromCosmics/interface/RootTreeHandler.h"
+#include "Analysis/TrackingEfficiencyFromCosmics/interface/RootTreeHandlerForTkEff.h"
 #include "Analysis/TrackingEfficiencyFromCosmics/interface/TreeTrack.h"
 
 #include <boost/foreach.hpp>
@@ -206,8 +206,8 @@ private:
   double phiMin_;
   double phiMax_;
   bool genInsideTkVol_;
-  boost::shared_ptr<RootTreeHandler> treeHandlerStandAloneMuons_;
-  boost::shared_ptr<RootTreeHandler> treeHandlerCleanedStandAloneMuons_;
+  boost::shared_ptr<RootTreeHandlerForTkEff> treeHandlerStandAloneMuons_;
+  boost::shared_ptr<RootTreeHandlerForTkEff> treeHandlerCleanedStandAloneMuons_;
 };
 
 MuonAnalyzerTreeWriter::MuonAnalyzerTreeWriter(const edm::ParameterSet& iConfig) :
@@ -279,8 +279,8 @@ MuonAnalyzerTreeWriter::MuonAnalyzerTreeWriter(const edm::ParameterSet& iConfig)
   }
   smartPropIP_ = 0;
 
-  treeHandlerStandAloneMuons_.reset(new RootTreeHandler(muonCollection_.label()+".root"));
-  treeHandlerCleanedStandAloneMuons_.reset(new RootTreeHandler("cleaned"+muonCollection_.label()+".root"));
+  treeHandlerStandAloneMuons_.reset(new RootTreeHandlerForTkEff(muonCollection_.label()+".root"));
+  treeHandlerCleanedStandAloneMuons_.reset(new RootTreeHandlerForTkEff("cleaned"+muonCollection_.label()+".root"));
 }
 
 MuonAnalyzerTreeWriter::~MuonAnalyzerTreeWriter()
