@@ -13,7 +13,7 @@
 //
 // Original Author:  Marco De Mattia,40 1-A11,
 //         Created:  Thu Mar 29 13:29:00 CEST 2012
-// $Id: CosmicMuonTreeWriter.cc,v 1.0 2012/03/29 13:29:00 demattia Exp $
+// $Id: CosmicMuonTreeWriter.cc,v 1.1 2012/03/30 12:29:19 demattia Exp $
 //
 //
 
@@ -60,6 +60,7 @@
 #include "Analysis/Records/interface/SmartPropagatorWithIPComponentsRecord.h"
 #include "Analysis/RootTreeProducers/interface/RootTreeHandler.h"
 #include "Analysis/RootTreeProducers/interface/Track.h"
+#include "Analysis/RootTreeProducers/interface/GenParticle.h"
 
 #include <boost/foreach.hpp>
 
@@ -107,51 +108,6 @@ private:
   std::vector<Track> muons_;
   std::vector<GenParticle> genParticles_;
 };
-
-
-void CosmicMuonTreeWriter::fillTrackToTreeTrack( Track & treeTrack, const reco::Track & track )
-{
-  treeTrack.pt = track.pt();
-  treeTrack.ptError = track.ptError();
-  treeTrack.eta = track.eta();
-  treeTrack.etaError = track.etaError();
-  treeTrack.phi = track.phi();
-  treeTrack.phiError = track.phiError();
-  treeTrack.charge = track.charge();
-  treeTrack.vx = track.vx();
-  treeTrack.vy = track.vy();
-  treeTrack.vz = track.vz();
-  treeTrack.chi2 = track.chi2();
-  treeTrack.normalizedChi2 = track.normalizedChi2();
-  treeTrack.referencePointRadius = std::sqrt(std::pow(track.referencePoint().x(),2)+std::pow(track.referencePoint().y(),2));
-  treeTrack.referencePointZ = track.referencePoint().z();
-  treeTrack.nHits = track.recHitsSize();
-  treeTrack.nValidHits = track.found();
-  treeTrack.nValidPlusInvalidHits = track.found()+track.lost();
-  treeTrack.innermostHitRadius = track.innerPosition().r();
-  treeTrack.innermostHitZ = track.innerPosition().z();
-  treeTrack.trackAlgorithm = track.algo();
-  reco::TrackBase::TrackQuality trackQualityHighPurity = reco::TrackBase::qualityByName("highPurity");
-  treeTrack.trackQuality = track.quality(trackQualityHighPurity);
-  treeTrack.muonStationsWithAnyHits = track.hitPattern().muonStationsWithAnyHits();
-  treeTrack.dtStationsWithAnyHits = track.hitPattern().dtStationsWithAnyHits();
-  treeTrack.cscStationsWithAnyHits = track.hitPattern().cscStationsWithAnyHits();
-}
-
-void CosmicMuonTreeWriter::fillTrackToTreeTrack(Track & treeTrack, const reco::Track & track, const SmartPropagatorWithIP::IP & ip)
-{
-  fillTrackToTreeTrack(treeTrack, track);
-  treeTrack.pt = ip.pt;
-  treeTrack.ptError = ip.ptError;
-  treeTrack.eta = ip.eta;
-  treeTrack.etaError = ip.etaError;
-  treeTrack.phi = ip.phi;
-  treeTrack.phiError = ip.phiError;
-  treeTrack.dxy = ip.dxyValue;
-  treeTrack.dxyError = ip.dxyError;
-  treeTrack.dz = ip.dzValue;
-  treeTrack.dzError = ip.dzError;
-}
 
 CosmicMuonTreeWriter::CosmicMuonTreeWriter(const edm::ParameterSet& iConfig) :
   useMCtruth_(iConfig.getParameter<bool>("UseMCtruth")),
@@ -233,7 +189,6 @@ void CosmicMuonTreeWriter::analyze(const edm::Event& iEvent, const edm::EventSet
 
   // Fill the trees
   treeHandler_->saveToTree(iEvent.id().event(), iEvent.run());
-  // treeHandler_->saveToTree(standAloneMuonsTreeTracks, iEvent.id().event(), iEvent.run());
   tracks_.clear();
   muons_.clear();
   genParticles_.clear();
@@ -305,6 +260,7 @@ void CosmicMuonTreeWriter::fillTreeTracks( const T & collection, const GlobalPoi
     }
     else {
       fillTrackToTreeTrack(treeTrack, *it);
+      std::cout << "pt = " << treeTrack.pt << std::endl;
       tracks.push_back(treeTrack);
     }
   }
@@ -326,7 +282,56 @@ GenParticle CosmicMuonTreeWriter::fillGenParticle(const T & it, const SmartPropa
   p.vy = it->vertex().y();
   p.vz = it->vertex().z();
   p.pid = it->pdgId();
+  std::cout << "filling genPt = " << p.pt << std::endl;
   return p;
+}
+
+void CosmicMuonTreeWriter::fillTrackToTreeTrack( Track & treeTrack, const reco::Track & track )
+{
+  treeTrack.pt = track.pt();
+  treeTrack.ptError = track.ptError();
+  treeTrack.eta = track.eta();
+  treeTrack.etaError = track.etaError();
+  treeTrack.phi = track.phi();
+  treeTrack.phiError = track.phiError();
+  treeTrack.charge = track.charge();
+  treeTrack.vx = track.vx();
+  treeTrack.vy = track.vy();
+  treeTrack.vz = track.vz();
+  treeTrack.chi2 = track.chi2();
+  treeTrack.normalizedChi2 = track.normalizedChi2();
+  treeTrack.referencePointRadius = std::sqrt(std::pow(track.referencePoint().x(),2)+std::pow(track.referencePoint().y(),2));
+  treeTrack.referencePointZ = track.referencePoint().z();
+  treeTrack.nHits = track.recHitsSize();
+  treeTrack.nValidHits = track.found();
+  treeTrack.nValidPlusInvalidHits = track.found()+track.lost();
+  treeTrack.innermostHitRadius = track.innerPosition().r();
+  treeTrack.innermostHitZ = track.innerPosition().z();
+  treeTrack.trackAlgorithm = track.algo();
+  reco::TrackBase::TrackQuality trackQualityHighPurity = reco::TrackBase::qualityByName("highPurity");
+  treeTrack.trackQuality = track.quality(trackQualityHighPurity);
+  treeTrack.muonStationsWithAnyHits = track.hitPattern().muonStationsWithAnyHits();
+  treeTrack.dtStationsWithAnyHits = track.hitPattern().dtStationsWithAnyHits();
+  treeTrack.cscStationsWithAnyHits = track.hitPattern().cscStationsWithAnyHits();
+  treeTrack.dxy = track.dxy();
+  treeTrack.dxyError = track.dxyError();
+  treeTrack.dz = track.dz();
+  treeTrack.dzError = track.dzError();
+}
+
+void CosmicMuonTreeWriter::fillTrackToTreeTrack(Track & treeTrack, const reco::Track & track, const SmartPropagatorWithIP::IP & ip)
+{
+  fillTrackToTreeTrack(treeTrack, track);
+  treeTrack.pt = ip.pt;
+  treeTrack.ptError = ip.ptError;
+  treeTrack.eta = ip.eta;
+  treeTrack.etaError = ip.etaError;
+  treeTrack.phi = ip.phi;
+  treeTrack.phiError = ip.phiError;
+  treeTrack.dxy = ip.dxyValue;
+  treeTrack.dxyError = ip.dxyError;
+  treeTrack.dz = ip.dzValue;
+  treeTrack.dzError = ip.dzError;
 }
 
 //define this as a plug-in

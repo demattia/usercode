@@ -93,7 +93,7 @@ process.smartPropagatorWithIPESProducer = cms.ESProducer("SmartPropagatorWithIPE
 
 process.demo = cms.EDAnalyzer('CosmicMuonTreeWriter',
                               UseMCtruth = cms.bool(True),
-                              RecomputeIP = cms.bool(True),
+                              RecomputeIP = cms.bool(False),
                               # MuonCollection = cms.InputTag("standAloneMuons"),
                               MuonCollection = cms.InputTag("cosmicMuons1Leg"),
                               TrackCollection = cms.InputTag("generalTracks"),

@@ -13,7 +13,7 @@
 //
 // Original Author:  Marco De Mattia,40 3-B32,+41227671551,
 //         Created:  Wed May 25 16:44:02 CEST 2011
-// $Id: TriggerEfficiency.cc,v 1.3 2012/03/07 13:55:29 demattia Exp $
+// $Id: TriggerEfficiency.cc,v 1.4 2012/03/07 17:09:13 demattia Exp $
 //
 //
 
@@ -65,6 +65,8 @@
 // #include "Analysis/TrackingEfficiencyFromCosmics/interface/EfficiencyTree.h"
 #include "Analysis/SmartPropagatorWithIP/interface/SmartPropagatorWithIP.h"
 #include "Analysis/Records/interface/SmartPropagatorWithIPComponentsRecord.h"
+#include "Analysis/RootTreeProducers/interface/Track.h"
+#include "Analysis/RootTreeProducers/interface/GenParticle.h"
 #include "Analysis/RootTreeProducers/interface/RootTreeHandler.h"
 
 #include <boost/foreach.hpp>
@@ -201,7 +203,7 @@ void TriggerEfficiency::analyze(const edm::Event& iEvent, const edm::EventSetup&
   edm::Handle<reco::GenParticleCollection> genParticles;
   if( useMCtruth_ ) {
     iEvent.getByLabel("genParticles", genParticles);
-    for( auto it = genParticles->begin(); it != genParticles->end(); ++it ) {
+    for( reco::GenParticleCollection::const_iterator it = genParticles->begin(); it != genParticles->end(); ++it ) {
       if( it->status() == 1 && fabs(it->pdgId()) == 13 ) {
         // Compute impact parameters for generator particle
         SmartPropagatorWithIP::IP ip;

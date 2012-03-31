@@ -62,7 +62,8 @@ public :
 AnalyzeTree::AnalyzeTree(TTree *tree) : fChain(0) 
 {
   // TFile * f = new TFile("hltL2Muons_new.root");
-  TFile * f = new TFile("hltL2Muons_old.root");
+  // TFile * f = new TFile("hltL2Muons_old.root");
+  TFile * f = new TFile("cosmicMuons1Leg.root");
   f->GetObject("T",tree);
   Init(tree);
 }
