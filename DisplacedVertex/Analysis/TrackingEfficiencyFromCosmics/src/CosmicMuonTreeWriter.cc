@@ -13,7 +13,7 @@
 //
 // Original Author:  Marco De Mattia,40 1-A11,
 //         Created:  Thu Mar 29 13:29:00 CEST 2012
-// $Id: CosmicMuonTreeWriter.cc,v 1.1 2012/03/30 12:29:19 demattia Exp $
+// $Id: CosmicMuonTreeWriter.cc,v 1.2 2012/03/31 17:27:31 demattia Exp $
 //
 //
 
@@ -311,8 +311,10 @@ void CosmicMuonTreeWriter::fillTrackToTreeTrack( Track & treeTrack, const reco::
   reco::TrackBase::TrackQuality trackQualityHighPurity = reco::TrackBase::qualityByName("highPurity");
   treeTrack.trackQuality = track.quality(trackQualityHighPurity);
   treeTrack.muonStationsWithAnyHits = track.hitPattern().muonStationsWithAnyHits();
-  treeTrack.dtStationsWithAnyHits = track.hitPattern().dtStationsWithAnyHits();
-  treeTrack.cscStationsWithAnyHits = track.hitPattern().cscStationsWithAnyHits();
+  // treeTrack.dtStationsWithAnyHits = track.hitPattern().dtStationsWithAnyHits();
+  // treeTrack.cscStationsWithAnyHits = track.hitPattern().cscStationsWithAnyHits();
+  treeTrack.dtStationsWithValidHits = track.hitPattern().dtStationsWithValidHits();
+  treeTrack.cscStationsWithValidHits = track.hitPattern().cscStationsWithValidHits();
   treeTrack.dxy = track.dxy();
   treeTrack.dxyError = track.dxyError();
   treeTrack.dz = track.dz();
