@@ -23,8 +23,10 @@ public:
   int nHits, nValidHits, nValidPlusInvalidHits;
   double innermostHitRadius, innermostHitZ;
   int muonStationsWithAnyHits;
-  int dtStationsWithAnyHits;
-  int cscStationsWithAnyHits;
+  // int dtStationsWithAnyHits;
+  // int cscStationsWithAnyHits;
+  int dtStationsWithValidHits;
+  int cscStationsWithValidHits;
   int trackAlgorithm;
   bool trackQuality;
 

@@ -67,7 +67,7 @@ double dxyErrMax( const double & pt )
 bool passMuonCut(const Track * muon)
 {
   if( (muon->nValidHits >= 0) &&
-      ( muon->dtStationsWithAnyHits + muon->cscStationsWithAnyHits > 1 ) &&
+      ( muon->dtStationsWithValidHits + muon->cscStationsWithValidHits > 1 ) &&
       (fabs(muon->eta) < 2.) &&
       (fabs(muon->dxyError) < dxyErrMax(muon->pt)) &&
       (fabs(muon->dzError) < dxyErrMax(muon->pt)) // Note: the use of the same function is intentional.
