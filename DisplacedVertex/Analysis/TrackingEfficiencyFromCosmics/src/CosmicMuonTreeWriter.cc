@@ -13,7 +13,7 @@
 //
 // Original Author:  Marco De Mattia,40 1-A11,
 //         Created:  Thu Mar 29 13:29:00 CEST 2012
-// $Id: CosmicMuonTreeWriter.cc,v 1.2 2012/03/31 17:27:31 demattia Exp $
+// $Id: CosmicMuonTreeWriter.cc,v 1.3 2012/04/02 11:06:20 demattia Exp $
 //
 //
 
@@ -260,7 +260,6 @@ void CosmicMuonTreeWriter::fillTreeTracks( const T & collection, const GlobalPoi
     }
     else {
       fillTrackToTreeTrack(treeTrack, *it);
-      std::cout << "pt = " << treeTrack.pt << std::endl;
       tracks.push_back(treeTrack);
     }
   }
