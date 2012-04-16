@@ -14,20 +14,26 @@ inline double deltaPhi(double phi1, double phi2) {
 
 bool passTrackCut(const Track * track)
 {
-  if( track->trackQuality && (fabs(track->eta) < 2.0) && (track->pt > 25) && (track->nValidHits > 6) ) {
+  // if( track->phi > 0 ) return false;
+
+  // return true;
+
+  // if( track->trackQuality && (fabs(track->eta) < 2.0) && (track->pt > 25) && (track->nValidHits > 6) ) {
+  // if( (fabs(track->eta) < 2.0) && (track->pt > 25) && (track->nValidHits > 6) ) {
+  if( track->trackQuality ) {
     return true;
   }
   return false;
 }
 
-template <class T1, class T2>
-void fillEff(const T1 & muons, TH1F * totalVsD0, const T2 & tracks, TH1F * passingVsD0)
+template <class T>
+void fillEff(const double & value, TH1F * totalVsD0, const T & tracks, TH1F * passingVsD0)
 {
   // Twice because we expect two tracks
-  double muonDxy = fabs((*muons)[0].dxy);
-  // std::cout << "pt = " << (*muons)[0].pt << std::endl;
-  totalVsD0->Fill(muonDxy);
-  totalVsD0->Fill(muonDxy);
+  // double muonDxy = fabs((*muons)[0].dxy);
+  // double muonDxy = fabs(returnValue->get((*muons)[0]));
+  totalVsD0->Fill(value);
+  totalVsD0->Fill(value);
 
   if( tracks->size() > 0 ) {
     bool firstPass = true;
@@ -39,7 +45,7 @@ void fillEff(const T1 & muons, TH1F * totalVsD0, const T2 & tracks, TH1F * passi
       // PiOver2 just to check that they are not very close. The deltaPhi should be either ~0 or ~pi.
       if( firstPass || fabs(deltaPhi(firstPhi, it->phi)) > TMath::PiOver2() ) {
 	if( passTrackCut( &*it ) ) {
-	  passingVsD0->Fill(muonDxy);
+	  passingVsD0->Fill(value);
 	  if( firstPass ) firstPhi = it->phi;
 	  else break;
 	  firstPass = false;
@@ -66,11 +72,11 @@ double dxyErrMax( const double & pt )
 
 bool passMuonCut(const Track * muon)
 {
-  if( (muon->nValidHits >= 0) &&
-      ( muon->dtStationsWithValidHits + muon->cscStationsWithValidHits > 1 ) &&
-      (fabs(muon->eta) < 2.) &&
-      (fabs(muon->dxyError) < dxyErrMax(muon->pt)) &&
-      (fabs(muon->dzError) < dxyErrMax(muon->pt)) // Note: the use of the same function is intentional.
+  if( (muon->nValidHits >= 0)
+      && ( muon->dtStationsWithValidHits + muon->cscStationsWithValidHits > 1 )
+      && (fabs(muon->eta) < 2.)
+      && (fabs(muon->dxyError) < dxyErrMax(muon->pt))
+      && (fabs(muon->dzError) < dxyErrMax(muon->pt)) // Note: the use of the same function is intentional.
       ) {
 
     if( fabs(muon->dz) < 10. ) {
@@ -91,15 +97,37 @@ void CosmicMuonAnalyzer::Loop()
   TFile * outputFile = new TFile("eff.root", "RECREATE");
   outputFile->cd();
 
+  // Vs D0
   TH1F * passingVsD0 = new TH1F("passingVsD0", "tracks found vs |d0|", nBins, 0., 100.);
   TH1F * totalVsD0 = new TH1F("totalVsD0", "cosmics found vs |d0| (filled twice)", nBins, 0., 100.);
   TH1F * effVsD0 = (TH1F*)passingVsD0->Clone("effVsD0");
 
-  TH1F * passingVsGenD0 = new TH1F("passingVsGenD0", "tracks found vs |genD0|", nBins, 0., 100.);
-  TH1F * totalVsGenD0 = new TH1F("totalVsGenD0", "genParticles found vs |genD0| (filled twice)", nBins, 0., 100.);
-  TH1F * effVsGenD0 = (TH1F*)passingVsGenD0->Clone("effVsGenD0");
+  TH1F * passingVsGenD0 = 0;
+  TH1F * totalVsGenD0 = 0;
+  TH1F * effVsGenD0 = 0;
+  if( MC ) {
+    passingVsGenD0 = new TH1F("passingVsGenD0", "tracks found vs |genD0|", nBins, 0., 100.);
+    totalVsGenD0 = new TH1F("totalVsGenD0", "genParticles found vs |genD0| (filled twice)", nBins, 0., 100.);
+    effVsGenD0 = (TH1F*)passingVsGenD0->Clone("effVsGenD0");
+  }
 
-  TH1F * hTracksDeltaPhi = new TH1F("hTracksDeltaPhi", "First and second track deltaPhi", 100, -3.15, 3.15);
+  // Vs Eta
+  TH1F * passingVsEta = new TH1F("passingVsEta", "tracks found vs #eta", nBins, -2.5, 2.5);
+  TH1F * totalVsEta = new TH1F("totalVsEta", "cosmics found vs #eta (filled twice)", nBins, -2.5, 2.5);
+  TH1F * effVsEta = (TH1F*)passingVsEta->Clone("effVsEta");
+
+  TH1F * passingVsGenEta = 0;
+  TH1F * totalVsGenEta = 0;
+  TH1F * effVsGenEta = 0;
+  if( MC ) {
+    passingVsGenEta = new TH1F("passingVsGenEta", "tracks found vs gen #eta", nBins, -2.5, 2.5);
+    totalVsGenEta = new TH1F("totalVsGenEta", "genParticles found vs gen #eta (filled twice)", nBins, -2.5, 2.5);
+    effVsGenEta = (TH1F*)passingVsGenEta->Clone("effVsGenEta");
+  }
+
+  TH1F * etaRelError = new TH1F("etaRelError", "relative error on #eta", nBins, 0., 1.5);
+  TH1F * dxyRelError = new TH1F("dxyRelError", "relative error on d_{0}", nBins, 0., 1.5);
+  TH1F * dzRelError = new TH1F("dzRelError", "relative error on z_{0}", nBins, 0., 1.5);
 
   Long64_t nbytes = 0, nb = 0;
   for (Long64_t jentry=0; jentry<nentries;jentry++) {
@@ -117,22 +145,44 @@ void CosmicMuonAnalyzer::Loop()
     if( muons->size() != 1 ) continue;
     if( !passMuonCut(&((*muons)[0])) ) continue;
 
-    fillEff(muons, totalVsD0, tracks, passingVsD0);
-    fillEff(genParticles, totalVsGenD0, tracks, passingVsGenD0);
-
-
-    if( tracks->size() > 1 ) {
-      hTracksDeltaPhi->Fill(deltaPhi((*tracks)[0].phi, (*tracks)[1].phi));
+    // Efficiency vs d0
+    fillEff(fabs((*muons)[0].dxy), totalVsD0, tracks, passingVsD0);
+    if( MC ) {
+      fillEff(fabs((*genParticles)[0].dxy), totalVsGenD0, tracks, passingVsGenD0);
     }
+
+    // Apply also a dxy cut for the efficiency vs eta
+    if( (*muons)[0].dxy > 5. ) continue;
+    // Efficiency vs eta
+    fillEff((*muons)[0].eta, totalVsEta, tracks, passingVsEta);
+    if( MC ) {
+      fillEff((*genParticles)[0].eta, totalVsGenEta, tracks, passingVsGenEta);
+    }
+
+    etaRelError->Fill((*muons)[0].etaError/fabs((*muons)[0].eta));
+    dxyRelError->Fill((*muons)[0].dxyError/fabs((*muons)[0].dxy));
+    dzRelError->Fill((*muons)[0].dzError/fabs((*muons)[0].dz));
+
   }
 
+  // Efficiency vs d0
   passingVsD0->Sumw2();
   totalVsD0->Sumw2();
   effVsD0->Divide(passingVsD0, totalVsD0, 1., 1., "B");
-
-  passingVsGenD0->Sumw2();
-  totalVsGenD0->Sumw2();
-  effVsGenD0->Divide(passingVsGenD0, totalVsGenD0, 1., 1., "B");
+  if( MC ) {
+    passingVsGenD0->Sumw2();
+    totalVsGenD0->Sumw2();
+    effVsGenD0->Divide(passingVsGenD0, totalVsGenD0, 1., 1., "B");
+  }
+  // Efficiency vs eta
+  passingVsEta->Sumw2();
+  totalVsEta->Sumw2();
+  effVsEta->Divide(passingVsEta, totalVsEta, 1., 1., "B");
+  if( MC ) {
+    passingVsGenEta->Sumw2();
+    totalVsGenEta->Sumw2();
+    effVsGenEta->Divide(passingVsGenEta, totalVsGenEta, 1., 1., "B");
+  }
 
   outputFile->Write();
   outputFile->Close();
