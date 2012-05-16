@@ -1,0 +1,49 @@
+Tracking Efficiency from Cosmics
+
+The code produces a tree containing Track and GenParticle objects (same names but different objects than the ones in CMSSW).
+These objects have all the information needed for the measurement that can be done using a simple root macro.
+
+To setup the code:
+
+cmsrel CMSSW_4_2_3
+cd CMSSW_4_2_3/src
+cmsenv
+cvs co -d Analysis UserCode/DeMattia/DisplacedVertex/Analysis/
+scramv1 b -j 4
+
+the cfg to run the code is in:
+Analysis/TrackingEfficiencyFromCosmics/test/CosmicMuonTreeWriter_cfg.py
+
+It will produce a tree named after the muon collection, e.g.:
+
+MuonCollection = cms.InputTag("cosmicMuons1Leg"),
+
+will produce cosmicMuons1Leg.root.
+
+The tree will contain all the reco tracks (default collection in the cfg is generalTracks), muons (default cosmicMuons1Leg
+collection) and, if UseMCtruth = cms.bool(True) the GenParticle collection will be filled with all the generated muons of
+status == 1 (stable) in the event.
+
+Note that the producer can also be used to save hlt muons as the code is already protected from missing collections (the hlt
+collections are not saved when they are empty and will give an exception).
+
+It is sufficient to set:
+
+MuonCollection = cms.InputTag("hltL2Muons"),
+
+
+The output tree can be analyzed with the macro:
+
+Analysis/TrackingEfficiencyFromCosmics/test/Macros/TreeAnalyzers/CosmicMuonAnalyzer.C
+
+the file CosmicMuonAnalyzer.h file in the same dir must be edited to point to the tree root file (search for .root).
+
+Note that this file includes the .h files in Analysis/RootTreeProducers/interface/ defining the Track and GenParticle object.
+If moved the includes must be changed accordingly to point to the correct location.
+
+The macro will produce plots showing the tracking efficiency as measured from cosmics and from MC truth (selected via a
+bool MC = true; defined in the .h file) vs transverse impact parameter and some other plots.
+
+It will apply the analysis cuts on tracks and selection cuts on the muons.
+
+Some selections will also be applied on the generated muons (e.g. eta range).
