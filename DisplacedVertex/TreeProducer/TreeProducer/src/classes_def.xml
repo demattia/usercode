@@ -1,0 +1,6 @@
+<lcgdict>
+ <class name="PseudoLepton"/>
+ <class name="std::vector<PseudoLepton>"/>
+ <class name="std::vector<PseudoLepton>::const_iterator" />
+ <class name="edm::Wrapper<std::vector<PseudoLepton> >" />
+</lcgdict>

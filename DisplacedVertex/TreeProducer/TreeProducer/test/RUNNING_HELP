@@ -1,0 +1,43 @@
+GUIDE TO RUNNING TREE PRODUCER
+
+I assume you have :
+-checked out a CMSSW area (e.g. 5_2_5)
+-checked out the trunk version of the code analysis code
+-have access to PAT tuples created by the MakePatTuple step
+-the sample cff file corresponding to the PAT tuples of a sample need to be updated with the list of PAT files (see isntructions in MakePatTuples step for more info)
+
+
+
+-To run the tree producer on a single sample, do (e.g. from the src directory) :
+
+python TreeProducer/TreeProducer/test/run_treeProducer.py SampleFiles/Samples/python/Data_Mu_Run2012A1_cff.py RAL
+
+Arguments :
+1) A sample cff file - make sure the pat file list has been updated
+2) Where or how you are running the job.  Currently supports "CERN" and "RAL".
+
+At the moment, this script will submit a number of batch jobs to the batch system on lxplus (or equivalent at RAL)
+We can add more functionality here e.g. batch jobs at LPC? Or run crab jobs on published PAT tuples?
+
+
+-To run the tree producer en masse :
+
+python TreeProducer/TreeProducer/test/runAllTreeProducer.py data CERN
+
+Arguments :
+1) Which type of samples to run on.  Choose from:
+	
+	data 
+	signal 
+	background 
+	qcd 
+	vectorboson 
+	all
+
+2) Where/how you are running
+
+
+The jobs will produce histograms_N.root files in the workdirs/SAMPLE_analysis directories. They can be merged by running mergeAllFiles.py from workdirs/:
+
+- cp mergeAllFiles.py mergeFiles.py $LOCALRT/src/workdirs/
+- ./mergeAllFiles.py
