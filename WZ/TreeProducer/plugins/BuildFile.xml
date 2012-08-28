@@ -1,0 +1,22 @@
+<export>
+</export>
+<library   name="TreeProducerTreeProducer_plugins" file="*.cc">
+  <use   name="FWCore/Framework"/>
+  <use   name="FWCore/ParameterSet"/>
+  <use   name="FWCore/MessageLogger"/>
+  <use   name="FWCore/MessageService"/>
+  <use   name="FWCore/Utilities"/>
+  <use   name="DataFormats/Common"/>
+  <use   name="DataFormats/PatCandidates"/>
+  <use   name="PhysicsTools/PatAlgos"/>
+  <use   name="PhysicsTools/PatUtils"/>
+  <use   name="RecoVertex/KalmanVertexFit"/>
+  <use   name="SimGeneral/HepPDTRecord"/>
+  <use   name="SimDataFormats/GeneratorProducts"/>
+  <use   name="TreeProducer/TreeProducer"/>
+  <use   name="TreeProducer/CheckHitPattern"/>
+  <use   name="hepmc"/>
+  <use   name="root"/>
+  <use   name="rootrflx"/>
+  <lib   name="DCache"/>
+</library>
