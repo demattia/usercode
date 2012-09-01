@@ -1,0 +1,76 @@
+#ifndef FILESANDWEIGHTS_H
+#define FILESANDWEIGHTS_H
+
+#include <map>
+#include <TString.h>
+
+std::map<TString, double> filesAndWeightsMap( bool electrons )
+{
+  // The weights are the cross sections in pb. The number of processed events is read from a histograms in the tree root file.
+   
+  // Files and weights map
+  std::map<TString, double> fw;
+  //  bool elecrton_ = false;
+  // Signal
+  //  fw["/home/ppd/bjo62667/DisplacedLeptons/Develop2012/CMSSW_5_2_5/src/workdirs//Signal_200_050F_analysis_20120801"] = 1.;
+
+  // Vector bosons
+
+//  fw["/home/ppd/bjo62667/DisplacedLeptons/Develop2012/CMSSW_5_2_5/src/workdirs/ZZ_analysis_20120801"] = 8.3;
+//  fw["/home/ppd/bjo62667/DisplacedLeptons/Develop2012/CMSSW_5_2_5/src/workdirs/WZ_analysis_20120801"] = 22;
+//  fw["/home/ppd/bjo62667/DisplacedLeptons/Develop2012/CMSSW_5_2_5/src/workdirs/WW_analysis_20120801"] = 57.1;
+//  fw["/home/ppd/bjo62667/DisplacedLeptons/Develop2012/CMSSW_5_2_5/src/workdirs/WJetsToLNu_analysis_20120801"] = 362570.2;
+//
+//
+//  // TTbar
+//
+//  fw["/home/ppd/bjo62667/DisplacedLeptons/Develop2012/CMSSW_5_2_5/src/workdirs/TTJets_analysis_20120723"] =  225.197 ;
+//
+//  // DY JETS
+//  // DYJets10 cross section too small...
+//  fw["/home/ppd/bjo62667/DisplacedLeptons/Develop2012/CMSSW_5_2_5/src/workdirs/DYJets10_analysis_20120723"] = 762.45;
+//  fw["/home/ppd/bjo62667/DisplacedLeptons/Develop2012/CMSSW_5_2_5/src/workdirs/DYJets50_analysis_20120723"] = 3503.71;
+    fw["/afs/cern.ch/work/e/ejclemen/DisplacedLeptons2012/CMSSW_5_2_5/src/workdirs/DYJets50_analysis_20120815"] = 3503.71;
+
+//
+
+if (!electrons)
+ {
+  // QCD mu
+//  fw["/home/ppd/bjo62667/DisplacedLeptons/Develop2012/CMSSW_5_2_5/src/workdirs/QCDmu15_analysis_20120726"] = 2738580.0;
+//   fw["/home/ppd/bjo62667/DisplacedLeptons/Develop2012/CMSSW_5_2_5/src/workdirs/QCDmu20_analysis_20120726"] = 1865500.0;
+//  fw["/home/ppd/bjo62667/DisplacedLeptons/Develop2012/CMSSW_5_2_5/src/workdirs/QCDmu30_analysis_20120726"] = 806298.0;
+//  fw["/home/ppd/bjo62667/DisplacedLeptons/Develop2012/CMSSW_5_2_5/src/workdirs/QCDmu50_analysis_20120726"] = 176187.6;
+//   fw["/home/ppd/bjo62667/DisplacedLeptons/Develop2012/CMSSW_5_2_5/src/workdirs/QCDmu80_analysis_20120726"] = 40448.0;
+//  fw["/home/ppd/bjo62667/DisplacedLeptons/Develop2012/CMSSW_5_2_5/src/workdirs/QCDmu120_analysis_20120726"] = 7463.94;
+//  fw["/home/ppd/bjo62667/DisplacedLeptons/Develop2012/CMSSW_5_2_5/src/workdirs/QCDmu170_analysis_20120726"] = 2299.752;
+//   fw["/home/ppd/bjo62667/DisplacedLeptons/Develop2012/CMSSW_5_2_5/src/workdirs/QCDmu300_analysis_20120726"] = 151.8048;
+//   fw["/home/ppd/bjo62667/DisplacedLeptons/Develop2012/CMSSW_5_2_5/src/workdirs/QCDmu470_analysis_20120726"] = 11.79648;
+//   fw["/home/ppd/bjo62667/DisplacedLeptons/Develop2012/CMSSW_5_2_5/src/workdirs/QCDmu600_analysis_20120726"] = 2.690196;
+  // fw["/home/ppd/bjo62667/DisplacedLeptons/Develop2012/CMSSW_5_2_5/src/workdirs/QCDmu800_analysis_20120726"] = 0.368781;
+  // fw["/home/ppd/bjo62667/DisplacedLeptons/Develop2012/CMSSW_5_2_5/src/workdirs/QCDmu1000_analysis_20120726"] = 0.0849078;
+
+      // Data
+//      fw["/home/ppd/bjo62667/DisplacedLeptons/Develop2012/CMSSW_5_2_5/src/workdirs/Data_Mu_Run2012A1_analysis_20120801"] = 1.;
+  fw["/afs/cern.ch/work/e/ejclemen/DisplacedLeptons2012/CMSSW_5_2_5/src/workdirs/Data_Mu_Run2012A1_analysis_20120815"] = 1;
+//      fw["/home/ppd/bjo62667/DisplacedLeptons/Develop2012/CMSSW_5_2_5/src/workdirs/Data_Mu_Run2012B1_analysis_20120801"] = 1.;
+
+ }
+else
+ {
+  // QCD em
+//  fw["/home/ppd/bjo62667/DisplacedLeptons/Develop2012/CMSSW_5_2_5/src/workdirs/QCDem20_analysis_20120726"] = 2914860.0;
+//  fw["/home/ppd/bjo62667/DisplacedLeptons/Develop2012/CMSSW_5_2_5/src/workdirs/QCDem30_analysis_20120726"] = 4615893.0;
+//  fw["/home/ppd/bjo62667/DisplacedLeptons/Develop2012/CMSSW_5_2_5/src/workdirs/QCDem80_analysis_20120726"] = 183294.9;
+//  fw["/home/ppd/bjo62667/DisplacedLeptons/Develop2012/CMSSW_5_2_5/src/workdirs/QCDem170_analysis_20120726"] = 4586.52;
+//  fw["/home/ppd/bjo62667/DisplacedLeptons/Develop2012/CMSSW_5_2_5/src/workdirs/QCDem250_analysis_20120726"] = 556.75;
+//  fw["/home/ppd/bjo62667/DisplacedLeptons/Develop2012/CMSSW_5_2_5/src/workdirs/QCDem350_analysis_20120726"] = 89.1;
+
+  // Data
+//  fw["/home/ppd/bjo62667/DisplacedLeptons/Develop2012/CMSSW_5_2_5/src/workdirs/Data_Photon_Run2012A1_analysis_20120723"] = 1.;
+//  fw["/home/ppd/bjo62667/DisplacedLeptons/Develop2012/CMSSW_5_2_5/src/workdirs/Data_Photon_Run2012B1_analysis_20120723"] = 1.;
+ }
+  return fw;
+}
+
+#endif
