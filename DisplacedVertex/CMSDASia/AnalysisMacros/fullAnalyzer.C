@@ -10,7 +10,6 @@ void fullAnalyzer(const bool electrons = false, const bool trackAnalysis = true,
   // The weights are the cross sections in pb
   std::map<TString, double> fw(filesAndWeightsMap( electrons ));
   std::map<TString, double>::const_iterator it = fw.begin();
-
   for( ; it != fw.end(); ++it ) {
     std::cout << "processing: " << it->first << std::endl;
 

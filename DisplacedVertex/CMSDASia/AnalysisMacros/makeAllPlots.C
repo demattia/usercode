@@ -66,7 +66,7 @@ void addHistogram(const TString & fileName, const TString & histoName, const int
   legend->AddEntry(histo, leg, "f");
 }
 
-void makePlot(const TString & histoName, TFile * outputFile, TString type, const TString & xTitle,  const double & yMin = 0., const double & yMax = 0., const bool electrons = false, const float lumi = 0 )
+void makePlot(const TString & histoName, TFile * outputFile, TString type, const TString & xTitle,  const double & yMin = 0., const double & yMax = 0., const bool electrons = false, const float lumi = 0)
 {
   std::cout << "----> Making plots for : " << histoName.Data() << std::endl;
   TH1::SetDefaultSumw2();
@@ -74,6 +74,7 @@ void makePlot(const TString & histoName, TFile * outputFile, TString type, const
   // Make title for stacks
   TString stackTitle = "CMS #sqrt{s} = 8 TeV, L = ";
   char s[32];
+  std::cout << "lumi = " << lumi/1000 << std::endl;
   sprintf(s, "%.1f",lumi/1000);
   stackTitle += s;
   stackTitle +="fb^{-1}";
@@ -106,28 +107,28 @@ void makePlot(const TString & histoName, TFile * outputFile, TString type, const
   double mcIntegralError2 = 0;
   std::cout << "Doing MC" << std::endl;
   TLegend *legend= new TLegend(0.65,0.6,0.85,0.85);
-//  addHistogram("CombinedFiles/ZZ_combined"+type+".root", histoName, 8, hs,"ZZ", legend, lumi, mcIntegral, mcIntegralError2);
-//  addHistogram("CombinedFiles/WZ_combined"+type+".root", histoName, 7, hs,"WZ", legend, lumi, mcIntegral, mcIntegralError2);
-//  addHistogram("CombinedFiles/WW_combined"+type+".root", histoName, 6, hs,"WW", legend, lumi, mcIntegral, mcIntegralError2);
-//  addHistogram("CombinedFiles/WJets_combined"+type+".root", histoName, 5, hs,"WJets", legend, lumi, mcIntegral, mcIntegralError2);
-  // addHistogram("Ztautau_combined"+type+".root", histoName, 97, hs,"Z/#gamma*->#tau#tau",legend, , lumi);
-  // if( electrons ) {
-  //   addHistogram("Zee_combined"+type+".root", histoName, kRed, hs,"Z/#gamma*->ee", legend, , lumi);
-  // }
-  // else {
-  //   addHistogram("Zmumu_combined"+type+".root", histoName, kRed, hs,"Z/#gamma*->#mu#mu", legend, lumi);
-  // }
+  addHistogram("CombinedFiles/ZZ_combined"+type+".root", histoName, 8, hs,"ZZ", legend, lumi, mcIntegral, mcIntegralError2);
+  addHistogram("CombinedFiles/WZ_combined"+type+".root", histoName, 7, hs,"WZ", legend, lumi, mcIntegral, mcIntegralError2);
+  addHistogram("CombinedFiles/WW_combined"+type+".root", histoName, 6, hs,"WW", legend, lumi, mcIntegral, mcIntegralError2);
+  // addHistogram("CombinedFiles/WJets_combined"+type+".root", histoName, 5, hs,"WJets", legend, lumi, mcIntegral, mcIntegralError2);
+  //  addHistogram("Ztautau_combined"+type+".root", histoName, 97, hs,"Z/#gamma*->#tau#tau",legend, , lumi);
+  //  if( electrons ) {
+  //    addHistogram("Zee_combined"+type+".root", histoName, kRed, hs,"Z/#gamma*->ee", legend, , lumi);
+  //  }
+  //  else {
+  //    addHistogram("Zmumu_combined"+type+".root", histoName, kRed, hs,"Z/#gamma*->#mu#mu", legend, lumi);
+  //  }
   addHistogram("CombinedFiles/DYJets_combined"+type+".root", histoName, kRed, hs,"DYJets", legend, lumi, mcIntegral, mcIntegralError2);
   // addHistogram("TTbar_combined"+type+".root", histoName, 3, hs,"tt", legend, lumi);
-//  addHistogram("CombinedFiles/TTJets_combined"+type+".root", histoName, 3, hs,"tt+jets", legend, lumi, mcIntegral, mcIntegralError2);
-//  addHistogram("CombinedFiles/QCD_combined"+type+".root", histoName, kBlue, hs,"QCD", legend, lumi, mcIntegral, mcIntegralError2);
+  addHistogram("CombinedFiles/TTJets_combined"+type+".root", histoName, 3, hs,"tt+jets", legend, lumi, mcIntegral, mcIntegralError2);
+  addHistogram("CombinedFiles/QCD_combined"+type+".root", histoName, kBlue, hs,"QCD", legend, lumi, mcIntegral, mcIntegralError2);
 
   
   std::cout << "Integral of Data : " << dataIntegral << " +/- " << dataIntegralError << endl;
   std::cout << "Integral of MC : " << mcIntegral << " +/- " << sqrt(mcIntegralError2) << endl;
 
   outputFile->cd();
-  TCanvas canvas;
+  TCanvas canvas(histoName+"_canvas");
   canvas.cd();
   gPad->SetLogy();
   canvas.Draw();
@@ -159,7 +160,7 @@ void makePlot(const TString & histoName, TFile * outputFile, TString type, const
     xlatex = 20;
   }
   else if (xTitle=="L_{xy}") {
-    hs.GetXaxis()->SetLimits(-100, 0);
+    hs.GetXaxis()->SetLimits(-20, 20);
     xlatex = 20;
     legend->SetX1(0.2);
     legend->SetX2(0.35);
@@ -173,7 +174,7 @@ void makePlot(const TString & histoName, TFile * outputFile, TString type, const
     xlatex = 20;
   }
   else {
-    hs.GetXaxis()->SetLimits(-100, 2);
+    hs.GetXaxis()->SetLimits(-40, 40);
     xlatex = 1;
     legend->SetX1(0.2);
     legend->SetX2(0.35);
@@ -215,8 +216,8 @@ void makeAllPlots(const bool electrons = false, const bool trackAnalysis = true,
   TFile * outputFile = new TFile("output"+type+".root", "RECREATE");
   // makePlot("caloCorrMass_nolifetime_inverted", outputFile, type, "mass[Gev/c^{2}]", "e^{+}e^{-}", 1, 0.07, 1500000);
   makePlot("Mass_nolifetime_inverted", outputFile, type, "mass[Gev/c^{2}]", 0.07, 10000000, electrons, lumi);
-  //  makePlot("signedDecayLengthSignificance_lifetime_nodecaylength",outputFile, type,"L_{xy}/#sigma", 0.001, 1000, electrons, lumi);
-  //  makePlot("Mass_lifetime_notinverted",outputFile, type,"mass[Gev/c^{2}]", 0.001, 1000, electrons, lumi);
+  makePlot("signedDecayLengthSignificance_lifetime_nodecaylength",outputFile, type,"L_{xy}/#sigma", 0.001, 1000, electrons, lumi);
+  makePlot("Mass_lifetime_notinverted",outputFile, type,"mass[Gev/c^{2}]", 0.001, 1000, electrons, lumi);
   makePlot("signedDecayLengthSignificance_nolifetime_nodecaylength",outputFile, type,"L_{xy}/#sigma", 0.01, 10000000, electrons, lumi);
   makePlot("signedDecayLength_nolifetime_nodecaylength",outputFile, type,"L_{xy}", 0.01, 10000000, electrons, lumi);
   makePlot("cosine_nolifetime_inverted",outputFile, type,"cos{#alpha}",0,10000, electrons, lumi );

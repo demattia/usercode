@@ -4,6 +4,7 @@
 #include <TStyle.h>
 #include <TCanvas.h>
 #include <iostream>
+#include <fstream>
 #include <TMath.h>
 
 void treeAnalyzer::initializeCuts()
@@ -64,32 +65,35 @@ bool treeAnalyzer::lifetimeRelatedCuts( std::vector<TreeCandidate>::const_iterat
     return false;
   }
 }
-bool treeAnalyzer::dileptonSelectionCuts( std::vector<TreeCandidate>::const_iterator cand )
+
+bool treeAnalyzer::dileptonSelectionCuts( std::vector<TreeCandidate>::const_iterator cand, const std::vector<TreeLepton> & leptons )
 {
   if((cand->leptonChargeL*cand->leptonChargeH < 0) &&
       cand->vertexChi2 < 5 &&
       cand->hitsBeforeVertexL <= 1 && cand->hitsBeforeVertexH <= 1 &&
       (electrons_ || cand->deltaR > 0.2 ) && // muons only
       (electrons_ || cand->cosine > -0.95 ) && // muons only
-      !(cand->isStandAloneL && cand->isStandAloneH) && // we are not using standAloneMuons
-      ( electrons_ || cand->corrDileptonMass > 15.)&& ( !electrons_ || cand->caloCorrMass > 15.)
+     !(leptons.at(cand->leptonIndexL).isStandAlone) && !(leptons.at(cand->leptonIndexH).isStandAlone) && // we are not using standAloneMuons
+      ( electrons_ || cand->corrDileptonMass > 15.) && ( !electrons_ || cand->caloCorrMass > 15.)
   ) return true;
   return false;
 }
 
-bool treeAnalyzer::triggerMatching( std::vector<TreeCandidate>::const_iterator cand )
+bool treeAnalyzer::triggerMatching( std::vector<TreeCandidate>::const_iterator cand, const std::vector<TreeLepton> & leptons )
 {
-  if( cand->triggerMatchL != 0 && cand->triggerMatchH != 0 && cand->triggerMatchL != cand->triggerMatchH ) return true;
+  // Temporarily made weaker. The triggerMatch values need to be made unique for each trigger object.
+  if( leptons.at(cand->leptonIndexL).triggerMatch != 0 && leptons.at(cand->leptonIndexH).triggerMatch != 0 ) return true;
+  // if( leptons.at(cand->leptonIndexL).triggerMatch != 0 && leptons.at(cand->leptonIndexH).triggerMatch != 0 && leptons.at(cand->leptonIndexL).triggerMatch != leptons.at(cand->leptonIndexH).triggerMatch ) return true;
   return false;
 }
 
-bool treeAnalyzer::analysisCuts(std::vector<TreeCandidate>::const_iterator cand, const bool removeIsolationCut, const bool removeLifetimeRelatedCuts, const bool decayLengthSigniInverted )
+bool treeAnalyzer::analysisCuts(const std::vector<TreeCandidate>::const_iterator & cand, const std::vector<TreeLepton> & leptons, const bool removeIsolationCut, const bool removeLifetimeRelatedCuts, const bool decayLengthSigniInverted )
 {
   if( acceptanceCuts( cand ) &&
       trackSelectionCuts( cand, removeIsolationCut ) &&  // i.e. isolation cuts
-      dileptonSelectionCuts( cand ) &&
+      dileptonSelectionCuts( cand, leptons ) &&
       lifetimeRelatedCuts( cand, removeLifetimeRelatedCuts,decayLengthSigniInverted)
-      &&   triggerMatching( cand )
+      && triggerMatching( cand, leptons )
   ) return true;
   return false;
 }
@@ -128,9 +132,22 @@ void treeAnalyzer::Loop()
   TH1F histo_lifetime_notinverted("Mass_lifetime_notinverted", "Mass_lifetime_notinverted", 100, 0, 500);
   TH1F histoDeltaPhi_lifetime_notinverted("deltaPhi_lifetime_notinverted", "deltaPhi_lifetime_notinverted", 100, 0, 3.2); 
 
+  ofstream outputMassFile;
+  TString typeName = "backgroundMC";
+  if ( dirName_.Contains("Data") ) {
+    typeName = "data";
+  }
+  if( !electrons_ ) {
+    std::cout << "masses_"+typeName+"_Muons.txt" << std::endl;
+    outputMassFile.open("masses_"+typeName+"_Muons.txt", fstream::app);
+  }
+  else {
+    std::cout << "masses_"+typeName+"_electrons.txt" << std::endl;
+    outputMassFile.open("masses_"+typeName+"_electrons.txt", fstream::app);
+  }
 
   // Decay Length Histograms
-  double maxDecayLengthSignificance = 20;
+  double maxDecayLengthSignificance = 40;
   double maxDecayLength = 40;
 
   int nBins = 40;
@@ -179,6 +196,8 @@ void treeAnalyzer::Loop()
     if (ientry < 0) break;
     nb = fChain->GetEntry(jentry);   nbytes += nb;
 
+    // std::cout << "number of genCTau = " << candidates->genCTau_.size() << std::endl;
+
     // Get PU weight for this event
     double totalWeight = 0;
     if ( dirName_.Contains("Data") ) {
@@ -201,7 +220,7 @@ void treeAnalyzer::Loop()
       double Mass;
       if (electrons_) Mass = cand->caloCorrMass;
       else Mass = cand->corrDileptonMass;
-      if( analysisCuts(cand,false,true,true) ) {
+      if( analysisCuts(cand,candidates->leptons_,false,true,true) ) {
 
         // Pileup histos
         histoNPv_nolifetime_nodecayLength.Fill(candidates->numPV, totalWeight);
@@ -225,7 +244,7 @@ void treeAnalyzer::Loop()
         histoGenDecayLength_nolifetime_inverted.Fill(cand->genDecayLength2D, totalWeight);
       }
 
-      if( analysisCuts(cand,false,true,false) ) {
+      if( analysisCuts(cand,candidates->leptons_,false,true,false) ) {
 
         histo_nolifetime_nodecaylength.Fill(Mass, totalWeight);
         histoDeltaPhi_nolifetime_nodecaylength.Fill(cand->dPhiCorr, totalWeight);
@@ -236,7 +255,7 @@ void treeAnalyzer::Loop()
         histoGenDecayLength_nolifetime_nodecaylength.Fill(cand->genDecayLength2D, totalWeight);
       }
 
-      if( analysisCuts(cand,false,false,true) ) {
+      if( analysisCuts(cand,candidates->leptons_,false,false,true) ) {
 
         histo_lifetime_nodecaylength.Fill(Mass, totalWeight);
         histoDeltaPhi_lifetime_nodecaylength.Fill(cand->dPhiCorr, totalWeight);
@@ -249,7 +268,7 @@ void treeAnalyzer::Loop()
       }
 
 
-      if( analysisCuts(cand,false,false,false) ) {
+      if( analysisCuts(cand,candidates->leptons_,false,false,false) ) {
 
         histo_lifetime_notinverted.Fill(Mass, totalWeight);
         histoDeltaPhi_lifetime_notinverted.Fill(cand->dPhiCorr, totalWeight);
@@ -259,23 +278,24 @@ void treeAnalyzer::Loop()
         histoSignedDecayLength_lifetime_notinverted.Fill(sign*cand->decayLength, totalWeight);
         histoGenDecayLength_lifetime_notinverted.Fill(cand->genDecayLength2D, totalWeight);
 
+        std::cout << "saving mass value = " << Mass << " with weight value = " << totalWeight << std::endl;
+        outputMassFile << Mass << "\t" << totalWeight << std::endl;
       }
 
-      if ( analysisCuts(cand,true,true,true) ) {
+      if ( analysisCuts(cand,candidates->leptons_,true,true,true) ) {
         histoIsolationPtH_nolifetime_inverted.Fill(cand->leptonIsoH, totalWeight);
         histoIsolationPtL_nolifetime_inverted.Fill(cand->leptonIsoL, totalWeight);
       }
-
-
 
       //    std::vector<std::string>::const_iterator it = triggers->begin();
       //    for( ; it != triggers->end(); ++it ) {
       //	 std::cout << "trigger name = " << *it << std::endl;
       //   }
 
-
     }
   }
+
+  outputMassFile.close();
 
   std::cout << "total entries = " << total << std::endl;
 
