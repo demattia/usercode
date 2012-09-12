@@ -15,10 +15,10 @@
 #include <iostream>
 
 // Candidates
-#include "TreeProducer/TreeProducer/interface/Candidates.h"
-#include "TreeProducer/TreeProducer/interface/TreeCandidate.h"
-#include "TreeProducer/TreeProducer/interface/TreeLepton.h"
-#include "TreeProducer/TreeProducer/src/LinkDef.h"
+#include "Candidates.h"
+#include "TreeCandidate.h"
+#include "TreeLepton.h"
+#include "LinkDef.h"
 
 #include "commonTools.C"
 
