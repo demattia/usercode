@@ -74,6 +74,7 @@ bool treeAnalyzer::dileptonSelectionCuts( std::vector<TreeCandidate>::const_iter
       (electrons_ || cand->deltaR > 0.2 ) && // muons only
       (electrons_ || cand->cosine > -0.95 ) && // muons only
      !(leptons.at(cand->leptonIndexL).isStandAlone) && !(leptons.at(cand->leptonIndexH).isStandAlone) && // we are not using standAloneMuons
+     !(leptons.at(cand->leptonIndexL).isGlobalMuon) && !(leptons.at(cand->leptonIndexH).isGlobalMuon) && // we are not using globalMuons
       ( electrons_ || cand->corrDileptonMass > 15.) && ( !electrons_ || cand->caloCorrMass > 15.)
   ) return true;
   return false;
