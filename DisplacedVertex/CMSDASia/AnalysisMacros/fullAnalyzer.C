@@ -17,10 +17,10 @@ void fullAnalyzer(const bool electrons = false, const bool trackAnalysis = true,
       treeAnalyzer analyzer(it->first+"/histograms.root", it->second, electrons);
       analyzer.Loop();
     }
-    else {
-//      muonAnalyzer analyzer(it->first+"/histograms.root", it->second, useSAMuons, electrons);
-//      analyzer.Loop();
-      if ( useSAMuons ) {}
-    }
+//    else {
+////      muonAnalyzer analyzer(it->first+"/histograms.root", it->second, useSAMuons, electrons);
+////      analyzer.Loop();
+//      if ( useSAMuons ) {}
+//    }
   }
 }

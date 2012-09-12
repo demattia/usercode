@@ -122,6 +122,8 @@ treeAnalyzer::treeAnalyzer(TString fileName, const double & weight, const bool e
   TString puFile = "PileupFiles/pileup_muon.root";
   if ( electrons ) puFile = "PileupFiles/pileup_electron.root";
   puweights_ = PileupReweighting(puFile);
+
+  Loop();
 }
 
 treeAnalyzer::~treeAnalyzer()
