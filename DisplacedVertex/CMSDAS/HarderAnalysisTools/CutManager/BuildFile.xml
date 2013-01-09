@@ -1,5 +1,0 @@
-<use   name="root"/>
-<use   name="HarderAnalysisTools/Histograms"/>
-<export>
-  <lib   name="1"/>
-</export>

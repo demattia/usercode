@@ -1,6 +1,0 @@
-source = PoolSource {
-  untracked vstring fileNames = {
-    "castor:/castor/cern.ch/user/d/demattia/FastSim/PUHL/VertexAlgoNew/TT_2JETS/Fast_TT_2JETS_2.root",
-    "castor:/castor/cern.ch/user/d/demattia/FastSim/PUHL/VertexAlgoNew/TT_2JETS/Fast_TT_2JETS_5.root"
-  }
-}

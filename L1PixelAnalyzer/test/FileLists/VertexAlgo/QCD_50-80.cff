@@ -1,5 +1,0 @@
-source = PoolSource {
-  untracked vstring fileNames = {
-    "castor:/castor/cern.ch/user/d/demattia/FastSim/PUHL/VertexAlgoNew/QCD_50-80/Fast_QCD_50-80_Merged_1.root"
-  }
-}

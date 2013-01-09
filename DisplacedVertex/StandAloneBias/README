@@ -1,4 +1,0 @@
-Usage:
-./MakeWebPage.sh "Title of the web page"
-
-It will take the plots from the TrackingEfficiencyFromCosmics.root, produce png files and put everything in a subdir called WebPage.
