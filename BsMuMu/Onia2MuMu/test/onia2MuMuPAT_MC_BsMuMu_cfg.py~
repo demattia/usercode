@@ -1,0 +1,17 @@
+# for the list of used tags please see:
+# https://twiki.cern.ch/twiki/bin/view/CMS/Onia2MuMuSamples
+
+import FWCore.ParameterSet.Config as cms
+
+process = cms.Process("Onia2MuMuPAT")
+
+from HeavyFlavorAnalysis.Onia2MuMu.onia2MuMuPAT_cff import *
+
+onia2MuMuPAT(process, GlobalTag="START53_V7G::All", MC=False, HLT="HLT", Filter=True)
+
+process.source.fileNames = cms.untracked.vstring(
+    '/store/mc/Summer12/BsToMuMu_BsFilter_8TeV-pythia6-evtgen/AODSIM/PU_S7_START52_V9-v1/0000/FE7F2004-A2AF-E111-BE8B-003048FFCC2C.root'
+)
+
+process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(10) )
+
