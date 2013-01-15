@@ -235,33 +235,33 @@ Onia2MuMuPAT::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 					const reco::Muon *rmu2 = dynamic_cast<const reco::Muon *>(it2->originalObject());
 					double minDca = 9999.;
 					try{
-						for(reco::Vertex::trackRef_iterator itVtx = theOriginalPV.tracks_begin(); itVtx != theOriginalPV.tracks_end(); itVtx++) if(itVtx->isNonnull()){
+						for(reco::Vertex::trackRef_iterator itVtx = theOriginalPV.tracks_begin(); itVtx != theOriginalPV.tracks_end(); itVtx++){
+						 if(itVtx->isNonnull()){
 							const reco::Track& track = **itVtx;
-							//	      if(!track.quality(reco::TrackBase::highPurity)) continue;
+							//if(!track.quality(reco::TrackBase::highPurity)) continue;
 							TransientTrack tt = theTTBuilder->build(track);
 							pair<bool,Measurement1D> tkPVdist = IPTools::absoluteImpactParameter3D(tt,thePrimaryV);
-							if (tkPVdist.first && tkPVdist.second.value()<minDca){
-								minDca = tkPVdist.second.value();
-							}
-							if(track.pt() > 0.5 && tkPVdist.second.value()<0.03) ++Ntrk;
-							if(track.pt() < 0.9) continue; //reject all rejects from counting if less than 900 MeV
+                                                        vertexWeight += theOriginalPV.trackWeight(*itVtx);
+                                                        if(deltaR(track.eta(),track.phi(),myCand.eta(), myCand.phi()) < 0.7) {
+                                                                // cout<<"myCand.eta"<<myCand.eta()<<"myCand.phi"<<myCand.phi()<<endl;
+	                                                        if (rmu1 != 0 && rmu1->innerTrack().key() == itVtx->key())
+        	                                                        continue;
+                        	                                if (rmu2 != 0 && rmu2->innerTrack().key() == itVtx->key())
+                	                                                continue;
+	                                                        if (tkPVdist.first && tkPVdist.second.value()<minDca){
+        	                                                        minDca = tkPVdist.second.value();
+                	                                        }
+                                                                if(track.pt() > 0.5 && tkPVdist.second.value()<0.03) Ntrk++;
+	                                                        if(track.pt() < 0.9) continue; //reject all rejects from counting if less than 900 MeV
+                                                                sumPTPV += track.pt();
+                                                                countTksOfPV++;
+                                                        }
 							//	      if (track.ptError()/track.pt()>0.1) continue;
-							// do not count the two muons
-							if (rmu1 != 0 && rmu1->innerTrack().key() == itVtx->key())
-								continue;
-							if (rmu2 != 0 && rmu2->innerTrack().key() == itVtx->key())
-								continue;
-
-							if(deltaR(track.eta(),track.phi(),myCand.eta(), myCand.phi()) < 0.7) {
-								// cout<<"myCand.eta"<<myCand.eta()<<"myCand.phi"<<myCand.phi()<<endl;
-								sumPTPV += track.pt();
-								countTksOfPV++;
-							}
-							vertexWeight += theOriginalPV.trackWeight(*itVtx);
 //							if(theOriginalPV.trackWeight(*itVtx) > 0.5){
 //								countTksOfPV++;
 //								sumPTPV += track.pt();
 //							}
+						 }
 						}
 					} catch (std::exception & err) {std::cout << " muon Selection%G�%@failed " << std::endl; return ; }
 
@@ -273,31 +273,37 @@ Onia2MuMuPAT::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 					double sumPt_noVtx = 0.;
 					int countTksOfnoVtx = 0;
 					for (TrackCollection::const_iterator tk = tkColl->begin(); tk != tkColl->end(); ++tk) {
+                                        //        if(!tk->quality(reco::TrackBase::highPurity)) continue;
 						bool hasVertex = false;
-						for(reco::Vertex::trackRef_iterator itVtx = theOriginalPV.tracks_begin(); itVtx != theOriginalPV.tracks_end(); itVtx++) if(itVtx->isNonnull()){
+						for(reco::Vertex::trackRef_iterator itVtx = theOriginalPV.tracks_begin(); itVtx != theOriginalPV.tracks_end(); itVtx++){
+						 if(itVtx->isNonnull()){
 							const reco::Track& track = **itVtx;
 							if(tk->pt() == track.pt() && tk->eta()==track.eta()){
 								// cout<<"tk->pt()"<<tk->pt()<<endl;
 								hasVertex = true;
 								continue;
 							}
+						 }
 						}
 						if(hasVertex) continue;
-						TransientTrack tt = theTTBuilder->build(*tk);
-						pair<bool,Measurement1D> tkPVdist = IPTools::absoluteImpactParameter3D(tt,myVertex);
-						if (tkPVdist.first && tkPVdist.second.value()<minDca){
-							minDca = tkPVdist.second.value();
-						}
-						if(tk->pt() > 0.5 && tkPVdist.second.value()<0.03) Ntrk++;
+						if(rmu1 != 0 && (*rmu1->innerTrack()).pt() == tk->pt() && (*rmu1->innerTrack()).eta() == tk->eta()){ cout<<"enter"<<endl; continue;}
+						if(rmu2 != 0 && (*rmu2->innerTrack()).pt() == tk->pt() && (*rmu2->innerTrack()).eta() == tk->eta()) continue;
+                                                TransientTrack tt = theTTBuilder->build(*tk);
+                                                pair<bool,Measurement1D> tkPVdist = IPTools::absoluteImpactParameter3D(tt,myVertex);
+	       					 if (deltaR(tk->eta(),tk->phi(),myCand.eta(), myCand.phi())< 0.7) {
+	                                                if (tkPVdist.first && tkPVdist.second.value()<minDca){
+        	                                                minDca = tkPVdist.second.value();
+                	                                }
+                                                        if(tk->pt() > 0.5 && tkPVdist.second.value()<0.03) Ntrk++;
+	                                                if(tk->pt()<0.9) continue;
+        	                                        if(tkPVdist.second.value() > 0.05) continue;
+                                                        sumPt_noVtx += tk->pt();
+                                                        countTksOfnoVtx++;
+                                                }
 
-						if(tk->pt()<0.9) continue;
-						if(tkPVdist.second.value() > 0.05) continue;
-						if (deltaR(tk->eta(),tk->phi(),myCand.eta(), myCand.phi())< 0.7) {
-							sumPt_noVtx += tk->pt();
-							countTksOfnoVtx++;
-						}
 					}
 					double Iso = myCand.pt()/(myCand.pt()+sumPt_noVtx+sumPTPV);
+					cout<<"Iso"<<Iso<<endl;
 
 					myCand.addUserFloat("Isolation", (float) Iso);
 					myCand.addUserFloat("minDca", (float) minDca);
@@ -306,6 +312,7 @@ Onia2MuMuPAT::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 					myCand.addUserFloat("vertexWeight", (float) vertexWeight);
 					myCand.addUserFloat("sumPTPV", (float) sumPTPV);
 
+                                                cout<<"Ntrk2=="<<Ntrk;
 
 					// DCA
 					// Compute both the dca in the transverse plane (dcaxy) and in 3D.
@@ -399,6 +406,16 @@ Onia2MuMuPAT::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 					myCand.addUserFloat("cosAlpha",-100);
 					myCand.addUserFloat("ppdlBS",-100);
 					myCand.addUserFloat("ppdlErrBS",-100);
+                                        myCand.addUserFloat("Isolation", -1);
+                                        myCand.addUserFloat("minDca", -1);
+                                        myCand.addUserInt("Ntrk", 9999);
+                                        myCand.addUserInt("countTksOfPV", 9999);
+                                        myCand.addUserFloat("vertexWeight", -1);
+                                        myCand.addUserFloat("sumPTPV", -1);
+                                        myCand.addUserFloat("DCAXY", -1);
+                                        myCand.addUserFloat("DCA", -1);
+                                        myCand.addUserFloat("delta3d",-1);
+                                        myCand.addUserFloat("delta3dErr",-1);
 					if (addCommonVertex_) {
 						myCand.addUserData("commonVertex",Vertex());
 					}
