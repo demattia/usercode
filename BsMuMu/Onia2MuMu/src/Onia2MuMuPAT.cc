@@ -236,32 +236,32 @@ Onia2MuMuPAT::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 					double minDca = 9999.;
 					try{
 						for(reco::Vertex::trackRef_iterator itVtx = theOriginalPV.tracks_begin(); itVtx != theOriginalPV.tracks_end(); itVtx++){
-						 if(itVtx->isNonnull()){
-							const reco::Track& track = **itVtx;
-							//if(!track.quality(reco::TrackBase::highPurity)) continue;
-							TransientTrack tt = theTTBuilder->build(track);
-							pair<bool,Measurement1D> tkPVdist = IPTools::absoluteImpactParameter3D(tt,thePrimaryV);
-                                                        vertexWeight += theOriginalPV.trackWeight(*itVtx);
-                                                        if(deltaR(track.eta(),track.phi(),myCand.eta(), myCand.phi()) < 0.7) {
-                                                                // cout<<"myCand.eta"<<myCand.eta()<<"myCand.phi"<<myCand.phi()<<endl;
-	                                                        if (rmu1 != 0 && rmu1->innerTrack().key() == itVtx->key())
-        	                                                        continue;
-                        	                                if (rmu2 != 0 && rmu2->innerTrack().key() == itVtx->key())
-                	                                                continue;
-	                                                        if (tkPVdist.first && tkPVdist.second.value()<minDca){
-        	                                                        minDca = tkPVdist.second.value();
-                	                                        }
-                                                                if(track.pt() > 0.5 && tkPVdist.second.value()<0.03) Ntrk++;
-	                                                        if(track.pt() < 0.9) continue; //reject all rejects from counting if less than 900 MeV
-                                                                sumPTPV += track.pt();
-                                                                countTksOfPV++;
-                                                        }
-							//	      if (track.ptError()/track.pt()>0.1) continue;
-//							if(theOriginalPV.trackWeight(*itVtx) > 0.5){
-//								countTksOfPV++;
-//								sumPTPV += track.pt();
-//							}
-						 }
+							if(itVtx->isNonnull()){
+								const reco::Track& track = **itVtx;
+								//if(!track.quality(reco::TrackBase::highPurity)) continue;
+								TransientTrack tt = theTTBuilder->build(track);
+								pair<bool,Measurement1D> tkPVdist = IPTools::absoluteImpactParameter3D(tt,myVertex);
+								vertexWeight += theOriginalPV.trackWeight(*itVtx);
+								if(track.pt() > 0.5 && tkPVdist.second.value()<0.03) ++Ntrk;
+								if(deltaR(track.eta(),track.phi(),myCand.eta(), myCand.phi()) < 0.7) {
+									// cout<<"myCand.eta"<<myCand.eta()<<"myCand.phi"<<myCand.phi()<<endl;
+									if (rmu1 != 0 && rmu1->innerTrack().key() == itVtx->key())
+										continue;
+									if (rmu2 != 0 && rmu2->innerTrack().key() == itVtx->key())
+										continue;
+									if (tkPVdist.first && tkPVdist.second.value()<minDca){
+										minDca = tkPVdist.second.value();
+									}
+									if(track.pt() < 0.9) continue; //reject all rejects from counting if less than 900 MeV
+									sumPTPV += track.pt();
+									countTksOfPV++;
+								}
+								//	      if (track.ptError()/track.pt()>0.1) continue;
+								//							if(theOriginalPV.trackWeight(*itVtx) > 0.5){
+								//								countTksOfPV++;
+								//								sumPTPV += track.pt();
+								//							}
+							}
 						}
 					} catch (std::exception & err) {std::cout << " muon Selection%G�%@failed " << std::endl; return ; }
 
@@ -273,34 +273,45 @@ Onia2MuMuPAT::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 					double sumPt_noVtx = 0.;
 					int countTksOfnoVtx = 0;
 					for (TrackCollection::const_iterator tk = tkColl->begin(); tk != tkColl->end(); ++tk) {
-                                        //        if(!tk->quality(reco::TrackBase::highPurity)) continue;
 						bool hasVertex = false;
-						for(reco::Vertex::trackRef_iterator itVtx = theOriginalPV.tracks_begin(); itVtx != theOriginalPV.tracks_end(); itVtx++){
-						 if(itVtx->isNonnull()){
-							const reco::Track& track = **itVtx;
-							if(tk->pt() == track.pt() && tk->eta()==track.eta()){
-								// cout<<"tk->pt()"<<tk->pt()<<endl;
-								hasVertex = true;
-								continue;
+						for(VertexCollection::const_iterator itv = priVtxs->begin(), itvend = priVtxs->end(); itv != itvend; ++itv){
+							for( reco::Vertex::trackRef_iterator itVtx = itv->tracks_begin(); itVtx != itv->tracks_end(); ++itVtx) {
+								if( itVtx->isNonnull() ) {
+									if(tk->pt() == (*itVtx)->pt() && tk->eta()==(*itVtx)->eta()) {
+										hasVertex = true;
+										// Found a vertex, break out of all loops and go the identifier "gotoVertexFound"
+										goto gotoVertexFound;
+									}
+								}
 							}
-						 }
 						}
+						// for(reco::Vertex::trackRef_iterator itVtx = theOriginalPV.tracks_begin(); itVtx != theOriginalPV.tracks_end(); itVtx++){
+						//	 if(itVtx->isNonnull()){
+						//     const reco::Track& track = **itVtx;
+						//     if(tk->pt() == track.pt() && tk->eta()==track.eta()){
+						//       // cout<<"tk->pt()"<<tk->pt()<<endl;
+						//       hasVertex = true;
+						//       continue;
+						//     }
+						//   }
+						// }
+						gotoVertexFound:
 						if(hasVertex) continue;
 						if(rmu1 != 0 && (*rmu1->innerTrack()).pt() == tk->pt() && (*rmu1->innerTrack()).eta() == tk->eta()){ cout<<"enter"<<endl; continue;}
 						if(rmu2 != 0 && (*rmu2->innerTrack()).pt() == tk->pt() && (*rmu2->innerTrack()).eta() == tk->eta()) continue;
-                                                TransientTrack tt = theTTBuilder->build(*tk);
-                                                pair<bool,Measurement1D> tkPVdist = IPTools::absoluteImpactParameter3D(tt,myVertex);
-	       					 if (deltaR(tk->eta(),tk->phi(),myCand.eta(), myCand.phi())< 0.7) {
-	                                                if (tkPVdist.first && tkPVdist.second.value()<minDca){
-        	                                                minDca = tkPVdist.second.value();
-                	                                }
-                                                        if(tk->pt() > 0.5 && tkPVdist.second.value()<0.03) Ntrk++;
-	                                                if(tk->pt()<0.9) continue;
-        	                                        if(tkPVdist.second.value() > 0.05) continue;
-                                                        sumPt_noVtx += tk->pt();
-                                                        countTksOfnoVtx++;
-                                                }
-
+						TransientTrack tt = theTTBuilder->build(*tk);
+						// Count number of close tracks not associated to any PV
+						pair<bool,Measurement1D> tkPVdist = IPTools::absoluteImpactParameter3D(tt,myVertex);
+						if(tk->pt() > 0.5 && tkPVdist.second.value()<0.03) ++Ntrk;
+						if (deltaR(tk->eta(),tk->phi(),myCand.eta(), myCand.phi())< 0.7) {
+							if (tkPVdist.first && tkPVdist.second.value()<minDca){
+								minDca = tkPVdist.second.value();
+							}
+							if(tk->pt()<0.9) continue;
+							if(tkPVdist.second.value() > 0.05) continue;
+							sumPt_noVtx += tk->pt();
+							countTksOfnoVtx++;
+						}
 					}
 					double Iso = myCand.pt()/(myCand.pt()+sumPt_noVtx+sumPTPV);
 					cout<<"Iso"<<Iso<<endl;
@@ -311,8 +322,6 @@ Onia2MuMuPAT::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 					myCand.addUserInt("countTksOfPV", countTksOfPV);
 					myCand.addUserFloat("vertexWeight", (float) vertexWeight);
 					myCand.addUserFloat("sumPTPV", (float) sumPTPV);
-
-                                                cout<<"Ntrk2=="<<Ntrk;
 
 					// DCA
 					// Compute both the dca in the transverse plane (dcaxy) and in 3D.
@@ -332,11 +341,11 @@ Onia2MuMuPAT::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 
 
 					// 3D IP of the Bs momentum wrt the PV
-//					// Vector between PV and SV
-//					TVector3 vdiff3D = TVector3(thePrimaryV.position().x(), thePrimaryV.position().y(), thePrimaryV.position().z()) -
-//							TVector3(myVertex.position().x(), myVertex.position().y(), myVertex.position().z());
-//					double delta3D = vdiff3D.Cross(TVector3(myCand.px(), myCand.py(), myCand.pz()).Unit()).Mag();
-//					// std::cout << "delta3D = " << delta3D << std::endl;
+					//					// Vector between PV and SV
+					//					TVector3 vdiff3D = TVector3(thePrimaryV.position().x(), thePrimaryV.position().y(), thePrimaryV.position().z()) -
+					//							TVector3(myVertex.position().x(), myVertex.position().y(), myVertex.position().z());
+					//					double delta3D = vdiff3D.Cross(TVector3(myCand.px(), myCand.py(), myCand.pz()).Unit()).Mag();
+					//					// std::cout << "delta3D = " << delta3D << std::endl;
 
 					// TODO: check that the error matrices can be used and combined as such. If they are variance-covariance matrices they have the
 					// variance (and covariance terms), i.e. sigma^2, so they can be summed. Verify this.
@@ -406,16 +415,16 @@ Onia2MuMuPAT::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 					myCand.addUserFloat("cosAlpha",-100);
 					myCand.addUserFloat("ppdlBS",-100);
 					myCand.addUserFloat("ppdlErrBS",-100);
-                                        myCand.addUserFloat("Isolation", -1);
-                                        myCand.addUserFloat("minDca", -1);
-                                        myCand.addUserInt("Ntrk", 9999);
-                                        myCand.addUserInt("countTksOfPV", 9999);
-                                        myCand.addUserFloat("vertexWeight", -1);
-                                        myCand.addUserFloat("sumPTPV", -1);
-                                        myCand.addUserFloat("DCAXY", -1);
-                                        myCand.addUserFloat("DCA", -1);
-                                        myCand.addUserFloat("delta3d",-1);
-                                        myCand.addUserFloat("delta3dErr",-1);
+					myCand.addUserFloat("Isolation", -1);
+					myCand.addUserFloat("minDca", -1);
+					myCand.addUserInt("Ntrk", 9999);
+					myCand.addUserInt("countTksOfPV", 9999);
+					myCand.addUserFloat("vertexWeight", -1);
+					myCand.addUserFloat("sumPTPV", -1);
+					myCand.addUserFloat("DCAXY", -1);
+					myCand.addUserFloat("DCA", -1);
+					myCand.addUserFloat("delta3d",-1);
+					myCand.addUserFloat("delta3dErr",-1);
 					if (addCommonVertex_) {
 						myCand.addUserData("commonVertex",Vertex());
 					}
