@@ -139,7 +139,14 @@ def onia2MuMuPAT(process, GlobalTag, MC=False, HLT='HLT', Filter=True):
         addCommonVertex = cms.bool(True), ## Embed the full reco::Vertex out of the common vertex fit
         addMuonlessPrimaryVertex = cms.bool(True), ## Embed the primary vertex re-made from all the tracks except the two muons
         addMCTruth = cms.bool(MC),      ## Add the common MC mother of the two muons, if any
-        resolvePileUpAmbiguity = cms.bool(True)   ## Order PVs by their vicinity to the J/psi vertex, not by sumPt
+        resolvePileUpAmbiguity = cms.bool(True),   ## Order PVs by their vicinity to the J/psi vertex, not by sumPt
+        addThirdTrack = cms.bool(True),  ## search a third track making a good vertex with the dimuon
+        minTrackPt =cms.double(0.5), ## minimum pt of the third track
+        trackMass = cms.double(0.4936), ## mass for the track
+        diMuPlusTrackMassMax = cms.double(5.9),
+        diMuPlusTrackMassMin = cms.double(4.9),
+        diMuMassMax = cms.double(3.2),## dimuon mass range where to search for the third track
+        diMuMassMin = cms.double(2.8)                                         
     )
 
     # check if there is at least one (inclusive) tracker+tracker di-muon
@@ -159,8 +166,8 @@ def onia2MuMuPAT(process, GlobalTag, MC=False, HLT='HLT', Filter=True):
         process.patMuonSequence *
         process.onia2MuMuPatTrkTrk *
         process.allTracks *
-        process.goodTracks * 
-        process.onia2MuMuPatTrkTrkFilter 
+        process.goodTracks  
+        #process.onia2MuMuPatTrkTrkFilter 
     )
 
     # Make Tag and Probe pairs for efficiency measurements
@@ -206,7 +213,8 @@ def onia2MuMuPAT(process, GlobalTag, MC=False, HLT='HLT', Filter=True):
             'keep *_genMuons_*_Onia2MuMuPAT',                      # generated muons and parents
       #      'keep patMuons_patMuonsWithTrigger_*_Onia2MuMuPAT',    # All PAT muos including general tracks and matches to triggers
             'keep *_goodTracks_*_Onia2MuMuPAT',                    # All good tracks (heavy!)  
-            'keep patCompositeCandidates_*__Onia2MuMuPAT',         # PAT di-muons
+             #'keep patCompositeCandidates_*__Onia2MuMuPAT',       # PAT di-muons
+            'keep patCompositeCandidates_*_*_Onia2MuMuPAT',        #PAT di-muons and dimuons+track                           
             'keep patMuons_tagMuons__Onia2MuMuPAT',                # tagMuons for efficiency
             'keep patMuons_probeMuons__Onia2MuMuPAT',              # probeMuons for efficiency
             'keep *_tagMuonsMCMatch__Onia2MuMuPAT',                # tagMuons MC matches for efficiency
@@ -217,7 +225,8 @@ def onia2MuMuPAT(process, GlobalTag, MC=False, HLT='HLT', Filter=True):
             'keep edmTriggerResults_TriggerResults_*_*',           # HLT info, per path (cheap)
             'keep l1extraL1MuonParticles_l1extraParticles_*_*',    # L1 info (cheap)
             'keep L1GlobalTriggerReadoutRecord_gtDigis_*_*',       # Prescale info
-            'keep *_l1GtRecord_*_*',                               # Prescale info    
+            'keep *_l1GtRecord_*_*'                               # Prescale info    
+            #'keep *_*_DiMu_*'
                                                
         ),
         SelectEvents = cms.untracked.PSet( SelectEvents = cms.vstring('Onia2MuMuPAT', 'TagAndProbe') ) if Filter else cms.untracked.PSet()
