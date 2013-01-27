@@ -385,6 +385,10 @@ Onia2MuMuPAT::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 					}
 					myCand.addUserFloat("DCAXY", dcaxy);
 					myCand.addUserFloat("DCA", dca);
+					if (TrackFound){
+					  my3Cand.addUserFloat("DCAXY", dcaxy);
+					  my3Cand.addUserFloat("DCA", dca);
+					}
 					// end DCA
 
 
@@ -466,6 +470,7 @@ Onia2MuMuPAT::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 					myCand.addUserFloat("Isolation", -1);
 					myCand.addUserFloat("minDca", -1);
 					myCand.addUserInt("Ntrk", 9999);
+					myCand.addUserFloat("MassErr",-1);
 					myCand.addUserInt("countTksOfPV", 9999);
 					myCand.addUserFloat("vertexWeight", -1);
 					myCand.addUserFloat("sumPTPV", -1);
@@ -892,6 +897,8 @@ bool Onia2MuMuPAT::searchForTheThirdTrack(const edm::Event& iEvent, const edm::E
     Cand.addUserFloat("delta3d",-1);
     Cand.addUserFloat("delta3dErr",-1);
     Cand.addUserFloat("MassErr",-1);
+    Cand.addUserFloat("DCAXY", -1);
+    Cand.addUserFloat("DCA", -1);
   }
   
   return found;
