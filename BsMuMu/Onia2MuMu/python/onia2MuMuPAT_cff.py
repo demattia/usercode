@@ -231,5 +231,5 @@ def onia2MuMuPAT(process, GlobalTag, MC=False, HLT='HLT', Filter=True):
         ),
         SelectEvents = cms.untracked.PSet( SelectEvents = cms.vstring('Onia2MuMuPAT', 'TagAndProbe') ) if Filter else cms.untracked.PSet()
     )
-    process.e = cms.EndPath(process.out)
+    process.e = cms.EndPathr(process.out)
 
