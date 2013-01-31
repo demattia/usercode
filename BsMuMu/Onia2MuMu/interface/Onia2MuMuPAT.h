@@ -45,8 +45,8 @@ class Onia2MuMuPAT : public edm::EDProducer {
   virtual void endJob() ;
   bool isAbHadron(int pdgID);
   bool isAMixedbHadron(int pdgID, int momPdgID);
-  bool searchForTheThirdTrack(const edm::Event&, const edm::EventSetup&, pat::CompositeCandidate&, const pat::Muon*, const pat::Muon*,reco::Vertex&,reco::Track&, bool&); 
   std::pair<int, float> findJpsiMCInfo(reco::GenParticleRef genJpsi);
+  math::XYZTLorentzVector fromPtEtaPhiToPxPyPz( const double & pt, const double & eta, const double & phi, const double & mass);
 
   // ----------member data ---------------------------
  private:
@@ -59,11 +59,6 @@ class Onia2MuMuPAT : public edm::EDProducer {
   bool addCommonVertex_, addMuonlessPrimaryVertex_;
   bool resolveAmbiguity_;
   bool addMCTruth_;
-  bool addThirdTrack_;
-  double minTrackPt_;
-  double trackMass_;  
-  double diMuPlusTrackMassMax_, diMuPlusTrackMassMin_;
-  double diMuMassMax_, diMuMassMin_;
   GreaterByPt<pat::CompositeCandidate> pTComparator_;
   GreaterByVProb<pat::CompositeCandidate> vPComparator_;
 
