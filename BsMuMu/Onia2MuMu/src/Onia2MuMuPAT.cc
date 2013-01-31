@@ -268,6 +268,8 @@ Onia2MuMuPAT::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 					double sumNdof = 0.;
 					double PVndof = theOriginalPV.ndof();
 					myCand.addUserFloat("PVndof",(float) PVndof);
+					myCand.addUserFloat("pvw8",(float) (thePrimaryV.ndof()+2)/(2*thePrimaryV.tracksSize()));
+
 					try{
 						for(reco::Vertex::trackRef_iterator itVtx = theOriginalPV.tracks_begin(); itVtx != theOriginalPV.tracks_end(); itVtx++){
 							if(itVtx->isNonnull()){
@@ -443,6 +445,7 @@ Onia2MuMuPAT::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 					myCand.addUserFloat("vNChi2",-1);
 					myCand.addUserFloat("vProb", -1);
 					myCand.addUserFloat("PVndof", -1.);
+					myCand.addUserFloat("pvw8", -1.);
 					myCand.addUserFloat("ppdlPV",-100);
 					myCand.addUserFloat("ppdlErrPV",-100);
 					myCand.addUserFloat("cosAlpha",-100);
