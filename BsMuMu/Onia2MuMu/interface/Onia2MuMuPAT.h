@@ -47,6 +47,7 @@ class Onia2MuMuPAT : public edm::EDProducer {
   bool isAMixedbHadron(int pdgID, int momPdgID);
   std::pair<int, float> findJpsiMCInfo(reco::GenParticleRef genJpsi);
   math::XYZTLorentzVector fromPtEtaPhiToPxPyPz( const double & pt, const double & eta, const double & phi, const double & mass);
+  void fillCandMuons(pat::CompositeCandidate & myCand, const pat::Muon & mu1, const pat::Muon & mu2, const reco::TransientTrack & refittedTrack1, const reco::TransientTrack & refittedTrack2);
 
   // ----------member data ---------------------------
  private:
