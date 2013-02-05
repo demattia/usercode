@@ -442,7 +442,7 @@ Onia2MuMuPAT::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 
 	  pvtx3D.SetXYZ(thePrimaryV.position().x(),thePrimaryV.position().y(),thePrimaryV.position().z());
 	  TVector3 vdiff3D = vtx3D - pvtx3D;
-	  double cosAlpha3D = vdiff3D.Dot(pCand)/(vdiff.Mag()*pCand.Mag());
+	  double cosAlpha3D = vdiff3D.Dot(pCand)/(vdiff3D.Mag()*pCand.Mag());
 	  Measurement1D dist3D = vdist3D.distance(Vertex(myVertex), thePrimaryV);
 	  double l3d = dist3D.value();
 	  double l3dsig = l3d/dist3D.error();
