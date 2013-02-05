@@ -1,0 +1,61 @@
+? pythia6PtGun_Rapidity.patch
+? python/__init__.py
+Index: plugins/Pythia6PtGun.cc
+===================================================================
+RCS file: /cvs_server/repositories/CMSSW/CMSSW/GeneratorInterface/Pythia6Interface/plugins/Pythia6PtGun.cc,v
+retrieving revision 1.5
+diff -u -r1.5 Pythia6PtGun.cc
+--- plugins/Pythia6PtGun.cc	1 Apr 2009 01:38:58 -0000	1.5
++++ plugins/Pythia6PtGun.cc	4 Jan 2010 05:30:18 -0000
+@@ -22,8 +22,8 @@
+    // ParameterSet defpset ;
+    ParameterSet pgun_params = 
+       pset.getParameter<ParameterSet>("PGunParameters"); //, defpset ) ;
+-   fMinEta     = pgun_params.getParameter<double>("MinEta"); // ,-2.2);
+-   fMaxEta     = pgun_params.getParameter<double>("MaxEta"); // , 2.2);
++   fMinRapidity     = pgun_params.getParameter<double>("MinRapidity"); // ,-2.2);
++   fMaxRapidity     = pgun_params.getParameter<double>("MaxRapidity"); // , 2.2);
+    fMinPt       = pgun_params.getParameter<double>("MinPt"); // ,  20.);
+    fMaxPt       = pgun_params.getParameter<double>("MaxPt"); // , 420.);
+    fAddAntiParticle = pgun_params.getParameter<bool>("AddAntiParticle"); //, false) ;  
+@@ -56,16 +56,18 @@
+ 	 int particleID = fPartIDs[i]; // this is PDG - need to convert to Py6 !!!
+ 	 int py6PID = HepPID::translatePDTtoPythia( particleID );
+          int dum = 0;
+-	 double pt=0, mom=0, ee=0, the=0, eta=0;
++	 double pt=0, mom=0, ee=0, the=0, eta=0, rap=0;
+ 	 double mass = pymass_(particleID);
+ 	 double phi = (fMaxPhi-fMinPhi)*pyr_(&dum)+fMinPhi;
+ 
+-	 eta  = (fMaxEta-fMinEta)*pyr_(&dum)+fMinEta;                                                      
++         pt = (fMaxPt-fMinPt)*pyr_(&dum)+fMinPt;
++
++	 rap  = (fMaxRapidity-fMinRapidity)*pyr_(&dum)+fMinRapidity;                                                      
++
++         eta = asinh( sqrt(pt*pt+mass*mass)/pt * sinh(rap) );
+ 
+ 	 the  = 2.*atan(exp(-eta));                                                                          
+ 	 
+-	 pt = (fMaxPt-fMinPt)*pyr_(&dum)+fMinPt;
+-	 
+ 	 mom = pt/sin(the);
+ 	 ee = sqrt(mom*mom+mass*mass);
+ 
+Index: plugins/Pythia6PtGun.h
+===================================================================
+RCS file: /cvs_server/repositories/CMSSW/CMSSW/GeneratorInterface/Pythia6Interface/plugins/Pythia6PtGun.h,v
+retrieving revision 1.2
+diff -u -r1.2 Pythia6PtGun.h
+--- plugins/Pythia6PtGun.h	13 Mar 2009 19:21:46 -0000	1.2
++++ plugins/Pythia6PtGun.h	4 Jan 2010 05:30:18 -0000
+@@ -19,8 +19,8 @@
+       
+       private:
+       
+-         double  fMinEta;
+-	 double  fMaxEta;
++         double  fMinRapidity;
++	 double  fMaxRapidity;
+ 	 double  fMinPt ;
+          double  fMaxPt ;
+ 	 bool    fAddAntiParticle;

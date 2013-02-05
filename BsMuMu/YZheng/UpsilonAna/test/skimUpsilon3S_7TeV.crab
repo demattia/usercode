@@ -1,0 +1,18 @@
+[CMSSW]
+events_per_job = 3024
+number_of_jobs = 10
+#make 10 samples of 1.87/pb luminosity
+pset = skimUpsilon_cfg.py
+datasetpath = /Upsilon3S/Summer09-MC_31X_V3_7TeV-v1/GEN-SIM-RECO
+output_file= skimUpsilon.root
+
+[USER]
+ui_working_dir = skimUpsilon3S_7TeV 
+return_data = 1
+copy_data = 0
+
+[CRAB]
+scheduler=condor
+jobtype=cmssw
+#server_name = cern
+

@@ -1,0 +1,26 @@
+<use   name="FWCore/Framework"/>
+<use   name="FWCore/ParameterSet"/>
+<use   name="DataFormats/EcalDigi"/>
+<use   name="DataFormats/EcalRecHit"/>
+<use   name="DataFormats/MuonReco"/>
+<use   name="DataFormats/EgammaReco"/>
+<use   name="DataFormats/EgammaCandidates"/>
+<use   name="DataFormats/HepMCCandidate"/>
+<use   name="SimDataFormats/Track"/>
+<use   name="CondFormats/EcalObjects"/>
+<use   name="CondFormats/DataRecord"/>
+<use   name="RecoLocalCalo/EcalRecAlgos"/>
+<use   name="Geometry/CaloGeometry"/>
+<use   name="DataFormats/L1GlobalTrigger"/>
+<use   name="Geometry/CaloTopology"/>
+<use   name="DataFormats/Math"/>
+<use   name="PhysicsTools/PatUtils"/>
+<use   name="PhysicsTools/UtilAlgos"/>
+<use   name="PhysicsTools/Utilities"/>
+<use   name="PhysicsTools/PatAlgos"/>
+<use   name="HLTrigger/HLTcore"/>
+<use   name="CommonTools/UtilAlgos"/>
+<use   name="clhep"/>
+<flags   EDM_PLUGIN="1"/>
+<export>
+</export>

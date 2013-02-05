@@ -1,0 +1,16 @@
+[CMSSW]
+events_per_job = 100
+number_of_jobs = 1
+pset = upsilonGun_cfg.py
+datasetpath = None
+output_file= upsilonGun.root
+
+[USER]
+ui_working_dir = upsilonGun 
+return_data = 1
+copy_data = 0
+
+[CRAB]
+scheduler=condor
+jobtype=cmssw
+
