@@ -1,3 +1,5 @@
+// Plots the invariant mass distribution in the range used by the analysis.
+
 void plot(const TString & index = "0")
 {
   TFile *_file0 = TFile::Open("data_afterCuts_"+index+".root");

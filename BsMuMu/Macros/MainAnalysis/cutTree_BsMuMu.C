@@ -1,28 +1,43 @@
-void cutTree_BsMuMu( TString eb = "0", TString index = "0", const TString & inFile="tmva-trees-3000.root", TString outFile="data_afterCuts_" )
+#include "../Selection.h"
+#include "TString.h"
+#include "TFile.h"
+#include "TTree.h"
+#include "TROOT.h"
+#include <iostream>
+
+// Apply the analysis cuts or the preselection cuts and filter the tree.
+// This macro is specific to the tree from the main analysis.
+void cutTree_BsMuMu( const bool data, const TString & eb, const TString & index = "0", const TString & inFile="tmva-trees-3000.root" )
 {
-  cout << "eb = " << eb << endl;
-  cout << "index = " << index << endl;
-  outFile += eb+"_"+index+".root";
+  TString outFile;
   TFile infile(inFile);
-  gDirectory->Cd("sidebandChan"+eb+"Events"+index);
+  if( data ) {
+    outFile += "data_afterCuts_";
+    gDirectory->Cd("sidebandChan"+eb+"Events"+index);
+  }
+  else {
+    outFile += "MC_afterCuts_";
+    gDirectory->Cd("signalChan"+eb+"Events"+index);
+  }
+  outFile += eb+"_"+index+".root";
+
   TTree* inTree = (TTree*)gROOT->FindObject("events");
   if(!inTree){
     cout<<"Could not access yield tree!"<<endl;
     return;
   }
 
+  std::cout << "file" << std::endl;
+
   TFile outfile(outFile,"recreate");
 
-  TString lifetimeCuts("pvip < 0.008 && pvips < 2.000");
-  TString trackCuts("iso > 0.8 && docatrk > 0.015 && closetrk < 2");
-  TString barrelCuts("m1eta < 1.4 && m1eta > -1.4 && m2eta < 1.4 && m2eta > -1.4 && ((m1pt > m2pt && m1pt > 4.5 && m2pt > 4.0)||(m1pt < m2pt && m1pt > 4.0 && m2pt > 4.5))");
-  TString endcapsCuts("!(m1eta < 1.4 && m1eta > -1.4 && m2eta < 1.4 && m2eta > -1.4) && ((m1pt > m2pt && m1pt > 4.5 && m2pt > 4.2)||(m1pt < m2pt && m1pt > 4.2 && m2pt > 4.5))");
-  TString candidateBarrelCuts("pt > 6.5 && alpha < 0.050 && fls3d > 13.0 && chi2/dof < 2.2");
-  TString candidateEndcapsCuts("pt > 8.5 && alpha < 0.030 && fls3d > 15.0 && chi2/dof < 1.8");
+  std::cout << "file2" << std::endl;
 
+  bool endcaps = 1;
+  if( eb == "0" ) endcaps = 0;
+  TString cuts(Selection2(endcaps, false));
 
-  TTree* outTree = (TTree*)inTree->CopyTree(lifetimeCuts+"&&"+trackCuts+"&& (("+barrelCuts+"&&"+candidateBarrelCuts+")"+"||"+"("+endcapsCuts+"&&"+candidateEndcapsCuts+"))");
-
+  TTree* outTree = (TTree*)inTree->CopyTree(cuts);
 
   //close everything
   outTree->Write();
