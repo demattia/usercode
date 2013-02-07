@@ -212,12 +212,10 @@ Onia2MuMuPAT::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 
 	    float minDz = 999999.;
 	    TwoTrackMinimumDistance ttmd;
-	    bool status = ttmd.calculate( GlobalTrajectoryParameters(
-								     GlobalPoint(myVertex.position().x(), myVertex.position().y(), myVertex.position().z()),
+	    bool status = ttmd.calculate( GlobalTrajectoryParameters(GlobalPoint(myVertex.position().x(), myVertex.position().y(), myVertex.position().z()),
 								     GlobalVector(myCand.px(),myCand.py(),myCand.pz()),TrackCharge(0),&(*magneticField)),
-					  GlobalTrajectoryParameters(
-								     GlobalPoint(bs.position().x(), bs.position().y(), bs.position().z()),
-								     GlobalVector(bs.dxdz(), bs.dydz(), 1.),TrackCharge(0),&(*magneticField)));
+					  GlobalTrajectoryParameters(GlobalPoint(bs.position().x(), bs.position().y(), bs.position().z()),
+								     GlobalVector(bs.dxdz(), bs.dydz(), 1.),TrackCharge(0),&(*magneticField)) );
 	    float extrapZ=-9E20;
 	    if (status) extrapZ=ttmd.points().first.z();
 
@@ -250,9 +248,6 @@ Onia2MuMuPAT::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 	      // check that muons are truly from reco::Muons (and not, e.g., from PF Muons)
 	      // also check that the tracks really come from the track collection used for the BS
 	      if (rmu1 != 0 && rmu2 != 0 && rmu1->track().id() == pvtracks.id() && rmu2->track().id() == pvtracks.id()) {
-		// Save the keys of the tracks in the primary vertex
-		// std::vector<size_t> vertexTracksKeys;
-		// vertexTracksKeys.reserve(thePrimaryV.tracksSize());
 		if( thePrimaryV.hasRefittedTracks() ) {
 		  // Need to go back to the original tracks before taking the key
 		  std::vector<reco::Track>::const_iterator itRefittedTrack = thePrimaryV.refittedTracks().begin();
@@ -260,7 +255,6 @@ Onia2MuMuPAT::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 		  for( ; itRefittedTrack != refittedTracksEnd; ++itRefittedTrack ) {
 		    if( thePrimaryV.originalTrack(*itRefittedTrack).key() == rmu1->track().key() ) continue;
 		    if( thePrimaryV.originalTrack(*itRefittedTrack).key() == rmu2->track().key() ) continue;
-		    // vertexTracksKeys.push_back(thePrimaryV.originalTrack(*itRefittedTrack).key());
 		    muonLess.push_back(*(thePrimaryV.originalTrack(*itRefittedTrack)));
 		  }
 		}
@@ -269,7 +263,6 @@ Onia2MuMuPAT::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 		  for( ; itPVtrack != thePrimaryV.tracks_end(); ++itPVtrack ) if (itPVtrack->isNonnull()) {
 		    if( itPVtrack->key() == rmu1->track().key() ) continue;
 		    if( itPVtrack->key() == rmu2->track().key() ) continue;
-		    // vertexTracksKeys.push_back(itPVtrack->key());
 		    muonLess.push_back(**itPVtrack);
 		  }
 		}
@@ -289,7 +282,12 @@ Onia2MuMuPAT::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 	  int countTksOfPV = 0, Ntrk=0;
 	  const reco::Muon *rmu1 = dynamic_cast<const reco::Muon *>(it->originalObject());
 	  const reco::Muon *rmu2 = dynamic_cast<const reco::Muon *>(it2->originalObject());
+	  double minDcaDR0p7 = 9999.;
+	  double minDcaDR0p7PtMin0p5 = 9999.;
+	  double minDcaDR0p7PtMin0p9 = 9999.;
 	  double minDca = 9999.;
+	  double minDcaPtMin0p5 = 9999.;
+	  double minDcaPtMin0p9 = 9999.;
 	  double sumNdof = 0.;
 	  double PVndof = theOriginalPV.ndof();
 	  myCand.addUserFloat("PVndof",(float) PVndof);
@@ -308,26 +306,30 @@ Onia2MuMuPAT::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 		pair<bool,Measurement1D> tkPVdist = IPTools::absoluteImpactParameter3D(tt,myVertex);
 		vertexWeight += theOriginalPV.trackWeight(*itVtx);
 		if(track.pt() > 0.5 && tkPVdist.second.value()<0.03) ++Ntrk;
+
+		// Use all tracks
+		if( tkPVdist.first ) {
+		  if( tkPVdist.second.value()<minDca ) minDca = tkPVdist.second.value();
+		  if( track.pt() > 0.5 && tkPVdist.second.value()<minDcaPtMin0p5 ) minDcaPtMin0p5 = tkPVdist.second.value();
+		  if( track.pt() > 0.9 && tkPVdist.second.value()<minDcaPtMin0p9 ) minDcaPtMin0p9 = tkPVdist.second.value();
+		}
+
+		// Use only tracks close to the Bs momentum direction
 		if(deltaR(track.eta(),track.phi(),myCand.eta(), myCand.phi()) < 0.7) {
-		  if (tkPVdist.first && tkPVdist.second.value()<minDca){
-		    minDca = tkPVdist.second.value();
+		  if( tkPVdist.first ) {
+		    if( tkPVdist.second.value()<minDcaDR0p7 ) minDcaDR0p7 = tkPVdist.second.value();
+		    if( track.pt() > 0.5 && tkPVdist.second.value()<minDcaDR0p7PtMin0p5 ) minDcaDR0p7PtMin0p5 = tkPVdist.second.value();
+		    if( track.pt() > 0.9 && tkPVdist.second.value()<minDcaDR0p7PtMin0p9 ) minDcaDR0p7PtMin0p9 = tkPVdist.second.value();
 		  }
-		  if(track.pt() < 0.9) continue; //reject all rejects from counting if less than 900 MeV
+		  if(track.pt() < 0.9) continue; //reject all low pt tracks from counting
 		  sumPTPV += track.pt();
 		}
 		sumNdof += track.ndof();
 		countTksOfPV++;
-
-		//	      if (track.ptError()/track.pt()>0.1) continue;
-		//							if(theOriginalPV.trackWeight(*itVtx) > 0.5){
-		//								countTksOfPV++;
-		//								sumPTPV += track.pt();
-		//							}
 	      }
 	    }
 	  } catch (std::exception & err) {std::cout << " muon Selection%G�%@failed " << std::endl; return ; }
 
-	  // cout<<"sumPTPV"<<sumPTPV<<"countTksOfPV"<<countTksOfPV<<endl;
 	  // -----Count the number of the tracks not associated to any vertex--------
 	  Handle<TrackCollection> tkColl;
 	  iEvent.getByLabel("generalTracks", tkColl);
@@ -348,31 +350,32 @@ Onia2MuMuPAT::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 		}
 	      }
 	    }
-	    // for(reco::Vertex::trackRef_iterator itVtx = theOriginalPV.tracks_begin(); itVtx != theOriginalPV.tracks_end(); itVtx++){
-	    //	 if(itVtx->isNonnull()){
-	    //     const reco::Track& track = **itVtx;
-	    //     if(tk->pt() == track.pt() && tk->eta()==track.eta()){
-	    //       // cout<<"tk->pt()"<<tk->pt()<<endl;
-	    //       hasVertex = true;
-	    //       continue;
-	    //     }
-	    //   }
-	    // }
 	  gotoVertexFound:
 	    if(hasVertex) continue;
-	    if(rmu1 != 0 && (*rmu1->innerTrack()).pt() == tk->pt() && (*rmu1->innerTrack()).eta() == tk->eta()){ cout<<"enter"<<endl; continue;}
+	    if(rmu1 != 0 && (*rmu1->innerTrack()).pt() == tk->pt() && (*rmu1->innerTrack()).eta() == tk->eta()) continue;
 	    if(rmu2 != 0 && (*rmu2->innerTrack()).pt() == tk->pt() && (*rmu2->innerTrack()).eta() == tk->eta()) continue;
 	    TransientTrack tt = theTTBuilder->build(*tk);
 	    // Count number of close tracks not associated to any PV
 	    pair<bool,Measurement1D> tkPVdist = IPTools::absoluteImpactParameter3D(tt,myVertex);
 	    if(tk->pt() > 0.5 && tkPVdist.second.value()<0.03) ++Ntrk;
-	    if (deltaR(tk->eta(),tk->phi(),myCand.eta(), myCand.phi())< 0.7) {
-	      if (tkPVdist.first && tkPVdist.second.value()<minDca){
-		minDca = tkPVdist.second.value();
+
+	    // Use all tracks
+	    if( tkPVdist.first ) {
+	      if( tkPVdist.second.value()<minDca ) minDca = tkPVdist.second.value();
+	      if( tk->pt() > 0.5 && tkPVdist.second.value()<minDcaPtMin0p5 ) minDcaPtMin0p5 = tkPVdist.second.value();
+	      if( tk->pt() > 0.9 && tkPVdist.second.value()<minDcaPtMin0p9 ) minDcaPtMin0p9 = tkPVdist.second.value();
+	    }
+
+	    // Use only tracks close to the Bs momentum direction
+	    if(deltaR(tk->eta(),tk->phi(),myCand.eta(), myCand.phi()) < 0.7) {
+	      if( tkPVdist.first ) {
+		if( tkPVdist.second.value()<minDcaDR0p7 ) minDcaDR0p7 = tkPVdist.second.value();
+		if( tk->pt() > 0.5 && tkPVdist.second.value()<minDcaDR0p7PtMin0p5 ) minDcaDR0p7PtMin0p5 = tkPVdist.second.value();
+		if( tk->pt() > 0.9 && tkPVdist.second.value()<minDcaDR0p7PtMin0p9 ) minDcaDR0p7PtMin0p9 = tkPVdist.second.value();
 	      }
-	      if(tk->pt()<0.9) continue;
+	      if(tk->pt() < 0.9) continue; //reject all low pt tracks from counting
 	      if(tkPVdist.second.value() > 0.05) continue;
-	      sumPt_noVtx += tk->pt();
+	      sumPTPV += tk->pt();
 	      countTksOfnoVtx++;
 	    }
 	  }
@@ -401,14 +404,6 @@ Onia2MuMuPAT::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 	  myCand.addUserFloat("DCAXY", dcaxy);
 	  myCand.addUserFloat("DCA", dca);
 	  // end DCA
-
-
-	  // 3D IP of the Bs momentum wrt the PV
-	  //					// Vector between PV and SV
-	  //					TVector3 vdiff3D = TVector3(thePrimaryV.position().x(), thePrimaryV.position().y(), thePrimaryV.position().z()) -
-	  //							TVector3(myVertex.position().x(), myVertex.position().y(), myVertex.position().z());
-	  //					double delta3D = vdiff3D.Cross(TVector3(myCand.px(), myCand.py(), myCand.pz()).Unit()).Mag();
-	  //					// std::cout << "delta3D = " << delta3D << std::endl;
 
 	  // TODO: check that the error matrices can be used and combined as such. If they are variance-covariance matrices they have the
 	  // variance (and covariance terms), i.e. sigma^2, so they can be summed. Verify this.
