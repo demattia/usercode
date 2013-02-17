@@ -7,6 +7,10 @@ TString Selection(const bool endcaps, const bool data, const bool cut_based = fa
   TString trigger("((mu1_HLT_DoubleMu2BarrelBsL3 && mu2_HLT_DoubleMu2BarrelBsL3) || (mu1_HLT_DoubleMu2BsL3 && mu2_HLT_DoubleMu2BsL3) && (mu1_HLT_DoubleMu2Dimuon6BsL3 && mu2_HLT_DoubleMu2Dimuon6BsL3) || (mu1_HLT_DoubleMu3BsL3 && mu2_HLT_DoubleMu3BsL3) || (mu1_HLT_VertexmumuFilterBs345 && mu2_HLT_VertexmumuFilterBs345) || (mu1_HLT_VertexmumuFilterBs3p545 && mu2_HLT_VertexmumuFilterBs3p545) || (mu1_HLT_VertexmumuFilterBs4 && mu2_HLT_VertexmumuFilterBs4) || (mu1_HLT_VertexmumuFilterBs47 && mu2_HLT_VertexmumuFilterBs47) || (mu1_HLT_VertexmumuFilterBs6 && mu2_HLT_VertexmumuFilterBs6))");
   cuts += trigger;
 
+  // Muon-id: GlobalMuon prompt tight
+  TString muId = "(mu1_GMPT && mu2_GMPT)";
+  cuts += " && " + muId;
+
   // Preselection cuts
   TString preselection("(mass > 4.9 && mass < 5.9 && pt > 0. && mass > 0 && ctauPV > 0. && cosAlpha3D > -2. && pt > 5. && pt < 9999. && mu1_pt > 4. && mu1_pt < 999. && mu2_pt > 4. && mu2_pt < 999. && ctauPV*pt/mass < 2. && ctauPV/ctauErrPV > 0. && ctauPV/ctauErrPV < 120. && delta3d < 0.1 && delta3d/delta3dErr < 5. && dca < 0.1 && acos(cosAlpha3D) < 0.3 && ntrk < 21 && minDca < 0.25 && isolation > 0.)");
   cuts += " && " + preselection;
@@ -28,12 +32,12 @@ TString Selection(const bool endcaps, const bool data, const bool cut_based = fa
 
     if( endcaps ) {
       TString endcapsPtCuts("((mu1_pt > mu2_pt && mu1_pt > 4.5 && mu2_pt > 4.2)||(mu1_pt < mu2_pt && mu1_pt > 4.2 && mu2_pt > 4.5))");
-      TString candidateEndcapsCuts("(pt > 8.5 && cosAlpha > 0.99955 && ctauPV/ctauErrPV > 15.0)");
+      TString candidateEndcapsCuts("(pt > 8.5 && cosAlpha3D > 0.99955 && ctauPV/ctauErrPV > 15.0)");
       cuts += " && " + endcapsPtCuts + " && " + candidateEndcapsCuts;
     }
     else {
       TString barrelPtCuts("((mu1_pt > mu2_pt && mu1_pt > 4.5 && mu2_pt > 4.0)||(mu1_pt < mu2_pt && mu1_pt > 4.0 && mu2_pt > 4.5))");
-      TString candidateBarrelCuts("(pt > 6.5 && cosAlpha > 0.99875 && ctauPV/ctauErrPV > 13.0)");
+      TString candidateBarrelCuts("(pt > 6.5 && cosAlpha3D > 0.99875 && ctauPV/ctauErrPV > 13.0)");
       cuts += " && " + barrelPtCuts + " && " + candidateBarrelCuts;
     }
   }
