@@ -130,8 +130,12 @@ detailedDimuonTree = cms.EDFilter('ProbeTreeProducer',
         mu1_Calo = cms.string("daughter('muon1').isCaloMuon"),
         mu1_GM = cms.string("daughter('muon1').isGlobalMuon"),
         mu1_GMPT = cms.string("daughter('muon1').isGlobalMuon && daughter('muon1').muonID('GlobalMuonPromptTight')"),
+        mu1_LSOLPTT = cms.string("daughter('muon1').isTrackerMuon && daughter('muon1').muonID('TMLastStationOptimizedLowPtTight')"),
         mu1_TM = cms.string("daughter('muon1').isTrackerMuon"),
+        mu1_GMPTKINK = cms.string("daughter('muon1').isGlobalMuon && daughter('muon1').muonID('GlobalMuonPromptTight') && daughter('muon1').muonID('GMTkKinkTight')"),
+        mu1_GMPTOPTOBARRELLOWPT = cms.string("daughter('muon1').isGlobalMuon && daughter('muon1').muonID('GlobalMuonPromptTight') && daughter('muon1').muonID('TMLastStationOptimizedBarrelLowPtTight')"),
         mu1_TMOST = cms.string("daughter('muon1').isTrackerMuon && daughter('muon1').muonID('TMOneStationTight')"),
+        mu1_TMLST = cms.string("daughter('muon1').isTrackerMuon && daughter('muon1').muonID('TMLastStationTight')"),
         mu1_TMOSAT = cms.string("daughter('muon1').isTrackerMuon && daughter('muon1').muonID('TMOneStationAngTight')"),
         mu1_TMLSAT = cms.string("daughter('muon1').isTrackerMuon && daughter('muon1').muonID('TMLastStationAngTight')"),        
         mu1_HLT_DoubleMu2BsL3 = cms.string("!daughter('muon1').triggerObjectMatchesByFilter('hltDoubleMu2BsL3Filtered').empty()"),
@@ -147,19 +151,23 @@ detailedDimuonTree = cms.EDFilter('ProbeTreeProducer',
         mu2_Calo = cms.string("daughter('muon2').isCaloMuon"),
         mu2_GM = cms.string("daughter('muon2').isGlobalMuon"),
         mu2_GMPT = cms.string("daughter('muon2').isGlobalMuon && daughter('muon2').muonID('GlobalMuonPromptTight')"),
+        mu2_LSOLPTT = cms.string("daughter('muon2').isTrackerMuon && daughter('muon2').muonID('TMLastStationOptimizedLowPtTight')"),
         mu2_TM = cms.string("daughter('muon2').isTrackerMuon"),
-        mu2_TMOST = cms.string("daughter('muon2').isTrackerMuon && daughter('muon1').muonID('TMOneStationTight')"),
-        mu2_TMOSAT = cms.string("daughter('muon2').isTrackerMuon && daughter('muon1').muonID('TMOneStationAngTight')"),
+        mu2_GMPTKINK = cms.string("daughter('muon2').isGlobalMuon && daughter('muon2').muonID('GlobalMuonPromptTight') && daughter('muon2').muonID('GMTkKinkTight')"),
+        mu2_GMPTOPTOBARRELLOWPT = cms.string("daughter('muon2').isGlobalMuon && daughter('muon2').muonID('GlobalMuonPromptTight') && daughter('muon2').muonID('TMLastStationOptimizedBarrelLowPtTight')"),
+        mu2_TMOST = cms.string("daughter('muon2').isTrackerMuon && daughter('muon2').muonID('TMOneStationTight')"),
+        mu2_TMLST = cms.string("daughter('muon2').isTrackerMuon && daughter('muon2').muonID('TMLastStationTight')"),
+        mu2_TMOSAT = cms.string("daughter('muon2').isTrackerMuon && daughter('muon2').muonID('TMOneStationAngTight')"),
         mu2_TMLSAT = cms.string("daughter('muon2').isTrackerMuon && daughter('muon2').muonID('TMLastStationAngTight')"),
-        mu2_HLT_DoubleMu2BsL3 = cms.string("!daughter('muon1').triggerObjectMatchesByFilter('hltDoubleMu2BsL3Filtered').empty()"),
-        mu2_HLT_DoubleMu3BsL3 = cms.string("!daughter('muon1').triggerObjectMatchesByFilter('hltDoubleMu3BsL3Filtered').empty()"),
-        mu2_HLT_DoubleMu2BarrelBsL3 = cms.string("!daughter('muon1').triggerObjectMatchesByFilter('hltDoubleMu2BarrelBsL3Filtered').empty()"),
-        mu2_HLT_DoubleMu2Dimuon6BsL3 = cms.string("!daughter('muon1').triggerObjectMatchesByFilter('hltDoubleMu2Dimuon6BsL3Filtered').empty()"),
-        mu2_HLT_VertexmumuFilterBs6 = cms.string("!daughter('muon1').triggerObjectMatchesByFilter('hltVertexmumuFilterBs6').empty()"),
-        mu2_HLT_VertexmumuFilterBs4 = cms.string("!daughter('muon1').triggerObjectMatchesByFilter('hltVertexmumuFilterBs4').empty()"),
-        mu2_HLT_VertexmumuFilterBs345 = cms.string("!daughter('muon1').triggerObjectMatchesByFilter('hltVertexmumuFilterBs345').empty()"),
-        mu2_HLT_VertexmumuFilterBs3p545 = cms.string("!daughter('muon1').triggerObjectMatchesByFilter('hltVertexmumuFilterBs3p545').empty()"),
-        mu2_HLT_VertexmumuFilterBs47 = cms.string("!daughter('muon1').triggerObjectMatchesByFilter('hltVertexmumuFilterBs47').empty()")
+        mu2_HLT_DoubleMu2BsL3 = cms.string("!daughter('muon2').triggerObjectMatchesByFilter('hltDoubleMu2BsL3Filtered').empty()"),
+        mu2_HLT_DoubleMu3BsL3 = cms.string("!daughter('muon2').triggerObjectMatchesByFilter('hltDoubleMu3BsL3Filtered').empty()"),
+        mu2_HLT_DoubleMu2BarrelBsL3 = cms.string("!daughter('muon2').triggerObjectMatchesByFilter('hltDoubleMu2BarrelBsL3Filtered').empty()"),
+        mu2_HLT_DoubleMu2Dimuon6BsL3 = cms.string("!daughter('muon2').triggerObjectMatchesByFilter('hltDoubleMu2Dimuon6BsL3Filtered').empty()"),
+        mu2_HLT_VertexmumuFilterBs6 = cms.string("!daughter('muon2').triggerObjectMatchesByFilter('hltVertexmumuFilterBs6').empty()"),
+        mu2_HLT_VertexmumuFilterBs4 = cms.string("!daughter('muon2').triggerObjectMatchesByFilter('hltVertexmumuFilterBs4').empty()"),
+        mu2_HLT_VertexmumuFilterBs345 = cms.string("!daughter('muon2').triggerObjectMatchesByFilter('hltVertexmumuFilterBs345').empty()"),
+        mu2_HLT_VertexmumuFilterBs3p545 = cms.string("!daughter('muon2').triggerObjectMatchesByFilter('hltVertexmumuFilterBs3p545').empty()"),
+        mu2_HLT_VertexmumuFilterBs47 = cms.string("!daughter('muon2').triggerObjectMatchesByFilter('hltVertexmumuFilterBs47').empty()")
     ),
     ignoreExceptions = cms.bool(True),
     addRunLumiInfo = cms.bool(True),
@@ -197,10 +205,10 @@ def selection(process, GlobalTag="GR_R_38X_V8::All", MC=False, SelectionTrigger=
         process.detailedDimuonTree
     )
 
-    CUT = SELECTIONCUT.replace("SelectionTrigger", SelectionTrigger)
-    process.yieldPsiTree = yieldTree.clone(
-        cut = cms.string(CUT + " && 2.5 < mass < 4.5"),
-    )
+    # CUT = SELECTIONCUT.replace("SelectionTrigger", SelectionTrigger)
+    # process.yieldPsiTree = yieldTree.clone(
+    #     cut = cms.string(CUT + " && 2.5 < mass < 4.5"),
+    # )
 
     # process.yieldMCTree = yieldTree.clone(
     #     cut = cms.string( "((daughter('muon1').pt > 3.5 && abs(daughter('muon1').eta) < 1.6) || (daughter('muon1').pt > 2.5 && 1.6 < abs(daughter('muon1').eta) < 2.4))"+
