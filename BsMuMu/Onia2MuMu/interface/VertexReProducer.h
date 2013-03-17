@@ -10,7 +10,8 @@
 #include "FWCore/Framework/interface/EventSetup.h"
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
 #include "RecoVertex/VertexPrimitives/interface/TransientVertex.h"
-#include "RecoVertex/PrimaryVertexProducer/interface/PrimaryVertexProducerAlgorithm.h"
+// #include "RecoVertex/PrimaryVertexProducer/interface/PrimaryVertexProducerAlgorithm.h"
+#include "HeavyFlavorAnalysis/Onia2MuMu/interface/PrimaryVertexProducerAlgorithm.h"
 
 class VertexReProducer {
     public:

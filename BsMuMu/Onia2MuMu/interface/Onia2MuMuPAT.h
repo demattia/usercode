@@ -19,6 +19,7 @@
 
 #include <CommonTools/UtilAlgos/interface/StringCutObjectSelector.h>
 #include "RecoVertex/VertexTools/interface/InvariantMassFromVertex.h"
+#include "HeavyFlavorAnalysis/Onia2MuMu/interface/VertexReProducer.h"
 
 template<typename T>
 struct GreaterByVProb {
@@ -55,13 +56,14 @@ class Onia2MuMuPAT : public edm::EDProducer {
   edm::InputTag thebeamspot_;
   edm::InputTag thePVs_;
   StringCutObjectSelector<pat::Muon> higherPuritySelection_;
-  StringCutObjectSelector<pat::Muon> lowerPuritySelection_; 
-  StringCutObjectSelector<reco::Candidate, true> dimuonSelection_;
+  StringCutObjectSelector<pat::Muon> lowerPuritySelection_;
+  StringCutObjectSelector<reco::Candidate::LorentzVector, true> dimuonSelection_;
   bool addCommonVertex_, addMuonlessPrimaryVertex_;
   bool resolveAmbiguity_;
   bool addMCTruth_;
   GreaterByPt<pat::CompositeCandidate> pTComparator_;
   GreaterByVProb<pat::CompositeCandidate> vPComparator_;
+  StringCutObjectSelector<reco::Candidate, true> prefilter_;
 
   InvariantMassFromVertex massCalculator;
 

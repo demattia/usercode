@@ -8,11 +8,13 @@ TString Selection(const bool endcaps, const bool data, const bool cut_based = fa
   cuts += trigger;
 
   // Muon-id: GlobalMuon prompt tight
-  TString muId = "(mu1_GMPT && mu2_GMPT)";
-  cuts += " && " + muId;
+  // TString muId = "(mu1_GMPT && mu2_GMPT)";
+  // No muon-id, it will be applied later.
+  TString muId = "";
+  if( muId != "" ) cuts += " && " + muId;
 
   // Preselection cuts
-  TString preselection("(mass > 4.9 && mass < 5.9 && pt > 0. && mass > 0 && ctauPV > 0. && cosAlpha3D > -2. && pt > 5. && pt < 9999. && mu1_pt > 4. && mu1_pt < 999. && mu2_pt > 4. && mu2_pt < 999. && ctauPV*pt/mass < 2. && ctauPV/ctauErrPV > 0. && ctauPV/ctauErrPV < 120. && delta3d < 0.1 && delta3d/delta3dErr < 5. && dca < 0.1 && acos(cosAlpha3D) < 0.3 && ntrk < 21 && minDca < 0.25 && isolation > 0.)");
+  TString preselection("(mass > 4.9 && mass < 5.9 && pt > 5. && pt < 9999. && mu1_pt > 4. && mu1_pt < 999. && mu2_pt > 4. && mu2_pt < 999. && l3d < 2. && l3dsig > 0. && l3dsig < 120. && NChi2 < 10. && delta3d < 0.1 && delta3d/delta3dErr < 5. && dca < 0.1 && acos(cosAlpha3D) < 0.3 && ntrk < 21 && minDca < 0.25 && isolation > 0.)");
   cuts += " && " + preselection;
 
   TString barrelCuts("(mu1_eta < 1.4 && mu1_eta > -1.4 && mu2_eta < 1.4 && mu2_eta > -1.4)");
@@ -59,12 +61,12 @@ TString Selection2(const bool endcaps, const bool cut_based = false)
     cuts += lifetimeCuts + " && " + trackCuts;
     if( endcaps ) {
       TString endcapsCuts("!(m1eta < 1.4 && m1eta > -1.4 && m2eta < 1.4 && m2eta > -1.4) && ((m1pt > m2pt && m1pt > 4.5 && m2pt > 4.2)||(m1pt < m2pt && m1pt > 4.2 && m2pt > 4.5))");
-      TString candidateEndcapsCuts("pt > 8.5 && alpha < 0.030 && fls3d > 15.0 && chi2/dof < 1.8");
+      TString candidateEndcapsCuts("pt > 8.5 && alpha < 0.030 && fls3d > 15.0 && NChi2 < 1.8");
       cuts += " && " + endcapsCuts + " && " + candidateEndcapsCuts;
     }
     else {
       TString barrelCuts("(m1eta < 1.4 && m1eta > -1.4 && m2eta < 1.4 && m2eta > -1.4) && ((m1pt > m2pt && m1pt > 4.5 && m2pt > 4.0)||(m1pt < m2pt && m1pt > 4.0 && m2pt > 4.5))");
-      TString candidateBarrelCuts("pt > 6.5 && alpha < 0.050 && fls3d > 13.0 && chi2/dof < 2.2");
+      TString candidateBarrelCuts("pt > 6.5 && alpha < 0.050 && fls3d > 13.0 && NChi2 < 2.2");
       cuts += " && " + barrelCuts + " && " + candidateBarrelCuts;
     }
   }

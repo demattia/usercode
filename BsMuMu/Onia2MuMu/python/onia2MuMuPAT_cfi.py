@@ -10,5 +10,7 @@ onia2MuMuPAT = cms.EDProducer('Onia2MuMuPAT',
   addCommonVertex = cms.bool(True), ## Embed the full reco::Vertex out of the common vertex fit
   addMuonlessPrimaryVertex = cms.bool(True), ## Embed the primary vertex re-made from all the tracks except the two muons
   addMCTruth = cms.bool(True),      ## Add the common MC mother of the two muons, if any
-  resolvePileUpAmbiguity = cms.bool(True)   ## Order PVs by their vicinity to the J/psi vertex, not by sumPt                            
+  resolvePileUpAmbiguity = cms.bool(True),   ## Order PVs by their vicinity to the J/psi vertex, not by sumPt
+  # Apply any preselection cut. These cuts are applied just before the candidates are saved in the collection, at the end of the onia2MuMuPAT.
+  preselection = cms.string("")
 )

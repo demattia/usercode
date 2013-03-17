@@ -107,6 +107,16 @@ detailedDimuonTree = cms.EDFilter('ProbeTreeProducer',
         mu1_R05emEt = cms.string("daughter('muon1').isolationR05.emEt"),
         mu1_R05hadEt = cms.string("daughter('muon1').isolationR05.hadEt"),
 
+        # BDT mu-id variables
+        mu1_validFrac = cms.string("daughter('muon1').innerTrack.validFraction"),
+        mu1_globalChi2 = cms.string("daughter('muon1').globalTrack.normalizedChi2"),
+        mu1_chi2LocPos = cms.string("daughter('muon1').combinedQuality.chi2LocalPosition"),
+        mu1_trkEHitsOut = cms.string("daughter('muon1').innerTrack.trackerExpectedHitsOuter.numberOfLostTrackerHits"),
+        mu1_segComp = cms.string("userFloat('segComp1')"),
+        mu1_glbTrackProb = cms.string("daughter('muon1').combinedQuality.glbTrackProbability"),
+        mu1_chi2LocMom = cms.string("daughter('muon1').combinedQuality.chi2LocalMomentum"),
+        mu1_trkVHits = cms.string("daughter('muon1').innerTrack.hitPattern.numberOfValidTrackerHits"),
+
         mu2_pt = cms.string("daughter('muon2').pt"),
         mu2_eta = cms.string("daughter('muon2').eta"),
         mu2_phi = cms.string("daughter('muon2').phi"),
@@ -125,6 +135,16 @@ detailedDimuonTree = cms.EDFilter('ProbeTreeProducer',
         mu2_R05sumPt = cms.string("daughter('muon2').isolationR05.sumPt"),
         mu2_R05emEt = cms.string("daughter('muon2').isolationR05.emEt"),
         mu2_R05hadEt = cms.string("daughter('muon2').isolationR05.hadEt"),
+
+        # BDT mu-id variables
+        mu2_validFrac = cms.string("daughter('muon2').innerTrack.validFraction"),
+        mu2_globalChi2 = cms.string("daughter('muon2').globalTrack.normalizedChi2"),
+        mu2_chi2LocPos = cms.string("daughter('muon2').combinedQuality.chi2LocalPosition"),
+        mu2_trkEHitsOut = cms.string("daughter('muon2').innerTrack.trackerExpectedHitsOuter.numberOfLostTrackerHits"),
+        mu2_segComp = cms.string("userFloat('segComp2')"),
+        mu2_glbTrackProb = cms.string("daughter('muon2').combinedQuality.glbTrackProbability"),
+        mu2_chi2LocMom = cms.string("daughter('muon2').combinedQuality.chi2LocalMomentum"),
+        mu2_trkVHits = cms.string("daughter('muon2').innerTrack.hitPattern.numberOfValidTrackerHits"),
     ),
     flags = cms.PSet(
         mu1_Calo = cms.string("daughter('muon1').isCaloMuon"),
@@ -175,11 +195,11 @@ detailedDimuonTree = cms.EDFilter('ProbeTreeProducer',
 )
 
 def selection(process, GlobalTag="GR_R_38X_V8::All", MC=False, SelectionTrigger="hltL1DoubleMuOpenTightL1Filtered"):
-    process.load("Configuration.StandardSequences.MagneticField_cff")
-    process.load("Configuration.StandardSequences.Geometry_cff")
-    process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
-    process.load("Configuration.StandardSequences.Reconstruction_cff")
-    process.GlobalTag.globaltag = cms.string(GlobalTag)
+#    process.load("Configuration.StandardSequences.MagneticField_cff")
+#    process.load("Configuration.StandardSequences.Geometry_cff")
+#    process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
+#    process.load("Configuration.StandardSequences.Reconstruction_cff")
+#    process.GlobalTag.globaltag = cms.string(GlobalTag)
     process.load("FWCore.MessageService.MessageLogger_cfi")
     process.options = cms.untracked.PSet(
         wantSummary = cms.untracked.bool(True),
