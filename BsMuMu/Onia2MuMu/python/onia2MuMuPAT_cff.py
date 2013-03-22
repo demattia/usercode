@@ -36,9 +36,10 @@ def onia2MuMuPAT(process, GlobalTag, MC=False, HLT='HLT', Filter=True):
         caloMuons = cms.InputTag("calomuons"),
         caloMuonsCut = cms.string(""),
         minCaloCompatibility = cms.double(0.6),
-        mergeTracks = cms.bool(False),
+        mergeTracks = cms.bool(True),
         tracks = cms.InputTag("generalTracks"),
-        tracksCut = cms.string("pt > 0.5")
+        # tracksCut = cms.string("pt > 0.5")
+        tracksCut = cms.string("(abs(eta) <= 0.9 && pt > 2.5) || (0.9 < abs(eta) <=2.4 && pt > 1.5)"),
     )
 
     # Prune generated particles to muons and their parents
@@ -107,6 +108,13 @@ def onia2MuMuPAT(process, GlobalTag, MC=False, HLT='HLT', Filter=True):
         addMCTruth = cms.bool(MC),
         # Order PVs by their vicinity to the J/psi vertex, not by sumPt
         resolvePileUpAmbiguity = cms.bool(True),
+        addThirdTrack = cms.bool(True),  ## search a third track making a good vertex with the dimuon
+        minTrackPt =cms.double(0.5), ## minimum pt of the third track
+        trackMass = cms.double(0.4936), ## mass for the track
+        diMuPlusTrackMassMax = cms.double(5.9),
+        diMuPlusTrackMassMin = cms.double(4.9),
+        diMuMassMax = cms.double(3.2),## dimuon mass range where to search for the third track
+        diMuMassMin = cms.double(2.8),
         # Preselection cuts
         preselection = cms.string("mass > 4.5 && mass < 6.3 && pt > 5. && pt < 9999. && daughter('muon1').pt > 4. && daughter('muon1').pt < 999. && daughter('muon2').pt > 4. && daughter('muon2').pt < 999. && userFloat('l3d') < 2. && userFloat('l3dsig') > 0. && userFloat('l3dsig') < 120. && userFloat('vNChi2') < 10. && userFloat('delta3d') < 0.1 && userFloat('delta3d')/userFloat('delta3dErr') < 5. && userFloat('DCA') < 0.1 && acos(userFloat('cosAlpha3D')) < 0.3 && userInt('Ntrk') < 21 && userFloat('minDca') < 0.25 && userFloat('Isolation') > 0."),
     )
@@ -154,7 +162,7 @@ def onia2MuMuPAT(process, GlobalTag, MC=False, HLT='HLT', Filter=True):
              # 'keep patMuons_patMuonsWithTrigger_*_Onia2MuMuPAT',    # All PAT muos including general tracks and matches to triggers
             'keep *_goodTracks_*_Onia2MuMuPAT',                    # All good tracks (heavy!)  
              # 'keep patCompositeCandidates_*__Onia2MuMuPAT',       # PAT di-muons
-            'keep patCompositeCandidates_*_*_Onia2MuMuPAT',        #PAT di-muons and dimuons+track                           
+            'keep patCompositeCandidates_*_*_Onia2MuMuPAT',        # PAT di-muons and dimuons+track
             # 'keep patMuons_tagMuons__Onia2MuMuPAT',                # tagMuons for efficiency
             # 'keep patMuons_probeMuons__Onia2MuMuPAT',              # probeMuons for efficiency
             # 'keep *_tagMuonsMCMatch__Onia2MuMuPAT',                # tagMuons MC matches for efficiency
