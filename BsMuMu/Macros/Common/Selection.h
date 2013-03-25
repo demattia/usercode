@@ -1,11 +1,21 @@
 #include "TString.h"
+#include <sstream>
 
-TString Selection(const bool endcaps, const bool data, const bool cut_based = false, const bool blinding = false)
+TString Selection(const bool endcaps, const bool data, const bool cut_based = false, const bool blinding = false, const int splitting = 0)
 {
   TString cuts = "";
 
   TString trigger("((mu1_HLT_DoubleMu2BarrelBsL3 && mu2_HLT_DoubleMu2BarrelBsL3) || (mu1_HLT_DoubleMu2BsL3 && mu2_HLT_DoubleMu2BsL3) && (mu1_HLT_DoubleMu2Dimuon6BsL3 && mu2_HLT_DoubleMu2Dimuon6BsL3) || (mu1_HLT_DoubleMu3BsL3 && mu2_HLT_DoubleMu3BsL3) || (mu1_HLT_VertexmumuFilterBs345 && mu2_HLT_VertexmumuFilterBs345) || (mu1_HLT_VertexmumuFilterBs3p545 && mu2_HLT_VertexmumuFilterBs3p545) || (mu1_HLT_VertexmumuFilterBs4 && mu2_HLT_VertexmumuFilterBs4) || (mu1_HLT_VertexmumuFilterBs47 && mu2_HLT_VertexmumuFilterBs47) || (mu1_HLT_VertexmumuFilterBs6 && mu2_HLT_VertexmumuFilterBs6))");
   cuts += trigger;
+
+  TString split("");
+  std::ostringstream convert;
+  convert << splitting;
+  TString splittingString(convert.str());
+  std::cout << "splittingString = " << splittingString << std::endl;
+  if( splitting != -1 ) split = " && (event%3 == "+splittingString+") && (run <= 203002)";
+  // else split = " && (run <= 203002)";
+  cuts += split;
 
   // Muon-id: GlobalMuon prompt tight
   // TString muId = "(mu1_GMPT && mu2_GMPT)";
@@ -14,7 +24,7 @@ TString Selection(const bool endcaps, const bool data, const bool cut_based = fa
   if( muId != "" ) cuts += " && " + muId;
 
   // Preselection cuts
-  TString preselection("(mass > 4.9 && mass < 5.9 && pt > 5. && pt < 9999. && mu1_pt > 4. && mu1_pt < 999. && mu2_pt > 4. && mu2_pt < 999. && l3d < 2. && l3dsig > 0. && l3dsig < 120. && NChi2 < 10. && delta3d < 0.1 && delta3d/delta3dErr < 5. && dca < 0.1 && acos(cosAlpha3D) < 0.3 && ntrk < 21 && minDca < 0.25 && isolation > 0.)");
+  TString preselection("(mass > 4.9 && mass < 5.9 && pt > 5. && pt < 9999. && mu1_pt > 4. && mu1_pt < 999. && mu2_pt > 4. && mu2_pt < 999. && l3d < 2. && l3dsig > 0. && l3dsig < 120. && NChi2 < 10. && delta3d < 0.1 && delta3d/delta3dErr < 5. && dca < 0.1 && acos(cosAlpha3D) < 0.3 && ntrk < 21 && minDca < 0.25 && isolation > 0. && (mu1_charge*mu2_charge == -1))");
   cuts += " && " + preselection;
 
   TString barrelCuts("(mu1_eta < 1.4 && mu1_eta > -1.4 && mu2_eta < 1.4 && mu2_eta > -1.4)");
