@@ -1,0 +1,20 @@
+\begin{table} 
+  \begin{tabular}{|l|l|l|l|l|l|l|} 
+    \hline 
+    rank & variable & separation \\ 
+    \hline 
+    1 & alpha & 5.191e-01 & alpha & 5.168e-01 & alpha & 5.144e-01 \\ 
+    2 & closetrk & 4.081e-01 & closetrk & 4.089e-01 & closetrk & 4.119e-01 \\ 
+    3 & fls3d & 3.396e-01 & fls3d & 3.416e-01 & fls3d & 3.432e-01 \\ 
+    4 & iso & 3.167e-01 & iso & 3.166e-01 & docatrk & 3.190e-01 \\ 
+    5 & docatrk & 3.167e-01 & docatrk & 3.137e-01 & iso & 3.168e-01 \\ 
+    6 & pvips & 2.059e-01 & pvips & 2.035e-01 & pvips & 1.985e-01 \\ 
+    7 & pvip & 1.675e-01 & pvip & 1.653e-01 & pvip & 1.583e-01 \\ 
+    8 & maxdoca & 1.100e-01 & maxdoca & 1.122e-01 & maxdoca & 1.105e-01 \\ 
+    9 & chi2/dof & 9.533e-02 & chi2/dof & 9.757e-02 & chi2/dof & 9.699e-02 \\ 
+    10 & y & 2.078e-02 & y & 2.169e-02 & y & 2.142e-02 \\ 
+    11 & pt & 8.127e-03 & pt & 9.486e-03 & pt & 8.867e-03 \\ 
+    \hline 
+  \end{tabular} 
+  \label{tab:datasets} 
+\end{table} 
