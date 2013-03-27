@@ -9,18 +9,29 @@
 \usepackage{rotating}
 
 \newcommand{\BsMuMu}{B$^{0}_{s}\rightarrow \mu^+\mu^-\ $}
-\newcommand{\BMuMu}{B$^{0}s\rightarrow \mu^+\mu^-\ $}
+\newcommand{\BMuMu}{B$^{0}\rightarrow \mu^+\mu^-\ $}
 
-\author{M. De Mattia}
+%\author{M. De Mattia}
+\author{Purdue, Pisa}
 \begin{document}
 \title{\BsMuMu Cross Check Analysis}
 \maketitle
 
 \begin{abstract}
 The aim of this analysis note is to provide supporting material for the cross check analysis for the
-search for \BsMuMu and \BMuMu decays. It follows closely the documentation provided in \cite{MainAN}
+search for \BsMuMu and \BMuMu decays. It follows closely the documentation provided in~\cite{MainAN}
 and includes direct comparison to the results in that note.
 \end{abstract}
+
+\newpage
+\tableofcontents
+\newpage
+
+\section{Introduction}
+
+\emph{Goals and how the note is organized.}
+
+\addcontentsline{toc}{section}{Part I (HCP analysis)}
 
 \section{Datasets}
 
@@ -58,10 +69,23 @@ Despite the availability of the full 2012 dataset, in order to allow a direct co
 the results in \cite{MainAN} this study is limited to runs $<= 203002$.
 The dataset is split in three different categories according the remainder of "event number$\%3$".
 
+
 \section{Selection}
 
-The same preselection as in \cite{MainAN} is used. The muons are chosen to pass global muon prompt tight
-selection (GM\_PT).
+\subsection{pre-selection}
+
+The same preselection as in \cite{MainAN} is used. 
+
+
+\subsection{muon identification}
+
+The muons are chosen to pass global muon prompt tight
+selection (GM\_PT). [to be updated]
+
+\subsection{variable distributions}
+
+
+
 
 The distributions of the variables used for the BDT training are shown in Figures \ref{fig:TMVAPlotsBarrel} and \ref{fig:TMVAPlotsEndcaps}.
 
@@ -79,7 +103,7 @@ The distributions of the variables used for the BDT training are shown in Figure
                 \centering
                 % \includegraphics[width=\textwidth]{Figures/y_barrel}
                 % \label{fig:yBarrel}
-                \includegraphics[width=\textwidth]{Figures/eta_barrel}
+%                \includegraphics[width=\textwidth]{Figures/eta_barrel}
                 \label{fig:etaBarrel}
         \end{subfigure}
         ~
@@ -152,7 +176,7 @@ The distributions of the variables used for the BDT training are shown in Figure
                 \centering
                 % \includegraphics[width=\textwidth]{Figures/y_endcaps}
                 % \label{fig:yEndcaps}
-                \includegraphics[width=\textwidth]{Figures/eta_endcaps}
+%                \includegraphics[width=\textwidth]{Figures/eta_endcaps}
                 \label{fig:etaEndcaps}
         \end{subfigure}
         ~
@@ -213,6 +237,9 @@ The distributions of the variables used for the BDT training are shown in Figure
         \label{fig:TMVAPlotsEndcaps}
 \end{sidewaysfigure}
 
+
+\subsection{variable ranking and correlations}
+
 \begin{figure}
 		\centering
         \begin{subfigure}[b]{0.45\textwidth}
@@ -244,6 +271,42 @@ The distributions of the variables used for the BDT training are shown in Figure
 \end{figure}
 
 \input{Tables/ranking_barrel.txt}
+
+
+\clearpage
+\section{Cut and count analysis}
+\subsection{optimization and blinded results}
+\subsection{unblind}
+
+\section{BDT analysis}
+\subsection{training and overtraining}
+\subsection{blinded results}
+\subsection{unblind}
+
+\section{Normalization channel}
+\subsection{datasets}
+\subsection{selection}
+\subsection{BDT}
+\subsection{yields}
+
+\cleardoublepage\addcontentsline{toc}{section}{Part II (full updated analysis)}
+
+\section{Full dataset}
+\section{Selection}
+\subsection{datasets}
+\subsection{muon identification}
+\subsection{variable distributions, correlations, ranking}
+\subsection{TMVA training}
+\subsubsection{MLP}
+\subsubsection{BDT}
+\subsection{Normalization channel}
+\subsubsection{MLP}
+\subsubsection{BDT}
+\subsection{Limits}
+
+
+\section{Summary}
+
 
 \bibliographystyle{plain}
 \bibliography{BsMuMuCrossCheckAnalysis}
