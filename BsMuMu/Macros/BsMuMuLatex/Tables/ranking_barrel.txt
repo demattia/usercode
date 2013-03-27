@@ -1,19 +1,19 @@
 \begin{table} 
-  \begin{tabular}{|l|l|l|l|l|l|l|} 
+  \begin{tabular}{|l|l|l|} 
     \hline 
     rank & variable & separation \\ 
     \hline 
-    1 & alpha & 5.224e-01 & alpha & 5.201e-01 & alpha & 5.221e-01 \\ 
-    2 & closetrk & 4.053e-01 & closetrk & 4.071e-01 & closetrk & 4.060e-01 \\ 
-    3 & fls3d & 3.453e-01 & fls3d & 3.465e-01 & fls3d & 3.454e-01 \\ 
-    4 & docatrk & 3.200e-01 & docatrk & 3.163e-01 & iso & 3.179e-01 \\ 
-    5 & iso & 3.148e-01 & iso & 3.134e-01 & docatrk & 3.171e-01 \\ 
-    6 & pvips & 1.951e-01 & pvips & 1.958e-01 & pvips & 1.933e-01 \\ 
-    7 & pvip & 1.630e-01 & pvip & 1.643e-01 & pvip & 1.612e-01 \\ 
-    8 & maxdoca & 1.112e-01 & maxdoca & 1.146e-01 & maxdoca & 1.128e-01 \\ 
-    9 & chi2/dof & 9.549e-02 & chi2/dof & 9.809e-02 & chi2/dof & 9.981e-02 \\ 
-    10 & eta & 2.645e-02 & eta & 2.690e-02 & eta & 2.592e-02 \\ 
-    11 & pt & 1.145e-02 & pt & 1.168e-02 & pt & 1.099e-02 \\ 
+    1 & alpha & 5.503e-01 \\ 
+    2 & closetrk & 3.976e-01 \\ 
+    3 & fls3d & 3.484e-01 \\ 
+    4 & docatrk & 2.802e-01 \\ 
+    5 & iso & 2.555e-01 \\ 
+    6 & pvips & 2.012e-01 \\ 
+    7 & pvip & 1.930e-01 \\ 
+    8 & maxdoca & 1.278e-01 \\ 
+    9 & chi2/dof & 1.036e-01 \\ 
+    10 & pt & 3.780e-02 \\ 
+    11 & eta & 1.069e-02 \\ 
     \hline 
   \end{tabular} 
   \label{tab:datasets} 
