@@ -1,7 +1,8 @@
 #include "TString.h"
 #include <sstream>
+#include <iostream>
 
-TString Selection(const bool endcaps, const bool data, const bool cut_based = false, const bool blinding = false, const int splitting = 0)
+TString Selection(const bool endcaps, const bool data, const bool cut_based = false, const bool blinding = false, const int splitting = 0, const TString & maxRun = "")
 {
   TString cuts = "";
 
@@ -13,14 +14,15 @@ TString Selection(const bool endcaps, const bool data, const bool cut_based = fa
   convert << splitting;
   TString splittingString(convert.str());
   std::cout << "splittingString = " << splittingString << std::endl;
-  if( splitting != -1 ) split = " && (event%3 == "+splittingString+") && (run <= 203002)";
-  // else split = " && (run <= 203002)";
+  if( splitting != -1 ) split = " && (event%3 == "+splittingString+")";
   cuts += split;
+  if( maxRun != "" && data ) cuts += " && (run <= "+maxRun+")";
 
   // Muon-id: GlobalMuon prompt tight
   // TString muId = "(mu1_GMPT && mu2_GMPT)";
   // No muon-id, it will be applied later.
-  TString muId = "";
+  // TString muId = "";
+  TString muId = "mu1_GM && (mu1_globalChi2 < 10.) && (mu1_numberOfValidMuonHits > 0.) && (mu1_numMatchedStations > 1.) && (mu1_numberOfValidPixelHits > 0.) && (mu1_trackerLayersWithMeasurement > 5.) && mu2_GM && (mu2_globalChi2 < 10.) && (mu2_numberOfValidMuonHits > 0.) && (mu2_numMatchedStations > 1.) && (mu2_numberOfValidPixelHits > 0.) && (mu2_trackerLayersWithMeasurement > 5.)";
   if( muId != "" ) cuts += " && " + muId;
 
   // Preselection cuts

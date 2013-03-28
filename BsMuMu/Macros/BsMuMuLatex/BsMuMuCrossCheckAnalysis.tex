@@ -103,7 +103,7 @@ The distributions of the variables used for the BDT training are shown in Figure
                 \centering
                 % \includegraphics[width=\textwidth]{Figures/y_barrel}
                 % \label{fig:yBarrel}
-%                \includegraphics[width=\textwidth]{Figures/eta_barrel}
+                \includegraphics[width=\textwidth]{Figures/eta_barrel}
                 \label{fig:etaBarrel}
         \end{subfigure}
         ~
@@ -176,7 +176,7 @@ The distributions of the variables used for the BDT training are shown in Figure
                 \centering
                 % \includegraphics[width=\textwidth]{Figures/y_endcaps}
                 % \label{fig:yEndcaps}
-%                \includegraphics[width=\textwidth]{Figures/eta_endcaps}
+	            \includegraphics[width=\textwidth]{Figures/eta_endcaps}
                 \label{fig:etaEndcaps}
         \end{subfigure}
         ~
@@ -277,7 +277,7 @@ the BDT training.
 
 \section{Boosted Decision Tree}
 
-The data sample is split in three different subsamples according to the rule $index = eventNumber\%3$.
+The inclusive samples split in three different subsamples according to the rule $index = eventNumber\%3$.
 These samples are then used as follows:
 \begin{itemize}
 \item events of type 0: analyzed by BDT0, trained on type-1 events, tested on type-2 events
@@ -288,10 +288,22 @@ for the training and testing.
 
 Tables \ref{tab:datasetsbarrelBDT} and \ref{tab:datasetsendcapsBDT} show the ranking of variables before
 the BDT training.
-\input{Tables/ranking_barrel_IdTransformation.txt}
-\input{Tables/ranking_endcaps_IdTransformation.txt}
+\input{Tables/ranking_barrel_BDT.txt}
+\input{Tables/ranking_endcaps_BDT.txt}
 
+Tables \ref{tab:numEvents} shows the number of candidates in each of the subsamples. The events are after
+all preselections including muon-id (tight muon).
+\input{Tables/numCandidates.txt}
 
+Figure \ref{fig:BDTControlPlots} shows control plots for the BDT training.
+
+\begin{figure}
+  \centering
+  \includegraphics[width=0.45\textwidth]{Figures/BDTControlPlots_barrel}
+  \includegraphics[width=0.45\textwidth]{Figures/BDTControlPlots_endcaps}
+  \caption{TMVA BDT charaterization plots for the barrel (left) and the endcap (right). Shown versus the tree number is the boost weight (top) and the event misclassification rate (middle), and the number of nodes before pruning (bottom).}
+  \label{fig:BDTControlPlots}
+\end{figure}
 
 \clearpage
 \section{Cut and count analysis}

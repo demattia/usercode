@@ -1,10 +1,10 @@
 #include "Common/Selection.h"
 
-void cutTree_BsMuMu( TString inFile="selection_Run2012A.root",
-		     TString outFile="data_preselection.root",
+void cutTree_BsMuMu( TString inFile,
+		     TString outFile,
 		     const bool endcaps, const bool data,
 		     const bool cut_based, const bool blinding,
-		     const int splitting )
+		     const int splitting, const TString & maxRun )
 {
   TFile infile(inFile);
   gDirectory->Cd("detailedDimuonTree");
@@ -16,7 +16,7 @@ void cutTree_BsMuMu( TString inFile="selection_Run2012A.root",
 
   TFile outfile(outFile,"recreate");
 
-  TString selection(Selection(endcaps, data, cut_based, blinding, splitting));
+  TString selection(Selection(endcaps, data, cut_based, blinding, splitting,maxRun));
 
   // std::cout << "SELECTION = " << selection << std::endl;
 

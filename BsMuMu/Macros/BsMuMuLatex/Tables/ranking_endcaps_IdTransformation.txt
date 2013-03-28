@@ -1,0 +1,23 @@
+\begin{table} 
+  \begin{tabular}{|l|l|l|l|l|l|l|} 
+    \hline 
+    & \multicolumn{2}{|c|}{0} & \multicolumn{2}{|c|}{1} & \multicolumn{2}{|c|}{2} \\ 
+    \hline 
+    rank & variable & separation & variable & separation & variable & separation \\ 
+    \hline 
+    1 & alpha & 5.692e-01 & alpha & 5.674e-01 & alpha & 5.632e-01 \\ 
+    2 & closetrk & 4.172e-01 & closetrk & 4.115e-01 & closetrk & 4.166e-01 \\ 
+    3 & fls3d & 3.764e-01 & fls3d & 3.747e-01 & fls3d & 3.728e-01 \\ 
+    4 & docatrk & 3.063e-01 & docatrk & 3.002e-01 & docatrk & 3.094e-01 \\ 
+    5 & iso & 2.525e-01 & iso & 2.534e-01 & iso & 2.564e-01 \\ 
+    6 & pvips & 2.193e-01 & pvips & 2.179e-01 & pvips & 2.233e-01 \\ 
+    7 & pvip & 2.022e-01 & pvip & 2.008e-01 & pvip & 2.043e-01 \\ 
+    8 & maxdoca & 1.272e-01 & maxdoca & 1.306e-01 & maxdoca & 1.293e-01 \\ 
+    9 & chi2/dof & 1.047e-01 & chi2/dof & 1.057e-01 & chi2/dof & 1.078e-01 \\ 
+    10 & pt & 3.555e-02 & pt & 3.862e-02 & pt & 3.534e-02 \\ 
+    11 & eta & 1.208e-02 & eta & 1.299e-02 & eta & 1.072e-02 \\ 
+    \hline 
+  \end{tabular} 
+  \label{tab:datasetsendcapsIdTransformation} 
+  \caption{Variable ranking for events of the three different event samples in the endcaps before BDT training.} 
+\end{table} 

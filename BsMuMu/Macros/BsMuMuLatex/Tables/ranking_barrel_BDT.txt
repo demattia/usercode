@@ -1,0 +1,23 @@
+\begin{table} 
+  \begin{tabular}{|l|l|l|l|l|l|l|} 
+    \hline 
+    & \multicolumn{2}{|c|}{0} & \multicolumn{2}{|c|}{1} & \multicolumn{2}{|c|}{2} \\ 
+    \hline 
+    rank & variable & separation & variable & separation & variable & separation \\ 
+    \hline 
+    1 & pvips & 1.660e-01 & iso & 1.383e-01 & pvips & 1.485e-01 \\ 
+    2 & iso & 1.295e-01 & pvips & 1.283e-01 & iso & 1.435e-01 \\ 
+    3 & alpha & 1.249e-01 & alpha & 1.206e-01 & alpha & 1.388e-01 \\ 
+    4 & fls3d & 9.997e-02 & pt & 1.026e-01 & fls3d & 1.070e-01 \\ 
+    5 & pt & 8.929e-02 & fls3d & 1.017e-01 & pt & 9.982e-02 \\ 
+    6 & closetrk & 8.100e-02 & closetrk & 7.681e-02 & closetrk & 9.170e-02 \\ 
+    7 & chi2dof & 7.528e-02 & chi2dof & 7.167e-02 & chi2dof & 8.199e-02 \\ 
+    8 & docatrk & 7.456e-02 & docatrk & 6.902e-02 & eta & 7.281e-02 \\ 
+    9 & eta & 7.163e-02 & eta & 6.747e-02 & maxdoca & 5.140e-02 \\ 
+    10 & pvip & 4.615e-02 & maxdoca & 6.372e-02 & pvip & 3.815e-02 \\ 
+    11 & maxdoca & 4.177e-02 & pvip & 5.978e-02 & docatrk & 2.639e-02 \\ 
+    \hline 
+  \end{tabular} 
+  \label{tab:datasetsbarrelBDT} 
+  \caption{Variable ranking for events of the three different event samples in the barrel after BDT training.} 
+\end{table} 
