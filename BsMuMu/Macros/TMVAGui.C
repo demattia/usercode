@@ -8,7 +8,7 @@
 #include "TControlBar.h"
 #include "TObjString.h"
 
-#include "../tmvaglob.C"
+#include "tmvaglob.C"
 
 // some global lists
 static TList*               TMVAGui_keyContent;
