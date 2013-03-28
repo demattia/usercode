@@ -1,0 +1,3 @@
+{
+  gROOT->LoadMacro("TMVAClassification.C+");
+}
