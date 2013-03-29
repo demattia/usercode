@@ -1,4 +1,4 @@
-// @(#)root/tmva $Id: TMVAClassification.C,v 1.2 2013/03/29 18:36:54 demattia Exp $
+// @(#)root/tmva $Id: TMVAClassification.C,v 1.3 2013/03/29 18:54:16 yzheng Exp $
 /**********************************************************************************
  * Project   : TMVA - a ROOT-integrated toolkit for multivariate data analysis    *
  * Package   : TMVA                                                               *
@@ -49,7 +49,7 @@
 #include "TMVA/Config.h"
 #endif
 
-void TMVAClassification( const TString & region = "barrel", const TString index = "", TString myMethodList = "", TString weightDirName = "" )
+void TMVAClassification( const TString & region = "barrel", const TString index = "", TString myMethodList = "")
 {
   if( region != "barrel" && region != "endcaps" ) {
     std::cout << "Error, region can only be barrel or endcaps. Selected region was: " << region << std::endl;
@@ -167,12 +167,14 @@ void TMVAClassification( const TString & region = "barrel", const TString index 
    TString fnameTestS = "BsMC12_barrel_preselection";
    TString fnameTestB = "Barrel_preselection";
    TString outputFileName = "TMVA_barrel";
+   TString weightDirName = "barrel";
    if( region == "endcaps" ) {
      fnameTrainS = "BsMC12_endcaps_preselection";
      fnameTrainB = "Endcaps_preselection";
      fnameTestS = "BsMC12_endcaps_preselection";
      fnameTestB = "Endcaps_preselection";
      outputFileName = "TMVA_endcaps";
+     weightDirName = "endcaps";
    }
    if( index != "" ) {
      fnameTrainS += "_"+index;
@@ -185,13 +187,14 @@ void TMVAClassification( const TString & region = "barrel", const TString index 
      fnameTestS += "_"+indexTest;
      fnameTestB += "_"+indexTest;
      outputFileName += "_"+index;
+     weightDirName += index;
    }
    fnameTrainS += ".root";
    fnameTrainB += ".root";
    fnameTestS += ".root";
    fnameTestB += ".root";
    outputFileName += ".root";
-
+   weightDirName += "Weights";
 
 
    // --------------------------------------------------------------------------------------------------
