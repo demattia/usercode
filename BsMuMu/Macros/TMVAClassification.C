@@ -1,4 +1,4 @@
-// @(#)root/tmva $Id: TMVAClassification.C,v 1.1 2013/03/28 22:35:54 demattia Exp $
+// @(#)root/tmva $Id: TMVAClassification.C,v 1.2 2013/03/29 18:36:54 demattia Exp $
 /**********************************************************************************
  * Project   : TMVA - a ROOT-integrated toolkit for multivariate data analysis    *
  * Package   : TMVA                                                               *
@@ -49,7 +49,7 @@
 #include "TMVA/Config.h"
 #endif
 
-void TMVAClassification( const TString & region = "barrel", const TString index = "", TString myMethodList = "" )
+void TMVAClassification( const TString & region = "barrel", const TString index = "", TString myMethodList = "", TString weightDirName = "" )
 {
   if( region != "barrel" && region != "endcaps" ) {
     std::cout << "Error, region can only be barrel or endcaps. Selected region was: " << region << std::endl;
@@ -190,7 +190,6 @@ void TMVAClassification( const TString & region = "barrel", const TString index 
    fnameTrainB += ".root";
    fnameTestS += ".root";
    fnameTestB += ".root";
-   TString weightDirName(outputFileName);
    outputFileName += ".root";
 
 
