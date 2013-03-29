@@ -1,4 +1,4 @@
-// @(#)root/tmva $Id: TMVAClassification.C 38895 2011-04-18 11:59:54Z evt $
+// @(#)root/tmva $Id: TMVAClassification.C,v 1.1 2013/03/28 22:35:54 demattia Exp $
 /**********************************************************************************
  * Project   : TMVA - a ROOT-integrated toolkit for multivariate data analysis    *
  * Package   : TMVA                                                               *
@@ -46,6 +46,7 @@
 // needs to be included when makecint runs (ACLIC)
 #include "TMVA/Factory.h"
 #include "TMVA/Tools.h"
+#include "TMVA/Config.h"
 #endif
 
 void TMVAClassification( const TString & region = "barrel", const TString index = "", TString myMethodList = "" )
@@ -189,6 +190,7 @@ void TMVAClassification( const TString & region = "barrel", const TString index 
    fnameTrainB += ".root";
    fnameTestS += ".root";
    fnameTestB += ".root";
+   TString weightDirName(outputFileName);
    outputFileName += ".root";
 
 
@@ -218,6 +220,8 @@ void TMVAClassification( const TString & region = "barrel", const TString index 
    // (please check "src/Config.h" to see all available global options)
    //    (TMVA::gConfig().GetVariablePlotting()).fTimesRMS = 8.0;
    //    (TMVA::gConfig().GetIONames()).fWeightFileDir = "myWeightDirectory";
+   // (TMVA::gConfig().GetIONames()).fWeightFileDir = outputFileName;
+   (TMVA::gConfig().GetIONames()).fWeightFileDir = weightDirName;
 
    // Define the input variables that shall be used for the MVA training
    // note that you may also use variable expressions, such as: "3*var1/var2*abs(var3)"
