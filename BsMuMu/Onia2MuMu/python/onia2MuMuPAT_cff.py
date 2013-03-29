@@ -119,18 +119,18 @@ def onia2MuMuPAT(process, GlobalTag, MC=False, HLT='HLT', Filter=True):
         preselection = cms.string("mass > 4.5 && mass < 6.3 && pt > 5. && pt < 9999. && daughter('muon1').pt > 4. && daughter('muon1').pt < 999. && daughter('muon2').pt > 4. && daughter('muon2').pt < 999. && userFloat('l3d') < 2. && userFloat('l3dsig') > 0. && userFloat('l3dsig') < 120. && userFloat('vNChi2') < 10. && userFloat('delta3d') < 0.1 && userFloat('delta3d')/userFloat('delta3dErr') < 5. && userFloat('DCA') < 0.1 && acos(userFloat('cosAlpha3D')) < 0.3 && userInt('Ntrk') < 21 && userFloat('minDca') < 0.25 && userFloat('Isolation') > 0."),
     )
 
-#    # check if there is at least one (inclusive) tracker+tracker di-muon
-#    process.onia2MuMuPatTrkTrkFilter = cms.EDFilter("CandViewCountFilter",
-#        src = cms.InputTag('onia2MuMuPatTrkTrk'),
-#        minNumber = cms.uint32(1),
-#    )
+    # check if there is at least one (inclusive) tracker+tracker di-muon
+    process.onia2MuMuPatTrkTrkFilter = cms.EDFilter("CandViewCountFilter",
+        src = cms.InputTag('onia2MuMuPatTrkTrk'),
+        minNumber = cms.uint32(1),
+    )
 
-#    process.onia2MuMuPatMassFilter = cms.EDFilter("CandViewSelector",
-#        src = cms.InputTag('onia2MuMuPatTrkTrk'),
-#        cut = cms.string("mass > 4.5 && mass < 6.3 && pt > 5. && pt < 9999. && daughter('muon1').pt > 4. && daughter('muon1').pt < 999. && daughter('muon2').pt > 4. && daughter('muon2').pt < 999. && userFloat('l3d') < 2. && userFloat('l3dsig') > 0. && userFloat('l3dsig') < 120. && userFloat('vNChi2') < 10. && userFloat('delta3d') < 0.1 && userFloat('delta3d')/userFloat('delta3dErr') < 5. && userFloat('DCA') < 0.1 && acos(userFloat('cosAlpha3D')) < 0.3 && userInt('Ntrk') < 21 && userFloat('minDca') < 0.25 && userFloat('Isolation') > 0."),
-#        # cut = cms.string("mass > 4.5 && mass < 6.3 && pt > 5. && pt < 9999. && daughter('muon1').pt > 4. && daughter('muon1').pt < 999. && daughter('muon2').pt > 4. && daughter('muon2').pt < 999."),
-#        filter = cms.bool(True)
-#    )
+    process.onia2MuMuPatMassFilter = cms.EDFilter("CandViewSelector",
+        src = cms.InputTag('onia2MuMuPatTrkTrk'),
+        cut = cms.string("mass > 4.5 && mass < 6.3 && pt > 5. && pt < 9999. && daughter('muon1').pt > 4. && daughter('muon1').pt < 999. && daughter('muon2').pt > 4. && daughter('muon2').pt < 999. && userFloat('l3d') < 2. && userFloat('l3dsig') > 0. && userFloat('l3dsig') < 120. && userFloat('vNChi2') < 10. && userFloat('delta3d') < 0.1 && userFloat('delta3d')/userFloat('delta3dErr') < 5. && userFloat('DCA') < 0.1 && acos(userFloat('cosAlpha3D')) < 0.3 && userInt('Ntrk') < 21 && userFloat('minDca') < 0.25 && userFloat('Isolation') > 0."),
+        # cut = cms.string("mass > 4.5 && mass < 6.3 && pt > 5. && pt < 9999. && daughter('muon1').pt > 4. && daughter('muon1').pt < 999. && daughter('muon2').pt > 4. && daughter('muon2').pt < 999."),
+        filter = cms.bool(True)
+    )
 
     # add tracks
     process.load("PhysicsTools.RecoAlgos.allTracks_cfi")
@@ -149,8 +149,8 @@ def onia2MuMuPAT(process, GlobalTag, MC=False, HLT='HLT', Filter=True):
         process.onia2MuMuPatTrkTrk *
         process.allTracks *
         process.goodTracks *
-        # process.onia2MuMuPatTrkTrkFilter *
-        # process.onia2MuMuPatMassFilter *
+        process.onia2MuMuPatTrkTrkFilter *
+        process.onia2MuMuPatMassFilter *
         process.nEventsAfterFilter
     )
 
