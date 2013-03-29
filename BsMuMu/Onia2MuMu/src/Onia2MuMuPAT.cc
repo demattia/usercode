@@ -866,7 +866,7 @@ bool Onia2MuMuPAT::searchForTheThirdTrack(const edm::Event& iEvent, const edm::E
 
     for (TrackCollection::const_iterator tk = tkColl->begin(); tk != tkColl->end(); ++tk) {
       bool hasVertex = false;
-      for(VertexCollection::const_iterator itv = priVtxs->begin(), itvend = priVtxs->end(); itv != itvend; ++itv){
+      for(VertexCollection::const_iterator itv = priVtxs->begin(), itvend = priVtxs->end(); itv != itvend; ++itv) {
         for( reco::Vertex::trackRef_iterator itVtx = itv->tracks_begin(); itVtx != itv->tracks_end(); ++itVtx) {
           if( itVtx->isNonnull() ) {
             if(tk->pt() == (*itVtx)->pt() && tk->eta()==(*itVtx)->eta()) {
