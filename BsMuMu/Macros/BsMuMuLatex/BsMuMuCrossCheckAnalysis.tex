@@ -276,10 +276,11 @@ the BDT training.
 \input{Tables/ranking_endcaps_IdTransformation.txt}
 
 \include{VariablesComparison}
+\include{VariablesComparison_3h}
 
 \section{Boosted Decision Tree}
 
-The inclusive samples split in three different subsamples according to the rule $index = eventNumber\%3$.
+The inclusive samples are split in three different subsamples according to the rule $index = eventNumber\%3$.
 These samples are then used as follows:
 \begin{itemize}
 \item events of type 0: analyzed by BDT0, trained on type-1 events, tested on type-2 events
