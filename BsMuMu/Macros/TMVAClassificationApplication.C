@@ -139,34 +139,35 @@ void TMVAClassificationApplication( TString myMethodList = "" )
 
    // Create a set of variables and declare them to the reader
    // - the variable names MUST corresponds in name and type to those given in the weight file(s) used
-   Float_t dca, pt, l3dsig, chi2dof, delta3d, delta3dSig, alpha, ntrk, minDca, isolation, y, l3d, cosAlphaXY, mu1_dxy, mu2_dxy, mu1_MVAMuonID, mu2_MVAMuonID, mu1_GMPT, mu2_GMPT;
+   Float_t dca, pt, l3dsig, chi2dof, delta3d, delta3dSig, alpha, ntrk, minDca, isolation, y, eta, l3d, cosAlphaXY, cosAlpha3D, mu1_dxy, mu2_dxy, mu1_MVAMuonID, mu2_MVAMuonID, mu1_GMPT, mu2_GMPT;
 
 
    bool originalVariables = true;
-   bool useNewMuonID = true;
+   bool useNewMuonID = false;
 
    reader->AddVariable( "pt", &pt );
-   reader->AddVariable( "y", &y );
    if( originalVariables ) {
-     reader->AddVariable( "l3dsig", &l3dsig );
-     reader->AddVariable( "alpha := acos(cosAlpha3D)",        &alpha );
+     reader->AddVariable( "eta", &eta );
+     reader->AddVariable( "fls3d := l3dsig", &l3dsig );
+     reader->AddVariable( "alpha := acos(cosAlpha3D)",      &alpha );
    }
-   reader->AddVariable( "dca",                              &dca );
-   reader->AddVariable( "delta3d",                          &delta3d );
-   reader->AddVariable( "delta3dSig := delta3d/delta3dErr", &delta3dSig );
-   reader->AddVariable( "isolation",                        &isolation );
+   reader->AddVariable( "maxdoca := dca",                   &dca );
+   reader->AddVariable( "pvip := delta3d",                  &delta3d );
+   reader->AddVariable( "pvips := delta3d/delta3dErr",      &delta3dSig );
+   reader->AddVariable( "iso := isolation",                 &isolation );
    if( originalVariables ) {
-     reader->AddVariable( "minDca",                         &minDca );
-     reader->AddVariable( "ntrk",                           &ntrk );
+     reader->AddVariable( "docatrk := minDca",              &minDca );
+     reader->AddVariable( "closetrk := ntrk",               &ntrk );
    }
-   reader->AddVariable( "chi2dof := NChi2",                &chi2dof );
+   reader->AddVariable( "chi2dof := NChi2",                 &chi2dof );
 
-   // if( !originalVariables) {
+   if( !originalVariables) {
+     reader->AddVariable( "y",                              &y );
      reader->AddVariable( "l3d",                            &l3d );
      reader->AddVariable( "cosAlphaXY",                     &cosAlphaXY );
      reader->AddVariable( "mu1_dxy",                        &mu1_dxy );
      reader->AddVariable( "mu2_dxy",                        &mu2_dxy );
-     // }
+   }
 
    if( useNewMuonID ) {
      // New Muon-id
@@ -244,7 +245,8 @@ void TMVAClassificationApplication( TString myMethodList = "" )
 
    // --- Book the MVA methods
 
-   TString dir    = "weights/";
+   TString dir    = "endcapsWeights/";
+   // TString dir    = "barrelWeights/";
    TString prefix = "TMVAClassification";
 
    // TString dirMuonID    = "tmvaMuonID/";
@@ -327,7 +329,7 @@ void TMVAClassificationApplication( TString myMethodList = "" )
    // TString fnameS = "BsMC12_barrel_preselection.root";
    // TString fnameS = "Barrel_preselection_unblinded.root";
    TString fnameS = "Endcaps_preselection_unblinded.root";
-   TString fnameB = "Barrel_preselection.root";
+   // TString fnameS = "Barrel_preselection_unblinded.root";
 
    // if (!gSystem->AccessPathName( fname ))
    //    input = TFile::Open( fname ); // check if file in local directory exists
@@ -341,17 +343,17 @@ void TMVAClassificationApplication( TString myMethodList = "" )
    // std::cout << "--- TMVAClassificationApp    : Using input file: " << input->GetName() << std::endl;
 
    TFile *inputS = TFile::Open( fnameS );
-   TFile *inputB = TFile::Open( fnameB );
+   // TFile *inputB = TFile::Open( fnameB );
    
    std::cout << "--- TMVAClassificationApplication       : Using input file: " << inputS->GetName() << std::endl;
-   std::cout << "--- and file: " << inputB->GetName() << std::endl;
+   // std::cout << "--- and file: " << inputB->GetName() << std::endl;
    
    // --- Register the training and test trees
 
    // TTree *signal     = (TTree*)inputS->Get("detailedDimuonTree/probe_tree");
    // TTree *background = (TTree*)inputB->Get("detailedDimuonTree/probe_tree");
    TTree *signal     = (TTree*)inputS->Get("probe_tree");
-   TTree *background = (TTree*)inputB->Get("probe_tree");
+   // TTree *background = (TTree*)inputB->Get("probe_tree");
    
    TTree *theTree = signal;
 
@@ -383,21 +385,23 @@ void TMVAClassificationApplication( TString myMethodList = "" )
    // theTree->SetBranchAddress( "isolation",                        &userIsolation );
    // theTree->SetBranchAddress( "y",                                &userY );
 
-   Float_t delta3dErr, cosAlpha3D;
+   Float_t delta3dErr;//, cosAlpha3D;
    theTree->SetBranchAddress( "dca",                              &dca );
    theTree->SetBranchAddress( "pt",                               &pt );
    theTree->SetBranchAddress( "l3dsig",                           &l3dsig );
    theTree->SetBranchAddress( "NChi2",                            &chi2dof );
    theTree->SetBranchAddress( "delta3d",                          &delta3d );
    theTree->SetBranchAddress( "delta3dErr",                       &delta3dErr );
-   theTree->SetBranchAddress( "cosAlpha3D",                            &alpha );
+   theTree->SetBranchAddress( "cosAlpha3D",                       &alpha );
    theTree->SetBranchAddress( "ntrk",                             &ntrk );
    theTree->SetBranchAddress( "minDca",                           &minDca );
    theTree->SetBranchAddress( "isolation",                        &isolation );
+   theTree->SetBranchAddress( "eta",                              &eta );
    theTree->SetBranchAddress( "y",                                &y );
    theTree->SetBranchAddress( "mass",                             &mass );
    theTree->SetBranchAddress( "l3d",                              &l3d );
    theTree->SetBranchAddress( "cosAlphaXY",                       &cosAlphaXY );
+   theTree->SetBranchAddress( "cosAlpha3D",                       &cosAlpha3D );
    theTree->SetBranchAddress( "mu1_dxy",                          &mu1_dxy );
    theTree->SetBranchAddress( "mu2_dxy",                          &mu2_dxy );
    theTree->SetBranchAddress( "mu1_MVAMuonID",                    &mu1_MVAMuonID );
@@ -420,7 +424,7 @@ void TMVAClassificationApplication( TString myMethodList = "" )
 
       theTree->GetEntry(ievt);
 
-      if( mu1_GMPT && mu2_GMPT ) continue;
+      // if( !mu1_GMPT && !mu2_GMPT ) continue;
 
       delta3dSig = delta3d/delta3dErr;
       alpha = acos(cosAlpha3D);
@@ -457,8 +461,9 @@ void TMVAClassificationApplication( TString myMethodList = "" )
       if (Use["TMlpANN"      ])   histNnT    ->Fill( reader->EvaluateMVA( "TMlpANN method"       ) );
       if (Use["BDT"          ]) {
 	histBdt    ->Fill( reader->EvaluateMVA( "BDT method"           ) );
-	// if (reader->EvaluateMVA( "BDT method"           ) > -0.0853) histMass->Fill(mass);
-	if (reader->EvaluateMVA( "BDT method"           ) > 0.06) histMass->Fill(mass);
+	// if (reader->EvaluateMVA( "BDT method"           ) > 0.1817) histMass->Fill(mass);
+	// if (reader->EvaluateMVA( "BDT method"           ) > 0.2163) histMass->Fill(mass);
+	if (reader->EvaluateMVA( "BDT method"           ) > 0.1547) histMass->Fill(mass);
       }
       if (Use["BDTD"         ])   histBdtD   ->Fill( reader->EvaluateMVA( "BDTD method"          ) );
       if (Use["BDTG"         ])   histBdtG   ->Fill( reader->EvaluateMVA( "BDTG method"          ) );

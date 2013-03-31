@@ -16,7 +16,7 @@ void cutTree_BsMuMu( TString inFile,
 
   TFile outfile(outFile,"recreate");
 
-  TString selection(Selection(endcaps, data, cut_based, blinding, splitting,maxRun));
+  TString selection(Selection(endcaps, data, cut_based, blinding, splitting, maxRun));
 
   // std::cout << "SELECTION = " << selection << std::endl;
 

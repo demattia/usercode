@@ -1,4 +1,4 @@
-// @(#)root/tmva $Id: TMVAClassification.C,v 1.3 2013/03/29 18:54:16 yzheng Exp $
+// @(#)root/tmva $Id: TMVAClassification.C,v 1.4 2013/03/29 19:07:56 demattia Exp $
 /**********************************************************************************
  * Project   : TMVA - a ROOT-integrated toolkit for multivariate data analysis    *
  * Package   : TMVA                                                               *
@@ -234,7 +234,6 @@ void TMVAClassification( const TString & region = "barrel", const TString index 
 
    factory->AddVariable( "pt",                               "pt", "GeV/c", 'F' );
    if( originalVariables ) {
-     // factory->AddVariable( "y",                              "y", "", 'F' );
      factory->AddVariable( "eta",                            "eta", "", 'F' );
      factory->AddVariable( "fls3d := l3dsig",                "fls3d", "", 'F' );
      factory->AddVariable( "alpha := acos(cosAlpha3D)",      "alpha", "", 'F' );
@@ -250,7 +249,7 @@ void TMVAClassification( const TString & region = "barrel", const TString index 
    factory->AddVariable( "chi2dof := NChi2",                 "chi2/dof", "", 'F' );
 
    if( !originalVariables) {
-     // factory->AddVariable( "y",                              "y", "", 'F' );
+     factory->AddVariable( "y",                              "y", "", 'F' );
      factory->AddVariable( "l3d",                            "l3d", "cm", 'F' );
      factory->AddVariable( "cosAlphaXY",                     "cosAlphaXY", "", 'F' );
      factory->AddVariable( "mu1_dxy",                        "mu1_dxy", "cm", 'F' );
