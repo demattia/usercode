@@ -6,7 +6,8 @@ TString Selection(const bool endcaps, const bool data, const bool cut_based = fa
 {
   TString cuts = "";
 
-  TString trigger("((mu1_HLT_DoubleMu2BarrelBsL3 && mu2_HLT_DoubleMu2BarrelBsL3) || (mu1_HLT_DoubleMu2BsL3 && mu2_HLT_DoubleMu2BsL3) || (mu1_HLT_DoubleMu2Dimuon6BsL3 && mu2_HLT_DoubleMu2Dimuon6BsL3) || (mu1_HLT_DoubleMu3BsL3 && mu2_HLT_DoubleMu3BsL3) || (mu1_HLT_VertexmumuFilterBs345 && mu2_HLT_VertexmumuFilterBs345) || (mu1_HLT_VertexmumuFilterBs3p545 && mu2_HLT_VertexmumuFilterBs3p545) || (mu1_HLT_VertexmumuFilterBs4 && mu2_HLT_VertexmumuFilterBs4) || (mu1_HLT_VertexmumuFilterBs47 && mu2_HLT_VertexmumuFilterBs47) || (mu1_HLT_VertexmumuFilterBs6 && mu2_HLT_VertexmumuFilterBs6))");
+  // TString trigger("((mu1_HLT_DoubleMu2BarrelBsL3 && mu2_HLT_DoubleMu2BarrelBsL3) || (mu1_HLT_DoubleMu2BsL3 && mu2_HLT_DoubleMu2BsL3) || (mu1_HLT_DoubleMu2Dimuon6BsL3 && mu2_HLT_DoubleMu2Dimuon6BsL3) || (mu1_HLT_DoubleMu3BsL3 && mu2_HLT_DoubleMu3BsL3) || (mu1_HLT_VertexmumuFilterBs345 && mu2_HLT_VertexmumuFilterBs345) || (mu1_HLT_VertexmumuFilterBs3p545 && mu2_HLT_VertexmumuFilterBs3p545) || (mu1_HLT_VertexmumuFilterBs4 && mu2_HLT_VertexmumuFilterBs4) || (mu1_HLT_VertexmumuFilterBs47 && mu2_HLT_VertexmumuFilterBs47) || (mu1_HLT_VertexmumuFilterBs6 && mu2_HLT_VertexmumuFilterBs6))");
+  TString trigger("((mu1_HLT_VertexmumuFilterBs345 && mu2_HLT_VertexmumuFilterBs345) || (mu1_HLT_VertexmumuFilterBs3p545 && mu2_HLT_VertexmumuFilterBs3p545) || (mu1_HLT_VertexmumuFilterBs4 && mu2_HLT_VertexmumuFilterBs4) || (mu1_HLT_VertexmumuFilterBs47 && mu2_HLT_VertexmumuFilterBs47))");
   cuts += trigger;
 
   TString split("");
@@ -31,7 +32,7 @@ TString Selection(const bool endcaps, const bool data, const bool cut_based = fa
 
   TString barrelCuts("(mu1_eta < 1.4 && mu1_eta > -1.4 && mu2_eta < 1.4 && mu2_eta > -1.4)");
   if( endcaps ) {
-    TString endcapsCuts("!"+barrelCuts);
+    TString endcapsCuts("!"+barrelCuts+" && mu1_eta < 2.4 && mu2_eta < 2.4 && mu1_eta > -2.4 && mu2_eta > -2.4");
     cuts += " && " + endcapsCuts;
   }
   else {
