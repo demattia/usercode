@@ -462,8 +462,8 @@ void TMVAClassificationApplication( TString myMethodList = "" )
       if (Use["BDT"          ]) {
 	histBdt    ->Fill( reader->EvaluateMVA( "BDT method"           ) );
 	// if (reader->EvaluateMVA( "BDT method"           ) > 0.1817) histMass->Fill(mass);
-	// if (reader->EvaluateMVA( "BDT method"           ) > 0.2163) histMass->Fill(mass);
-	if (reader->EvaluateMVA( "BDT method"           ) > 0.1547) histMass->Fill(mass);
+	if (reader->EvaluateMVA( "BDT method"           ) > 0.2163) histMass->Fill(mass);
+	// if (reader->EvaluateMVA( "BDT method"           ) > 0.1547) histMass->Fill(mass);
       }
       if (Use["BDTD"         ])   histBdtD   ->Fill( reader->EvaluateMVA( "BDTD method"          ) );
       if (Use["BDTG"         ])   histBdtG   ->Fill( reader->EvaluateMVA( "BDTG method"          ) );
