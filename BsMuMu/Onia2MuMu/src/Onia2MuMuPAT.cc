@@ -64,16 +64,16 @@ void Onia2MuMuPAT::fillCandMuons(pat::CompositeCandidate & myCand, const pat::Mu
 {
   myCand.addDaughter(mu1, "muon1");
   int highPurity1 = 0;
-  if(refittedTrack1.track().quality(reco::TrackBase::highPurity)) highPurity1 = 1;
-  // if(mu1.track().quality(reco::TrackBase::highPurity)) highPurity1 = 1;
+  // if(refittedTrack1.track().quality(reco::TrackBase::highPurity)) highPurity1 = 1;
+  if(mu1.track()->quality(reco::TrackBase::highPurity)) highPurity1 = 1;
   myCand.addUserInt("highPurity1", highPurity1);
   myCand.addUserFloat("segComp1", muon::segmentCompatibility(mu1));
   // std::cout << "segComp1 = " << muon::segmentCompatibility(mu1) << std::endl;
 
   myCand.addDaughter(mu2, "muon2");
   int highPurity2 = 0;
-  if(refittedTrack2.track().quality(reco::TrackBase::highPurity)) highPurity2 = 1;
-  // if(mu2.track().quality(reco::TrackBase::highPurity)) highPurity2 = 1;
+  // if(refittedTrack2.track().quality(reco::TrackBase::highPurity)) highPurity2 = 1;
+  if(mu2.track()->quality(reco::TrackBase::highPurity)) highPurity2 = 1;
   myCand.addUserInt("highPurity2", highPurity2);
   myCand.addUserFloat("segComp2", muon::segmentCompatibility(mu2));
   // std::cout << "segComp2 = " << muon::segmentCompatibility(mu2) << std::endl;
@@ -143,11 +143,14 @@ Onia2MuMuPAT::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
   for(View<pat::Muon>::const_iterator it = muons->begin(), itend = muons->end(); it != itend; ++it){
     // both must pass low quality
     if(!lowerPuritySelection_(*it)) continue;
+    if( !(it->innerTrack()->quality(TrackBase::highPurity)) ) continue;
     for(View<pat::Muon>::const_iterator it2 = it+1; it2 != itend;++it2){
       // both must pass low quality
       if(!lowerPuritySelection_(*it2)) continue;
+      if( !(it2->innerTrack()->quality(TrackBase::highPurity)) ) continue;
       // one must pass tight quality
       if (!(higherPuritySelection_(*it) || higherPuritySelection_(*it2))) continue;
+
 
       pat::CompositeCandidate myCand;
       pat::CompositeCandidate my3Cand;
@@ -497,6 +500,8 @@ gotoVertexFound:
           GlobalError v2e = thePrimaryV.error();
           AlgebraicSymMatrix33 vXYe = v1e.matrix() + v2e.matrix();
           double ctauErrPV = sqrt(ROOT::Math::Similarity(vpperp,vXYe))*myCand.mass()/(pperp.Perp2());
+          double lxy = distXY.value();
+          double lxysig = lxy/distXY.error();
 
           pvtx3D.SetXYZ(thePrimaryV.position().x(),thePrimaryV.position().y(),thePrimaryV.position().z());
           TVector3 vdiff3D = vtx3D - pvtx3D;
@@ -511,6 +516,8 @@ gotoVertexFound:
           myCand.addUserFloat("cosAlpha3D",cosAlpha3D);
           myCand.addUserFloat("l3d",l3d);
           myCand.addUserFloat("l3dsig",l3dsig);
+          myCand.addUserFloat("lxy",lxy);
+          myCand.addUserFloat("lxysig",lxysig);
 
           // lifetime using BS
           pvtx.SetXYZ(theBeamSpotV.position().x(),theBeamSpotV.position().y(),0);
@@ -540,6 +547,8 @@ gotoVertexFound:
           myCand.addUserFloat("cosAlpha3D",-100);
           myCand.addUserFloat("l3d",-100);
           myCand.addUserFloat("l3dsig",-100);
+          myCand.addUserFloat("lxy",-100);
+          myCand.addUserFloat("lxysig",-100);
           myCand.addUserFloat("ppdlBS",-100);
           myCand.addUserFloat("ppdlErrBS",-100);
           myCand.addUserFloat("Isolation", -1);
