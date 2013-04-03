@@ -327,9 +327,8 @@ void TMVAClassificationApplication( TString myMethodList = "" )
    // TString fname = "";
 
    // TString fnameS = "BsMC12_barrel_preselection.root";
-   // TString fnameS = "Barrel_preselection_unblinded.root";
-   TString fnameS = "Endcaps_preselection_unblinded.root";
-   // TString fnameS = "Barrel_preselection_unblinded.root";
+   // TString fnameS = "Endcaps_preselection_unblinded.root";
+   TString fnameS = "Barrel_preselection_unblinded.root";
 
    // if (!gSystem->AccessPathName( fname ))
    //    input = TFile::Open( fname ); // check if file in local directory exists
@@ -461,8 +460,8 @@ void TMVAClassificationApplication( TString myMethodList = "" )
       if (Use["TMlpANN"      ])   histNnT    ->Fill( reader->EvaluateMVA( "TMlpANN method"       ) );
       if (Use["BDT"          ]) {
 	histBdt    ->Fill( reader->EvaluateMVA( "BDT method"           ) );
-	// if (reader->EvaluateMVA( "BDT method"           ) > 0.1817) histMass->Fill(mass);
-	if (reader->EvaluateMVA( "BDT method"           ) > 0.2163) histMass->Fill(mass);
+	if (reader->EvaluateMVA( "BDT method"           ) > 0.1361) histMass->Fill(mass);
+	// if (reader->EvaluateMVA( "BDT method"           ) > 0.2163) histMass->Fill(mass);
 	// if (reader->EvaluateMVA( "BDT method"           ) > 0.1547) histMass->Fill(mass);
       }
       if (Use["BDTD"         ])   histBdtD   ->Fill( reader->EvaluateMVA( "BDTD method"          ) );
