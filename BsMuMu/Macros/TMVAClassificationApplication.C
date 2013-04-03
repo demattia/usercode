@@ -30,7 +30,7 @@
 
 using namespace TMVA;
 
-void TMVAClassificationApplication( TString myMethodList = "" ) 
+void TMVAClassificationApplication( const TString & inputFileName, const TString & outputFileName, const TString & weightDir, const float & cutValue, TString myMethodList = "" ) 
 {   
 #ifdef __CINT__
    gROOT->ProcessLine( ".O0" ); // turn off optimization in CINT
@@ -139,7 +139,8 @@ void TMVAClassificationApplication( TString myMethodList = "" )
 
    // Create a set of variables and declare them to the reader
    // - the variable names MUST corresponds in name and type to those given in the weight file(s) used
-   Float_t dca, pt, l3dsig, chi2dof, delta3d, delta3dSig, alpha, ntrk, minDca, isolation, y, eta, l3d, cosAlphaXY, cosAlpha3D, mu1_dxy, mu2_dxy, mu1_MVAMuonID, mu2_MVAMuonID, mu1_GMPT, mu2_GMPT;
+   Float_t dca, pt, l3dsig, chi2dof, delta3d, delta3dSig, alpha, ntrk, minDca, isolation, y, eta, l3d, cosAlphaXY, cosAlpha3D, mu1_dxy, mu2_dxy, mu1_MVAMuonID, mu2_MVAMuonID;
+   // Float_t mu1_GMPT, mu2_GMPT;
 
 
    bool originalVariables = true;
@@ -245,7 +246,7 @@ void TMVAClassificationApplication( TString myMethodList = "" )
 
    // --- Book the MVA methods
 
-   TString dir    = "endcapsWeights/";
+   // TString dir    = "endcapsWeights/";
    // TString dir    = "barrelWeights/";
    TString prefix = "TMVAClassification";
 
@@ -256,7 +257,8 @@ void TMVAClassificationApplication( TString myMethodList = "" )
    for (std::map<std::string,int>::iterator it = Use.begin(); it != Use.end(); it++) {
       if (it->second) {
          TString methodName = TString(it->first) + TString(" method");
-         TString weightfile = dir + prefix + TString("_") + TString(it->first) + TString(".weights.xml");
+         // TString weightfile = dir + prefix + TString("_") + TString(it->first) + TString(".weights.xml");
+         TString weightfile = weightDir + prefix + TString("_") + TString(it->first) + TString(".weights.xml");
          reader->BookMVA( methodName, weightfile ); 
 
          // TString weightfileMuonID = dirMuonID + prefixMuonID + TString("_") + TString(it->first) + TString(".weights.xml");
@@ -303,7 +305,7 @@ void TMVAClassificationApplication( TString myMethodList = "" )
    if (Use["Category"])      histCat     = new TH1F( "MVA_Category",      "MVA_Category",      nbin, -2., 2. );
    if (Use["Plugin"])        histPBdt    = new TH1F( "MVA_PBDT",          "MVA_BDT",           nbin, -0.8, 0.8 );
 
-   TH1F *histMass = new TH1F("mass", "mass", 50, 4.9, 5.9);
+   TH1F *histMass = new TH1F("mass", "mass", 40, 4.9, 5.9);
 
    // PDEFoam also returns per-event error, fill in histogram, and also fill significance
    if (Use["PDEFoam"]) {
@@ -341,9 +343,10 @@ void TMVAClassificationApplication( TString myMethodList = "" )
    // }
    // std::cout << "--- TMVAClassificationApp    : Using input file: " << input->GetName() << std::endl;
 
-   TFile *inputS = TFile::Open( fnameS );
+   // TFile *inputS = TFile::Open( fnameS );
    // TFile *inputB = TFile::Open( fnameB );
-   
+   TFile *inputS = TFile::Open( inputFileName );
+
    std::cout << "--- TMVAClassificationApplication       : Using input file: " << inputS->GetName() << std::endl;
    // std::cout << "--- and file: " << inputB->GetName() << std::endl;
    
@@ -405,8 +408,8 @@ void TMVAClassificationApplication( TString myMethodList = "" )
    theTree->SetBranchAddress( "mu2_dxy",                          &mu2_dxy );
    theTree->SetBranchAddress( "mu1_MVAMuonID",                    &mu1_MVAMuonID );
    theTree->SetBranchAddress( "mu2_MVAMuonID",                    &mu2_MVAMuonID );
-   theTree->SetBranchAddress( "mu1_GMPT",                         &mu1_GMPT );
-   theTree->SetBranchAddress( "mu2_GMPT",                         &mu2_GMPT );
+   // theTree->SetBranchAddress( "mu1_GMPT",                         &mu1_GMPT );
+   // theTree->SetBranchAddress( "mu2_GMPT",                         &mu2_GMPT );
 
    // Efficiency calculator for cut method
    Int_t    nSelCutsGA = 0;
@@ -460,7 +463,8 @@ void TMVAClassificationApplication( TString myMethodList = "" )
       if (Use["TMlpANN"      ])   histNnT    ->Fill( reader->EvaluateMVA( "TMlpANN method"       ) );
       if (Use["BDT"          ]) {
 	histBdt    ->Fill( reader->EvaluateMVA( "BDT method"           ) );
-	if (reader->EvaluateMVA( "BDT method"           ) > 0.1361) histMass->Fill(mass);
+	if (reader->EvaluateMVA( "BDT method"           ) > cutValue) histMass->Fill(mass);
+	// if (reader->EvaluateMVA( "BDT method"           ) > 0.1361) histMass->Fill(mass);
 	// if (reader->EvaluateMVA( "BDT method"           ) > 0.2163) histMass->Fill(mass);
 	// if (reader->EvaluateMVA( "BDT method"           ) > 0.1547) histMass->Fill(mass);
       }
@@ -525,7 +529,7 @@ void TMVAClassificationApplication( TString myMethodList = "" )
 
    // --- Write histograms
 
-   TFile *target  = new TFile( "TMVApp.root","RECREATE" );
+   TFile *target  = new TFile( outputFileName,"RECREATE" );
    if (Use["Likelihood"   ])   histLk     ->Write();
    if (Use["LikelihoodD"  ])   histLkD    ->Write();
    if (Use["LikelihoodPCA"])   histLkPCA  ->Write();
