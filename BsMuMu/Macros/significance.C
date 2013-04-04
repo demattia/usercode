@@ -11,7 +11,7 @@
 #include "TLegend.h"
 #include "TMarker.h"
 #include <iostream>
-#include "Common/setTDRStyle_modified.C"
+#include "../Common/setTDRStyle_modified.C"
 
 const double nsig_barrel  = 60.;
 const double nbkg_barrel  = 28884.;
@@ -137,20 +137,31 @@ void significance(TString method="BDT",TString region="barrel") {
    tl->SetLineStyle(4);
    tl->Draw("same");
 
-   c.SaveAs(TString("plots/"+name+"_eff.gif"));
+   TString ext(".pdf");
+
+   c.SaveAs(TString("plots/"+name+"_eff"+ext));
 
    TCanvas c2;
    roc->SetTitle("");
    roc->GetXaxis()->SetTitle("#epsilon_{S}");
    roc->GetYaxis()->SetTitle("1-#epsilon_{B}");
-   roc->SetMarkerStyle(7);
+   //roc->SetMarkerStyle(7);
    roc->Draw();
-   tp->Draw();
+   //tp->Draw();
    TMarker* tm = new TMarker(sig_max_effS,1.-sig_max_effB, 28);
    tm->SetMarkerSize(1.5);
+   tm->SetMarkerColor(2);
    tm->Draw("same");
+   c2.SaveAs(TString("plots/"+name+"_roc"+ext));
 
-   c2.SaveAs(TString("plots/"+name+"_roc.gif"));
+   TCanvas c3;
+   roc->GetXaxis()->SetRangeUser(0.,1);
+   roc->GetYaxis()->SetRangeUser(0.99,1.);
+   roc->Draw();
+   //tp->Draw("same");
+   tm->Draw("same");
+   c3.SaveAs(TString("plots/"+name+"_roc_zoom"+ext));
+
 
    inputA->Close();
 }
