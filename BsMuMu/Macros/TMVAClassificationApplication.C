@@ -306,6 +306,17 @@ void TMVAClassificationApplication( const TString & inputFileName, const TString
    if (Use["Plugin"])        histPBdt    = new TH1F( "MVA_PBDT",          "MVA_BDT",           nbin, -0.8, 0.8 );
 
    TH1F *histMass = new TH1F("mass", "mass", 40, 4.9, 5.9);
+   TH1F *histPt = new TH1F("pt", "pt", 50, 0., 50.);
+   TH1F *histEta = new TH1F("eta", "eta", 24, -2.4, 2.4);
+   TH1F *histFls3d = new TH1F("fls3d", "fls3d", 100, 0., 100.);
+   TH1F *histAlpha = new TH1F("alpha", "alpha", 30, 0., 0.3);
+   TH1F *histMaxdoca = new TH1F("maxdoca", "maxdoca", 50, 0., 0.05);
+   TH1F *histPvip = new TH1F("pvip", "pvip", 50, 0., 0.05);
+   TH1F *histPvips = new TH1F("pvips", "pvips", 50, 0., 5.);
+   TH1F *histIso = new TH1F("iso", "iso", 100, 0., 1.);
+   TH1F *histDocatrk = new TH1F("docatrk", "docatrk", 20, 0., 0.2);
+   TH1F *histClosetrk = new TH1F("closetrk", "closetrk", 21, 0, 21);
+   TH1F *histChi2dof = new TH1F("chi2dof", "chi2dof", 100, 0., 10.);
 
    // PDEFoam also returns per-event error, fill in histogram, and also fill significance
    if (Use["PDEFoam"]) {
@@ -463,7 +474,20 @@ void TMVAClassificationApplication( const TString & inputFileName, const TString
       if (Use["TMlpANN"      ])   histNnT    ->Fill( reader->EvaluateMVA( "TMlpANN method"       ) );
       if (Use["BDT"          ]) {
 	histBdt    ->Fill( reader->EvaluateMVA( "BDT method"           ) );
-	if (reader->EvaluateMVA( "BDT method"           ) > cutValue) histMass->Fill(mass);
+	if (reader->EvaluateMVA( "BDT method"           ) > cutValue) {
+	  histMass->Fill(mass);
+	  histPt->Fill(pt);
+	  histEta->Fill(eta);
+	  histFls3d->Fill(l3dsig);
+	  histAlpha->Fill(alpha);
+	  histMaxdoca->Fill(dca);
+	  histPvip->Fill(delta3d);
+	  histPvips->Fill(delta3dSig);
+	  histIso->Fill(isolation);
+	  histDocatrk->Fill(minDca);
+	  histClosetrk->Fill(ntrk);
+	  histChi2dof->Fill(chi2dof);
+	}
 	// if (reader->EvaluateMVA( "BDT method"           ) > 0.1361) histMass->Fill(mass);
 	// if (reader->EvaluateMVA( "BDT method"           ) > 0.2163) histMass->Fill(mass);
 	// if (reader->EvaluateMVA( "BDT method"           ) > 0.1547) histMass->Fill(mass);
@@ -561,6 +585,17 @@ void TMVAClassificationApplication( const TString & inputFileName, const TString
    if (Use["Category"     ])   histCat    ->Write();
    if (Use["Plugin"       ])   histPBdt   ->Write();
    histMass->Write();
+   histPt->Write();
+   histEta->Write();
+   histFls3d->Write();
+   histAlpha->Write();
+   histMaxdoca->Write();
+   histPvip->Write();
+   histPvips->Write();
+   histIso->Write();
+   histDocatrk->Write();
+   histClosetrk->Write();
+   histChi2dof->Write();
 
    // Write also error and significance histos
    if (Use["PDEFoam"]) { histPDEFoam->Write(); histPDEFoamErr->Write(); histPDEFoamSig->Write(); }
@@ -573,7 +608,18 @@ void TMVAClassificationApplication( const TString & inputFileName, const TString
   
    delete reader;
 
-   histMass->Draw();
+   // histMass->Draw();
+   // histPt->Draw();
+   // histEta->Draw();
+   // histFls3d->Draw();
+   // histAlpha->Draw();
+   // histMaxdoca->Draw();
+   // histPvip->Draw();
+   // histPvips->Draw();
+   // histIso->Draw();
+   // histDocatrk->Draw();
+   // histClosetrk->Draw();
+   // histChi2dof->Draw();
     
    std::cout << "==> TMVAClassificationApplication is done!" << endl << std::endl;
 } 

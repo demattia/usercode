@@ -143,7 +143,7 @@ class StatDialogMVAEffs {
    
    void ReadHistograms(TFile* file);
    void UpdateSignificanceHists();
-   void DrawHistograms();
+   void DrawHistograms(const TString & region);
 
    void RaiseDialog() { if (fMain) { fMain->RaiseWindow(); fMain->Layout(); fMain->MapWindow(); } }
 
@@ -300,13 +300,13 @@ StatDialogMVAEffs::StatDialogMVAEffs(const TGWindow* p, Float_t ns, Float_t nb) 
    fCloseButton->Connect("Clicked()", "StatDialogMVAEffs", this, "Close()");
 }
 
-void StatDialogMVAEffs::UpdateCanvases() 
+void StatDialogMVAEffs::UpdateCanvases(const TString & region)
 {
    if (fInfoList==0) return;
    if (fInfoList->First()==0) return;
    MethodInfo* info = (MethodInfo*)fInfoList->First();
    if ( info->canvas==0 ) {
-      DrawHistograms();
+      DrawHistograms(region);
       return;
    }
    TIter next(fInfoList);
@@ -403,7 +403,7 @@ void StatDialogMVAEffs::ReadHistograms(TFile* file)
    return;
 }
 
-void StatDialogMVAEffs::DrawHistograms() 
+void StatDialogMVAEffs::DrawHistograms(const TString & region)
 {
    // counter variables
    Int_t countCanvas = 0;
@@ -524,6 +524,8 @@ void StatDialogMVAEffs::DrawHistograms()
 
       if (Save_Images) {
          TMVAGlob::imgconv( c, Form("plots/mvaeffs_%s", info->methodTitle.Data()) ); 
+	 std::cout << "SAVING" << std::endl;
+	 c->SaveAs("mvaeffs_"+info->methodTitle+"_"+region+".pdf");
       }
       countCanvas++;
    }
@@ -554,17 +556,19 @@ void StatDialogMVAEffs::PrintResults( const MethodInfo* info )
         << endl;
 }
 
-void mvaeffs( TString fin = "TMVA_barrel.root", const int expectedSignal = 1000, const int expectedBackground = 1000,
+void mvaeffs( const TString & region = "barrel",
+	      const int expectedSignal = 1000, const int expectedBackground = 1000,
               Bool_t useTMVAStyle = kTRUE, TString formula="S/sqrt(S+B)" )
 {
    TMVAGlob::Initialize( useTMVAStyle );
 
    StatDialogMVAEffs* gGui = new StatDialogMVAEffs(gClient->GetRoot(), expectedSignal, expectedBackground);
 
+   TString fin("TMVA_"+region+".root");
    TFile* file = TMVAGlob::OpenFile( fin );
    gGui->ReadHistograms(file);
    gGui->SetFormula(formula);
    gGui->UpdateSignificanceHists();
-   gGui->DrawHistograms();
+   gGui->DrawHistograms(region);
    gGui->RaiseDialog();   
 }
