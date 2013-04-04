@@ -11,12 +11,12 @@
 #include "TLegend.h"
 #include "TMarker.h"
 #include <iostream>
-#include "../Common/setTDRStyle_modified.C"
+#include "Common/setTDRStyle_modified.C"
 
-const double nsig_barrel  = 63.;
-const double nbkg_barrel  = 40361.;
-const double nsig_endcap  = 40.;
-const double nbkg_endcap  = 70362.;
+const double nsig_barrel  = 60.;
+const double nbkg_barrel  = 28884.;
+const double nsig_endcap  = 35.;
+const double nbkg_endcap  = 35392.;
 
 void significance(TString method="BDT",TString region="barrel") {
   
@@ -41,7 +41,7 @@ void significance(TString method="BDT",TString region="barrel") {
   TH1F* tmva_s = (TH1F*)gROOT->FindObject(TString("MVA_"+method+"_S_high"));
   TH1F* tmva_b = (TH1F*)gROOT->FindObject(TString("MVA_"+method+"_B_high"));
 
-  const int rb =10;
+  const int rb =100;
   tmva_s->Rebin(rb);
   tmva_b->Rebin(rb);
 

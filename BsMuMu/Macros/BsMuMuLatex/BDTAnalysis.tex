@@ -1,6 +1,3 @@
-
-%\section{BDT analysis}
-
 Figures \ref{fig:massOptimalCut} show the optimal value of the BDT cut for the estimated numbers of signal and background
 events.
 
@@ -33,7 +30,7 @@ Figures \ref{fig:massPlotUnblinded} shows the unblinded invariant mass distribut
 \end{figure}
 
 
-Figures
+Figures \ref{fig:AfterBDTCutVariablesBarrelBlinded}, \ref{fig:AfterBDTCutVariablesEndcapsBlinded}, \ref{fig:AfterBDTCutVariablesBarrelUnblinded} and \ref{fig:AfterBDTCutVariablesEndcapsUnblinded} show variable distributions after the application of the BDT selection.
 
 \begin{figure}
   \centering
@@ -49,7 +46,7 @@ Figures
   \includegraphics[width=0.3\textwidth]{Figures/AfterBDTCut_closetrk_Barrel.pdf}
   \includegraphics[width=0.3\textwidth]{Figures/AfterBDTCut_chi2dof_Barrel.pdf}
   \caption{Variable distributions for the barrel after BDT cuts on blinded data.}
-  \label{fig:massPlotUnblinded}
+  \label{fig:AfterBDTCutVariablesBarrelBlinded}
 \end{figure}
 
 \begin{figure}
@@ -66,7 +63,7 @@ Figures
   \includegraphics[width=0.3\textwidth]{Figures/AfterBDTCut_closetrk_Endcaps.pdf}
   \includegraphics[width=0.3\textwidth]{Figures/AfterBDTCut_chi2dof_Endcaps.pdf}
   \caption{Variable distributions for the endcaps after BDT cuts on blinded data.}
-  \label{fig:massPlotUnblinded}
+  \label{fig:AfterBDTCutVariablesEndcapsBlinded}
 \end{figure}
 
 \begin{figure}
@@ -83,7 +80,7 @@ Figures
   \includegraphics[width=0.3\textwidth]{Figures/AfterBDTCut_closetrk_BarrelUnblinded.pdf}
   \includegraphics[width=0.3\textwidth]{Figures/AfterBDTCut_chi2dof_BarrelUnblinded.pdf}
   \caption{Variable distributions for the barrel after BDT cuts on unblinded data.}
-  \label{fig:massPlotUnblinded}
+  \label{fig:AfterBDTCutVariablesBarrelUnblinded}
 \end{figure}
 
 \begin{figure}
@@ -100,44 +97,23 @@ Figures
   \includegraphics[width=0.3\textwidth]{Figures/AfterBDTCut_closetrk_EndcapsUnblinded.pdf}
   \includegraphics[width=0.3\textwidth]{Figures/AfterBDTCut_chi2dof_EndcapsUnblinded.pdf}
   \caption{Variable distributions for the endcaps after BDT cuts on unblinded data.}
-  \label{fig:massPlotUnblinded}
+  \label{fig:AfterBDTCutVariablesEndcapsUnblinded}
 \end{figure}
 
+Figures \ref{fig:applicationBDTOutputBarrel} and \ref{fig:applicationBDTOutputEndcaps} show the output of the BDT application on different samples for data and \BsMuMu simulation.
 
 \begin{figure}
   \centering
-  \includegraphics[width=0.45\textwidth]{Figures/bdt/BDT_barrel_roc}
-  \includegraphics[width=0.45\textwidth]{Figures/bdt/BDT_barrel_eff} \\
-  \includegraphics[width=0.45\textwidth]{Figures/bdt/BDT_barrel_mass}
-  \includegraphics[width=0.45\textwidth]{Figures/bdt/BDT_barrel_mass_unblind}
-\caption{BDT barrel}
-\end{figure}
-
-\begin{figure}
-  \centering
-  \includegraphics[width=0.45\textwidth]{Figures/mlp/MLP_barrel_roc}
-  \includegraphics[width=0.45\textwidth]{Figures/mlp/MLP_barrel_eff} \\
-  \includegraphics[width=0.45\textwidth]{Figures/mlp/MLP_barrel_mass}
-  \includegraphics[width=0.45\textwidth]{Figures/mlp/MLP_barrel_mass_unblind}
-\caption{MLP barrel}
-\end{figure}
-
-
-%%%
-\begin{figure}
-  \centering
-  \includegraphics[width=0.45\textwidth]{Figures/bdt/BDT_endcaps_roc}
-  \includegraphics[width=0.45\textwidth]{Figures/bdt/BDT_endcaps_eff} \\
-  \includegraphics[width=0.45\textwidth]{Figures/bdt/BDT_endcaps_mass}
-  \includegraphics[width=0.45\textwidth]{Figures/bdt/BDT_endcaps_mass_unblind}
-\caption{BDT endcaps}
+  \includegraphics[width=0.45\textwidth]{Figures/ApplicationBDTOutput_Barrel.pdf}
+  \includegraphics[width=0.45\textwidth]{Figures/ApplicationBDTOutput_Endcaps.pdf}
+  \caption{BDT output distribution for the application on data for different control samples and the full sample for (left) and endcaps (right).}
+  \label{fig:applicationBDTOutputBarrel}
 \end{figure}
 
 \begin{figure}
   \centering
-  \includegraphics[width=0.45\textwidth]{Figures/mlp/MLP_endcaps_roc}
-  \includegraphics[width=0.45\textwidth]{Figures/mlp/MLP_endcaps_eff} \\
-  \includegraphics[width=0.45\textwidth]{Figures/mlp/MLP_endcaps_mass}
-  \includegraphics[width=0.45\textwidth]{Figures/mlp/MLP_endcaps_mass_unblind}
-\caption{MLP endcaps}
+  \includegraphics[width=0.45\textwidth]{Figures/ApplicationBDTOutput_BsMCBarrel.pdf}
+  \includegraphics[width=0.45\textwidth]{Figures/ApplicationBDTOutput_BsMCEndcaps.pdf}
+  \caption{BDT output distribution for the application on \BsMuMu signal MC different control samples and the full sample for (left) and endcaps (right).}
+  \label{fig:applicationBDTOutputEndcaps}
 \end{figure}
