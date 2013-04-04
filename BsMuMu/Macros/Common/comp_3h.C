@@ -12,35 +12,41 @@
 
 struct Vars
 {
-  Vars(const TString & inVarA, const TString & inVarB, const Int_t inNbins, const Double_t & inMin, const Double_t & inMax)
-    : varA(inVarA), varB(inVarB), nbins(inNbins), min(inMin), max(inMax) {}
+  Vars(const TString & inVarA, const TString & inVarB, const TString & inVarC, const Int_t inNbins, const Double_t & inMin, const Double_t & inMax)
+    : varA(inVarA), varB(inVarB), varC(inVarC), nbins(inNbins), min(inMin), max(inMax) {}
   // varA is the name in the parallel analysis tree, while varB in the reference tree from the main analysis
   TString varA;
   TString varB;
+  TString varC;
   Int_t nbins;
   Double_t min;
   Double_t max;
 };
 
 
-void comp(const TString & parallelAnalysisFile = "Barrel_preselection.root",
-	  const TString & mainAnalysisFile = "data_main_barrel.root")
+void comp_3h(const TString & inputFileA = "Barrel_preselection_0.root",
+	  const TString & inputFileB = "Barrel_preselection_1.root", 
+      const TString & inputFileC = "Barrel_preselection_2.root")
 {
-  TString fnameA(parallelAnalysisFile);
+  TString fnameA("/uscmst1b_scratch/lpc1/lpcmuon/zhenhu/BsMuMu/data/HackedTrees/"+inputFileA);
   TFile* inputA = TFile::Open( fnameA );
-  
-  TString fnameB (mainAnalysisFile);
+  TString fnameB("/uscmst1b_scratch/lpc1/lpcmuon/zhenhu/BsMuMu/data/HackedTrees/"+inputFileB);
   TFile* inputB = TFile::Open( fnameB );
-
+  TString fnameC("/uscmst1b_scratch/lpc1/lpcmuon/zhenhu/BsMuMu/data/HackedTrees/"+inputFileC);
+  TFile* inputC = TFile::Open( fnameC );
+  
   gDirectory->Cd(fnameA+":/");
   TTree* treeA = (TTree*)gROOT->FindObject("probe_tree");
-  //treeB->Show();
-
   gDirectory->Cd(fnameB+":/");
-  TTree* treeB = (TTree*)gROOT->FindObject("events");
+  TTree* treeB = (TTree*)gROOT->FindObject("probe_tree");
+  gDirectory->Cd(fnameC+":/");
+  TTree* treeC = (TTree*)gROOT->FindObject("probe_tree");
+
+//  gDirectory->Cd(fnameB+":/");
+//  TTree* treeB = (TTree*)gROOT->FindObject("events");
   //treeA->Show();
 
-  TFile outfile("comp.root","recreate");
+  TFile outfile("comp2.root","recreate");
   //gDirectory->Cd(*outfile+":/");
 
   // gROOT->LoadMacro("setTDRStyle_modified.C");
@@ -48,87 +54,99 @@ void comp(const TString & parallelAnalysisFile = "Barrel_preselection.root",
 
 
   std::vector<Vars> vars;
-  vars.push_back(Vars("mass", "m", 40, 4.9, 5.9));
-  vars.push_back(Vars("pt", "pt", 40, 0, 50));
-  vars.push_back(Vars("dca", "maxdoca", 40, 0, 0.1));
-  vars.push_back(Vars("mu1_pt", "m1pt", 40, 0, 50));
-  vars.push_back(Vars("mu2_pt", "m2pt", 40, 0, 50));
-  vars.push_back(Vars("delta3d", "pvip", 40, 0, 0.05));
-  vars.push_back(Vars("delta3d/delta3dErr", "pvips", 40, 0, 5));
-  vars.push_back(Vars("cosAlpha3D", "cosa", 40, 0.95, 1.));
-  vars.push_back(Vars("ntrk", "closetrk", 40, 0, 20));
-  vars.push_back(Vars("minDca", "docatrk", 40, 0, 0.2));
-  vars.push_back(Vars("isolation", "iso", 40, 0, 1));
-  vars.push_back(Vars("l3d", "fl3d", 40, 0, 5));
-  vars.push_back(Vars("l3dsig", "fls3d", 40, 0, 10));
-  vars.push_back(Vars("pvw8", "pvw8", 40, 0, 1.1));
+  vars.push_back(Vars("mass", "mass", "mass", 40, 4.9, 5.9));
+  vars.push_back(Vars("pt", "pt", "pt", 40, 0, 50));
+  vars.push_back(Vars("dca", "dca", "dca", 40, 0, 0.1));
+  vars.push_back(Vars("mu1_pt", "mu1_pt", "mu1_pt", 40, 0, 50));
+  vars.push_back(Vars("mu2_pt", "mu2_pt", "mu2_pt", 40, 0, 50));
+  vars.push_back(Vars("delta3d", "delta3d", "delta3d", 40, 0, 0.05));
+  vars.push_back(Vars("delta3d/delta3dErr", "delta3d/delta3dErr", "delta3d/delta3dErr", 40, 0, 5));
+  vars.push_back(Vars("cosAlpha3D", "cosAlpha3D", "cosAlpha3D", 40, 0.95, 1.));
+  vars.push_back(Vars("ntrk", "ntrk", "ntrk", 40, 0, 20));
+  vars.push_back(Vars("minDca", "minDca", "minDca", 40, 0, 0.2));
+  vars.push_back(Vars("isolation", "isolation", "isolation", 40, 0, 1));
+  vars.push_back(Vars("l3d", "l3d", "l3d", 40, 0, 5));
+  vars.push_back(Vars("l3dsig", "l3dsig", "l3dsig", 40, 0, 10));
+  vars.push_back(Vars("pvw8", "pvw8", "pvw8", 40, 0, 1.1));
   // vars.push_back(Vars("alpha3D", "alpha"));
 
-  TString dir = "figs/";
+  TString dir = "figs_3h/";
   TString ext = ".pdf";
   char tmp[100];
 
-  TString varA(""), varB(""), cvsn("");
+  TString varA(""), varB(""), varC(""), cvsn("");
   // TCanvas cvs[nvar];
 
-  Double_t ks = 0;
+  Int_t n = 14;
+  Double_t ks1,ks2,ks3;
   Int_t i=0;
+
   TH1F *KTest = new TH1F("KTest","KTest",50,0,1);
 
   // for(int i=0; i<nvar; i++) {
   for( std::vector<Vars>::const_iterator it = vars.begin(); it != vars.end(); ++it ) {
-    std::cout << "variable: " << it->varA << " -> " << it->varB << std::endl; // << flush;
-    varA=""; varB=""; cvsn="";
+    std::cout << "variable: " << it->varA << " -> " << it->varB << " -> " << it->varC << std::endl; // << flush;
+    varA=""; varB=""; varC=""; cvsn="";
     cvsn.Append(it->varA.Data());
     varA.Append(it->varA.Data());
     varB.Append(it->varB.Data());
+    varC.Append(it->varC.Data());
     sprintf(tmp,"(%d,%4.2f,%4.2f)",it->nbins,it->min,it->max);
     TString lim (""); lim.Append(tmp);
     cvsn = dir + varB + ext;
     TCanvas cvs(cvsn);
     varA+=" >> hA";    
     varB+=" >> hB";
+    varC+=" >> hC";
     varA+=lim; 
     varB+=lim;
-    std::cout << "plot: " <<varA << " " << varB << std::endl << std::flush;
+    varC+=lim;
+    std::cout << "plot: " <<varA << " " << varB << " " << varC <<std::endl << std::flush;
     treeA->Draw(varA.Data());
     treeB->Draw(varB.Data());
+    treeC->Draw(varC.Data());
     TH1F *hA = (TH1F*)gDirectory->Get("hA");
     TH1F *hB = (TH1F*)gDirectory->Get("hB");
-
+    TH1F *hC = (TH1F*)gDirectory->Get("hC");
     hA->Sumw2();
     hB->Sumw2();
+    hC->Sumw2();
     if(hA)    
-      //hA->Scale(1.);
       hA->Scale(1./hA->Integral());
     if(hB)
-      //hB->Scale(1. * hA->Integral()/hB->Integral());
       hB->Scale(1./hB->Integral());
+    if(hC)
+      hC->Scale(1./hC->Integral());
     hA->SetLineColor(kRed);
     hB->SetLineColor(kBlue);
+    hC->SetLineColor(kGreen+2);
 
     hA->SetLineWidth(2);
     hB->SetLineWidth(2);
-    TLegend leg(0.5,0.7,0.7,0.8);
-    leg.AddEntry(hA,"xcheck","pl");
-    leg.AddEntry(hB,"main","pl");
+    hC->SetLineWidth(2);
+//    TLegend leg(0.5,0.7,0.7,0.8);
+//    leg.AddEntry(hA,"xcheck","pl");
+//    leg.AddEntry(hB,"main","pl");
+
 
     cvs.cd(); 
     THStack hs("hs",hA->GetTitle());
     hs.Add(hA);
     hs.Add(hB);
+    hs.Add(hC);
     hs.Draw("HISTnostack");
 
-	cout<<hA->GetBinContent(5)<<endl;
-	cout<<hB->GetBinContent(5)<<endl;
-    ks=hA->KolmogorovTest(hB,"D");
-    cout<<"KS = "<<ks<<endl;
-    TString probatext = Form( "P(KS) = %5.3g", ks );
+    ks1=hA->KolmogorovTest(hB);
+    ks2=hB->KolmogorovTest(hC);
+    ks3=hC->KolmogorovTest(hA);
+    //cout<<"KS = "<<ks1<<", "<<ks2<<", "<<ks3<<endl;
+    TString probatext = Form( "P(KS) = %5.3g/%5.3g/%5.3g", ks1, ks2, ks3 );
     TText* tt = new TText( 0.55, 0.65, probatext );
     tt->SetNDC(); tt->SetTextSize( 0.032 ); tt->AppendPad();
-    KTest->Fill(ks);
+    KTest->Fill(ks1);
+    KTest->Fill(ks2);
+    KTest->Fill(ks3);
 
-    leg.Draw("same");
     cvs.SaveAs(cvsn);
   }
 
