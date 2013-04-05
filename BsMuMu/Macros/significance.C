@@ -1,6 +1,7 @@
 #include "TString.h"
 #include "TH1.h"
 #include "TH2.h"
+#include "TGraph.h"
 #include "TGaxis.h"
 #include "TFile.h"
 #include "TCanvas.h"
@@ -18,7 +19,7 @@ const double nbkg_barrel  = 28884.;
 const double nsig_endcap  = 35.;
 const double nbkg_endcap  = 35392.;
 
-void significance(TString method="BDT",TString region="barrel") {
+void significance(TString method="BDT",TString region="barrel", TString index="0") {
   
   double nsig, nbkg;
   if(region=="barrel") {
@@ -32,8 +33,13 @@ void significance(TString method="BDT",TString region="barrel") {
   cout << "processing " << method << " for " << region << endl;
 
   TString name = method + "_" + region;
+  if(index!="") 
+    name += "_"+index;
 
-  TString fnameA = "TMVA_" + region + ".root";
+  TString fnameA = "TMVA_" + region;
+  if(index!="") 
+    fnameA += "_"+index;
+  fnameA += ".root";
   TFile* inputA = TFile::Open(fnameA);
 
   gDirectory->Cd(fnameA+":/Method_"+method+"/"+method);
@@ -41,7 +47,7 @@ void significance(TString method="BDT",TString region="barrel") {
   TH1F* tmva_s = (TH1F*)gROOT->FindObject(TString("MVA_"+method+"_S_high"));
   TH1F* tmva_b = (TH1F*)gROOT->FindObject(TString("MVA_"+method+"_B_high"));
 
-  const int rb =100;
+  const int rb = 40;
   tmva_s->Rebin(rb);
   tmva_b->Rebin(rb);
 
@@ -162,6 +168,15 @@ void significance(TString method="BDT",TString region="barrel") {
    tm->Draw("same");
    c3.SaveAs(TString("plots/"+name+"_roc_zoom"+ext));
 
+   TGraph* mark = new TGraph(1);
+   mark->SetPoint(1,sig_max_effS,1.-sig_max_effB);
+   mark->SetName("marker");
+   TString outfileName("plots/signif_"+name+".root");
+   TFile* outputFile = TFile::Open( outfileName, "RECREATE" );
+   roc->Write();   
+   mark->Write();   
+   outputFile->Close();
 
+   
    inputA->Close();
 }
