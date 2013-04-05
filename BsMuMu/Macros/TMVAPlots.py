@@ -453,7 +453,7 @@ print region.title()+":"
 optimalCutBarrel = optimalCutBDT(region, expectedEventsEndcaps, estimatedBackgroundEndcaps)
 os.system("mv mvaeffs_BDT_"+region+".pdf "+figuresDir)
 
-# <rawcell>
+# <headingcell level=3>
 
 # Apply the BDT to the data and obtain the mass plot.
 
@@ -531,11 +531,115 @@ def drawVariablePlots(region, plotType = ""):
 # applyBDT("Endcaps_preselection.root", "EndcapsTMVApp.root", "endcapsWeights/", optimalCutBarrel)
 # drawMassPlot("Endcaps")
 drawVariablePlots("Barrel")
+drawVariablePlots("Endcaps")
 
 # applyBDT("Barrel_preselection_unblinded.root", "BarrelTMVAppUnblinded.root", "barrelWeights/", optimalCutBarrel)
 # drawMassPlot("Barrel", "Unblinded")
 # applyBDT("Endcaps_preselection_unblinded.root", "EndcapsTMVAppUnblinded.root", "endcapsWeights/", optimalCutBarrel)
 # drawMassPlot("Endcaps", "Unblinded")
+drawVariablePlots("Barrel", "Unblinded")
+drawVariablePlots("Endcaps", "Unblinded")
+
+# <rawcell>
+
+# Figure 19
+
+# <codecell>
+
+class TypeSettings:
+    def __init__(self, inputIndex, inputColor, inputOption):
+        self.index = inputIndex
+        self.color = inputColor
+        self.option = inputOption
+
+def drawAppBDTOutputPlots(region):
+    canvas = TCanvas("canvasMVA_BDT"+region, "canvasMVA_BDT"+region)
+    stackBDT = THStack("ApplicationBDTOutput_"+region, "ApplicationBDTOutput_"+region)
+    # histo = []
+    canvas.Draw()
+    # The loop plots only one histogram. Probably the others are removed or overwritten
+    # for plotType in [TypeSettings("", 1, ""), TypeSettings("0", 2, "same"), TypeSettings("1", 3, "same"), TypeSettings("2", 4, "same")]:
+    #     appFile = TFile(region+"TMVApp"+plotType.index+".root")
+    #     print plotType.option
+    #     histo.append(appFile.Get("MVA_BDT").Clone("ApplicationBDTOutput_"+region+plotType.index))
+    #     stackBDT.Add(histo[len(histo)-1])
+    #     # histo.Draw()
+    appFile = TFile(region+"TMVApp.root")
+    histo = appFile.Get("MVA_BDT").Clone("ApplicationBDTOutput_"+region)
+    histo.Scale(1/histo.GetEntries())
+    stackBDT.Add(histo)
+
+    appFile0 = TFile(region+"TMVApp0.root")
+    histo0 = appFile0.Get("MVA_BDT").Clone("ApplicationBDTOutput_"+region+"0")
+    histo0.SetLineColor(2)
+    histo0.Scale(1/histo0.GetEntries())
+    stackBDT.Add(histo0)
+
+    appFile1 = TFile(region+"TMVApp1.root")
+    histo1 = appFile1.Get("MVA_BDT").Clone("ApplicationBDTOutput_"+region+"1")
+    histo1.SetLineColor(8)
+    histo1.Scale(1/histo1.GetEntries())
+    stackBDT.Add(histo1)
+
+    appFile2 = TFile(region+"TMVApp2.root")
+    histo2 = appFile2.Get("MVA_BDT").Clone("ApplicationBDTOutput_"+region+"2")
+    histo2.SetLineColor(4)
+    histo2.Scale(1/histo2.GetEntries())
+    stackBDT.Add(histo2)
+
+    stackBDT.Draw("nostack")
+
+    if region.find("BsMC") != -1:
+        applicationBDTLegend = TLegend(0.2,0.7,0.5,0.9,"","brNDC")
+        applicationBDTLegend.SetHeader("Bs MC "+region.split("BsMC")[1])
+    else:
+        applicationBDTLegend = TLegend(0.55,0.7,0.85,0.9,"","brNDC")
+        applicationBDTLegend.SetHeader(region)
+    applicationBDTLegend.AddEntry(histo, "Full sample", "l")
+    applicationBDTLegend.AddEntry(histo0, "Trained on 0, tested on 1, applied on 2", "l")
+    applicationBDTLegend.AddEntry(histo1, "Trained on 1, tested on 2, applied on 0", "l")
+    applicationBDTLegend.AddEntry(histo2, "Trained on 2, tested on 0, applied on 1", "l")
+    applicationBDTLegend.Draw("same")
+    applicationBDTLegend.SetFillColor(0)
+    applicationBDTLegend.SetLineColor(0)
+
+    # appFile = TFile(region+"TMVApp1.root")
+    # appFile.Get("MVA_BDT").Draw()
+    canvas.SaveAs(figuresDir+"ApplicationBDTOutput_"+region+".pdf")
+
+# Barrel
+# Applied on 2, trained on 0 (tested on 1)
+# applyBDT("Barrel_preselection_2.root", "BarrelTMVApp0.root", "barrel0Weights/", optimalCutBarrel)
+# Applied on 0, trained on 1 (tested on 2)
+# applyBDT("Barrel_preselection_0.root", "BarrelTMVApp1.root", "barrel1Weights/", optimalCutBarrel)
+# Applied on 1, trained on 2 (tested on 0)
+# applyBDT("Barrel_preselection_1.root", "BarrelTMVApp2.root", "barrel2Weights/", optimalCutBarrel)
+
+drawAppBDTOutputPlots("Barrel")
+
+# applyBDT("BsMC12_barrel_preselection.root", "BsMCBarrelTMVApp.root", "barrelWeights/", optimalCutBarrel)
+# applyBDT("BsMC12_barrel_preselection_2.root", "BsMCBarrelTMVApp0.root", "barrel0Weights/", optimalCutBarrel)
+# applyBDT("BsMC12_barrel_preselection_0.root", "BsMCBarrelTMVApp1.root", "barrel1Weights/", optimalCutBarrel)
+# applyBDT("BsMC12_barrel_preselection_1.root", "BsMCBarrelTMVApp2.root", "barrel2Weights/", optimalCutBarrel)
+
+drawAppBDTOutputPlots("BsMCBarrel")
+
+# Endcaps
+# Applied on 2, trained on 0 (tested on 1)
+# applyBDT("Endcaps_preselection_2.root", "EndcapsTMVApp0.root", "endcaps0Weights/", optimalCutEndcaps)
+# Applied on 0, trained on 1 (tested on 2)
+# applyBDT("Endcaps_preselection_0.root", "EndcapsTMVApp1.root", "endcaps1Weights/", optimalCutEndcaps)
+# Applied on 1, trained on 2 (tested on 0)
+# applyBDT("Endcaps_preselection_1.root", "EndcapsTMVApp2.root", "endcaps2Weights/", optimalCutEndcaps)
+
+drawAppBDTOutputPlots("Endcaps")
+
+# applyBDT("BsMC12_endcaps_preselection.root", "BsMCEndcapsTMVApp.root", "endcapsWeights/", optimalCutEndcaps)
+# applyBDT("BsMC12_endcaps_preselection_2.root", "BsMCEndcapsTMVApp0.root", "endcaps0Weights/", optimalCutEndcaps)
+# applyBDT("BsMC12_endcaps_preselection_0.root", "BsMCEndcapsTMVApp1.root", "endcaps1Weights/", optimalCutEndcaps)
+# applyBDT("BsMC12_endcaps_preselection_1.root", "BsMCEndcapsTMVApp2.root", "endcaps2Weights/", optimalCutEndcaps)
+
+drawAppBDTOutputPlots("BsMCEndcaps")
 
 # <codecell>
 
