@@ -365,7 +365,6 @@ Onia2MuMuPAT::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
                 pair<bool,Measurement1D> tkPVdist = IPTools::absoluteImpactParameter3D(tt,myVertex);
                 vertexWeight += theOriginalPV.trackWeight(*itVtx);
                 if(track.pt() > 0.5 && tkPVdist.second.value()<0.03) ++Ntrk;
-
                 // Use all tracks
                 if( tkPVdist.first ) {
                   if( tkPVdist.second.value()<minDca ) minDca = tkPVdist.second.value();
@@ -484,6 +483,12 @@ gotoVertexFound:
             myCand.addUserFloat("delta3d",delta3d.second.value());
             myCand.addUserFloat("delta3dErr",delta3d.second.error());
           }
+          // Longitudinal IP
+          pair<bool,Measurement1D> pvlip = IPTools::signedDecayLength3D(tt,GlobalVector(0,0,1),thePrimaryV);
+          if( pvlip.first ) {
+            myCand.addUserFloat("pvlip",pvlip.second.value());
+            myCand.addUserFloat("pvlipErr",pvlip.second.error());
+          }
 
           if (addMuonlessPrimaryVertex_)
             myCand.addUserData("muonlessPV",Vertex(thePrimaryV));
@@ -545,6 +550,8 @@ gotoVertexFound:
           myCand.addUserFloat("ppdlErrPV",-100);
           myCand.addUserFloat("cosAlphaXY",-100);
           myCand.addUserFloat("cosAlpha3D",-100);
+          myCand.addUserFloat("pvlip",-9999);
+          myCand.addUserFloat("pvlipErr",-9999);
           myCand.addUserFloat("l3d",-100);
           myCand.addUserFloat("l3dsig",-100);
           myCand.addUserFloat("lxy",-100);
