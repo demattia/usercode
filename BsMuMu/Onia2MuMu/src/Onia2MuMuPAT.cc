@@ -179,13 +179,17 @@ Onia2MuMuPAT::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
       // ---- fit vertex using Tracker tracks (if they have tracks) ----
       if (it->track().isNonnull() && it2->track().isNonnull()) {
 
-        if (it->track()->pt()==it2->track()->pt()) continue; //against split-muons
+        //if (fabs(it->track()->pt()-it2->track()->pt()) < 1.e-5 ) continue; //against split-muons (if using == it can create problems)
+	if(deltaR(m1p4.eta(),m1p4.phi(),m2p4.eta(), m2p4.phi()) < 1.e-5) continue;
+
         double M2=myCand.mass();
         if (addThirdTrack_ && (it->charge()!=it2->charge()) && M2 > diMuMassMin_ && M2 < diMuMassMax_)
           TrackFound=searchForTheThirdTrack(iEvent, iSetup, my3Cand, &(*it), &(*it2),PVDiMuTk,track,resolveAmbiguity_);
 
         if (TrackFound){
-          my3Cand.addUserData("PVwithmuons",PVDiMuTk);
+	  if (addMuonlessPrimaryVertex_) my3Cand.addUserData("muonlessPV",PVDiMuTk);
+          else my3Cand.addUserData("PVwithmuons",PVDiMuTk);
+
           if (addCommonVertex_) {
             vector<TransientTrack> t_tks3;
             t_tks3.push_back(theTTBuilder->build(*it->track()));  // pass the reco::Track, not the reco::TrackRef (which can be transient)
@@ -200,7 +204,8 @@ Onia2MuMuPAT::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
           my3Cand.addDaughter(tkcand,"Kaon");
         }else{
           if (addCommonVertex_) my3Cand.addUserData("commonVertex",Vertex());
-          my3Cand.addUserData("PVwithmuons",Vertex());
+	  if (addMuonlessPrimaryVertex_) my3Cand.addUserData("muonlessPV",Vertex());
+          else my3Cand.addUserData("PVwithmuons",Vertex());
         }
 
         //build the dimuon secondary vertex
@@ -306,7 +311,7 @@ Onia2MuMuPAT::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
               const reco::Muon *rmu2 = dynamic_cast<const reco::Muon *>(it2->originalObject());
               // check that muons are truly from reco::Muons (and not, e.g., from PF Muons)
               // also check that the tracks really come from the track collection used for the BS
-              if (rmu1 != 0 && rmu2 != 0 && rmu1->track().id() == pvtracks.id() && rmu2->track().id() == pvtracks.id()) {
+              if (rmu1 != 0 && rmu2 != 0 && (rmu1->track().id() == pvtracks.id() || rmu2->track().id() == pvtracks.id())) {
                 if( thePrimaryV.hasRefittedTracks() ) {
                   // Need to go back to the original tracks before taking the key
                   std::vector<reco::Track>::const_iterator itRefittedTrack = thePrimaryV.refittedTracks().begin();
@@ -386,7 +391,7 @@ Onia2MuMuPAT::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
                 countTksOfPV++;
               }
             }
-          } catch (std::exception & err) {std::cout << " muon Selection%G�%@failed " << std::endl; return ; }
+          } catch (std::exception & err) {std::cout << " muon Selection failed " << std::endl; return ; }
 
           // -----Count the number of the tracks not associated to any vertex--------
           Handle<TrackCollection> tkColl;
@@ -400,7 +405,8 @@ Onia2MuMuPAT::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
             for(VertexCollection::const_iterator itv = priVtxs->begin(), itvend = priVtxs->end(); itv != itvend; ++itv){
               for( reco::Vertex::trackRef_iterator itVtx = itv->tracks_begin(); itVtx != itv->tracks_end(); ++itVtx) {
                 if( itVtx->isNonnull() ) {
-                  if(tk->pt() == (*itVtx)->pt() && tk->eta()==(*itVtx)->eta()) {
+		  if (deltaR(tk->eta(),tk->phi(),(*itVtx)->eta(),(*itVtx)->phi())<1.e-5){
+		    //if(tk->pt() == (*itVtx)->pt() && tk->eta()==(*itVtx)->eta()) {
                     hasVertex = true;
                     // Found a vertex, break out of all loops and go the identifier "gotoVertexFound"
                     goto gotoVertexFound;
@@ -410,8 +416,10 @@ Onia2MuMuPAT::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
             }
 gotoVertexFound:
             if(hasVertex) continue;
-            if(rmu1 != 0 && (*rmu1->innerTrack()).pt() == tk->pt() && (*rmu1->innerTrack()).eta() == tk->eta()) continue;
-            if(rmu2 != 0 && (*rmu2->innerTrack()).pt() == tk->pt() && (*rmu2->innerTrack()).eta() == tk->eta()) continue;
+	    if (rmu1 != 0 && (deltaR(rmu1->innerTrack()->eta(),rmu1->innerTrack()->phi(),tk->eta(),tk->phi())< 1.e-5)) continue;
+	    if (rmu2 != 0 && (deltaR(rmu2->innerTrack()->eta(),rmu2->innerTrack()->phi(),tk->eta(),tk->phi())< 1.e-5)) continue;
+            //if(rmu1 != 0 && (*rmu1->innerTrack()).pt() == tk->pt() && (*rmu1->innerTrack()).eta() == tk->eta()) continue;
+            //if(rmu2 != 0 && (*rmu2->innerTrack()).pt() == tk->pt() && (*rmu2->innerTrack()).eta() == tk->eta()) continue;
             TransientTrack tt = theTTBuilder->build(*tk);
             // Count number of close tracks not associated to any PV
             pair<bool,Measurement1D> tkPVdist = IPTools::absoluteImpactParameter3D(tt,myVertex);
@@ -740,16 +748,23 @@ bool Onia2MuMuPAT::searchForTheThirdTrack(const edm::Event& iEvent, const edm::E
   double tmpProb=-1, errorMass=-1;
   TransientVertex SVtx;
   Track track;
+  TrackRef tref;
   int charge=10;
+
+  TLorentzVector mu1P4=TLorentzVector(mu1->innerTrack()->px(),mu1->innerTrack()->py(),mu1->innerTrack()->pz(),mu1->energy());
+  TLorentzVector mu2P4=TLorentzVector(mu2->innerTrack()->px(),mu2->innerTrack()->py(),mu2->innerTrack()->pz(),mu2->energy());
+  TLorentzVector trackP4;
 
   for (TrackCollection::const_iterator tk = tkColl->begin(); tk != tkColl->end(); ++tk) {
 
+    trackP4=TLorentzVector(tk->px(),tk->py(),tk->pz(), sqrt((tk->p()*tk->p())+(trackMass_*trackMass_)));
+
     if (!tk->quality(TrackBase::highPurity)) continue;
     if (tk->pt() < minTrackPt_) continue;
-    if (tk->pt()==mu1->innerTrack()->pt() || tk->pt()==mu2->innerTrack()->pt()) continue;
 
-    TLorentzVector dimuP4=TLorentzVector(mu1->px()+mu2->px(),mu1->py()+mu2->py(),mu1->pz()+mu2->pz(),mu1->energy()+mu2->energy());
-    TLorentzVector trackP4=TLorentzVector(tk->px(),tk->py(),tk->pz(), sqrt((tk->p()*tk->p())+(trackMass_*trackMass_)));
+    if ((trackP4.DeltaR(mu1P4) < 1.e-5) || (trackP4.DeltaR(mu2P4) < 1.e-5)) continue;
+
+    TLorentzVector dimuP4=mu1P4+mu2P4;//TLorentzVector(mu1->px()+mu2->px(),mu1->py()+mu2->py(),mu1->pz()+mu2->pz(),mu1->energy()+mu2->energy());
     TLorentzVector totP4=dimuP4+trackP4;
 
     if (totP4.M() > diMuPlusTrackMassMax_ || totP4.M() < diMuPlusTrackMassMin_) continue;
@@ -784,14 +799,12 @@ bool Onia2MuMuPAT::searchForTheThirdTrack(const edm::Event& iEvent, const edm::E
   }
 
   if (found){
-    
+
     ktk=Track(track);
+    trackP4=TLorentzVector(track.px(),track.py(),track.pz(), sqrt((track.p()*track.p())+(trackMass_*trackMass_)));
     LorentzVector vtk=LorentzVector(track.px(),track.py(),track.pz(),sqrt((track.p()*track.p())+(trackMass_*trackMass_)));
     LorentzVector jpsi = mu1->p4() + mu2->p4();
     Cand.setP4(jpsi+vtk);
-
-    // LeafCandidate tkcand=LeafCandidate(track.charge(),vtk);
-    //Cand.addDaughter(tkcand,"Kaon");
 
     charge=mu1->charge()+mu2->charge()+track.charge();
     Cand.setCharge(charge);
@@ -848,34 +861,63 @@ bool Onia2MuMuPAT::searchForTheThirdTrack(const edm::Event& iEvent, const edm::E
       }
     }
 
+    if (addMuonlessPrimaryVertex_) buildMuonlessPV(iEvent,iSetup, mu1,mu2,track,thePrimaryV);
     PV=Vertex(thePrimaryV);
-
+    
     // count the number of high Purity tracks with pT > 900 MeV attached to the chosen vertex
     double vertexWeight = 0., sumPTPV = 0.;
     int countTksOfPV = 0, Ntrk=0;
     double minDca = 9999.;
+    double minDcaDR0p7 = 9999.;
+    double minDcaDR0p7PtMin0p5 = 9999.;
+    double minDcaDR0p7PtMin0p9 = 9999.;
+    double minDcaPtMin0p5 = 9999.;
+    double minDcaPtMin0p9 = 9999.;
+    double sumNdof = 0.;
+    double PVndof = thePrimaryV.ndof();
+    Cand.addUserFloat("PVndof",(float) PVndof);
+    Cand.addUserFloat("pvw8",(float) (thePrimaryV.ndof()+2)/(2*thePrimaryV.tracksSize()));
 
     for(reco::Vertex::trackRef_iterator itVtx = thePrimaryV.tracks_begin(); itVtx != thePrimaryV.tracks_end(); itVtx++){
       if(itVtx->isNonnull()){
         const reco::Track& trk = **itVtx;
-        if (trk.pt()==mu1->innerTrack()->pt() || trk.pt()==mu2->innerTrack()->pt() || trk.pt()==track.pt()) continue;
+
+	TLorentzVector tmpP4=TLorentzVector(trk.px(),trk.py(),trk.pz(),1.0);
+
+	if ((tmpP4.DeltaR(mu1P4) < 1.e-5) || (tmpP4.DeltaR(mu2P4) < 1.e-5) || (tmpP4.DeltaR(trackP4) < 1.e-5)) continue;
+
+	//if (trk.pt()==mu1->innerTrack()->pt() || trk.pt()==mu2->innerTrack()->pt() || trk.pt()==track.pt()) continue;
+
         //if(!track.quality(reco::TrackBase::highPurity)) continue;
         TransientTrack tt = theTTBuilder->build(trk);
         pair<bool,Measurement1D> tkPVdist = IPTools::absoluteImpactParameter3D(tt,SVtx);
+
         vertexWeight += thePrimaryV.trackWeight(*itVtx);
         if(track.pt() > 0.5 && tkPVdist.second.value()<0.03) ++Ntrk;
+
+	if( tkPVdist.first ) {
+	  if( tkPVdist.second.value()<minDca ) minDca = tkPVdist.second.value();
+	  if( track.pt() > 0.5 && tkPVdist.second.value()<minDcaPtMin0p5 ) minDcaPtMin0p5 = tkPVdist.second.value();
+	  if( track.pt() > 0.9 && tkPVdist.second.value()<minDcaPtMin0p9 ) minDcaPtMin0p9 = tkPVdist.second.value();
+	}
+
+
         if(deltaR(track.eta(),track.phi(),Cand.eta(),Cand.phi()) < 0.7) {
           // cout<<"myCand.eta"<<myCand.eta()<<"myCand.phi"<<myCand.phi()<<endl;
-          if (tkPVdist.first && tkPVdist.second.value()<minDca){
-            minDca = tkPVdist.second.value();
-          }
+	  if( tkPVdist.first ) {
+	    if( tkPVdist.second.value()<minDcaDR0p7 ) minDcaDR0p7 = tkPVdist.second.value();
+	    if( track.pt() > 0.5 && tkPVdist.second.value()<minDcaDR0p7PtMin0p5 ) minDcaDR0p7PtMin0p5 = tkPVdist.second.value();
+	    if( track.pt() > 0.9 && tkPVdist.second.value()<minDcaDR0p7PtMin0p9 ) minDcaDR0p7PtMin0p9 = tkPVdist.second.value();
+	  }
+
           if(track.pt() < 0.9) continue; //reject all rejects from counting if less than 900 MeV
           sumPTPV += track.pt();
-          countTksOfPV++;
-        }
+	}
+	sumNdof += track.ndof();
+	countTksOfPV++;
       }
     }
-
+    
     // now tracks outside the PV fit
     double sumPt_noVtx = 0.;
     int countTksOfnoVtx = 0;
@@ -885,16 +927,32 @@ bool Onia2MuMuPAT::searchForTheThirdTrack(const edm::Event& iEvent, const edm::E
       for(VertexCollection::const_iterator itv = priVtxs->begin(), itvend = priVtxs->end(); itv != itvend; ++itv) {
         for( reco::Vertex::trackRef_iterator itVtx = itv->tracks_begin(); itVtx != itv->tracks_end(); ++itVtx) {
           if( itVtx->isNonnull() ) {
-            if(tk->pt() == (*itVtx)->pt() && tk->eta()==(*itVtx)->eta()) {
+            if(deltaR(tk->eta(),tk->phi(),(*itVtx)->eta(),(*itVtx)->phi()) < 1.e-5) {
               hasVertex=true;
-              if (!hasVertex && (tk->pt()!=mu1->innerTrack()->pt() && tk->pt()!=mu2->innerTrack()->pt() && tk->pt()==track.pt())){
+	      bool isAlreadySelected=false;
+
+	      if ((deltaR(mu1->innerTrack()->eta(),mu1->innerTrack()->phi(),tk->eta(),tk->phi()) < 1.e-5) ||
+		  (deltaR(mu2->innerTrack()->eta(),mu2->innerTrack()->phi(),tk->eta(),tk->phi()) < 1.e-5) ||
+		  (deltaR(track.eta(),track.phi(),tk->eta(),tk->phi()) < 1.e-5)) isAlreadySelected=true;
+
+              if (!hasVertex && !isAlreadySelected){
                 TransientTrack tt = theTTBuilder->build(*tk);
                 pair<bool,Measurement1D> tkPVdist = IPTools::absoluteImpactParameter3D(tt,SVtx);
                 if(tk->pt() > 0.5 && tkPVdist.second.value()<0.03) ++Ntrk;
-                if (deltaR(tk->eta(),tk->phi(),Cand.eta(), Cand.phi())< 0.7) {
-                  if (tkPVdist.first && tkPVdist.second.value()<minDca){
-                    minDca = tkPVdist.second.value();
-                  }
+
+		if( tkPVdist.first ) {
+		  if( tkPVdist.second.value()<minDca ) minDca = tkPVdist.second.value();
+		  if( tk->pt() > 0.5 && tkPVdist.second.value()<minDcaPtMin0p5 ) minDcaPtMin0p5 = tkPVdist.second.value();
+		  if( tk->pt() > 0.9 && tkPVdist.second.value()<minDcaPtMin0p9 ) minDcaPtMin0p9 = tkPVdist.second.value();
+		}
+
+		if(deltaR(tk->eta(),tk->phi(),Cand.eta(), Cand.phi()) < 0.7) {
+		  if( tkPVdist.first ) {
+		    if( tkPVdist.second.value()<minDcaDR0p7 ) minDcaDR0p7 = tkPVdist.second.value();
+		    if( tk->pt() > 0.5 && tkPVdist.second.value()<minDcaDR0p7PtMin0p5 ) minDcaDR0p7PtMin0p5 = tkPVdist.second.value();
+		    if( tk->pt() > 0.9 && tkPVdist.second.value()<minDcaDR0p7PtMin0p9 ) minDcaDR0p7PtMin0p9 = tkPVdist.second.value();
+		  }
+		  
                   if(tk->pt()<0.9) continue;
                   if(tkPVdist.second.value() > 0.05) continue;
                   sumPt_noVtx += tk->pt();
@@ -911,10 +969,14 @@ bool Onia2MuMuPAT::searchForTheThirdTrack(const edm::Event& iEvent, const edm::E
 
     Cand.addUserFloat("Isolation", (float) Iso);
     Cand.addUserFloat("minDca", (float) minDca);
+    Cand.addUserFloat("minDcaDr0p7", (float) minDcaDR0p7);
+    Cand.addUserFloat("minDcaDr0p7Min0p5", (float) minDcaDR0p7PtMin0p5);
+    Cand.addUserFloat("minDcaDr0p7Min0p9", (float) minDcaDR0p7PtMin0p9);
     Cand.addUserInt("Ntrk", Ntrk);
     Cand.addUserInt("countTksOfPV", countTksOfPV);
     Cand.addUserFloat("vertexWeight", (float) vertexWeight);
     Cand.addUserFloat("sumPTPV", (float) sumPTPV);
+    Cand.addUserFloat("sumNdof", (float) sumNdof);
 
     TrajectoryStateClosestToPoint mu1TS = (theTTBuilder->build(mu1->track())).impactPointTSCP();
     TrajectoryStateClosestToPoint mu2TS = (theTTBuilder->build(mu2->track())).impactPointTSCP();
@@ -933,34 +995,60 @@ bool Onia2MuMuPAT::searchForTheThirdTrack(const edm::Event& iEvent, const edm::E
       Cand.addUserFloat("delta3dErr",delta3d.second.error());
     }
 
+    // Longitudinal IP
+    pair<bool,Measurement1D> pvlip = IPTools::signedDecayLength3D(tt,GlobalVector(0,0,1),thePrimaryV);
+    if( pvlip.first ) {
+      Cand.addUserFloat("pvlip",pvlip.second.value());
+      Cand.addUserFloat("pvlipErr",pvlip.second.error());
+    }
+
     //lifetime etc...
 
-    TVector3 vtx;
-    TVector3 pvtx;
-    VertexDistanceXY vdistXY;
+    TVector3 vtx,vtx3D;
+    TVector3 pvtx,pvtx3D;
+    VertexDistanceXY vdistXY,vdist3D;
     vtx.SetXYZ(SVtx.position().x(),SVtx.position().y(),0);
     TVector3 pperp(Cand.px(), Cand.py(), 0);
     AlgebraicVector3 vpperp(pperp.x(),pperp.y(),0);
 
+    vtx3D.SetXYZ(SVtx.position().x(),SVtx.position().y(),SVtx.position().z());
+    TVector3 pCand((jpsi+vtk).px(), (jpsi+vtk).py(), (jpsi+vtk).pz());
+
     //using PV
     pvtx.SetXYZ(thePrimaryV.position().x(),thePrimaryV.position().y(),0);
     TVector3 vdiff = vtx - pvtx;
-    double cosAlpha = vdiff.Dot(pperp)/(vdiff.Perp()*pperp.Perp());
+    double cosAlphaXY = vdiff.Dot(pperp)/(vdiff.Perp()*pperp.Perp());
     Measurement1D distXY = vdistXY.distance(Vertex(SVtx), thePrimaryV);
-    double ctauPV = distXY.value()*cosAlpha * Cand.mass()/pperp.Perp();
+    double ctauPV = distXY.value()*cosAlphaXY * Cand.mass()/pperp.Perp();
     GlobalError v1e = (Vertex(SVtx)).error();
     GlobalError v2e = thePrimaryV.error();
     AlgebraicSymMatrix33 vXYe = v1e.matrix() + v2e.matrix();
     double ctauErrPV = sqrt(ROOT::Math::Similarity(vpperp,vXYe))*Cand.mass()/(pperp.Perp2());
-    
+    double lxy = distXY.value();
+    double lxysig = lxy/distXY.error();    
+
+
+    pvtx3D.SetXYZ(thePrimaryV.position().x(),thePrimaryV.position().y(),thePrimaryV.position().z());
+    TVector3 vdiff3D = vtx3D - pvtx3D;
+    double cosAlpha3D = vdiff3D.Dot(pCand)/(vdiff3D.Mag()*pCand.Mag());
+    Measurement1D dist3D = vdist3D.distance(Vertex(SVtx), thePrimaryV);
+    double l3d = dist3D.value();
+    double l3dsig = l3d/dist3D.error();
+
+
     Cand.addUserFloat("ppdlPV",ctauPV);
     Cand.addUserFloat("ppdlErrPV",ctauErrPV);
-    Cand.addUserFloat("cosAlpha",cosAlpha);
+    Cand.addUserFloat("cosAlphaXY",cosAlphaXY);
+    Cand.addUserFloat("cosAlpha3D",cosAlpha3D);
+    Cand.addUserFloat("l3d",l3d);
+    Cand.addUserFloat("l3dsig",l3dsig);
+    Cand.addUserFloat("lxy",lxy);
+    Cand.addUserFloat("lxysig",lxysig);
     
     //using BS
     pvtx.SetXYZ(theBeamSpotV.position().x(),theBeamSpotV.position().y(),0);
     vdiff = vtx - pvtx;
-    cosAlpha = vdiff.Dot(pperp)/(vdiff.Perp()*pperp.Perp());
+    double cosAlpha = vdiff.Dot(pperp)/(vdiff.Perp()*pperp.Perp());
     distXY = vdistXY.distance(Vertex(SVtx), theBeamSpotV);
     double ctauBS = distXY.value()*cosAlpha*Cand.mass()/pperp.Perp();
     GlobalError v1eB = (Vertex(SVtx)).error();
@@ -975,12 +1063,24 @@ bool Onia2MuMuPAT::searchForTheThirdTrack(const edm::Event& iEvent, const edm::E
     Cand.addUserFloat("vNChi2",-1);
     Cand.addUserFloat("vProb", -1);
     Cand.addUserFloat("ppdlPV",-100);
+    Cand.addUserFloat("pvw8", -1.);
     Cand.addUserFloat("ppdlErrPV",-100);
-    Cand.addUserFloat("cosAlpha",-100);
+    Cand.addUserFloat("cosAlphaXY",-100);
+    Cand.addUserFloat("PVndof", -1.);
+    Cand.addUserFloat("cosAlpha3D",-100);
+    Cand.addUserFloat("pvlip",-9999);
+    Cand.addUserFloat("pvlipErr",-9999);
+    Cand.addUserFloat("l3d",-100);
+    Cand.addUserFloat("l3dsig",-100);
+    Cand.addUserFloat("lxy",-100);
+    Cand.addUserFloat("lxysig",-100);
     Cand.addUserFloat("ppdlBS",-100);
     Cand.addUserFloat("ppdlErrBS",-100);
     Cand.addUserFloat("Isolation", -1);
     Cand.addUserFloat("minDca", -1);
+    Cand.addUserFloat("minDcaDr0p7", -1);
+    Cand.addUserFloat("minDcaDr0p7Min0p5", -1);
+    Cand.addUserFloat("minDcaDr0p7Min0p9", -1);
     Cand.addUserInt("Ntrk", 9999);
     Cand.addUserInt("countTksOfPV", 9999);
     Cand.addUserFloat("vertexWeight", -1);
@@ -990,9 +1090,77 @@ bool Onia2MuMuPAT::searchForTheThirdTrack(const edm::Event& iEvent, const edm::E
     Cand.addUserFloat("MassErr",-1);
     Cand.addUserFloat("DCAXY", -1);
     Cand.addUserFloat("DCA", -1);
+    Cand.addUserFloat("sumNdof", -1);
+    
   }
   
   return found;
+}
+
+// ---- method to build the PV without the candidate tracks included ----------
+
+void Onia2MuMuPAT::buildMuonlessPV(const edm::Event& iEvent, const edm::EventSetup& iSetup,const pat::Muon * rmu1,const pat::Muon * rmu2, const reco::Track & track, reco::Vertex & thePrimaryV){
+  using namespace edm;
+  using namespace std;
+  using namespace reco;
+  typedef Candidate::LorentzVector LorentzVector;
+
+  TrackCollection muonLess;
+
+  Handle<VertexCollection> priVtxs;
+  iEvent.getByLabel(thePVs_, priVtxs);
+
+  Handle<BeamSpot> theBeamSpot;
+  iEvent.getByLabel(thebeamspot_,theBeamSpot);
+  
+  VertexReProducer revertex(priVtxs, iEvent);
+  Handle<TrackCollection> pvtracks;
+  iEvent.getByLabel(revertex.inputTracks(),   pvtracks);
+  if( !pvtracks.isValid()) {cout << "PV tracks not valid!!" << endl; return;}
+
+  Handle<BeamSpot>        pvbeamspot;
+  iEvent.getByLabel(revertex.inputBeamSpot(), pvbeamspot);
+  if (pvbeamspot.id() != theBeamSpot.id()) edm::LogWarning("Inconsistency") << "The BeamSpot used for PV reco is not the same used in this analyzer.";
+
+  //to see if the track is in pv fit
+  bool tkIn=false;
+
+  for (TrackCollection::const_iterator tk = pvtracks->begin(); tk != pvtracks->end(); ++tk) {
+    double dR=deltaR(tk->eta(),tk->phi(),track.eta(),track.phi());
+    if (dR<1.e-5) tkIn=true;
+  }
+
+  if (rmu1->track().id() == pvtracks.id() || rmu2->track().id() == pvtracks.id() || tkIn) {
+    if( thePrimaryV.hasRefittedTracks() ) {
+      // Need to go back to the original tracks before taking the key
+      std::vector<reco::Track>::const_iterator itRefittedTrack = thePrimaryV.refittedTracks().begin();
+      std::vector<reco::Track>::const_iterator refittedTracksEnd = thePrimaryV.refittedTracks().end();
+      for( ; itRefittedTrack != refittedTracksEnd; ++itRefittedTrack ) {
+	if( thePrimaryV.originalTrack(*itRefittedTrack).key() == rmu1->track().key() ) continue;
+	if( thePrimaryV.originalTrack(*itRefittedTrack).key() == rmu2->track().key() ) continue;
+	if( deltaR(thePrimaryV.originalTrack(*itRefittedTrack)->eta(),thePrimaryV.originalTrack(*itRefittedTrack)->phi(),track.eta(),track.phi()) < 1.e-5) continue;
+	//if( thePrimaryV.originalTrack(*itRefittedTrack).key() == track.key() ) continue;
+	muonLess.push_back(*(thePrimaryV.originalTrack(*itRefittedTrack)));
+      }
+    }
+    else {
+      std::vector<reco::TrackBaseRef>::const_iterator itPVtrack = thePrimaryV.tracks_begin();
+      for( ; itPVtrack != thePrimaryV.tracks_end(); ++itPVtrack ) if (itPVtrack->isNonnull()) {
+	if( itPVtrack->key() == rmu1->track().key() ) continue;
+	if( itPVtrack->key() == rmu2->track().key() ) continue;
+	if(deltaR((*itPVtrack)->eta(),(*itPVtrack)->phi(),track.eta(),track.phi())< 1.e-5) continue;
+	muonLess.push_back(**itPVtrack);
+      }
+    }
+    if (muonLess.size()>1 && muonLess.size() < thePrimaryV.tracksSize()){
+      vector<TransientVertex> pvs;
+      pvs = revertex.makeVertices(muonLess, *pvbeamspot, iSetup) ;
+      if (!pvs.empty()) {
+	Vertex muonLessPV = Vertex(pvs.front());
+	thePrimaryV = muonLessPV;
+      }
+    }    
+  }
 }
 
 // ------------ method called once each job just before starting event loop  ------------
