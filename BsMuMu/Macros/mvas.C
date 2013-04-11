@@ -12,7 +12,7 @@ enum HistType { MVAType = 0, ProbaType = 1, RarityType = 2, CompareType = 3 };
 
 // input: - Input file (result from TMVA)
 //        - use of TMVA plotting TStyle
-void mvas( TString fin = "TMVA.root", HistType htype = MVAType, Bool_t useTMVAStyle = kTRUE )
+void mvas( TString fin = "TMVA.root", HistType htype = MVAType, Bool_t useTMVAStyle = kTRUE, Int_t logy = 0)
 {
    // set style and remove existing canvas'
    TMVAGlob::Initialize( useTMVAStyle );
@@ -110,15 +110,18 @@ void mvas( TString fin = "TMVA.root", HistType htype = MVAType, Bool_t useTMVASt
          Float_t nrms = 10;
          cout << "--- Mean and RMS (S): " << sig->GetMean() << ", " << sig->GetRMS() << endl;
          cout << "--- Mean and RMS (B): " << bgd->GetMean() << ", " << bgd->GetRMS() << endl;
-         Float_t xmin = TMath::Max( TMath::Min(sig->GetMean() - nrms*sig->GetRMS(), 
-                                               bgd->GetMean() - nrms*bgd->GetRMS() ),
-                                    sig->GetXaxis()->GetXmin() );
-         Float_t xmax = TMath::Min( TMath::Max(sig->GetMean() + nrms*sig->GetRMS(), 
-                                               bgd->GetMean() + nrms*bgd->GetRMS() ),
-                                    sig->GetXaxis()->GetXmax() );
-         Float_t ymin = 0;
+         //Float_t xmin = TMath::Max( TMath::Min(sig->GetMean() - nrms*sig->GetRMS(), 
+         //                                      bgd->GetMean() - nrms*bgd->GetRMS() ),
+         //                           sig->GetXaxis()->GetXmin() );
+         //Float_t xmax = TMath::Min( TMath::Max(sig->GetMean() + nrms*sig->GetRMS(), 
+         //                                      bgd->GetMean() + nrms*bgd->GetRMS() ),
+         //                           sig->GetXaxis()->GetXmax() );
+		 Float_t xmin = -1;
+		 Float_t xmax = 1;
+ 		 Float_t ymin = 0;
+		 Float_t ymax = 9;
          Float_t maxMult = (htype == CompareType) ? 1.3 : 1.2;
-         Float_t ymax = TMath::Max( sig->GetMaximum(), bgd->GetMaximum() )*maxMult;
+         //Float_t ymax = TMath::Max( sig->GetMaximum(), bgd->GetMaximum() )*maxMult;
    
          // build a frame
          Int_t nb = 500;
@@ -128,11 +131,11 @@ void mvas( TString fin = "TMVA.root", HistType htype = MVAType, Bool_t useTMVASt
          TH2F* frame = new TH2F( hFrameName, sig->GetTitle(), 
                                  nb, xmin, xmax, nb, ymin, ymax );
          frame->GetXaxis()->SetTitle( methodTitle + ((htype == MVAType || htype == CompareType) ? " response" : "") );
-         if      (htype == ProbaType  ) frame->GetXaxis()->SetTitle( "Signal probability" );
+		 if      (htype == ProbaType  ) frame->GetXaxis()->SetTitle( "Signal probability" );
          else if (htype == RarityType ) frame->GetXaxis()->SetTitle( "Signal rarity" );
          frame->GetYaxis()->SetTitle("(1/N) dN^{ }/^{ }dx");
          TMVAGlob::SetFrameStyle( frame );
-   
+         gPad->SetLogy(logy);
          // eventually: draw the frame
          frame->Draw();  
     
