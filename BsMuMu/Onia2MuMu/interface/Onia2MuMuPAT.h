@@ -71,8 +71,33 @@ class Onia2MuMuPAT : public edm::EDProducer {
   GreaterByVProb<pat::CompositeCandidate> vPComparator_;
   StringCutObjectSelector<reco::Candidate, true> prefilter_;
 
+  int findVerteId( const reco::Vertex theOriginalPV, const reco::VertexCollection & priVtxs, const reco::Track & track, const double & maxDeltaR );
+  float computeDcaXY(const TrajectoryStateClosestToPoint & tt1, const TrajectoryStateClosestToPoint & tt2);
+  float computeDca(const TrajectoryStateClosestToPoint & tt1, const TrajectoryStateClosestToPoint & tt2);
+
   InvariantMassFromVertex massCalculator;
 
+  struct SimpleTrack
+  {
+    SimpleTrack(const double & inPt, const double & inEta, const double & inPhi,
+                const int inNdof, const double & inDoca,
+                const double & inDocaSignificance,
+                const int inVertexId, const bool inHighPurity) :
+      pt(inPt), eta(inEta), phi(inPhi),
+      ndof(inNdof), doca(inDoca),
+      docaSignificance(inDocaSignificance),
+      vertexId(inVertexId), highPurity(inHighPurity)
+    {}
+
+    double pt;
+    double eta;
+    double phi;
+    int ndof;
+    double doca;
+    double docaSignificance;
+    int vertexId;
+    bool highPurity;
+  };
 };
 
 //
