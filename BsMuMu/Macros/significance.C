@@ -12,14 +12,14 @@
 #include "TLegend.h"
 #include "TMarker.h"
 #include <iostream>
-#include "../Common/setTDRStyle_modified.C"
+#include "Common/setTDRStyle_modified.C"
 
 const double nsig_barrel  = 60.;
 const double nbkg_barrel  = 28884.;
 const double nsig_endcap  = 35.;
 const double nbkg_endcap  = 35392.;
 
-void significance(TString method="BDT",TString region="barrel", TString index="0") {
+void significance(TString method="BDT",TString region="barrel", TString index="") {
   
   double nsig, nbkg;
   if(region=="barrel") {
@@ -47,7 +47,7 @@ void significance(TString method="BDT",TString region="barrel", TString index="0
   TH1F* tmva_s = (TH1F*)gROOT->FindObject(TString("MVA_"+method+"_S_high"));
   TH1F* tmva_b = (TH1F*)gROOT->FindObject(TString("MVA_"+method+"_B_high"));
 
-  const int rb = 40;
+  const int rb =250;
   tmva_s->Rebin(rb);
   tmva_b->Rebin(rb);
 
@@ -62,7 +62,7 @@ void significance(TString method="BDT",TString region="barrel", TString index="0
   normS = tmva_s -> Integral(1,nbins);
   normB = tmva_b -> Integral(1,nbins);
 
-  double sumS(0), sumB(0), signi(0); 
+  double sumS(0), sumB(0), signi(0), signi1(0), signi2(0); 
 
   printf("check bins: %d  %f %f %f %f \n", nbins, xmin, xmax, sumS, normS);
 
@@ -70,6 +70,8 @@ void significance(TString method="BDT",TString region="barrel", TString index="0
   TH1F* effB = new TH1F("effB","effB",nbins,xmin,xmax);
   TH1F* rejB = new TH1F("rejB","rejB",nbins,xmin,xmax);
   TH1F* sign = new TH1F("sign","sign",nbins,xmin,xmax);
+  TH1F* sign1 = new TH1F("sign1","sign1",nbins,xmin,xmax);
+  TH1F* sign2 = new TH1F("sign2","sign2",nbins,xmin,xmax);
 
   TH2F* roc  = new TH2F("roc","roc",nbins,0,1.02,nbins,0,1.02);
 
@@ -88,6 +90,15 @@ void significance(TString method="BDT",TString region="barrel", TString index="0
     signi = sumS/sqrt(sumS + sumB);
     sign->SetBinContent(i, signi);
 
+    signi1 = sumB?sumS/sqrt(sumB):0;
+    sign1->SetBinContent(i, signi1);
+
+    signi2 = sumS/(sqrt(sumB)+0.5);
+    sign2->SetBinContent(i, signi2);
+
+    printf("--> signif : %f  %f %f\n", 
+	   signi, signi1, signi2 );
+
   }
 
   int sig_max_bin = sign->GetMaximumBin(); 
@@ -104,6 +115,7 @@ void significance(TString method="BDT",TString region="barrel", TString index="0
   //setTDRStyle(false);
   gStyle->SetOptStat(kFALSE);
   gStyle->SetFillColor(0);
+  gStyle->SetLegendBorderSize(0); 
 
   TCanvas c;
   c.SetGrid();
@@ -116,13 +128,38 @@ void significance(TString method="BDT",TString region="barrel", TString index="0
   rejB->Draw("same c");
   c.Update();  
 
-  Float_t rightmax = 1.02*sign->GetMaximum();
+  Float_t rightmax = 1.02*sign1->GetMaximum();
   Float_t scale = gPad->GetUymax()/rightmax;
-  sign->SetLineColor(8);
-  sign->Scale(scale);
-  sign->SetLineWidth(3);
 
-  sign->Draw("same c");
+  sign->Scale(scale);
+  sign1->Scale(scale);
+  sign2->Scale(scale);
+
+  sign ->SetLineColor(8);
+  sign1->SetLineColor(38);
+  sign2->SetLineColor(42);
+
+  sign ->SetLineWidth(2);
+  sign1->SetLineWidth(2);
+  sign2->SetLineWidth(2);
+
+  sign1->SetLineStyle(3);
+  sign2->SetLineStyle(2);
+
+  sign ->Draw("same c");
+  sign1->Draw("same c");
+  sign2->Draw("same c");
+
+  TLegend* leg = new TLegend(0.12,0.65,0.45,0.75);
+  //leg->SetHeader("The Legend Title");
+  char ss0[50], ss1[50],ss2[50];
+  sprintf(ss0, "S/#sqrt{S+B},     max.@ %s>%5.4f", method.Data(), effS->GetBinCenter(sign ->GetMaximumBin()));
+  sprintf(ss1, "S/#sqrt{B},          max.@ %s>%5.4f", method.Data(), effS->GetBinCenter(sign1->GetMaximumBin()));
+  sprintf(ss2, "S/(#sqrt{B}+0.5), max.@ %s>%5.4f", method.Data(), effS->GetBinCenter(sign2->GetMaximumBin()));
+  leg->AddEntry(sign ,ss0,"l");
+  leg->AddEntry(sign1,ss1,"l");
+  leg->AddEntry(sign2,ss2,"l");
+  leg->Draw();
 
 
   //draw an axis on the right side
