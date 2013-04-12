@@ -5,8 +5,8 @@
     \hline 
     Signal barrel & 11235 & 11074 & 11042 \\ 
     Signal endcaps & 6686 & 6589 & 6622 \\ 
-    Background barrel & 27338 & 27091 & 27232 \\ 
-    Background endcaps & 34455 & 34583 & 34494 \\ 
+    Background barrel & 27512 & 27381 & 27432 \\ 
+    Background endcaps & 20702 & 20615 & 20642 \\ 
     \hline 
   \end{tabular} 
   \label{tab:numCandidates} 
