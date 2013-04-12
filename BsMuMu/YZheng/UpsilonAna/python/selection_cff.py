@@ -1,65 +1,7 @@
 import FWCore.ParameterSet.Config as cms
 
-# #dimuon
-# 
-# SELECTIONCUT  = " charge = 0"
-# SELECTIONCUT += " && userFloat('vProb') > 0.001"
-# SELECTIONCUT += " && abs(rapidity) < 2."
-# SELECTIONCUT += " && abs(daughter('muon1').innerTrack.dz - daughter('muon2').innerTrack.dz) < 2."
-# 
-# #each muon
-# SELECTIONCUT += " && ((daughter('muon1').pt > 3.5 && abs(daughter('muon1').eta) < 1.6) || (daughter('muon1').pt > 2.5 && 1.6 < abs(daughter('muon1').eta) < 2.4))"
-# SELECTIONCUT += " && daughter('muon1').isTrackerMuon "
-# SELECTIONCUT += " && daughter('muon1').innerTrack.numberOfValidHits > 11 "
-# SELECTIONCUT += " && daughter('muon1').innerTrack.hitPattern.pixelLayersWithMeasurement > 0 "
-# SELECTIONCUT += " && daughter('muon1').innerTrack.normalizedChi2 < 5 "
-# SELECTIONCUT += " && abs(daughter('muon1').innerTrack.dz) < 25 "
-# SELECTIONCUT += " && abs(daughter('muon1').dB) < 0.2 "
-# #SELECTIONCUT += " && daughter('muon1').muonID('TMLastStationAngTight') "
-# 
-# SELECTIONCUT += " && ((daughter('muon2').pt > 3.5 && abs(daughter('muon2').eta) < 1.6) || (daughter('muon2').pt > 2.5 && 1.6 < abs(daughter('muon2').eta) < 2.4))"
-# SELECTIONCUT += " && daughter('muon2').isTrackerMuon "
-# SELECTIONCUT += " && daughter('muon2').innerTrack.numberOfValidHits > 11 "
-# SELECTIONCUT += " && daughter('muon2').innerTrack.hitPattern.pixelLayersWithMeasurement > 0 "
-# SELECTIONCUT += " && daughter('muon2').innerTrack.normalizedChi2 < 5 "
-# SELECTIONCUT += " && abs(daughter('muon2').innerTrack.dz) < 25 "
-# SELECTIONCUT += " && abs(daughter('muon2').dB) < 0.2 "
-# #SELECTIONCUT += " && daughter('muon2').muonID('TMLastStationAngTight') "
-# 
-# # SELECTIONCUT += " && !daughter('muon1').triggerObjectMatchesByFilter('SelectionTrigger').empty() && daughter('muon1').userFloat('muonL1Info:deltaR')<0.3"
-# # SELECTIONCUT += " && !daughter('muon2').triggerObjectMatchesByFilter('SelectionTrigger').empty() && daughter('muon2').userFloat('muonL1Info:deltaR')<0.3"
-# SELECTIONCUT += " && (!daughter('muon1').triggerObjectMatchesByFilter('SelectionTrigger').empty() || !daughter('muon1').triggerObjectMatchesByFilter('hltDoubleMu3BsL3Filtered').empty() || !daughter('muon1').triggerObjectMatchesByFilter('hltDoubleMu2BarrelBsL3Filtered').empty() || !daughter('muon1').triggerObjectMatchesByFilter('hltDoubleMu2Dimuon6BsL3Filtered').empty() || !daughter('muon1').triggerObjectMatchesByFilter('hltVertexmumuFilterBs6').empty() || !daughter('muon1').triggerObjectMatchesByFilter('hltVertexmumuFilterBs4').empty() || !daughter('muon1').triggerObjectMatchesByFilter('hltVertexmumuFilterBs345').empty() || !daughter('muon1').triggerObjectMatchesByFilter('hltVertexmumuFilterBs3p545').empty() || !daughter('muon1').triggerObjectMatchesByFilter('hltVertexmumuFilterBs47').empty())"
-# SELECTIONCUT += " && (!daughter('muon2').triggerObjectMatchesByFilter('SelectionTrigger').empty() || !daughter('muon2').triggerObjectMatchesByFilter('hltDoubleMu3BsL3Filtered').empty() || !daughter('muon2').triggerObjectMatchesByFilter('hltDoubleMu2BarrelBsL3Filtered').empty() || !daughter('muon2').triggerObjectMatchesByFilter('hltDoubleMu2Dimuon6BsL3Filtered').empty() || !daughter('muon2').triggerObjectMatchesByFilter('hltVertexmumuFilterBs6').empty() || !daughter('muon2').triggerObjectMatchesByFilter('hltVertexmumuFilterBs4').empty() || !daughter('muon1').triggerObjectMatchesByFilter('hltVertexmumuFilterBs345').empty() || !daughter('muon1').triggerObjectMatchesByFilter('hltVertexmumuFilterBs3p545').empty() || !daughter('muon1').triggerObjectMatchesByFilter('hltVertexmumuFilterBs47').empty())"
-
-# yieldTree = cms.EDFilter('ProbeTreeProducer',
-#     src = cms.InputTag("onia2MuMuPatTrkTrk"),
-#     cut = cms.string(SELECTIONCUT),
-#     sortDescendingBy = cms.string("userFloat('vProb')"),
-#     maxProbes = cms.int32(1),
-#     variables = cms.PSet(
-#         upsPt  = cms.string("pt"),
-#         upsRapidity   = cms.string("rapidity"),
-#         invariantMass = cms.string("mass"),
-#         PDGid = cms.string("userInt('momPDGId')"),
-# 
-#         muPlusPt = cms.string("daughter('muon1').pt"),
-#         muPlusEta = cms.string("daughter('muon1').eta"),
-#         muPlusPhi = cms.string("daughter('muon1').phi"),
-#         muPlusCharge = cms.string("daughter('muon1').charge"),
-# 
-#         muMinusPt = cms.string("daughter('muon2').pt"),
-#         muMinusEta = cms.string("daughter('muon2').eta"),
-#         muMinusPhi = cms.string("daughter('muon2').phi"),
-#         muMinusCharge = cms.string("daughter('muon2').charge"),
-#     ),
-#     flags = cms.PSet(),
-#     ignoreExceptions = cms.bool(True),
-#     addRunLumiInfo = cms.bool(True),
-#     filter = cms.bool(True),
-# )
-
 detailedDimuonTree = cms.EDFilter('ProbeTreeProducer',
-    src = cms.InputTag("onia2MuMuPatTrkTrk"),
+    src = cms.InputTag("onia2MuMuPatTrkTrk", "DiMu"),
     variables = cms.PSet(
         pt = cms.string("pt"),
         y  = cms.string("rapidity"),
@@ -71,9 +13,28 @@ detailedDimuonTree = cms.EDFilter('ProbeTreeProducer',
         isolation = cms.string("userFloat('Isolation')"),
         minDca = cms.string("userFloat('minDca')"),
         ntrk = cms.string("userInt('Ntrk')"),
+        ntrkhp = cms.string("userInt('Ntrkhp')"),
+        ntrk20 = cms.string("userInt('Ntrk20')"),
+        ntrkhp20 = cms.string("userInt('Ntrkhp20')"),
+        ntrk1sigma = cms.string("userInt('Ntrk1sigma')"),
+        ntrk1isgmahp = cms.string("userInt('Ntrk1sigmahp')"),
+        ntrk1sigma20 = cms.string("userInt('Ntrk1sigma20')"),
+        ntrk1sigmahp20 = cms.string("userInt('Ntrk1sigmahp20')"),
+        ntrk2sigma = cms.string("userInt('Ntrk2sigma')"),
+        ntrk2isgmahp = cms.string("userInt('Ntrk2sigmahp')"),
+        ntrk2sigma20 = cms.string("userInt('Ntrk2sigma20')"),
+        ntrk2sigmahp20 = cms.string("userInt('Ntrk2sigmahp20')"),
+        ntrk3sigma = cms.string("userInt('Ntrk3sigma')"),
+        ntrk3isgmahp = cms.string("userInt('Ntrk3sigmahp')"),
+        ntrk3sigma20 = cms.string("userInt('Ntrk3sigma20')"),
+        ntrk3sigmahp20 = cms.string("userInt('Ntrk3sigmahp20')"),
         countTksOfPV = cms.string("userInt('countTksOfPV')"),
-        vertexWeight = cms.string("userFloat('vertexWeight')"),
+        countTksOfNoVtx = cms.string("userInt('countTksOfNoVtx')"),
+        # vertexWeight = cms.string("userFloat('vertexWeight')"),
         sumPTPV = cms.string("userFloat('sumPTPV')"),
+        sumPTNoVtx = cms.string("userFloat('sumPTNoVtx')"),
+        sumNdofPV = cms.string("userFloat('sumNdofPV')"),
+        sumNdofNoVtx = cms.string("userFloat('sumNdofNoVtx')"),
         dcaxy = cms.string("userFloat('DCAXY')"),
         dca = cms.string("userFloat('DCA')"),
         ctauPV = cms.string("userFloat('ppdlPV')"),
@@ -88,6 +49,8 @@ detailedDimuonTree = cms.EDFilter('ProbeTreeProducer',
         highPurity2 = cms.string("userInt('highPurity2')"),
         l3d = cms.string("userFloat('l3d')"),
         l3dsig = cms.string("userFloat('l3dsig')"),
+        lxy = cms.string("userFloat('lxy')"),
+        lxysig = cms.string("userFloat('lxysig')"),
 
         mu1_pt = cms.string("daughter('muon1').pt"),
         mu1_eta = cms.string("daughter('muon1').eta"),
@@ -111,6 +74,7 @@ detailedDimuonTree = cms.EDFilter('ProbeTreeProducer',
         mu1_numberOfValidPixelHits = cms.string("daughter('muon1').innerTrack.hitPattern.numberOfValidPixelHits"),
         mu1_trackerLayersWithMeasurement = cms.string("daughter('muon1').innerTrack.hitPattern.trackerLayersWithMeasurement"),
         mu1_numberOfValidMuonHits = cms.string("daughter('muon1').globalTrack.hitPattern.numberOfValidMuonHits"),
+        mu1_iso = cms.string("userFloat('isoMu1')"),
 
         # BDT mu-id variables
         mu1_validFrac = cms.string("daughter('muon1').innerTrack.validFraction"),
@@ -144,6 +108,7 @@ detailedDimuonTree = cms.EDFilter('ProbeTreeProducer',
         mu2_numberOfValidPixelHits = cms.string("daughter('muon2').innerTrack.hitPattern.numberOfValidPixelHits"),
         mu2_trackerLayersWithMeasurement = cms.string("daughter('muon2').innerTrack.hitPattern.trackerLayersWithMeasurement"),
         mu2_numberOfValidMuonHits = cms.string("daughter('muon2').globalTrack.hitPattern.numberOfValidMuonHits"),
+        mu2_iso = cms.string("userFloat('isoMu2')"),
 
         # BDT mu-id variables
         mu2_validFrac = cms.string("daughter('muon2').innerTrack.validFraction"),
@@ -154,6 +119,7 @@ detailedDimuonTree = cms.EDFilter('ProbeTreeProducer',
         mu2_glbTrackProb = cms.string("daughter('muon2').combinedQuality.glbTrackProbability"),
         mu2_chi2LocMom = cms.string("daughter('muon2').combinedQuality.chi2LocalMomentum"),
         mu2_trkVHits = cms.string("daughter('muon2').innerTrack.hitPattern.numberOfValidTrackerHits"),
+
     ),
     flags = cms.PSet(
         mu1_Calo = cms.string("daughter('muon1').isCaloMuon"),
@@ -235,21 +201,6 @@ def selection(process, GlobalTag="GR_R_38X_V8::All", MC=False, SelectionTrigger=
     process.detailedDimuonTreePath = cms.Path(
         process.detailedDimuonTree
     )
-
-    # CUT = SELECTIONCUT.replace("SelectionTrigger", SelectionTrigger)
-    # process.yieldPsiTree = yieldTree.clone(
-    #     cut = cms.string(CUT + " && 2.5 < mass < 4.5"),
-    # )
-
-    # process.yieldMCTree = yieldTree.clone(
-    #     cut = cms.string( "((daughter('muon1').pt > 3.5 && abs(daughter('muon1').eta) < 1.6) || (daughter('muon1').pt > 2.5 && 1.6 < abs(daughter('muon1').eta) < 2.4))"+
-    #                       "&& ((daughter('muon2').pt > 3.5 && abs(daughter('muon2').eta) < 1.6) || (daughter('muon2').pt > 2.5 && 1.6 < abs(daughter('muon2').eta) < 2.4))"+
-    #                       "&& userInt('momPDGId')!=0"
-    #     ),
-    # )
-    # process.yieldMCTreePath = cms.Path(
-    #     process.yieldMCTree
-    # )
 
     process.TFileService = cms.Service("TFileService", fileName = cms.string("selection_test.root"))
 
