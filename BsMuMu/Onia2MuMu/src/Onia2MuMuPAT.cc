@@ -15,6 +15,7 @@
 #include "TrackingTools/Records/interface/TransientTrackRecord.h"
 #include "RecoVertex/KalmanVertexFit/interface/KalmanVertexFitter.h"
 #include "RecoVertex/VertexTools/interface/VertexDistanceXY.h"
+#include "RecoVertex/VertexTools/interface/VertexDistance3D.h"
 #include "TMath.h"
 #include "Math/VectorUtil.h"
 #include "TLorentzVector.h"
@@ -1078,7 +1079,8 @@ bool Onia2MuMuPAT::searchForTheThirdTrack(const edm::Event& iEvent, const edm::E
 
     TVector3 vtx,vtx3D;
     TVector3 pvtx,pvtx3D;
-    VertexDistanceXY vdistXY,vdist3D;
+    VertexDistanceXY vdistXY;
+    VertexDistance3D vdist3D;
     vtx.SetXYZ(SVtx.position().x(),SVtx.position().y(),0);
     TVector3 pperp(Cand.px(), Cand.py(), 0);
     AlgebraicVector3 vpperp(pperp.x(),pperp.y(),0);
