@@ -28,10 +28,11 @@
 # Definition of common variables
 figuresDir = "/Users/demattia/TMVA-v4.1.2/test/NewTrees/BsMuMuLatex/Figures/"
 tablesDir = "/Users/demattia/TMVA-v4.1.2/test/NewTrees/BsMuMuLatex/Tables/"
+rootExecutable = "/Users/demattia/Downloads/root-v5-34-00-patches/bin/root"
 
 # <codecell>
 
-# cd /Users/demattia/TMVA-v4.1.2/test/NewTrees/
+cd /Users/demattia/TMVA-v4.1.2/test/NewTrees/
 
 # <codecell>
 
@@ -435,7 +436,7 @@ estimatedBackgroundEndcaps = estimateBackground("Endcaps")
 
 import subprocess
 def optimalCutBDT(TMVAFileName, expectedSignalEvents, estimatedBackground):
-    p = subprocess.Popen(["/Users/demattia/Downloads/root-v5-34-00-patches/bin/root", "-q", "-l", "mvaeffs.C(\""+TMVAFileName+"\","+str(expectedSignalEvents)+","+str(estimatedBackground)+")"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    p = subprocess.Popen([rootExecutable, "-q", "-l", "mvaeffs.C(\""+TMVAFileName+"\","+str(expectedSignalEvents)+","+str(estimatedBackground)+")"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     out, err = p.communicate()
     for line in out.splitlines():
         if line.find("Classifier  ") != -1:
@@ -450,7 +451,7 @@ optimalCutBarrel = optimalCutBDT(region, expectedEventsBarrel, estimatedBackgrou
 os.system("mv mvaeffs_BDT_"+region+".pdf "+figuresDir)
 region = "endcaps"
 print region.title()+":"
-optimalCutBarrel = optimalCutBDT(region, expectedEventsEndcaps, estimatedBackgroundEndcaps)
+optimalCutEndcaps = optimalCutBDT(region, expectedEventsEndcaps, estimatedBackgroundEndcaps)
 os.system("mv mvaeffs_BDT_"+region+".pdf "+figuresDir)
 
 # <headingcell level=3>
@@ -459,13 +460,20 @@ os.system("mv mvaeffs_BDT_"+region+".pdf "+figuresDir)
 
 # <codecell>
 
+# Change this to redo also the BDT application #
+# -------------------------------------------- #
+
+redoApplication = True
+
+# -------------------------------------------- #
+
 import subprocess
 from ROOT import TLine
 from ROOT import TGraphErrors
 from array import array
 
 def applyBDT(inputFileName, outputFileName, weightDir, cutValue):
-    p = subprocess.Popen(["/Users/demattia/Downloads/root-v5-34-00-patches/bin/root", "-q", "-l", "TMVAClassificationApplication.C+(\""+inputFileName+"\",\""+outputFileName+"\",\""+weightDir+"\","+str(cutValue)+")"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    p = subprocess.Popen([rootExecutable, "-q", "-l", "TMVAClassificationApplication.C+(\""+inputFileName+"\",\""+outputFileName+"\",\""+weightDir+"\","+str(cutValue)+")"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     out, err = p.communicate()
     # print out
     # print err
@@ -525,18 +533,19 @@ def drawVariablePlots(region, plotType = ""):
         variablePdfFileName = "AfterBDTCut_"+var+"_"+region+plotType+".pdf"
         canvas.SaveAs(figuresDir+variablePdfFileName)
 
-        
-# applyBDT("Barrel_preselection.root", "BarrelTMVApp.root", "barrelWeights/", optimalCutBarrel)
-# drawMassPlot("Barrel")
-# applyBDT("Endcaps_preselection.root", "EndcapsTMVApp.root", "endcapsWeights/", optimalCutBarrel)
-# drawMassPlot("Endcaps")
+if redoApplication:
+    applyBDT("Barrel_preselection.root", "BarrelTMVApp.root", "barrelWeights/", optimalCutBarrel)
+    applyBDT("Endcaps_preselection.root", "EndcapsTMVApp.root", "endcapsWeights/", optimalCutBarrel)
+    applyBDT("Barrel_preselection_unblinded.root", "BarrelTMVAppUnblinded.root", "barrelWeights/", optimalCutBarrel)
+    applyBDT("Endcaps_preselection_unblinded.root", "EndcapsTMVAppUnblinded.root", "endcapsWeights/", optimalCutBarrel)
+
+drawMassPlot("Barrel")
+drawMassPlot("Endcaps")
 drawVariablePlots("Barrel")
 drawVariablePlots("Endcaps")
 
-# applyBDT("Barrel_preselection_unblinded.root", "BarrelTMVAppUnblinded.root", "barrelWeights/", optimalCutBarrel)
-# drawMassPlot("Barrel", "Unblinded")
-# applyBDT("Endcaps_preselection_unblinded.root", "EndcapsTMVAppUnblinded.root", "endcapsWeights/", optimalCutBarrel)
-# drawMassPlot("Endcaps", "Unblinded")
+drawMassPlot("Barrel", "Unblinded")
+drawMassPlot("Endcaps", "Unblinded")
 drawVariablePlots("Barrel", "Unblinded")
 drawVariablePlots("Endcaps", "Unblinded")
 
@@ -545,6 +554,13 @@ drawVariablePlots("Endcaps", "Unblinded")
 # Figure 19
 
 # <codecell>
+
+# Change this to redo also the BDT application #
+# -------------------------------------------- #
+
+redoApplication = True
+
+# -------------------------------------------- #
 
 class TypeSettings:
     def __init__(self, inputIndex, inputColor, inputOption):
@@ -602,44 +618,49 @@ def drawAppBDTOutputPlots(region):
     applicationBDTLegend.Draw("same")
     applicationBDTLegend.SetFillColor(0)
     applicationBDTLegend.SetLineColor(0)
-
-    # appFile = TFile(region+"TMVApp1.root")
-    # appFile.Get("MVA_BDT").Draw()
     canvas.SaveAs(figuresDir+"ApplicationBDTOutput_"+region+".pdf")
 
-# Barrel
-# Applied on 2, trained on 0 (tested on 1)
-# applyBDT("Barrel_preselection_2.root", "BarrelTMVApp0.root", "barrel0Weights/", optimalCutBarrel)
-# Applied on 0, trained on 1 (tested on 2)
-# applyBDT("Barrel_preselection_0.root", "BarrelTMVApp1.root", "barrel1Weights/", optimalCutBarrel)
-# Applied on 1, trained on 2 (tested on 0)
-# applyBDT("Barrel_preselection_1.root", "BarrelTMVApp2.root", "barrel2Weights/", optimalCutBarrel)
+if redoApplication:
+    # Barrel
+    # Applied on 2, trained on 0 (tested on 1)
+    applyBDT("Barrel_preselection_2.root", "BarrelTMVApp0.root", "barrel0Weights/", optimalCutBarrel)
+    # Applied on 0, trained on 1 (tested on 2)
+    applyBDT("Barrel_preselection_0.root", "BarrelTMVApp1.root", "barrel1Weights/", optimalCutBarrel)
+    # Applied on 1, trained on 2 (tested on 0)
+    applyBDT("Barrel_preselection_1.root", "BarrelTMVApp2.root", "barrel2Weights/", optimalCutBarrel)
+
+    applyBDT("BsMC12_barrel_preselection.root", "BsMCBarrelTMVApp.root", "barrelWeights/", optimalCutBarrel)
+    applyBDT("BsMC12_barrel_preselection_2.root", "BsMCBarrelTMVApp0.root", "barrel0Weights/", optimalCutBarrel)
+    applyBDT("BsMC12_barrel_preselection_0.root", "BsMCBarrelTMVApp1.root", "barrel1Weights/", optimalCutBarrel)
+    applyBDT("BsMC12_barrel_preselection_1.root", "BsMCBarrelTMVApp2.root", "barrel2Weights/", optimalCutBarrel)
+
+    # Endcaps
+    # Applied on 2, trained on 0 (tested on 1)
+    applyBDT("Endcaps_preselection_2.root", "EndcapsTMVApp0.root", "endcaps0Weights/", optimalCutEndcaps)
+    # Applied on 0, trained on 1 (tested on 2)
+    applyBDT("Endcaps_preselection_0.root", "EndcapsTMVApp1.root", "endcaps1Weights/", optimalCutEndcaps)
+    # Applied on 1, trained on 2 (tested on 0)
+    applyBDT("Endcaps_preselection_1.root", "EndcapsTMVApp2.root", "endcaps2Weights/", optimalCutEndcaps)
+
+    applyBDT("BsMC12_endcaps_preselection.root", "BsMCEndcapsTMVApp.root", "endcapsWeights/", optimalCutEndcaps)
+    applyBDT("BsMC12_endcaps_preselection_2.root", "BsMCEndcapsTMVApp0.root", "endcaps0Weights/", optimalCutEndcaps)
+    applyBDT("BsMC12_endcaps_preselection_0.root", "BsMCEndcapsTMVApp1.root", "endcaps1Weights/", optimalCutEndcaps)
+    applyBDT("BsMC12_endcaps_preselection_1.root", "BsMCEndcapsTMVApp2.root", "endcaps2Weights/", optimalCutEndcaps)
+
 
 drawAppBDTOutputPlots("Barrel")
-
-# applyBDT("BsMC12_barrel_preselection.root", "BsMCBarrelTMVApp.root", "barrelWeights/", optimalCutBarrel)
-# applyBDT("BsMC12_barrel_preselection_2.root", "BsMCBarrelTMVApp0.root", "barrel0Weights/", optimalCutBarrel)
-# applyBDT("BsMC12_barrel_preselection_0.root", "BsMCBarrelTMVApp1.root", "barrel1Weights/", optimalCutBarrel)
-# applyBDT("BsMC12_barrel_preselection_1.root", "BsMCBarrelTMVApp2.root", "barrel2Weights/", optimalCutBarrel)
-
 drawAppBDTOutputPlots("BsMCBarrel")
-
-# Endcaps
-# Applied on 2, trained on 0 (tested on 1)
-# applyBDT("Endcaps_preselection_2.root", "EndcapsTMVApp0.root", "endcaps0Weights/", optimalCutEndcaps)
-# Applied on 0, trained on 1 (tested on 2)
-# applyBDT("Endcaps_preselection_0.root", "EndcapsTMVApp1.root", "endcaps1Weights/", optimalCutEndcaps)
-# Applied on 1, trained on 2 (tested on 0)
-# applyBDT("Endcaps_preselection_1.root", "EndcapsTMVApp2.root", "endcaps2Weights/", optimalCutEndcaps)
-
 drawAppBDTOutputPlots("Endcaps")
-
-# applyBDT("BsMC12_endcaps_preselection.root", "BsMCEndcapsTMVApp.root", "endcapsWeights/", optimalCutEndcaps)
-# applyBDT("BsMC12_endcaps_preselection_2.root", "BsMCEndcapsTMVApp0.root", "endcaps0Weights/", optimalCutEndcaps)
-# applyBDT("BsMC12_endcaps_preselection_0.root", "BsMCEndcapsTMVApp1.root", "endcaps1Weights/", optimalCutEndcaps)
-# applyBDT("BsMC12_endcaps_preselection_1.root", "BsMCEndcapsTMVApp2.root", "endcaps2Weights/", optimalCutEndcaps)
-
 drawAppBDTOutputPlots("BsMCEndcaps")
+
+# <rawcell>
+
+# Comparison plots
+
+# <codecell>
+
+os.system("./Common/RunAllComp.sh Common "+rootExecutable)
+os.system("./Common/RunAllComp_3h.sh Common "+rootExecutable)
 
 # <codecell>
 

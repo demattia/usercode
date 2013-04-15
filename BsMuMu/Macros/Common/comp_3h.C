@@ -25,14 +25,14 @@ struct Vars
 
 
 void comp_3h(const TString & inputFileA = "Barrel_preselection_0.root",
-	  const TString & inputFileB = "Barrel_preselection_1.root", 
-      const TString & inputFileC = "Barrel_preselection_2.root")
+	     const TString & inputFileB = "Barrel_preselection_1.root", 
+	     const TString & inputFileC = "Barrel_preselection_2.root")
 {
-  TString fnameA("/uscmst1b_scratch/lpc1/lpcmuon/zhenhu/BsMuMu/data/HackedTrees/"+inputFileA);
+  TString fnameA(inputFileA);
   TFile* inputA = TFile::Open( fnameA );
-  TString fnameB("/uscmst1b_scratch/lpc1/lpcmuon/zhenhu/BsMuMu/data/HackedTrees/"+inputFileB);
+  TString fnameB(inputFileB);
   TFile* inputB = TFile::Open( fnameB );
-  TString fnameC("/uscmst1b_scratch/lpc1/lpcmuon/zhenhu/BsMuMu/data/HackedTrees/"+inputFileC);
+  TString fnameC(inputFileC);
   TFile* inputC = TFile::Open( fnameC );
   
   gDirectory->Cd(fnameA+":/");
