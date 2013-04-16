@@ -49,6 +49,8 @@ detailedDimuonTree = cms.EDFilter('ProbeTreeProducer',
         highPurity2 = cms.string("userInt('highPurity2')"),
         l3d = cms.string("userFloat('l3d')"),
         l3dsig = cms.string("userFloat('l3dsig')"),
+        pvlip = cms.string("userFloat('pvlip')"),
+        pvlipErr = cms.string("userFloat('pvlipErr')"),
         lxy = cms.string("userFloat('lxy')"),
         lxysig = cms.string("userFloat('lxysig')"),
 
