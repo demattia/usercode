@@ -26,13 +26,13 @@
 # <codecell>
 
 # Definition of common variables
-figuresDir = "/Users/demattia/TMVA-v4.1.2/test/NewTrees/BsMuMuLatex/Figures/"
-tablesDir = "/Users/demattia/TMVA-v4.1.2/test/NewTrees/BsMuMuLatex/Tables/"
-rootExecutable = "/Users/demattia/Downloads/root-v5-34-00-patches/bin/root"
+figuresDir = "/home/zhenhu/CMSSW_5_3_2_patch1/src/BsMuMu/Macros/BsMuMuLatex/Figures/"
+tablesDir = "/home/zhenhu/CMSSW_5_3_2_patch1/src/BsMuMu/Macros/BsMuMuLatex/Tables/"
+rootExecutable = "/afs/cern.ch/sw/lcg/app/releases/ROOT/5.34.00/x86_64-slc5-gcc43-opt/root/bin/root"
 
 # <codecell>
 
-cd /Users/demattia/TMVA-v4.1.2/test/NewTrees/
+# cd /Users/demattia/TMVA-v4.1.2/test/NewTrees/
 
 # <codecell>
 
@@ -435,6 +435,7 @@ estimatedBackgroundEndcaps = estimateBackground("Endcaps")
 # <codecell>
 
 import subprocess
+import os
 def optimalCutBDT(TMVAFileName, expectedSignalEvents, estimatedBackground):
     p = subprocess.Popen([rootExecutable, "-q", "-l", "mvaeffs.C(\""+TMVAFileName+"\","+str(expectedSignalEvents)+","+str(estimatedBackground)+")"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     out, err = p.communicate()
