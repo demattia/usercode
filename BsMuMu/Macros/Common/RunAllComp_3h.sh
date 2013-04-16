@@ -45,3 +45,5 @@ ${rootExecutable} -l -b -q comp_3h.C++\(\"../BsMC12_endcaps_preselection_0.root\
 mv figs_3h MC_endcaps_figs_3h
 cp MC_endcaps_figs_3h/*.pdf MC_endcaps_figs_3h/*/*.pdf ../BsMuMuLatex/Figures/VariablesComparison/MC_endcaps_figs_3h/
 cat page_template.php | sed s/"TITLE"/"MC Endcaps"/g > MC_endcaps_figs_3h/page.php
+
+cd -

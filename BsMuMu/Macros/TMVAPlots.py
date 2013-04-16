@@ -662,6 +662,7 @@ drawAppBDTOutputPlots("BsMCEndcaps")
 
 os.system("./Common/RunAllComp.sh Common "+rootExecutable)
 os.system("./Common/RunAllComp_3h.sh Common "+rootExecutable)
+os.system("./runMvas.sh")
 
 # <codecell>
 
