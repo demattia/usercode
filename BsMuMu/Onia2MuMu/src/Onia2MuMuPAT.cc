@@ -407,6 +407,9 @@ Onia2MuMuPAT::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
           double isoMu1 = mu1.pt()/(mu1.pt()+sumPtTk1);
           double isoMu2 = mu2.pt()/(mu2.pt()+sumPtTk2);
 
+          // Sort the simpleTracks. Smallest doca first.
+          std::sort(simpleTracks.begin(), simpleTracks.end());
+
           // Count the number of tracks from the candidate PV or no PV and with pt > 0.5 GeV, doca < 300 microns and doca significance > 1.
           // Using only the first 20 tracks
           double maxDoca = 0.03;
