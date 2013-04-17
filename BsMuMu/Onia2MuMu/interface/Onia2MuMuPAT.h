@@ -89,6 +89,10 @@ class Onia2MuMuPAT : public edm::EDProducer {
       vertexId(inVertexId), highPurity(inHighPurity)
     {}
 
+    bool operator<(const SimpleTrack & compTrack) const {
+      return( doca < compTrack.doca );
+    }
+
     double pt;
     double eta;
     double phi;
