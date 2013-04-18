@@ -183,7 +183,8 @@ Onia2MuMuPAT::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
         //if (fabs(it->track()->pt()-it2->track()->pt()) < 1.e-5 ) continue; //against split-muons (if using == it can create problems)
         if(deltaR(m1p4.eta(),m1p4.phi(),m2p4.eta(), m2p4.phi()) < 1.e-5) continue;
 
-        double M2=myCand.mass();
+	/*
+        double M2=dimuonBeforeRefit.mass();
         if (addThirdTrack_ && (it->charge()!=it2->charge()) && M2 > diMuMassMin_ && M2 < diMuMassMax_)
           TrackFound=searchForTheThirdTrack(iEvent, iSetup, my3Cand, &(*it), &(*it2),PVDiMuTk,track,resolveAmbiguity_);
 
@@ -202,12 +203,17 @@ Onia2MuMuPAT::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
           }
           LorentzVector vtk=LorentzVector(track.px(),track.py(),track.pz(),sqrt((track.p()*track.p())+(trackMass_*trackMass_)));
           tkcand=LeafCandidate(track.charge(),vtk);
+	  TransientTrack fake; 
+	  if( mu1.pt() > mu2.pt() )  fillCandMuons(my3Cand, mu1, mu2, fake, fake); //fake is not used by this function
+	  else fillCandMuons(my3Cand, mu2, mu1, fake, fake);
           my3Cand.addDaughter(tkcand,"Kaon");
+
         }else{
           if (addCommonVertex_) my3Cand.addUserData("commonVertex",Vertex());
           if (addMuonlessPrimaryVertex_) my3Cand.addUserData("muonlessPV",Vertex());
           else my3Cand.addUserData("PVwithmuons",Vertex());
         }
+	*/
 
         //build the dimuon secondary vertex
         vector<TransientTrack> t_tks;
@@ -221,6 +227,7 @@ Onia2MuMuPAT::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
         myCand.addUserFloat("MassErr",MassWErr.error());
 
         if (myVertex.isValid()) {
+
           float vChi2 = myVertex.totalChiSquared();
           float vNDF  = myVertex.degreesOfFreedom();
           float vProb(TMath::Prob(vChi2,(int)vNDF));
@@ -241,14 +248,39 @@ Onia2MuMuPAT::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
                                                             muMasses[1]));
           mu2.setP4(m2p4);
 
+
+	  double M2=dimuonBeforeRefit.mass();
+	  if (addThirdTrack_ && (it->charge()!=it2->charge()) && M2 > diMuMassMin_ && M2 < diMuMassMax_)
+	    TrackFound=searchForTheThirdTrack(iEvent, iSetup, my3Cand, &(*it), &(*it2),PVDiMuTk,track,resolveAmbiguity_);
+
+	  if (TrackFound){
+	    if (addMuonlessPrimaryVertex_) my3Cand.addUserData("muonlessPV",PVDiMuTk);
+	    else my3Cand.addUserData("PVwithmuons",PVDiMuTk);
+
+	    if (addCommonVertex_) {
+	      vector<TransientTrack> t_tks3;
+	      t_tks3.push_back(theTTBuilder->build(*it->track()));  // pass the reco::Track, not the reco::TrackRef (which can be transient)
+	      t_tks3.push_back(theTTBuilder->build(*it2->track())); // otherwise the vertex will have transient refs inside.
+	      t_tks3.push_back(theTTBuilder->build(track));
+	      TransientVertex tvtx=vtxFitter.vertex(t_tks3);
+	      SVDiMuTk=Vertex(tvtx);
+	      my3Cand.addUserData("commonVertex",SVDiMuTk);
+	    }
+
+	    LorentzVector vtk=LorentzVector(track.px(),track.py(),track.pz(),sqrt((track.p()*track.p())+(trackMass_*trackMass_)));
+	    tkcand=LeafCandidate(track.charge(),vtk); 
+
+	    if( mu1.pt() > mu2.pt() )  fillCandMuons(my3Cand, mu1, mu2,  refittedTrack1, refittedTrack2); //fake is not used by this function
+	    else fillCandMuons(my3Cand, mu2, mu1,  refittedTrack2, refittedTrack1);
+	    my3Cand.addDaughter(tkcand,"Kaon");
+	  }
+	 
           // Make sure mu1 is the highest pt muon
           if( mu1.pt() > mu2.pt() ) {
             fillCandMuons(myCand, mu1, mu2, refittedTrack1, refittedTrack2);
-            fillCandMuons(my3Cand, mu1, mu2, refittedTrack1, refittedTrack2);
           }
           else {
             fillCandMuons(myCand, mu2, mu1, refittedTrack2, refittedTrack1);
-            fillCandMuons(my3Cand, mu2, mu1, refittedTrack2, refittedTrack1);
           }
 
           myCand.addUserFloat("vNChi2",vChi2/vNDF);
@@ -654,8 +686,17 @@ Onia2MuMuPAT::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
           myCand.addUserFloat("isoMu2", -1);
           myCand.addUserFloat("DCAXY", -1);
           myCand.addUserFloat("DCA", -1);
+	  if (addThirdTrack_){
+	    my3Cand.addUserFloat("DCAXY", -1);
+	    my3Cand.addUserFloat("DCA", -1);
+	    if (addCommonVertex_) my3Cand.addUserData("commonVertex",Vertex());
+	    if (addMuonlessPrimaryVertex_) my3Cand.addUserData("muonlessPV",Vertex());
+	    else my3Cand.addUserData("PVwithmuons",Vertex());
+	  }
           myCand.addUserFloat("delta3d",-1);
           myCand.addUserFloat("delta3dErr",-1);
+	  myCand.addUserFloat("mu1_dxyBeamspot", -1);
+	  myCand.addUserFloat("mu2_dxyBeamspot", -1);
           if (addCommonVertex_) {
             myCand.addUserData("commonVertex",Vertex());
           }
@@ -716,8 +757,8 @@ Onia2MuMuPAT::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
       // Save the candidate if it passes preselection cuts
       if( prefilter_(myCand) ) {
         oniaOutput->push_back(myCand);
-        if (addThirdTrack_ && TrackFound) oniaOutputWithTrack->push_back(my3Cand);
       }
+      if (addThirdTrack_ && TrackFound && prefilter_(my3Cand)) oniaOutputWithTrack->push_back(my3Cand);
     }
   }
 
@@ -809,6 +850,8 @@ bool Onia2MuMuPAT::searchForTheThirdTrack(const edm::Event& iEvent, const edm::E
   using namespace reco;
   typedef Candidate::LorentzVector LorentzVector;
 
+  //cout << "Search for a track" << endl;
+
   vector<double> muMasses;
   muMasses.push_back( 0.1134289256 );
   muMasses.push_back( 0.1134289256 );
@@ -847,11 +890,11 @@ bool Onia2MuMuPAT::searchForTheThirdTrack(const edm::Event& iEvent, const edm::E
     if (totP4.M() > diMuPlusTrackMassMax_ || totP4.M() < diMuPlusTrackMassMin_) continue;
 
     vector<TransientTrack> t_tks;
-    track=Track(*tk);
+    Track tmptrack=Track(*tk);
 
     t_tks.push_back(theTTBuilder->build(mu1->track()));  // pass the reco::Track, not  the reco::TrackRef (which can be transient)
     t_tks.push_back(theTTBuilder->build(mu2->track())); // otherwise the vertex will have transient refs inside.
-    t_tks.push_back(theTTBuilder->build(track));
+    t_tks.push_back(theTTBuilder->build(tmptrack));
 
     TransientVertex tmpVtx = vtxFitter.vertex(t_tks);
 
@@ -904,6 +947,7 @@ bool Onia2MuMuPAT::searchForTheThirdTrack(const edm::Event& iEvent, const edm::E
 
     Handle<BeamSpot> theBeamSpot;
     iEvent.getByLabel(thebeamspot_,theBeamSpot);
+
     BeamSpot bs = *theBeamSpot;
     theBeamSpotV = Vertex(bs.position(), bs.covariance3D());
 
@@ -938,125 +982,178 @@ bool Onia2MuMuPAT::searchForTheThirdTrack(const edm::Event& iEvent, const edm::E
       }
     }
 
+    Vertex OriginalPV=Vertex(thePrimaryV);
     if (addMuonlessPrimaryVertex_) buildMuonlessPV(iEvent,iSetup, mu1,mu2,track,thePrimaryV);
     PV=Vertex(thePrimaryV);
     
     // count the number of high Purity tracks with pT > 900 MeV attached to the chosen vertex
-    double vertexWeight = 0., sumPTPV = 0., sumPt_noVtx = 0.;
-    int countTksOfPV = 0, Ntrk=0;
+    double sumPTPV = 0., sumPTNoVtx = 0.;
+    double sumPtTk1 = 0., sumPtTk2 = 0.;
+    int countTksOfPV = 0, countTksOfNoVtx = 0;
+    int Ntrk = 0, Ntrkhp = 0, Ntrk20 = 0, Ntrkhp20 = 0;
+    int Ntrk1sigma = 0, Ntrk1sigmahp = 0, Ntrk1sigma20 = 0, Ntrk1sigmahp20 = 0;
+    int Ntrk2sigma = 0, Ntrk2sigmahp = 0, Ntrk2sigma20 = 0, Ntrk2sigmahp20 = 0;
+    int Ntrk3sigma = 0, Ntrk3sigmahp = 0, Ntrk3sigma20 = 0, Ntrk3sigmahp20 = 0;
     double minDca = 9999.;
-    double minDcaDR0p7 = 9999.;
-    double minDcaDR0p7PtMin0p5 = 9999.;
-    double minDcaDR0p7PtMin0p9 = 9999.;
-    double minDcaPtMin0p5 = 9999.;
-    double minDcaPtMin0p9 = 9999.;
-    double sumNdof = 0.;
-    double PVndof = thePrimaryV.ndof();
+    double sumNdofPV = 0., sumNdofNoVtx = 0.;
+    
+    double PVndof = OriginalPV.ndof();
     Cand.addUserFloat("PVndof",(float) PVndof);
     Cand.addUserFloat("pvw8",(float) (thePrimaryV.ndof()+2)/(2*thePrimaryV.tracksSize()));
-
-    for(reco::Vertex::trackRef_iterator itVtx = thePrimaryV.tracks_begin(); itVtx != thePrimaryV.tracks_end(); itVtx++){
-      if(itVtx->isNonnull()){
-        const reco::Track& trk = **itVtx;
-
-        TLorentzVector tmpP4=TLorentzVector(trk.px(),trk.py(),trk.pz(),1.0);
-
-        if ((tmpP4.DeltaR(mu1P4) < 1.e-5) || (tmpP4.DeltaR(mu2P4) < 1.e-5) || (tmpP4.DeltaR(trackP4) < 1.e-5)) continue;
-
-        //if (trk.pt()==mu1->innerTrack()->pt() || trk.pt()==mu2->innerTrack()->pt() || trk.pt()==track.pt()) continue;
-
-        //if(!track.quality(reco::TrackBase::highPurity)) continue;
-        TransientTrack tt = theTTBuilder->build(trk);
-        pair<bool,Measurement1D> tkPVdist = IPTools::absoluteImpactParameter3D(tt,SVtx);
-
-        vertexWeight += thePrimaryV.trackWeight(*itVtx);
-        if(track.pt() > 0.5 && tkPVdist.second.value()<0.03) ++Ntrk;
-
-        if( tkPVdist.first ) {
-          if( tkPVdist.second.value()<minDca ) minDca = tkPVdist.second.value();
-          if( track.pt() > 0.5 && tkPVdist.second.value()<minDcaPtMin0p5 ) minDcaPtMin0p5 = tkPVdist.second.value();
-          if( track.pt() > 0.9 && tkPVdist.second.value()<minDcaPtMin0p9 ) minDcaPtMin0p9 = tkPVdist.second.value();
-        }
-
-
-        if(deltaR(track.eta(),track.phi(),Cand.eta(),Cand.phi()) < 0.7) {
-          // cout<<"myCand.eta"<<myCand.eta()<<"myCand.phi"<<myCand.phi()<<endl;
-          if( tkPVdist.first ) {
-            if( tkPVdist.second.value()<minDcaDR0p7 ) minDcaDR0p7 = tkPVdist.second.value();
-            if( track.pt() > 0.5 && tkPVdist.second.value()<minDcaDR0p7PtMin0p5 ) minDcaDR0p7PtMin0p5 = tkPVdist.second.value();
-            if( track.pt() > 0.9 && tkPVdist.second.value()<minDcaDR0p7PtMin0p9 ) minDcaDR0p7PtMin0p9 = tkPVdist.second.value();
-          }
-
-          if(track.pt() < 0.9) continue; //reject all rejects from counting if less than 900 MeV
-          sumPTPV += track.pt();
-        }
-        sumNdof += track.ndof();
-        countTksOfPV++;
-      }
-    }
-    
-    // now tracks outside the PV fit
-    int countTksOfNoVtx = 0;
-
-    for (TrackCollection::const_iterator tk = tkColl->begin(); tk != tkColl->end(); ++tk) {
-      bool hasVertex = false;
-      for(VertexCollection::const_iterator itv = priVtxs->begin(), itvend = priVtxs->end(); itv != itvend; ++itv) {
-        for( reco::Vertex::trackRef_iterator itVtx = itv->tracks_begin(); itVtx != itv->tracks_end(); ++itVtx) {
-          if( itVtx->isNonnull() ) {
-            if(deltaR(tk->eta(),tk->phi(),(*itVtx)->eta(),(*itVtx)->phi()) < 1.e-5) {
-              hasVertex=true;
-              bool isAlreadySelected=false;
-
-              if ((deltaR(mu1->innerTrack()->eta(),mu1->innerTrack()->phi(),tk->eta(),tk->phi()) < 1.e-5) ||
-                  (deltaR(mu2->innerTrack()->eta(),mu2->innerTrack()->phi(),tk->eta(),tk->phi()) < 1.e-5) ||
-                  (deltaR(track.eta(),track.phi(),tk->eta(),tk->phi()) < 1.e-5)) isAlreadySelected=true;
-
-              if (!hasVertex && !isAlreadySelected){
-                TransientTrack tt = theTTBuilder->build(*tk);
-                pair<bool,Measurement1D> tkPVdist = IPTools::absoluteImpactParameter3D(tt,SVtx);
-                if(tk->pt() > 0.5 && tkPVdist.second.value()<0.03) ++Ntrk;
-
-                if( tkPVdist.first ) {
-                  if( tkPVdist.second.value()<minDca ) minDca = tkPVdist.second.value();
-                  if( tk->pt() > 0.5 && tkPVdist.second.value()<minDcaPtMin0p5 ) minDcaPtMin0p5 = tkPVdist.second.value();
-                  if( tk->pt() > 0.9 && tkPVdist.second.value()<minDcaPtMin0p9 ) minDcaPtMin0p9 = tkPVdist.second.value();
-                }
-
-                if(deltaR(tk->eta(),tk->phi(),Cand.eta(), Cand.phi()) < 0.7) {
-                  if( tkPVdist.first ) {
-                    if( tkPVdist.second.value()<minDcaDR0p7 ) minDcaDR0p7 = tkPVdist.second.value();
-                    if( tk->pt() > 0.5 && tkPVdist.second.value()<minDcaDR0p7PtMin0p5 ) minDcaDR0p7PtMin0p5 = tkPVdist.second.value();
-                    if( tk->pt() > 0.9 && tkPVdist.second.value()<minDcaDR0p7PtMin0p9 ) minDcaDR0p7PtMin0p9 = tkPVdist.second.value();
-                  }
-
-                  if(tk->pt()<0.9) continue;
-                  if(tkPVdist.second.value() > 0.05) continue;
-                  sumPt_noVtx += tk->pt();
-                  countTksOfNoVtx++;
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-    
-    double Iso = Cand.pt()/(Cand.pt()+sumPt_noVtx+sumPTPV);
-
-    Cand.addUserFloat("Isolation", (float) Iso);
-    Cand.addUserFloat("minDca", (float) minDca);
-    Cand.addUserFloat("minDcaDr0p7", (float) minDcaDR0p7);
-    Cand.addUserFloat("minDcaDr0p7Min0p5", (float) minDcaDR0p7PtMin0p5);
-    Cand.addUserFloat("minDcaDr0p7Min0p9", (float) minDcaDR0p7PtMin0p9);
-    Cand.addUserInt("Ntrk", Ntrk);
-    Cand.addUserInt("countTksOfPV", countTksOfPV);
-    Cand.addUserFloat("vertexWeight", (float) vertexWeight);
-    Cand.addUserFloat("sumPTPV", (float) sumPTPV);
-    Cand.addUserFloat("sumNdof", (float) sumNdof);
-
+   
     TrajectoryStateClosestToPoint mu1TS = (theTTBuilder->build(mu1->track())).impactPointTSCP();
     TrajectoryStateClosestToPoint mu2TS = (theTTBuilder->build(mu2->track())).impactPointTSCP();
     TrajectoryStateClosestToPoint tkTS = (theTTBuilder->build(track)).impactPointTSCP();
+    
+    double maxDeltaR = 1.e-5;
+    
+    std::vector<SimpleTrack> simpleTracks;
+
+    Handle<TrackCollection> tkColl;
+    iEvent.getByLabel("generalTracks", tkColl);
+
+    for( auto tracktmp = tkColl->begin(); tracktmp != tkColl->end(); ++tracktmp ) {
+
+      if( mu1 != 0 && deltaR(tracktmp->eta(),tracktmp->phi(),mu1->eta(),mu1->phi()) < maxDeltaR ) continue;
+      if( mu2 != 0 && deltaR(tracktmp->eta(),tracktmp->phi(),mu2->eta(),mu2->phi()) < maxDeltaR ) continue;
+      if(deltaR(tracktmp->eta(),tracktmp->phi(),track.eta(),track.phi()) < maxDeltaR ) continue;
+
+      double doca = 999.;
+      double docaSig = 999.;
+      int vertexId = 999;
+      bool highPurity = tracktmp->quality(reco::TrackBase::highPurity);
+
+      // Compute doca and doca significance
+      TransientTrack tt = theTTBuilder->build(*tracktmp);
+      pair<bool,Measurement1D> tkPVdist = IPTools::absoluteImpactParameter3D(tt,Vertex(SVtx));
+
+      if( tkPVdist.first ) {
+	doca = tkPVdist.second.value();
+	if(tkPVdist.second.error() != 0) docaSig = doca/tkPVdist.second.error();
+      }
+      vertexId = findVerteId( OriginalPV, *priVtxs.product(), *tracktmp, maxDeltaR );
+
+      // Muon isolation
+      // --------------
+      if( tracktmp->pt() > 0.5 ) {
+	if( vertexId == 1 ) {
+	  sumPtTk1 += tracktmp->pt();
+	  sumPtTk2 += tracktmp->pt();
+	}
+	else if( vertexId == 0 ) {
+	  TrajectoryStateClosestToPoint tscp = tt.impactPointTSCP();
+	  if( computeDca(tscp, mu1TS) < 1 ) sumPtTk1 += tracktmp->pt();
+	  if( computeDca(tscp, mu2TS) < 1 ) sumPtTk2 += tracktmp->pt();
+	}
+      }
+      simpleTracks.push_back(SimpleTrack(tracktmp->pt(), tracktmp->eta(), tracktmp->phi(), tracktmp->ndof(), doca, docaSig, vertexId, highPurity));
+    }
+
+    double isoMu1 = mu1->pt()/(mu1->pt()+sumPtTk1);
+    double isoMu2 = mu2->pt()/(mu2->pt()+sumPtTk2);
+
+    std::sort(simpleTracks.begin(), simpleTracks.end());
+
+    double maxDoca = 0.03;
+    int tkCount = 0;
+ 
+    for( auto tk = simpleTracks.begin(); tk != simpleTracks.end(); ++tk, ++tkCount ) {
+      
+      if( tk->vertexId == 1 ) ++countTksOfPV;
+      else if( tk->vertexId == 0 ) ++countTksOfNoVtx;
+      
+      // From here on use only tracks from the candidate PV or no PV
+      if( tk->vertexId == 2 ) continue;
+      
+      // Take the minimum doca
+      if( minDca > tk->doca ) minDca = tk->doca;
+      
+      // Number of close tracks
+      if( tk->pt > 0.5 && tk->doca < maxDoca ) {
+	++Ntrk;
+	if( tk->highPurity ) ++Ntrkhp;
+	if( tkCount < 20 ) {
+	  ++Ntrk20;
+	  if( tk->highPurity ) ++Ntrkhp20;
+	}
+	
+	// Number of close tracks with doca > 1 sigma
+	if( tk->docaSignificance > 1. ) {
+	  ++Ntrk1sigma;
+	  if( tk->highPurity ) ++Ntrk1sigmahp;
+	  if( tkCount < 20 ) {
+	    ++Ntrk1sigma20;
+	    if( tk->highPurity ) ++Ntrk1sigmahp20;
+	  }
+	  
+	  // Number of close tracks with doca > 2 sigma
+	  if( tk->docaSignificance > 2. ) {
+	    ++Ntrk2sigma;
+	    if( tk->highPurity ) ++Ntrk2sigmahp;
+	    if( tkCount < 20 ) {
+	      ++Ntrk2sigma20;
+	      if( tk->highPurity ) ++Ntrk2sigmahp20;
+	    }
+	    
+	    // Number of close tracks with doca > 3 sigma
+	    if( tk->docaSignificance > 3. ) {
+	      ++Ntrk3sigma;
+	      if( tk->highPurity ) ++Ntrk3sigmahp;
+	      if( tkCount < 20 ) {
+		++Ntrk3sigma20;
+		if( tk->highPurity ) ++Ntrk3sigmahp20;
+	      }
+	    }
+	  }
+	}
+      }
+      
+      // SumPT of tracks from candidate PV or no PV
+      if( tk->pt < 0.9 ) continue;
+      if( deltaR(tk->eta ,tk->phi, Cand.eta(), Cand.phi()) > 0.7 ) continue;
+      if( tk->vertexId == 1 ) {
+	sumNdofPV += tk->ndof;
+	sumPTPV += tk->pt;
+      }
+      // In this case the doca is also required to be less than 500 microns
+      else if( tk->vertexId == 0 && tk->doca < 0.05 ) {
+	sumNdofNoVtx += tk->ndof;
+	sumPTNoVtx += tk->pt;
+      }
+    }
+
+    double Iso = Cand.pt()/(Cand.pt()+sumPTNoVtx+sumPTPV);
+
+    Cand.addUserFloat("Isolation", (float) Iso);
+    Cand.addUserFloat("minDca", (float) minDca);
+    Cand.addUserInt("Ntrk", Ntrk);
+    Cand.addUserInt("Ntrkhp", Ntrkhp);
+    Cand.addUserInt("Ntrk20", Ntrk20);
+    Cand.addUserInt("Ntrkhp20", Ntrkhp20);
+    Cand.addUserInt("Ntrk1sigma", Ntrk1sigma);
+    Cand.addUserInt("Ntrk1sigmahp", Ntrk1sigmahp);
+    Cand.addUserInt("Ntrk1sigma20", Ntrk1sigma20);
+    Cand.addUserInt("Ntrk1sigmahp20", Ntrk1sigmahp20);
+    Cand.addUserInt("Ntrk2sigma", Ntrk2sigma);
+    Cand.addUserInt("Ntrk2sigmahp", Ntrk2sigmahp);
+    Cand.addUserInt("Ntrk2sigma20", Ntrk2sigma20);
+    Cand.addUserInt("Ntrk2sigmahp20", Ntrk2sigmahp20);
+    Cand.addUserInt("Ntrk3sigma", Ntrk3sigma);
+    Cand.addUserInt("Ntrk3sigmahp", Ntrk3sigmahp);
+    Cand.addUserInt("Ntrk3sigma20", Ntrk3sigma20);
+    Cand.addUserInt("Ntrk3sigmahp20", Ntrk3sigmahp20);
+    Cand.addUserInt("countTksOfPV", countTksOfPV);
+    Cand.addUserInt("countTksOfNoVtx", countTksOfNoVtx);
+    Cand.addUserFloat("sumPTPV", (float) sumPTPV);
+    Cand.addUserFloat("sumPTNoVtx", (float) sumPTNoVtx);
+    Cand.addUserFloat("sumNdofPV", (float) sumNdofPV);
+    Cand.addUserFloat("sumNdofNoVtx", (float) sumNdofNoVtx);
+    Cand.addUserFloat("isoMu1", (float) isoMu1);
+    Cand.addUserFloat("isoMu2", (float) isoMu2);
+
+    /* TrajectoryStateClosestToPoint mu1TS = (theTTBuilder->build(mu1->track())).impactPointTSCP();
+    TrajectoryStateClosestToPoint mu2TS = (theTTBuilder->build(mu2->track())).impactPointTSCP();
+    TrajectoryStateClosestToPoint tkTS = (theTTBuilder->build(track)).impactPointTSCP();*/
 
     FreeTrajectoryState fts(
           GlobalPoint(SVtx.position().x(), SVtx.position().y(), SVtx.position().z()),
@@ -1133,10 +1230,15 @@ bool Onia2MuMuPAT::searchForTheThirdTrack(const edm::Event& iEvent, const edm::E
     AlgebraicSymMatrix33 vXYeB = v1eB.matrix()+ v2eB.matrix();
     double ctauErrBS = sqrt(ROOT::Math::Similarity(vpperp,vXYeB))*Cand.mass()/(pperp.Perp2());
 
+    Cand.addUserFloat("mu1_dxyBeamspot", mu1->innerTrack()->dxy(*theBeamSpot.product()));
+    Cand.addUserFloat("mu2_dxyBeamspot", mu2->innerTrack()->dxy(*theBeamSpot.product()));
+
     Cand.addUserFloat("ppdlBS",ctauBS);
     Cand.addUserFloat("ppdlErrBS",ctauErrBS);
 
   }else{
+    Cand.addUserFloat("delta3d",-1);
+    Cand.addUserFloat("delta3dErr",-1);
     Cand.addUserFloat("vNChi2",-1);
     Cand.addUserFloat("vProb", -1);
     Cand.addUserFloat("ppdlPV",-100);
@@ -1155,20 +1257,32 @@ bool Onia2MuMuPAT::searchForTheThirdTrack(const edm::Event& iEvent, const edm::E
     Cand.addUserFloat("ppdlErrBS",-100);
     Cand.addUserFloat("Isolation", -1);
     Cand.addUserFloat("minDca", -1);
-    Cand.addUserFloat("minDcaDr0p7", -1);
-    Cand.addUserFloat("minDcaDr0p7Min0p5", -1);
-    Cand.addUserFloat("minDcaDr0p7Min0p9", -1);
     Cand.addUserInt("Ntrk", 9999);
+    Cand.addUserInt("Ntrkhp", 9999);
+    Cand.addUserInt("Ntrk20", 9999);
+    Cand.addUserInt("Ntrkhp20", 9999);
+    Cand.addUserInt("Ntrk1sigma", 9999);
+    Cand.addUserInt("Ntrk1sigmahp", 9999);
+    Cand.addUserInt("Ntrk1sigma20", 9999);
+    Cand.addUserInt("Ntrk1sigmahp20", 9999);
+    Cand.addUserInt("Ntrk2sigma", 9999);
+    Cand.addUserInt("Ntrk2sigmahp", 9999);
+    Cand.addUserInt("Ntrk2sigma20", 9999);
+    Cand.addUserInt("Ntrk2sigmahp20", 9999);
+    Cand.addUserInt("Ntrk3sigma", 9999);
+    Cand.addUserInt("Ntrk3sigmahp", 9999);
+    Cand.addUserInt("Ntrk3sigma20", 9999);
+    Cand.addUserInt("Ntrk3sigmahp20", 9999);
     Cand.addUserInt("countTksOfPV", 9999);
-    Cand.addUserFloat("vertexWeight", -1);
+    Cand.addUserInt("countTksOfNoVtx", 9999);
     Cand.addUserFloat("sumPTPV", -1);
-    Cand.addUserFloat("delta3d",-1);
-    Cand.addUserFloat("delta3dErr",-1);
-    Cand.addUserFloat("MassErr",-1);
-    Cand.addUserFloat("DCAXY", -1);
-    Cand.addUserFloat("DCA", -1);
-    Cand.addUserFloat("sumNdof", -1);
-    
+    Cand.addUserFloat("sumPTNoVtx", -1);
+    Cand.addUserFloat("sumNdofPV",  -1);
+    Cand.addUserFloat("sumNdofNoVtx", -1);
+    Cand.addUserFloat("isoMu1", -1);
+    Cand.addUserFloat("isoMu2", -1);
+    Cand.addUserFloat("mu1_dxyBeamspot", -1);
+    Cand.addUserFloat("mu2_dxyBeamspot", -1);
   }
   
   return found;
