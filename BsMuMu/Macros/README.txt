@@ -4,3 +4,9 @@ Usage:
 
 At this moment the file must be edited to change wether to apply the analysis cuts or only the preselection.
 The variable cut_based is a boolen, if true it means the analysis cuts are applied.
+
+Then, run
+./runTMVA.sh
+
+To produce all the tables and plots, run
+python TMVAPlots.py

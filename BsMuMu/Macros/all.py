@@ -2,14 +2,14 @@
 
 import os
 
-inputTrees = ['/Users/demattia/TMVA-v4.1.2/test/NewTrees/Trees/Run2012A/selection_test.root',
-              '/Users/demattia/TMVA-v4.1.2/test/NewTrees/Trees/Run2012ARecover/selection_test.root',
-              '/Users/demattia/TMVA-v4.1.2/test/NewTrees/Trees/Run2012B/selection_test.root',
-              '/Users/demattia/TMVA-v4.1.2/test/NewTrees/Trees/Run2012C1/selection_test.root',
-              '/Users/demattia/TMVA-v4.1.2/test/NewTrees/Trees/Run2012CEcalRecover/selection_test.root',
-              '/Users/demattia/TMVA-v4.1.2/test/NewTrees/Trees/Run2012C2/selection_test.root',
-              '/Users/demattia/TMVA-v4.1.2/test/NewTrees/Trees/Run2012D/selection_test.root',
-              '/Users/demattia/TMVA-v4.1.2/test/NewTrees/Trees/BsMC/selection_test.root',
+inputTrees = ['Trees/Run2012A/selection_test.root',
+              'Trees/Run2012ARecover/selection_test.root',
+              'Trees/Run2012B/selection_test.root',
+              'Trees/Run2012C1/selection_test.root',
+              'Trees/Run2012DRereco/selection_test.root',
+              'Trees/Run2012C2/selection_test.root',
+              'Trees/Run2012D/selection_test.root',
+              'Trees/BsMC/selection_test.root',
               ]
 region = ["barrel", "endcaps"]
 
@@ -22,10 +22,10 @@ maxRun = "203002"
 def combineSamplesAndAddMuonID(appendName):
     # Combine barrel samples
     os.system("rm -f Barrel"+appendName)
-    os.system("hadd Barrel"+appendName+" Run2012A_barrel"+appendName+" Run2012ARecover_barrel"+appendName+" Run2012B_barrel"+appendName+" Run2012C1_barrel"+appendName+" Run2012CEcalRecover_barrel"+appendName+" Run2012C2_barrel"+appendName+" Run2012D_barrel"+appendName)
+    os.system("hadd Barrel"+appendName+" Run2012A_barrel"+appendName+" Run2012ARecover_barrel"+appendName+" Run2012B_barrel"+appendName+" Run2012C1_barrel"+appendName+" Run2012DRereco_barrel"+appendName+" Run2012C2_barrel"+appendName+" Run2012D_barrel"+appendName)
     # Combine endcaps samples
     os.system("rm -f Endcaps"+appendName)
-    os.system("hadd Endcaps"+appendName+" Run2012A_endcaps"+appendName+" Run2012ARecover_endcaps"+appendName+" Run2012B_endcaps"+appendName+" Run2012C1_endcaps"+appendName+" Run2012CEcalRecover_endcaps"+appendName+" Run2012C2_endcaps"+appendName+" Run2012D_endcaps"+appendName)
+    os.system("hadd Endcaps"+appendName+" Run2012A_endcaps"+appendName+" Run2012ARecover_endcaps"+appendName+" Run2012B_endcaps"+appendName+" Run2012C1_endcaps"+appendName+" Run2012DRereco_endcaps"+appendName+" Run2012C2_endcaps"+appendName+" Run2012D_endcaps"+appendName)
     os.system("rm -f Run*")
     # Add MVA muon-id
     os.system("root -l -b -q AddMuonID.C+\(\\\"Barrel"+appendName+"\\\"\)")

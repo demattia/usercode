@@ -1,3 +1,4 @@
+rm TMVALog_*.txt 
 root -b -q -l compileTMVA.C
 root -b -q -l TMVAClassification.C+\(\"barrel\",\"\",\"\"\) > TMVALog_barrel.txt &
 root -b -q -l TMVAClassification.C+\(\"endcaps\",\"\",\"\"\) > TMVALog_endcaps.txt &
