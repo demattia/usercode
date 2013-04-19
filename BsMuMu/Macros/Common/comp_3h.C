@@ -62,7 +62,7 @@ void comp_3h(const TString & inputFileA = "Barrel_preselection_0.root",
   vars.push_back(Vars("delta3d", "delta3d", "delta3d", 40, 0, 0.05));
   vars.push_back(Vars("delta3d/delta3dErr", "delta3d/delta3dErr", "delta3d/delta3dErr", 40, 0, 5));
   vars.push_back(Vars("cosAlpha3D", "cosAlpha3D", "cosAlpha3D", 40, 0.95, 1.));
-  vars.push_back(Vars("ntrk", "ntrk", "ntrk", 40, 0, 20));
+  vars.push_back(Vars("ntrk20", "ntrk20", "ntrk20", 40, 0, 20));
   vars.push_back(Vars("minDca", "minDca", "minDca", 40, 0, 0.2));
   vars.push_back(Vars("isolation", "isolation", "isolation", 40, 0, 1));
   vars.push_back(Vars("l3d", "l3d", "l3d", 40, 0, 5));
@@ -323,7 +323,7 @@ OURS  -------------------------
  mu2_nTrHits     = 0
  mu2_phi         = 0
  mu2_pt          = 0
- ntrk            = 0
+ ntrk20            = 0
  pt              = 0
  sumPTPV         = 0
  vProb           = 0

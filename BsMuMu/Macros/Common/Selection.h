@@ -27,7 +27,7 @@ TString Selection(const bool endcaps, const bool data, const bool cut_based = fa
   if( muId != "" ) cuts += " && " + muId;
 
   // Preselection cuts
-  TString preselection("(mass > 4.9 && mass < 5.9 && pt > 5. && pt < 9999. && mu1_pt > 4. && mu1_pt < 999. && mu2_pt > 4. && mu2_pt < 999. && l3d < 2. && l3dsig > 0. && l3dsig < 120. && NChi2 < 10. && delta3d < 0.1 && delta3d/delta3dErr < 5. && dca < 0.1 && acos(cosAlpha3D) < 0.3 && ntrk < 21 && minDca < 0.25 && isolation > 0. && (mu1_charge*mu2_charge == -1) && (lxysig > 3) && (abs(pvlip) < 1.0) && (abs(pvlip)/abs(pvlipErr) < 5.0))");
+  TString preselection("(mass > 4.9 && mass < 5.9 && pt > 5. && pt < 9999. && mu1_pt > 4. && mu1_pt < 999. && mu2_pt > 4. && mu2_pt < 999. && l3d < 2. && l3dsig > 0. && l3dsig < 120. && NChi2 < 10. && delta3d < 0.1 && delta3d/delta3dErr < 5. && dca < 0.1 && acos(cosAlpha3D) < 0.3 && ntrk20 < 21 && minDca < 0.25 && isolation > 0. && (mu1_charge*mu2_charge == -1) && (lxysig > 3) && (abs(pvlip) < 1.0) && (abs(pvlip)/abs(pvlipErr) < 5.0))");
   cuts += " && " + preselection;
 
   TString barrelCuts("(mu1_eta < 1.4 && mu1_eta > -1.4 && mu2_eta < 1.4 && mu2_eta > -1.4)");
@@ -42,7 +42,7 @@ TString Selection(const bool endcaps, const bool data, const bool cut_based = fa
   // Cut-based analysis
   if( cut_based ) {
     TString lifetimeCuts("(delta3d < 0.008 && delta3d/delta3dErr < 2.000)");
-    TString trackCuts("(isolation > 0.8 && dca > 0.015 && ntrk < 2)");
+    TString trackCuts("(isolation > 0.8 && dca > 0.015 && ntrk20 < 2)");
     cuts += " && " + lifetimeCuts + " && " + trackCuts;
 
     if( endcaps ) {

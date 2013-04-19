@@ -56,7 +56,7 @@ void comp(const TString & parallelAnalysisFile = "Barrel_preselection.root",
   vars.push_back(Vars("delta3d", "pvip", 40, 0, 0.05));
   vars.push_back(Vars("delta3d/delta3dErr", "pvips", 40, 0, 5));
   vars.push_back(Vars("cosAlpha3D", "cosa", 40, 0.95, 1.));
-  vars.push_back(Vars("ntrk", "closetrk", 40, 0, 20));
+  vars.push_back(Vars("ntrk20", "closetrk", 40, 0, 20));
   vars.push_back(Vars("minDca", "docatrk", 40, 0, 0.2));
   vars.push_back(Vars("isolation", "iso", 40, 0, 1));
   vars.push_back(Vars("l3d", "fl3d", 40, 0, 5));
@@ -305,7 +305,7 @@ OURS  -------------------------
  mu2_nTrHits     = 0
  mu2_phi         = 0
  mu2_pt          = 0
- ntrk            = 0
+ ntrk20            = 0
  pt              = 0
  sumPTPV         = 0
  vProb           = 0

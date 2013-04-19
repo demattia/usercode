@@ -1,4 +1,4 @@
-// @(#)root/tmva $Id: TMVAClassification.C,v 1.4 2013/03/29 19:07:56 demattia Exp $
+// @(#)root/tmva $Id: TMVAClassification.C,v 1.5 2013/03/31 12:50:26 demattia Exp $
 /**********************************************************************************
  * Project   : TMVA - a ROOT-integrated toolkit for multivariate data analysis    *
  * Package   : TMVA                                                               *
@@ -244,7 +244,7 @@ void TMVAClassification( const TString & region = "barrel", const TString index 
    factory->AddVariable( "iso := isolation",                 "iso", "", 'F' );
    if( originalVariables ) {
      factory->AddVariable( "docatrk := minDca",              "docatrk", "cm", 'F' );
-     factory->AddVariable( "closetrk := ntrk",               "closetrk", "", 'I' );
+     factory->AddVariable( "closetrk := ntrk20",               "closetrk", "", 'I' );
    }
    factory->AddVariable( "chi2dof := NChi2",                 "chi2/dof", "", 'F' );
 
