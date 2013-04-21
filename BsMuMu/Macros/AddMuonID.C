@@ -1,7 +1,7 @@
 #include "TTree.h"
 #include "TFile.h"
 #include <iostream>
-#include "tmvaMuonID/TMVAClassification_BDT.class.C"
+#include "tmvaMuonID/TMVAClassification_BDT_TM.class.C"
 
 void AddMuonID(const TString & type = "Barrel")
 {
