@@ -2,6 +2,9 @@
 #include "TFile.h"
 #include <iostream>
 #include "tmvaMuonID/TMVAClassification_BDT_TM.class.C"
+#include "Common/Selection.h"
+
+// This function adds the mvaMuonId variables to the trees. It also applies the cut.
 
 void AddMuonID(const TString & type = "Barrel")
 {
@@ -88,7 +91,7 @@ void AddMuonID(const TString & type = "Barrel")
     inputValues[9] = mu2_trkEHitsOut;
     mu2_MVAMuonID = muonID.GetMvaValue( inputValues );
 
-    newtree->Fill();
+    if( mvaMuonIDSelection(mu1_MVAMuonID, mu2_MVAMuonID) ) newtree->Fill();
   }
 
   g->Write();

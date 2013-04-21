@@ -88,5 +88,5 @@ def applySelectionAndSplit(inputTrees, region, splitting, maxRun, blindData = Tr
 for splitting in range(-1,3):
     applySelectionAndSplit(inputTrees, region, splitting, maxRun)
 
-# Produced unblinded datasets. The last parameter is blindData = False
+# Produce unblinded datasets. The last parameter is blindData = False
 applySelectionAndSplit(inputTrees, region, -1, maxRun, False)
