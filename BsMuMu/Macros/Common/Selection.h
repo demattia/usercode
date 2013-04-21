@@ -23,8 +23,9 @@ TString Selection(const bool endcaps, const bool data, const bool cut_based = fa
   // TString muId = "(mu1_GMPT && mu2_GMPT)";
   // No muon-id, it will be applied later.
   // TString muId = "";
+  TString mvaMuonId = "(mu1_MVAMuonID > 0.3769) && (mu1_MVAMuonID > 0.3769)";
   TString muId = "mu1_GM && (mu1_globalChi2 < 10.) && (mu1_numberOfValidMuonHits > 0.) && (mu1_numMatchedStations > 1.) && (mu1_numberOfValidPixelHits > 0.) && (mu1_trackerLayersWithMeasurement > 5.) && mu2_GM && (mu2_globalChi2 < 10.) && (mu2_numberOfValidMuonHits > 0.) && (mu2_numMatchedStations > 1.) && (mu2_numberOfValidPixelHits > 0.) && (mu2_trackerLayersWithMeasurement > 5.)";
-  if( muId != "" ) cuts += " && " + muId;
+  if( muId != "" ) cuts += " && " + muId + " && " + mvaMuonId;
 
   // Preselection cuts
   TString preselection("(mass > 4.9 && mass < 5.9 && pt > 5. && pt < 9999. && mu1_pt > 4. && mu1_pt < 999. && mu2_pt > 4. && mu2_pt < 999. && l3d < 2. && l3dsig > 0. && l3dsig < 120. && NChi2 < 10. && delta3d < 0.1 && delta3d/delta3dErr < 5. && dca < 0.1 && acos(cosAlpha3D) < 0.3 && ntrk20 < 21 && minDca < 0.25 && isolation > 0. && (mu1_charge*mu2_charge == -1) && (lxysig > 3) && (abs(pvlip) < 1.0) && (abs(pvlip)/abs(pvlipErr) < 5.0))");
