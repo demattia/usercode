@@ -3,17 +3,17 @@
     \hline 
     rank & variable & separation \\ 
     \hline 
-    1 & alpha & 5.759e-01 \\ 
-    2 & closetrk & 4.330e-01 \\ 
-    3 & fls3d & 4.128e-01 \\ 
-    4 & pvips & 3.735e-01 \\ 
-    5 & docatrk & 3.267e-01 \\ 
-    6 & pvip & 3.188e-01 \\ 
-    7 & iso & 2.340e-01 \\ 
-    8 & maxdoca & 1.575e-01 \\ 
-    9 & chi2/dof & 1.443e-01 \\ 
-    10 & pt & 4.002e-02 \\ 
-    11 & eta & 1.300e-03 \\ 
+    1 & alpha & 5.755e-01 \\ 
+    2 & closetrk & 4.317e-01 \\ 
+    3 & fls3d & 4.144e-01 \\ 
+    4 & pvips & 3.721e-01 \\ 
+    5 & docatrk & 3.251e-01 \\ 
+    6 & pvip & 3.181e-01 \\ 
+    7 & iso & 2.352e-01 \\ 
+    8 & maxdoca & 1.602e-01 \\ 
+    9 & chi2/dof & 1.462e-01 \\ 
+    10 & pt & 4.094e-02 \\ 
+    11 & eta & 1.633e-03 \\ 
     \hline 
   \end{tabular} 
   \label{tab:datasets} 

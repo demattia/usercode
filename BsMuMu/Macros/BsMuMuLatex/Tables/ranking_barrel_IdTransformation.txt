@@ -5,17 +5,17 @@
     \hline 
     rank & variable & separation & variable & separation & variable & separation \\ 
     \hline 
-    1 & alpha & 5.305e-01 & alpha & 5.284e-01 & alpha & 5.367e-01 \\ 
-    2 & closetrk & 4.470e-01 & closetrk & 4.427e-01 & closetrk & 4.330e-01 \\ 
-    3 & pvips & 3.702e-01 & pvips & 3.697e-01 & pvips & 3.769e-01 \\ 
-    4 & docatrk & 3.357e-01 & docatrk & 3.305e-01 & docatrk & 3.298e-01 \\ 
-    5 & fls3d & 3.280e-01 & fls3d & 3.258e-01 & fls3d & 3.246e-01 \\ 
-    6 & iso & 3.009e-01 & iso & 3.050e-01 & iso & 3.069e-01 \\ 
-    7 & pvip & 2.947e-01 & pvip & 2.888e-01 & pvip & 3.052e-01 \\ 
-    8 & maxdoca & 1.381e-01 & maxdoca & 1.359e-01 & maxdoca & 1.390e-01 \\ 
-    9 & chi2/dof & 1.320e-01 & chi2/dof & 1.306e-01 & chi2/dof & 1.367e-01 \\ 
-    10 & eta & 1.079e-02 & eta & 1.076e-02 & eta & 1.191e-02 \\ 
-    11 & pt & 6.807e-03 & pt & 6.551e-03 & pt & 6.212e-03 \\ 
+    1 & alpha & 5.318e-01 & alpha & 5.290e-01 & alpha & 5.364e-01 \\ 
+    2 & closetrk & 4.462e-01 & closetrk & 4.423e-01 & closetrk & 4.345e-01 \\ 
+    3 & pvips & 3.715e-01 & pvips & 3.702e-01 & pvips & 3.756e-01 \\ 
+    4 & docatrk & 3.343e-01 & docatrk & 3.295e-01 & docatrk & 3.298e-01 \\ 
+    5 & fls3d & 3.269e-01 & fls3d & 3.275e-01 & fls3d & 3.264e-01 \\ 
+    6 & iso & 3.004e-01 & iso & 3.033e-01 & iso & 3.065e-01 \\ 
+    7 & pvip & 2.967e-01 & pvip & 2.903e-01 & pvip & 3.046e-01 \\ 
+    8 & maxdoca & 1.370e-01 & maxdoca & 1.375e-01 & maxdoca & 1.403e-01 \\ 
+    9 & chi2/dof & 1.302e-01 & chi2/dof & 1.320e-01 & chi2/dof & 1.370e-01 \\ 
+    10 & eta & 1.090e-02 & eta & 1.044e-02 & eta & 1.183e-02 \\ 
+    11 & pt & 7.086e-03 & pt & 6.153e-03 & pt & 6.132e-03 \\ 
     \hline 
   \end{tabular} 
   \label{tab:datasetsbarrelIdTransformation} 
