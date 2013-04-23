@@ -3,6 +3,12 @@
     \hline 
     Sample & Type 0 & Type 1 & Type 2 \\ 
     \hline 
-    Signal barrel & 8931 & 8847 & 11004 \\ 
-    Signal endcaps & 5140 & 5103 & 6075 \\ 
-    Background barrel & 
+    Signal barrel & 11206 & 11038 & 11004 \\ 
+    Signal endcaps & 6155 & 6070 & 6075 \\ 
+    Background barrel & 25505 & 25397 & 25433 \\ 
+    Background endcaps & 19809 & 19799 & 19862 \\ 
+    \hline 
+  \end{tabular} 
+  \label{tab:numCandidates} 
+  \caption{Number of events per type for signal and background events in the barrel and endcap.} 
+\end{table} 

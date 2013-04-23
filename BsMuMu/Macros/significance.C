@@ -15,21 +15,23 @@
 #include "Common/setTDRStyle_modified.C"
 #include <fstream>
 
-const double nsig_barrel  = 60.;
-const double nbkg_barrel  = 28884.;
-const double nsig_endcap  = 35.;
-const double nbkg_endcap  = 35392.;
+// const double nsig_barrel  = 60.;
+// const double nbkg_barrel  = 28884.;
+// const double nsig_endcap  = 35.;
+// const double nbkg_endcap  = 35392.;
 
-void significance(TString method="BDT",TString region="barrel", TString index="", const int subdir = 1) {
-  
-  double nsig, nbkg;
-  if(region=="barrel") {
-    nsig = nsig_barrel;
-    nbkg = nbkg_barrel;
-  } else if (region=="endcaps") {
-    nsig = nsig_endcap;
-    nbkg = nbkg_endcap;
-  } else  {cout<<"wrong input"<<endl; exit(-1);}
+void significance(const double & nsig, const double & nbkg, TString method="BDT",TString region="barrel", TString index="", const int subdir = 1) {
+
+  // double nsig, nbkg;
+  // nsig = nsig1;
+  // nbkg = nbkg1;
+  // if(region=="barrel") {
+  //   nsig = nsig_barrel;
+  //   nbkg = nbkg_barrel;
+  // } else if (region=="endcaps") {
+  //   nsig = nsig_endcap;
+  //   nbkg = nbkg_endcap;
+  // } else  {cout<<"wrong input"<<endl; exit(-1);}
 
   cout << "processing " << method << " for " << region << endl;
 
@@ -48,8 +50,8 @@ void significance(TString method="BDT",TString region="barrel", TString index=""
   TH1F* tmva_s = (TH1F*)gROOT->FindObject(TString("MVA_"+method+"_S_high"));
   TH1F* tmva_b = (TH1F*)gROOT->FindObject(TString("MVA_"+method+"_B_high"));
 
-  const int rb = 250;
-  // const int rb = 1;
+  // const int rb = 250;
+  const int rb = 1;
   tmva_s->Rebin(rb);
   tmva_b->Rebin(rb);
 
