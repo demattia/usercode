@@ -5,17 +5,17 @@
     \hline 
     rank & variable & separation & variable & separation & variable & separation \\ 
     \hline 
-    1 & iso & 1.820e-01 & pvips & 1.949e-01 & pvips & 1.841e-01 \\ 
-    2 & pvips & 1.713e-01 & maxdoca & 1.253e-01 & fls3d & 1.455e-01 \\ 
-    3 & closetrk & 1.148e-01 & iso & 1.166e-01 & iso & 1.059e-01 \\ 
-    4 & maxdoca & 9.784e-02 & fls3d & 1.117e-01 & pt & 9.342e-02 \\ 
-    5 & chi2dof & 7.669e-02 & pt & 1.079e-01 & closetrk & 8.258e-02 \\ 
-    6 & alpha & 7.440e-02 & docatrk & 8.908e-02 & pvip & 7.755e-02 \\ 
-    7 & docatrk & 7.182e-02 & closetrk & 5.634e-02 & alpha & 6.894e-02 \\ 
-    8 & fls3d & 5.980e-02 & eta & 5.353e-02 & maxdoca & 6.576e-02 \\ 
-    9 & eta & 5.520e-02 & chi2dof & 5.223e-02 & docatrk & 6.503e-02 \\ 
-    10 & pvip & 4.925e-02 & alpha & 4.886e-02 & chi2dof & 5.973e-02 \\ 
-    11 & pt & 4.687e-02 & pvip & 4.359e-02 & eta & 5.148e-02 \\ 
+    1 & pvips & 1.628e-01 & iso & 1.568e-01 & pvips & 1.607e-01 \\ 
+    2 & iso & 1.596e-01 & pvips & 1.540e-01 & iso & 1.378e-01 \\ 
+    3 & alpha & 1.303e-01 & alpha & 1.274e-01 & alpha & 1.313e-01 \\ 
+    4 & chi2dof & 9.416e-02 & pt & 8.550e-02 & fls3d & 1.072e-01 \\ 
+    5 & fls3d & 8.341e-02 & fls3d & 7.946e-02 & closetrk & 8.633e-02 \\ 
+    6 & pt & 8.193e-02 & chi2dof & 7.733e-02 & chi2dof & 8.480e-02 \\ 
+    7 & closetrk & 7.948e-02 & closetrk & 7.160e-02 & pt & 8.444e-02 \\ 
+    8 & docatrk & 6.250e-02 & docatrk & 6.546e-02 & eta & 5.820e-02 \\ 
+    9 & eta & 5.252e-02 & eta & 6.224e-02 & pvip & 5.298e-02 \\ 
+    10 & pvip & 4.742e-02 & pvip & 6.192e-02 & maxdoca & 5.151e-02 \\ 
+    11 & maxdoca & 4.593e-02 & maxdoca & 5.827e-02 & docatrk & 4.475e-02 \\ 
     \hline 
   \end{tabular} 
   \label{tab:datasetsbarrelBDT} 

@@ -9,4 +9,3 @@ root -b -q -l significance.C+\(\"BDT\",\"endcaps\",\"\"\)
 root -b -q -l significance.C+\(\"BDT\",\"endcaps\",\"0\"\)
 root -b -q -l significance.C+\(\"BDT\",\"endcaps\",\"1\"\)
 root -b -q -l significance.C+\(\"BDT\",\"endcaps\",\"2\"\)
-

@@ -13,13 +13,14 @@
 #include "TMarker.h"
 #include <iostream>
 #include "Common/setTDRStyle_modified.C"
+#include <fstream>
 
 const double nsig_barrel  = 60.;
 const double nbkg_barrel  = 28884.;
 const double nsig_endcap  = 35.;
 const double nbkg_endcap  = 35392.;
 
-void significance(TString method="BDT",TString region="barrel", TString index="") {
+void significance(TString method="BDT",TString region="barrel", TString index="", const int subdir = 1) {
   
   double nsig, nbkg;
   if(region=="barrel") {
@@ -42,12 +43,13 @@ void significance(TString method="BDT",TString region="barrel", TString index=""
   fnameA += ".root";
   TFile* inputA = TFile::Open(fnameA);
 
-  gDirectory->Cd(fnameA+":/Method_"+method+"/"+method);
+  if( subdir ) gDirectory->Cd(fnameA+":/Method_"+method+"/"+method);
   gDirectory->pwd();
   TH1F* tmva_s = (TH1F*)gROOT->FindObject(TString("MVA_"+method+"_S_high"));
   TH1F* tmva_b = (TH1F*)gROOT->FindObject(TString("MVA_"+method+"_B_high"));
 
-  const int rb =250;
+  const int rb = 250;
+  // const int rb = 1;
   tmva_s->Rebin(rb);
   tmva_b->Rebin(rb);
 
@@ -107,10 +109,12 @@ void significance(TString method="BDT",TString region="barrel", TString index=""
   double sig_max_effS = effS->GetBinContent(sig_max_bin);
   double sig_max_effB = effB->GetBinContent(sig_max_bin);
   //printf("maximum significance: %f bin:%d mva:%f %f %f \n", sig_max, sig_max_bin, sig_max_mva, sig_max_effS, sig_max_effB);
- char ss[100];
- sprintf(ss, "%s,  max. significance: %3.1f, %s>%5.4f, #epsilon_{S}=%4.3f, #epsilon_{B}=%5.4f",region.Data(),sig_max,method.Data(), sig_max_mva, sig_max_effS, sig_max_effB);
+  char ss[100];
+  sprintf(ss, "%s,  max. significance: %3.1f, %s>%5.4f, #epsilon_{S}=%4.3f, #epsilon_{B}=%5.4f",region.Data(),sig_max,method.Data(), sig_max_mva, sig_max_effS, sig_max_effB);
 
-
+  ofstream outputTxt("maxsignificance_"+region+".txt");
+  outputTxt << ss;
+  outputTxt.close();
 
   //setTDRStyle(false);
   gStyle->SetOptStat(kFALSE);

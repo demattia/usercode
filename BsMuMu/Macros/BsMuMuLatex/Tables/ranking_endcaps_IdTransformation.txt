@@ -5,17 +5,17 @@
     \hline 
     rank & variable & separation & variable & separation & variable & separation \\ 
     \hline 
-    1 & alpha & 5.840e-01 & alpha & 5.800e-01 & alpha & 5.846e-01 \\ 
-    2 & closetrk & 4.315e-01 & closetrk & 4.308e-01 & closetrk & 4.388e-01 \\ 
-    3 & fls3d & 4.118e-01 & fls3d & 4.224e-01 & fls3d & 4.207e-01 \\ 
-    4 & pvips & 3.780e-01 & pvips & 3.673e-01 & pvips & 3.791e-01 \\ 
-    5 & pvip & 3.299e-01 & docatrk & 3.209e-01 & docatrk & 3.248e-01 \\ 
-    6 & docatrk & 3.198e-01 & pvip & 3.194e-01 & pvip & 3.240e-01 \\ 
-    7 & iso & 2.375e-01 & iso & 2.409e-01 & iso & 2.372e-01 \\ 
-    8 & maxdoca & 1.600e-01 & maxdoca & 1.616e-01 & maxdoca & 1.626e-01 \\ 
-    9 & chi2/dof & 1.452e-01 & chi2/dof & 1.437e-01 & chi2/dof & 1.470e-01 \\ 
-    10 & pt & 4.260e-02 & pt & 4.692e-02 & pt & 4.381e-02 \\ 
-    11 & eta & 2.767e-03 & eta & 1.392e-03 & eta & 2.145e-03 \\ 
+    1 & alpha & 5.835e-01 & alpha & 5.801e-01 & alpha & 5.857e-01 \\ 
+    2 & closetrk & 4.289e-01 & closetrk & 4.298e-01 & closetrk & 4.383e-01 \\ 
+    3 & fls3d & 4.096e-01 & fls3d & 4.214e-01 & fls3d & 4.214e-01 \\ 
+    4 & pvips & 3.776e-01 & pvips & 3.673e-01 & pvips & 3.792e-01 \\ 
+    5 & iso & 3.429e-01 & iso & 3.440e-01 & iso & 3.496e-01 \\ 
+    6 & pvip & 3.301e-01 & pvip & 3.199e-01 & docatrk & 3.264e-01 \\ 
+    7 & docatrk & 3.203e-01 & docatrk & 3.191e-01 & pvip & 3.245e-01 \\ 
+    8 & maxdoca & 1.578e-01 & maxdoca & 1.624e-01 & maxdoca & 1.614e-01 \\ 
+    9 & chi2/dof & 1.436e-01 & chi2/dof & 1.442e-01 & chi2/dof & 1.462e-01 \\ 
+    10 & pt & 4.321e-02 & pt & 4.551e-02 & pt & 4.328e-02 \\ 
+    11 & eta & 2.712e-03 & eta & 1.287e-03 & eta & 1.884e-03 \\ 
     \hline 
   \end{tabular} 
   \label{tab:datasetsendcapsIdTransformation} 
