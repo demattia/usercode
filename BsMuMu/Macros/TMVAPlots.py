@@ -25,14 +25,22 @@
 
 # <codecell>
 
-# Definition of common variables
-figuresDir = "/home/zhenhu/CMSSW_5_3_2_patch1/src/BsMuMu/Macros/BsMuMuLatex/Figures/"
-tablesDir = "/home/zhenhu/CMSSW_5_3_2_patch1/src/BsMuMu/Macros/BsMuMuLatex/Tables/"
-rootExecutable = "/afs/cern.ch/sw/lcg/app/releases/ROOT/5.34.00/x86_64-slc5-gcc43-opt/root/bin/root"
+# For the HCP analysis
+# figuresDir = "/Users/demattia/TMVA-v4.1.2/test/NewTrees/BsMuMuLatex/Figures/"
+# tablesDir = "/Users/demattia/TMVA-v4.1.2/test/NewTrees/BsMuMuLatex/Tables/"
+# For the new analysis
+figuresDir = "/Users/demattia/TMVA-v4.1.2/test/NewAnalysis/BsMuMuLatex/Figures/"
+tablesDir = "/Users/demattia/TMVA-v4.1.2/test/NewAnalysis/BsMuMuLatex/Tables/"
+
+rootExecutable = "/Users/demattia/Downloads/root-v5-34-00-patches/bin/root"
 
 # <codecell>
 
 # cd /Users/demattia/TMVA-v4.1.2/test/NewTrees/
+
+# <codecell>
+
+cd /Users/demattia/TMVA-v4.1.2/test/NewAnalysis/
 
 # <codecell>
 
@@ -338,7 +346,9 @@ runD = 7483.
 # Full 2012 data
 # integratedLuminosity = runA+runARecover+runB+runC1+runCEcalRecover+runC2+runD
 # Same data as reference AN
-integratedLuminosity = runA+runARecover+runB+runC1+runCEcalRecover+runC2
+# integratedLuminosity = runA+runARecover+runB+runC1+runCEcalRecover+runC2
+# In /pb
+integratedLuminosity = 18620
 
 expectedEvents = sigma*genFilterEff*integratedLuminosity
 
@@ -455,104 +465,33 @@ print region.title()+":"
 optimalCutEndcaps = optimalCutBDT(region, expectedEventsEndcaps, estimatedBackgroundEndcaps)
 os.system("mv mvaeffs_BDT_"+region+".pdf "+figuresDir)
 
-# <headingcell level=3>
+# <rawcell>
 
-# Apply the BDT to the data and obtain the mass plot.
+# Extract the optimal BDT cuts for each BDT in the subsamples:
+# - merge the TMVA output files for each BDT training
+# - run the significance macro to extract the maximum significance
+# Since the significance macro only uses the number of entries to recompute internally the efficiencies it is possible to merge the input files.
 
 # <codecell>
 
-# Change this to redo also the BDT application #
-# -------------------------------------------- #
+os.system(rootExecutable+" -l -b -q mergeTMVAs.C\(\\\"BDT\\\",\\\"barrel\\\"")
+os.system(rootExecutable+" -l -b -q significance.C+\("+str(expectedEventsBarrel)+","+str(estimatedBackgroundBarrel)+",\\\"BDT\\\",\\\"barrel\\\",\\\"merged\\\",0\)")
+maxSigFile = open("maxsignificance_barrel.txt")
+line = maxSigFile.readline()
+print line
+optimalCutBarrel = line.split()[4].split(">")[1].strip(",")
+print "optimal BDT cut barrel =", optimalCutBarrel
+os.system(rootExecutable+" -l -b -q mergeTMVAs.C\(\\\"BDT\\\",\\\"endcaps\\\"")
+os.system(rootExecutable+" -l -b -q significance.C+\("+str(expectedEventsEndcaps)+","+str(estimatedBackgroundEndcaps)+",\\\"BDT\\\",\\\"endcaps\\\",\\\"merged\\\",0\)")
+maxSigFile = open("maxsignificance_endcaps.txt")
+line = maxSigFile.readline()
+print line
+optimalCutEndcaps = line.split()[4].split(">")[1].strip(",")
+print "optimal BDT cut endcaps =", optimalCutEndcaps
 
-redoApplication = True
+# <headingcell level=3>
 
-# -------------------------------------------- #
-
-import subprocess
-from ROOT import TLine
-from ROOT import TGraphErrors
-from array import array
-
-def applyBDT(inputFileName, outputFileName, weightDir, cutValue):
-    p = subprocess.Popen([rootExecutable, "-q", "-l", "TMVAClassificationApplication.C+(\""+inputFileName+"\",\""+outputFileName+"\",\""+weightDir+"\","+str(cutValue)+")"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    out, err = p.communicate()
-    # print out
-    # print err
-
-def drawMassPlot(region, plotType = ""):
-    appFile = TFile(region+"TMVApp"+plotType+".root")
-    histoMass = appFile.Get("mass")
-    canvasMass = TCanvas("canvasMass"+region, "Mass "+region)
-    canvasMass.Draw()
-    histoMass.Draw()
-    histoMass.GetYaxis().SetRangeUser(0, 10)
-    # line1 = TLine(5.2,1,5.3,1)
-    # line1.SetLineColor(2)
-    # line1.SetLineWidth(2)
-    # line1.Draw("same")
-    # line2 = TLine(5.3,1.5,5.45,1.5)
-    # line2.SetLineColor(4)
-    # line2.SetLineWidth(2)
-    # line2.Draw("same")
-    x = array("d", [5.25])
-    y = array("d", [0.6])
-    errX = array("d", [0.05])
-    errY = array("d", [0.])
-    line1 = TGraphErrors(1, x, y, errX, errY)
-    line1.Draw("E1")
-    line1.SetLineColor(2)
-    line1.SetLineWidth(2)
-    line1.SetMarkerColor(2)
-    line1.SetMarkerSize(0)
-    x = array("d", [5.375])
-    y = array("d", [0.8])
-    errX = array("d", [0.075])
-    errY = array("d", [0.])
-    line2 = TGraphErrors(1, x, y, errX, errY)
-    line2.Draw("E1")
-    line2.SetLineColor(4)
-    line2.SetLineWidth(2)
-    line2.SetMarkerColor(4)
-    line2.SetMarkerSize(0)
-    histoMass.GetXaxis().SetTitle("Mass [GeV/c^{2}]")
-    histoMass.GetYaxis().SetTitle("Entries")
-    massLegend = TLegend(0.5,0.7,0.8,0.9,"","brNDC")
-    massLegend.SetHeader(region)
-    massLegend.AddEntry(line1, "B^{0} Signal Region", "l")
-    massLegend.AddEntry(line2, "B^{0}_{s} Signal Region", "l")
-    massLegend.Draw("same")
-    massLegend.SetFillColor(0)
-    massLegend.SetLineColor(0)
-    canvasMass.SaveAs(figuresDir+region+"MassPlot"+plotType+".pdf")
-
-def drawVariablePlots(region, plotType = ""):
-    appFile = TFile(region+"TMVApp"+plotType+".root")
-    for var in ["pt", "eta", "fls3d", "alpha", "maxdoca", "pvip", "pvips", "iso", "docatrk", "closetrk", "chi2dof"]:
-        canvas = TCanvas("canvas"+var+region+plotType)
-        canvas.Draw()
-        appFile.Get(var).Draw()
-        variablePdfFileName = "AfterBDTCut_"+var+"_"+region+plotType+".pdf"
-        canvas.SaveAs(figuresDir+variablePdfFileName)
-
-if redoApplication:
-    applyBDT("Barrel_preselection.root", "BarrelTMVApp.root", "barrelWeights/", optimalCutBarrel)
-    applyBDT("Endcaps_preselection.root", "EndcapsTMVApp.root", "endcapsWeights/", optimalCutBarrel)
-    applyBDT("Barrel_preselection_unblinded.root", "BarrelTMVAppUnblinded.root", "barrelWeights/", optimalCutBarrel)
-    applyBDT("Endcaps_preselection_unblinded.root", "EndcapsTMVAppUnblinded.root", "endcapsWeights/", optimalCutBarrel)
-
-drawMassPlot("Barrel")
-drawMassPlot("Endcaps")
-drawVariablePlots("Barrel")
-drawVariablePlots("Endcaps")
-
-drawMassPlot("Barrel", "Unblinded")
-drawMassPlot("Endcaps", "Unblinded")
-drawVariablePlots("Barrel", "Unblinded")
-drawVariablePlots("Endcaps", "Unblinded")
-
-# <rawcell>
-
-# Figure 19
+# BDT Application Overlay Plots
 
 # <codecell>
 
@@ -568,6 +507,12 @@ class TypeSettings:
         self.index = inputIndex
         self.color = inputColor
         self.option = inputOption
+
+def applyBDT(inputFileName, outputFileName, weightDir, cutValue):
+    p = subprocess.Popen([rootExecutable, "-q", "-l", "TMVAClassificationApplication.C+(\""+inputFileName+"\",\""+outputFileName+"\",\""+weightDir+"\","+str(cutValue)+")"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    out, err = p.communicate()
+    # print out
+    print err
 
 def drawAppBDTOutputPlots(region):
     canvas = TCanvas("canvasMVA_BDT"+region, "canvasMVA_BDT"+region)
@@ -623,6 +568,7 @@ def drawAppBDTOutputPlots(region):
 
 if redoApplication:
     # Barrel
+    applyBDT("Barrel_preselection.root", "BarrelTMVApp.root", "barrelWeights/", optimalCutBarrel)
     # Applied on 2, trained on 0 (tested on 1)
     applyBDT("Barrel_preselection_2.root", "BarrelTMVApp0.root", "barrel0Weights/", optimalCutBarrel)
     # Applied on 0, trained on 1 (tested on 2)
@@ -636,6 +582,7 @@ if redoApplication:
     applyBDT("BsMC12_barrel_preselection_1.root", "BsMCBarrelTMVApp2.root", "barrel2Weights/", optimalCutBarrel)
 
     # Endcaps
+    applyBDT("Endcaps_preselection.root", "EndcapsTMVApp.root", "endcapsWeights/", optimalCutEndcaps)
     # Applied on 2, trained on 0 (tested on 1)
     applyBDT("Endcaps_preselection_2.root", "EndcapsTMVApp0.root", "endcaps0Weights/", optimalCutEndcaps)
     # Applied on 0, trained on 1 (tested on 2)
@@ -654,9 +601,101 @@ drawAppBDTOutputPlots("BsMCBarrel")
 drawAppBDTOutputPlots("Endcaps")
 drawAppBDTOutputPlots("BsMCEndcaps")
 
-# <rawcell>
+# <headingcell level=2>
 
-# Comparison plots
+# Draw the mass plot combining the results of the three BDTs
+
+# <codecell>
+
+import subprocess
+from ROOT import TFile
+from ROOT import TLine
+from ROOT import TGraphErrors
+from array import array
+
+def applyBDT(inputFileName, outputFileName, weightDir, cutValue):
+    p = subprocess.Popen([rootExecutable, "-q", "-l", "TMVAClassificationApplication.C+(\""+inputFileName+"\",\""+outputFileName+"\",\""+weightDir+"\","+str(cutValue)+")"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    out, err = p.communicate()
+    # print out
+    # print err
+
+def drawMassPlot(region, plotType = ""):
+    # Take the histograms from each application
+    appFile0 = TFile(region+"TMVApp0"+plotType+".root")
+    appFile1 = TFile(region+"TMVApp1"+plotType+".root")
+    appFile2 = TFile(region+"TMVApp2"+plotType+".root")
+    histoMass0 = appFile0.Get("mass")
+    histoMass1 = appFile1.Get("mass")
+    histoMass2 = appFile2.Get("mass")
+    histoMass = histoMass0.Clone(histoMass0.GetName()+"_merged")
+    histoMass.Add(histoMass1)
+    histoMass.Add(histoMass2)
+    print "Mass entries "+region+" "+str(histoMass.GetEntries())
+    print "Mass integral "+region+" "+str(histoMass.Integral())
+    # Draw the merged histogram
+    canvasMass = TCanvas("canvasMass"+region, "Mass "+region)
+    canvasMass.Draw()
+    histoMass.Draw()
+    histoMass.GetYaxis().SetRangeUser(0, 10)
+    x = array("d", [5.25])
+    y = array("d", [0.6])
+    errX = array("d", [0.05])
+    errY = array("d", [0.])
+    line1 = TGraphErrors(1, x, y, errX, errY)
+    line1.Draw("E1")
+    line1.SetLineColor(2)
+    line1.SetLineWidth(2)
+    line1.SetMarkerColor(2)
+    line1.SetMarkerSize(0)
+    x = array("d", [5.375])
+    y = array("d", [0.8])
+    errX = array("d", [0.075])
+    errY = array("d", [0.])
+    line2 = TGraphErrors(1, x, y, errX, errY)
+    line2.Draw("E1")
+    line2.SetLineColor(4)
+    line2.SetLineWidth(2)
+    line2.SetMarkerColor(4)
+    line2.SetMarkerSize(0)
+    histoMass.GetXaxis().SetTitle("Mass [GeV/c^{2}]")
+    histoMass.GetYaxis().SetTitle("Entries")
+    massLegend = TLegend(0.5,0.7,0.8,0.9,"","brNDC")
+    massLegend.SetHeader(region)
+    massLegend.AddEntry(line1, "B^{0} Signal Region", "l")
+    massLegend.AddEntry(line2, "B^{0}_{s} Signal Region", "l")
+    massLegend.Draw("same")
+    massLegend.SetFillColor(0)
+    massLegend.SetLineColor(0)
+    canvasMass.SaveAs(figuresDir+region+"MassPlot"+plotType+".pdf")
+
+def drawVariablePlots(region, plotType = ""):
+    appFile0 = TFile(region+"TMVApp0"+plotType+".root")
+    appFile1 = TFile(region+"TMVApp1"+plotType+".root")
+    appFile2 = TFile(region+"TMVApp2"+plotType+".root")
+    for var in ["pt", "eta", "fls3d", "alpha", "maxdoca", "pvip", "pvips", "iso", "docatrk", "closetrk", "chi2dof"]:
+        canvas = TCanvas("canvas"+var+region+plotType)
+        canvas.Draw()
+        varPlot = appFile0.Get(var).Clone(var+"_merged")
+        varPlot.Add(appFile1.Get(var))
+        varPlot.Add(appFile2.Get(var))
+        varPlot.Draw()
+        variablePdfFileName = "AfterBDTCut_"+var+"_"+region+plotType+".pdf"
+        canvas.SaveAs(figuresDir+variablePdfFileName)
+
+drawMassPlot("Barrel")
+drawMassPlot("Endcaps")
+drawVariablePlots("Barrel")
+drawVariablePlots("Endcaps")
+
+# Needs to be fixed. The split files are not available at the moment.
+# drawMassPlot("Barrel", "Unblinded")
+# drawMassPlot("Endcaps", "Unblinded")
+# drawVariablePlots("Barrel", "Unblinded")
+# drawVariablePlots("Endcaps", "Unblinded")
+
+# <headingcell level=2>
+
+# Variable Comparison Plots
 
 # <codecell>
 
