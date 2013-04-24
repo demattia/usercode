@@ -1,10 +1,11 @@
 \section{Cut and count analysis}
 
-\subsection{optimization} 
+%\subsection{optimization} 
 
 The same varibale set as used for MVA training is employed.
 The Simulating Annealing method in TMVA is used.
-The cuts are selected such that the selection signal efficiency matches that of the BDT.
+
+The following cuts are selected such that the selection signal efficiency matches that of the BDT:
 
 \begin{verbatim}
 Barrel:
@@ -34,22 +35,52 @@ Endcaps:
 	-0.0797694 < "chi2dof" <= 3.64842
 \end{verbatim}
 
-\subsection{blinded results}
+
+%\subsection{blinded results}
+
 
 
 \begin{figure}[!h]
   \centering
   \includegraphics[width=0.45\textwidth]{Figures/cnt/SA_barrel_mass}
   \includegraphics[width=0.45\textwidth]{Figures/cnt/SA_endcaps_mass}
-\caption{Blinded cut results for barrel (left) and endcaps (right).}
+\caption{Blinded cut results for barrel (left) and endcaps (right), using same signal efficiency as for BDT.}
 \end{figure}
 
+The following cuts are are those obtained with CutsSA optimization:
 
-\subsection{unblind}
+%--- Retrieve cut values for signal efficiency of 0.3 from Reader
+\begin{verbatim}
+Barrel:
+
+ 		 5.9942 < "pt" <= 121.049
+ 		 -1.25077 < "eta" <= 1.37007
+ 		 16.9689 < "fls3d" <= 81.03
+ 		 0.00252547 < "alpha" <= 0.128236
+ 		 6.32349e-05 < "maxdoca" <= 0.0295907
+ 		 -0.000639053 < "pvip" <= 0.0741967
+ 		 0.208293 < "pvips" <= 1.5732
+ 		 0.77493 < "iso" <= 1.24891
+ 		 1.48865e-05 < "docatrk" <= 0.100205
+ 		 -0.167867 < "closetrk" <= 2.93966
+ 		 -0.042743 < "chi2dof" <= 7.25043
+\end{verbatim}
 
 \begin{figure}[!h]
   \centering
-  \includegraphics[width=0.45\textwidth]{Figures/cnt/SA_barrel_mass_unblind}
-  \includegraphics[width=0.45\textwidth]{Figures/cnt/SA_endcaps_mass_unblind}
-\caption{Unblinded cut results for barrel (left) and endcaps (right).}
+  \includegraphics[width=0.45\textwidth]{Figures/cnt/SA_barrel_mass_opt}
+   %\includegraphics[width=0.45\textwidth]{Figures/cnt/SA_endcaps_mass}
+\caption{Blinded cut results for barrel (left) and endcaps (right), after optimization.}
 \end{figure}
+
+
+
+
+%\subsection{unblind}
+%
+%\begin{figure}[!h]
+%  \centering
+%  \includegraphics[width=0.45\textwidth]{Figures/cnt/SA_barrel_mass_unblind}
+%  \includegraphics[width=0.45\textwidth]{Figures/cnt/SA_endcaps_mass_unblind}
+%\caption{Unblinded cut results for barrel (left) and endcaps (right).}
+%\end{figure}
