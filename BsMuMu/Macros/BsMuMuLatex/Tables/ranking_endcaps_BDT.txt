@@ -5,17 +5,17 @@
     \hline 
     rank & variable & separation & variable & separation & variable & separation \\ 
     \hline 
-    1 & pvips & 1.674e-01 & pvips & 1.655e-01 & pvips & 1.751e-01 \\ 
-    2 & alpha & 1.598e-01 & iso & 1.478e-01 & alpha & 1.449e-01 \\ 
-    3 & iso & 1.402e-01 & alpha & 1.395e-01 & iso & 1.393e-01 \\ 
-    4 & chi2dof & 9.473e-02 & chi2dof & 1.134e-01 & docatrk & 9.209e-02 \\ 
-    5 & closetrk & 8.768e-02 & fls3d & 9.084e-02 & maxdoca & 8.448e-02 \\ 
-    6 & pvip & 7.316e-02 & closetrk & 8.618e-02 & pvip & 7.639e-02 \\ 
-    7 & fls3d & 6.528e-02 & pt & 6.089e-02 & fls3d & 6.871e-02 \\ 
-    8 & eta & 6.194e-02 & pvip & 5.937e-02 & chi2dof & 6.334e-02 \\ 
-    9 & pt & 5.871e-02 & maxdoca & 5.289e-02 & eta & 5.639e-02 \\ 
-    10 & docatrk & 5.458e-02 & docatrk & 4.347e-02 & closetrk & 5.204e-02 \\ 
-    11 & maxdoca & 3.651e-02 & eta & 4.009e-02 & pt & 4.731e-02 \\ 
+    1 & pvips & 1.899e-01 & pvips & 1.895e-01 & pvips & 2.435e-01 \\ 
+    2 & chi2dof & 1.431e-01 & closetrk & 1.705e-01 & docatrk & 1.677e-01 \\ 
+    3 & iso & 1.340e-01 & iso & 1.343e-01 & iso & 1.130e-01 \\ 
+    4 & closetrk & 1.284e-01 & chi2dof & 1.141e-01 & pvip & 1.010e-01 \\ 
+    5 & pvip & 1.028e-01 & alpha & 7.860e-02 & eta & 6.758e-02 \\ 
+    6 & alpha & 7.309e-02 & pt & 7.304e-02 & alpha & 6.485e-02 \\ 
+    7 & eta & 6.530e-02 & fls3d & 6.754e-02 & closetrk & 5.579e-02 \\ 
+    8 & fls3d & 4.786e-02 & pvip & 6.365e-02 & pt & 5.541e-02 \\ 
+    9 & pt & 4.472e-02 & docatrk & 4.614e-02 & chi2dof & 4.727e-02 \\ 
+    10 & docatrk & 3.649e-02 & maxdoca & 3.604e-02 & maxdoca & 4.403e-02 \\ 
+    11 & maxdoca & 3.438e-02 & eta & 2.654e-02 & fls3d & 3.990e-02 \\ 
     \hline 
   \end{tabular} 
   \label{tab:datasetsendcapsBDT} 
