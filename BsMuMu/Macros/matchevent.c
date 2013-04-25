@@ -50,9 +50,17 @@
 			cout<<"!!!!!***** No Matched Event in the Main Analysis Tree *****!!!!!"<<endl<<endl;
 	}
 
-    TCanvas *cmu1_pt = new TCanvas("cmu1_pt ","cmu1_pt");
+	TCanvas *cmu1_pt = new TCanvas("cmu1_pt ","cmu1_pt");
 	hmu1_pt->SetLineColor(kRed);
 	hm1pt->SetLineColor(kBlue);
+	hm1pt->SetLineStyle(kDashed);
 	hmu1_pt->Draw();
 	hm1pt->Draw("same");
+
+    TCanvas *cl3dsig = new TCanvas("cl3dsig ","cl3dsig");
+    hl3dsig->SetLineColor(kRed);
+    hfls3d->SetLineColor(kBlue);
+	hfls3d->SetLineStyle(kDashed);
+    hl3dsig->Draw();
+    hfls3d->Draw("same");
 }
