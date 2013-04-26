@@ -1,4 +1,6 @@
 #include "TString.h"
+#include "TF1.h"
+#include "TLine.h"
 #include "TH1.h"
 #include "TH2.h"
 #include "TGraph.h"
@@ -12,46 +14,30 @@
 #include "TLegend.h"
 #include "TMarker.h"
 #include <iostream>
-#include "Common/setTDRStyle_modified.C"
 #include <fstream>
+#include "setTDRStyle_modified.C"
 
-// const double nsig_barrel  = 60.;
-// const double nbkg_barrel  = 28884.;
-// const double nsig_endcap  = 35.;
-// const double nbkg_endcap  = 35392.;
+TString fileName(const TString & method, const TString & region, const TString & index);
+void significanceCuts(const double & nsig, const double & nbkg, TString method="BDT",TString region="barrel", TString index="", const int subdir = 1);
 
 void significance(const double & nsig, const double & nbkg, TString method="BDT",TString region="barrel", TString index="", const int subdir = 1) {
 
-  // double nsig, nbkg;
-  // nsig = nsig1;
-  // nbkg = nbkg1;
-  // if(region=="barrel") {
-  //   nsig = nsig_barrel;
-  //   nbkg = nbkg_barrel;
-  // } else if (region=="endcaps") {
-  //   nsig = nsig_endcap;
-  //   nbkg = nbkg_endcap;
-  // } else  {cout<<"wrong input"<<endl; exit(-1);}
-
   cout << "processing " << method << " for " << region << endl;
+  
+  if(method.Contains("Cuts")) {
+    significanceCuts(nsig,nbkg,method,region,index,1);
+    return; 
+  }
 
-  TString name = method + "_" + region;
-  if(index!="") 
-    name += "_"+index;
-
-  TString fnameA = "TMVA_" + region;
-  if(index!="") 
-    fnameA += "_"+index;
-  fnameA += ".root";
+  TString fnameA = fileName(method, region, index);
   TFile* inputA = TFile::Open(fnameA);
 
-  if( subdir ) gDirectory->Cd(fnameA+":/Method_"+method+"/"+method);
+  if(subdir) gDirectory->Cd(fnameA+":/Method_"+method+"/"+method);
   gDirectory->pwd();
   TH1F* tmva_s = (TH1F*)gROOT->FindObject(TString("MVA_"+method+"_S_high"));
   TH1F* tmva_b = (TH1F*)gROOT->FindObject(TString("MVA_"+method+"_B_high"));
 
-  // const int rb = 250;
-  const int rb = 1;
+  const int rb =1;//250;
   tmva_s->Rebin(rb);
   tmva_b->Rebin(rb);
 
@@ -68,7 +54,7 @@ void significance(const double & nsig, const double & nbkg, TString method="BDT"
 
   double sumS(0), sumB(0), signi(0), signi1(0), signi2(0); 
 
-  printf("check bins: %d  %f %f %f %f \n", nbins, xmin, xmax, sumS, normS);
+  //printf("check bins: %d  %f %f %f %f \n", nbins, xmin, xmax, sumS, normS);
 
   TH1F* effS = new TH1F("effS","effS",nbins,xmin,xmax);
   TH1F* effB = new TH1F("effB","effB",nbins,xmin,xmax);
@@ -105,18 +91,55 @@ void significance(const double & nsig, const double & nbkg, TString method="BDT"
 
   }
 
+
   int sig_max_bin = sign->GetMaximumBin(); 
   double sig_max_mva = effS->GetBinCenter(sig_max_bin);
-  double sig_max = sign->GetBinContent(sig_max_bin);
+  
+  TF1 *pol = new TF1("fa1","[0]*(1+[1]*x+[2]*x*x+[3]*x*x*x)",sig_max_mva-0.1,sig_max_mva+0.1);
+  pol->SetParameters(1,1,1,1);
+  //pol->FixParameter(3,0); pol->SetRange(0.1,0.5);
+  sign->Fit(pol, "r");
+
+  TF1 *pol1 = (TF1*) pol->Clone();
+  sign1 -> Scale(sign->Integral(1,nbins)/sign1->Integral(1,nbins));
+  sign1->Fit(pol1, "r");
+  sign1->Scale(pol->GetMaximum()/pol1->GetMaximum());
+  sign1->Fit(pol1, "r");
+
+  TF1 *pol2 = (TF1*) pol->Clone();
+  sign2 -> Scale(sign->Integral(1,nbins)/sign2->Integral(1,nbins));
+  sign2->Fit(pol2, "r");
+  sign2->Scale(pol->GetMaximum()/pol2->GetMaximum());
+  sign2->Fit(pol2, "r");
+  
+  sign->Fit(pol, "r");
+
+  double sig_max      = sign->GetBinContent(sig_max_bin);
   double sig_max_effS = effS->GetBinContent(sig_max_bin);
   double sig_max_effB = effB->GetBinContent(sig_max_bin);
   //printf("maximum significance: %f bin:%d mva:%f %f %f \n", sig_max, sig_max_bin, sig_max_mva, sig_max_effS, sig_max_effB);
-  char ss[100];
-  sprintf(ss, "%s,  max. significance: %3.1f, %s>%5.4f, #epsilon_{S}=%4.3f, #epsilon_{B}=%5.4f",region.Data(),sig_max,method.Data(), sig_max_mva, sig_max_effS, sig_max_effB);
 
-  ofstream outputTxt("maxsignificance_"+region+".txt");
-  outputTxt << ss;
-  outputTxt.close();
+  double max_sig_pol_val  = pol ->GetMaximum();
+  double max_sig_pol_mva  = pol ->GetMaximumX();
+  double max_sig_pol1_mva = pol1->GetMaximumX();
+  double max_sig_pol2_mva = pol2->GetMaximumX();
+  double max_sig_pol_bin  = sign->GetBinCenter(sign->FindBin(max_sig_pol_mva));
+  double max_sig_pol_effS = effS->GetBinContent(sign->FindBin(max_sig_pol_mva));
+  double max_sig_pol_effB = effB->GetBinContent(sign->FindBin(max_sig_pol_mva));
+
+  printf("pol fit to sign: max %f, mva %f effb %f effs %f \n",
+	 max_sig_pol_val, max_sig_pol_mva, max_sig_pol_effB, max_sig_pol_effS);
+  printf("histogram sign:  max %f  mva %f effb %f effs %f \n", 
+	 sig_max, sig_max_mva, sig_max_effB, sig_max_effS);
+
+   char ss[100];
+   sprintf(ss, "%s,  max. significance: %3.1f, %s>%5.4f, #epsilon_{S}=%4.3f, #epsilon_{B}=%5.4f",
+	   region.Data(), max_sig_pol_val, method.Data(), pol->GetMaximumX(), max_sig_pol_effS, max_sig_pol_effB);
+   printf("%s \n",ss);
+
+   ofstream outputTxt("maxsignificance_"+method+"_"+region+".txt");
+   outputTxt << max_sig_pol_mva << max_sig_pol1_mva << max_sig_pol2_mva;
+   outputTxt.close();
 
   //setTDRStyle(false);
   gStyle->SetOptStat(kFALSE);
@@ -137,7 +160,7 @@ void significance(const double & nsig, const double & nbkg, TString method="BDT"
   Float_t rightmax = 1.02*sign1->GetMaximum();
   Float_t scale = gPad->GetUymax()/rightmax;
 
-  sign->Scale(scale);
+  sign ->Scale(scale);
   sign1->Scale(scale);
   sign2->Scale(scale);
 
@@ -149,6 +172,7 @@ void significance(const double & nsig, const double & nbkg, TString method="BDT"
   sign1->SetLineWidth(2);
   sign2->SetLineWidth(2);
 
+  sign ->SetLineStyle(4);
   sign1->SetLineStyle(3);
   sign2->SetLineStyle(2);
 
@@ -156,12 +180,32 @@ void significance(const double & nsig, const double & nbkg, TString method="BDT"
   sign1->Draw("same c");
   sign2->Draw("same c");
 
+  pol ->SetLineColor(8);
+  pol1->SetLineColor(38);
+  pol2->SetLineColor(42);
+
+  pol ->SetLineWidth(2);
+  pol1->SetLineWidth(1);
+  pol2->SetLineWidth(1);
+
+  //pol1->SetLineStyle(3);
+  //pol2->SetLineStyle(2);
+
+  pol ->SetParameter(0, pol ->GetParameter(0)*scale);
+  pol1->SetParameter(0, pol1->GetParameter(0)*scale);
+  pol2->SetParameter(0, pol2->GetParameter(0)*scale);
+
+  pol ->Draw("same");
+  pol1->Draw("same");
+  pol2->Draw("same");
+
+
   TLegend* leg = new TLegend(0.12,0.65,0.45,0.75);
   //leg->SetHeader("The Legend Title");
   char ss0[50], ss1[50],ss2[50];
-  sprintf(ss0, "S/#sqrt{S+B},     max.@ %s>%5.4f", method.Data(), effS->GetBinCenter(sign ->GetMaximumBin()));
-  sprintf(ss1, "S/#sqrt{B},          max.@ %s>%5.4f", method.Data(), effS->GetBinCenter(sign1->GetMaximumBin()));
-  sprintf(ss2, "S/(#sqrt{B}+0.5), max.@ %s>%5.4f", method.Data(), effS->GetBinCenter(sign2->GetMaximumBin()));
+  sprintf(ss0, "S/#sqrt{S+B},     max.@ %s>%5.4f",     method.Data(), max_sig_pol_mva);
+  sprintf(ss1, "S/#sqrt{B},          max.@ %s>%5.4f",  method.Data(), max_sig_pol1_mva);
+  sprintf(ss2, "S/(#sqrt{B}+0.5), max.@ %s>%5.4f",     method.Data(), max_sig_pol2_mva);
   leg->AddEntry(sign ,ss0,"l");
   leg->AddEntry(sign1,ss1,"l");
   leg->AddEntry(sign2,ss2,"l");
@@ -182,13 +226,23 @@ void significance(const double & nsig, const double & nbkg, TString method="BDT"
    tp->AddText(ss);
    tp->Draw("same");
    
-   TLine* tl = new TLine(sig_max_mva,0,sig_max_mva, gPad->GetUymax());
+   TLine* tl = new TLine(sig_max_mva,0, max_sig_pol_mva, gPad->GetUymax());
    tl->SetLineStyle(4);
    tl->Draw("same");
 
-   TString ext(".pdf");
+   TString ext(".gif");
+
+
+  TString name = method + "_" + region;
+  if(index!="") name += "_"+index;
 
    c.SaveAs(TString("plots/"+name+"_eff"+ext));
+
+   TString lpath("latex/Figures/");
+   if(method == "BDT")  lpath += "bdt/";
+   if(method == "MLP")  lpath += "mlp/";
+   if(method.Contains("Cuts")) lpath += "cnt/";
+   c.SaveAs(TString(lpath+name+"_eff.pdf"));
 
    TCanvas c2;
    roc->SetTitle("");
@@ -202,6 +256,7 @@ void significance(const double & nsig, const double & nbkg, TString method="BDT"
    tm->SetMarkerColor(2);
    tm->Draw("same");
    c2.SaveAs(TString("plots/"+name+"_roc"+ext));
+   c2.SaveAs(TString(lpath+name+"_roc.pdf"));
 
    TCanvas c3;
    roc->GetXaxis()->SetRangeUser(0.,1);
@@ -210,6 +265,7 @@ void significance(const double & nsig, const double & nbkg, TString method="BDT"
    //tp->Draw("same");
    tm->Draw("same");
    c3.SaveAs(TString("plots/"+name+"_roc_zoom"+ext));
+   c3.SaveAs(TString(lpath+name+"_roc_zoom.pdf"));
 
    TGraph* mark = new TGraph(1);
    mark->SetPoint(1,sig_max_effS,1.-sig_max_effB);
@@ -222,4 +278,204 @@ void significance(const double & nsig, const double & nbkg, TString method="BDT"
 
    
    inputA->Close();
+}
+
+void significanceCuts(const double & nsig, const double & nbkg, TString method,TString region, TString index, const int subdir) {
+
+  assert(method=="CutsSA");
+  //TString method("CutsSA");
+
+  TString fname = fileName(method, region, index);
+  TFile* input = TFile::Open(fname);
+  if(subdir) gDirectory->Cd(fname+":/Method_Cuts/"+method);
+  //gDirectory->pwd();
+  //gDirectory->ls();
+  TH1F* effB = (TH1F*)gROOT->FindObject(TString("MVA_"+method+"_effB"));
+  TH1F* rejB = (TH1F*)gROOT->FindObject(TString("MVA_"+method+"_rejBvsS"));
+
+  int nbins   = effB -> GetNbinsX();
+  double xmin = effB -> GetBinLowEdge(1);
+  double xmax = effB -> GetBinLowEdge(nbins+1);
+
+  const int sfac = 1;
+  //nbins /= sfac;
+
+  TH1F* sign = new TH1F("sign","sign",nbins/sfac,xmin,xmax);
+  TH1F* sign1 = new TH1F("sign1","sign1",nbins/sfac,xmin,xmax);
+  TH1F* sign2 = new TH1F("sign2","sign2",nbins/sfac,xmin,xmax);
+
+  double effb(0), effs(0), signi(0),  signi1(0), signi2(0);
+
+  for(int i=0; i<nbins/sfac; i++) {
+
+    int ibin= i; 
+    //int ibint = ibin*sfac + int(sfac/2) +1;
+    effs = effB->GetBinCenter(ibin*sfac + int(sfac/2) +1);
+
+    effb=0;
+    for(int j=0; j<sfac; j++) 
+      effb+=effB->GetBinContent(ibin*sfac+j);    
+    effb=effb/sfac;
+
+    signi = effs*nsig/sqrt(effs*nsig + effb*nbkg);
+    if(effb==0) signi=0;
+    sign->SetBinContent(ibin, signi);
+
+    signi1 = effb?effs*nsig/sqrt(effb*nbkg):0;
+    sign1->SetBinContent(i, signi1);
+
+    signi2 = effb?effs*nsig/(sqrt(effb*nbkg) + 0.5):0;
+    sign2->SetBinContent(i, signi2);
+    printf("== bin %d effs %f effb %f  signi %f signi1 %f signi2 %f \n", ibin, effs, effb, signi, signi1, signi2);
+    //printf("== ibin %d ibinav %d effs %f  effb %f   sign %f\n",ibin, ibint, effs, effb, signi);
+  }
+  
+  double sig_max = sign->GetMaximum();
+  double yoffset = 0;
+  for(int i=0; i<nbins/sfac; i++) {
+    sign->SetBinContent(i, sign->GetBinContent(i)+yoffset);
+  }
+
+
+  TF1 *pol = new TF1("fa1","[0]*(1+[1]*x+[2]*x*x+[3]*x*x*x)",0.0,0.8);
+  pol->SetParameters(1,1,1,1);
+  //pol->FixParameter(3,0); pol->SetRange(0.1,0.5);
+  sign->Fit(pol, "r");
+
+  TF1 *pol1 = (TF1*) pol->Clone();
+  sign1 -> Scale(sign->Integral(1,nbins)/sign1->Integral(1,nbins));
+  sign1->Fit(pol1, "r");
+  sign1->Scale(pol->GetMaximum()/pol1->GetMaximum());
+  sign1->Fit(pol1, "r");
+
+  TF1 *pol2 = (TF1*) pol->Clone();
+  sign2 -> Scale(sign->Integral(1,nbins)/sign2->Integral(1,nbins));
+  sign2->Fit(pol2, "r");
+  sign2->Scale(pol->GetMaximum()/pol2->GetMaximum());
+  sign2->Fit(pol2, "r");
+
+  sign->Fit(pol, "r");
+
+  int sig_max_bin = sign->GetMaximumBin(); 
+  //double sig_max = sign->GetBinContent(sig_max_bin);
+  double sig_max_effS = effB->GetBinCenter(sig_max_bin);
+  double sig_max_effB = effB->GetBinContent(sig_max_bin);
+
+  double max_sig_pol_val = pol->GetMaximum();
+  double max_sig_pol_x   = pol->GetMaximumX();
+  double max_sig_pol1_x  = pol1->GetMaximumX();
+  double max_sig_pol2_x  = pol2->GetMaximumX();
+  double max_sig_pol_bin = sign->GetBinCenter(sign->FindBin(max_sig_pol_x));
+  double max_sig_pol_effS = effB->GetBinCenter(sign->FindBin(max_sig_pol_x));
+  double max_sig_pol_effB = effB->GetBinContent(sign->FindBin(max_sig_pol_x));
+  
+  printf("pol fit to sign: max %f  max-x %f binval: %f\n ", max_sig_pol_val, max_sig_pol_x, max_sig_pol_bin);
+  
+  char ss[100];
+  sprintf(ss, "%s,  max. significance: %3.1f, %s, #epsilon_{S}=%4.3f, #epsilon_{B}=%5.4f",region.Data(),max_sig_pol_val,method.Data(), pol->GetMaximumX(), max_sig_pol_effB);
+  printf("%s \n",ss);
+  
+  ofstream outputTxt("maxsignificance_"+method+"_"+region+".txt");
+  outputTxt << max_sig_pol_x << "\t" <<  max_sig_pol1_x << "\t" << max_sig_pol2_x; 
+  outputTxt.close();
+  
+  gStyle->SetOptStat(kFALSE);
+  gStyle->SetFillColor(0);
+  gStyle->SetLegendBorderSize(0); 
+  
+  
+  TCanvas c;
+  c.SetGrid();
+
+  sign->GetXaxis()->SetRangeUser(0.,0.76);
+
+  double ymarg = 0.9;
+  Float_t rightmax = sign->GetMaximum();
+  //Float_t scale = gPad->GetUymax()/rightmax;
+  //scale *= (1-sig_max*(1.-ymarg)/rightmax);
+  //sign->Scale(scale);
+  //sign->Scale(1-sig_max*(1.-ymarg)/rightmax);
+  //sign->Sumw2();
+
+  sign->GetYaxis()->SetTitle("significance");
+  sign->GetXaxis()->SetTitle("#epsilon_{S}");
+  //sign->GetXaxis()->SetTextColor(8);
+
+  sign->SetTitle("");
+  sign->SetLineWidth(1);
+  sign->SetLineColor(8);
+  sign->Draw("hist c");
+
+  pol  -> SetRange(pol ->GetMaximumX()-0.2,pol ->GetMaximumX()+0.2);
+  pol1 -> SetRange(pol1->GetMaximumX()-0.2,pol1->GetMaximumX()+0.2);
+  pol2 -> SetRange(pol2->GetMaximumX()-0.2,pol2->GetMaximumX()+0.2);
+
+  pol ->SetLineColor(kBlue);
+  pol1->SetLineColor(38);
+  pol2->SetLineColor(42);
+
+  pol ->SetLineWidth(2);
+  pol1->SetLineWidth(2);
+  pol2->SetLineWidth(2);
+
+  //pol1->SetLineStyle(3);
+  //pol2->SetLineStyle(2);
+
+  pol ->Draw("same");
+  pol1->Draw("same");
+  pol2->Draw("same");
+
+  TLegend* leg = new TLegend(0.3,0.2,0.7,0.3);
+  char ss0[50], ss1[50],ss2[50];
+  sprintf(ss0, "S/#sqrt{S+B},     max.@ #epsilon_{S}>%5.3f"   ,pol  ->GetMaximumX());
+  sprintf(ss1, "S/#sqrt{B},          max.@ #epsilon_{S}>%5.3f",pol1 ->GetMaximumX());
+  sprintf(ss2, "S/(#sqrt{B}+0.5), max.@ #epsilon_{S}>%5.3f"   ,pol2 ->GetMaximumX());
+  leg->AddEntry(pol ,ss0,"l");
+  leg->AddEntry(pol1,ss1,"l");
+  leg->AddEntry(pol2,ss2,"l");
+  leg->Draw();
+  
+  c.Update();  
+
+  rejB->Scale(gPad->GetUymax()/1.1);
+  rejB->SetTitle("");
+  rejB->SetLineColor(kRed);
+  rejB->Draw("c same");
+
+
+  //draw an axis on the right side
+  TGaxis *axis = new TGaxis(gPad->GetUxmax(),gPad->GetUymin(),
+			    gPad->GetUxmax(), gPad->GetUymax(),0, 1.1,510,"+L");
+  axis->SetLineColor (kRed);
+  //axis->SetLabelColor(8);
+  //axis->SetTextColor (kRed);
+  axis->SetTitle("1 - #epsilon_{B}");
+  axis->Draw("same");
+
+   TPaveText *tp = new TPaveText(0.2,0.9,0.9,0.95,"brNDC");
+   tp->SetBorderSize(0);
+   tp->AddText(ss);
+   tp->Draw("same");
+
+  TLine* tl = new TLine(pol->GetMaximumX(),0,pol->GetMaximumX(), gPad->GetUymax());
+  tl->SetLineStyle(4);
+  tl->Draw("same");
+  
+  TString ext(".gif");
+  c.SaveAs(TString("plots/Cuts_"+region+"_eff"+ext));
+  TString name = method + "_" + region;
+  if(index!="") name += "_"+index;
+  TString lpath("latex/Figures/cnt/");
+  c.SaveAs(TString(lpath+name+"_eff.pdf"));
+
+  input->Close();
+}
+
+
+TString fileName(const TString & method, const TString & region, const TString & index) {
+  TString fnameA = "TMVA_" + region;
+  if(index!="") 
+    fnameA += "_"+index;
+  fnameA += ".root";
+  return fnameA;
 }
