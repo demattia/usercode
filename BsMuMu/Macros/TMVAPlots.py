@@ -476,18 +476,30 @@ os.system("mv mvaeffs_BDT_"+region+".pdf "+figuresDir)
 
 os.system(rootExecutable+" -l -b -q mergeTMVAs.C\(\\\"BDT\\\",\\\"barrel\\\"")
 os.system(rootExecutable+" -l -b -q significance.C+\("+str(expectedEventsBarrel)+","+str(estimatedBackgroundBarrel)+",\\\"BDT\\\",\\\"barrel\\\",\\\"merged\\\",0\)")
-maxSigFile = open("maxsignificance_barrel.txt")
+maxSigFile = open("maxsignificance_BDT_barrel.txt")
 line = maxSigFile.readline()
 print line
-optimalCutBarrel = line.split()[4].split(">")[1].strip(",")
-print "optimal BDT cut barrel =", optimalCutBarrel
+print "optimal cut barrel S/sqrt(S+B):",  line.split()[0], ", S/sqrt(B):",  line.split()[1],  ", S/sqrt(B)+0.5:",  line.split()[2]  
+optimalCutBarrel = line.split()[0]
+print "chosen optimal BDT cut barrel =", optimalCutBarrel
 os.system(rootExecutable+" -l -b -q mergeTMVAs.C\(\\\"BDT\\\",\\\"endcaps\\\"")
 os.system(rootExecutable+" -l -b -q significance.C+\("+str(expectedEventsEndcaps)+","+str(estimatedBackgroundEndcaps)+",\\\"BDT\\\",\\\"endcaps\\\",\\\"merged\\\",0\)")
-maxSigFile = open("maxsignificance_endcaps.txt")
+maxSigFile = open("maxsignificance_BDT_endcaps.txt")
 line = maxSigFile.readline()
 print line
-optimalCutEndcaps = line.split()[4].split(">")[1].strip(",")
-print "optimal BDT cut endcaps =", optimalCutEndcaps
+print "optimal cut endcaps S/sqrt(S+B):",  line.split()[0], ", S/sqrt(B):",  line.split()[1],  ", S/sqrt(B)+0.5:",  line.split()[2]  
+optimalCutEndcaps = line.split()[0]
+print "chosen optimal BDT cut endcaps =", optimalCutEndcaps
+
+"""
+#in case the CUTS method was run:
+os.system(rootExecutable+" -l -b -q mergeTMVAs.C\(\\\"CutsSA\\\",\\\"barrel\\\"")
+os.system(rootExecutable+" -l -b -q significance.C+\("+str(expectedEventsBarrel)+","+str(estimatedBackgroundBarrel)+",\\\"CutsSA\\\",\\\"barrel\\\",\\\"merged\\\",0\)")
+maxSigFile = open("maxsignificance_CutsSA_barrel.txt")
+line = maxSigFile.readline()
+print line
+print "optimal cut barrel S/sqrt(S+B):",  line.split()[0], ", S/sqrt(B):",  line.split()[1],  ", S/sqrt(B)+0.5:",  line.split()[2]  
+"""
 
 # <headingcell level=3>
 
