@@ -14,17 +14,8 @@
 #include <iostream>
 #include <sstream>
 
-const double nsig_barrel  = 60.;
-const double nbkg_barrel  = 28884.;
-const double nsig_endcap  = 35.;
-const double nbkg_endcap  = 35392.;
-
 TString fileName(const TString & method, const TString & region, const TString & index)
 {
-  TString name = method + "_" + region;
-  if(index!="") 
-    name += "_"+index;
-
   TString fnameA = "TMVA_" + region;
   if(index!="") 
     fnameA += "_"+index;
