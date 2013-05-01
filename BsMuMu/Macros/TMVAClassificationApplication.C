@@ -30,11 +30,17 @@
 
 using namespace TMVA;
 
-void TMVAClassificationApplication( const TString & inputFileName, const TString & outputFileName, const TString & weightDir, const float & cutValue, TString myMethodList = "" ) 
+void TMVAClassificationApplication( const TString & inputFileName, const TString & outputFileName, const TString & weightDir, const float & cutValue, TString myMethodList = "BDT" ) 
 {   
 #ifdef __CINT__
    gROOT->ProcessLine( ".O0" ); // turn off optimization in CINT
 #endif
+
+   bool useBDT = myMethodList=="BDT"?1:0;
+   bool useMLP = myMethodList=="MLP"?1:0;
+   bool useCutsSA = myMethodList=="CutsSA"?1:0;
+
+   cout << "running TMVAClassificationApplication for method:" << myMethodList << " BDT:" << useBDT << " MLP:" << useMLP << " Cuts:" << useCutsSA <<endl;
 
    //---------------------------------------------------------------
 
@@ -49,7 +55,7 @@ void TMVAClassificationApplication( const TString & inputFileName, const TString
    Use["CutsD"]           = 0;
    Use["CutsPCA"]         = 0;
    Use["CutsGA"]          = 0;
-   Use["CutsSA"]          = 0;
+   Use["CutsSA"]          = useCutsSA;
    // 
    // --- 1-dimensional likelihood ("naive Bayes estimator")
    Use["Likelihood"]      = 0;
@@ -82,7 +88,7 @@ void TMVAClassificationApplication( const TString & inputFileName, const TString
    Use["FDA_MCMT"]        = 0;
    //
    // --- Neural Networks (all are feed-forward Multilayer Perceptrons)
-   Use["MLP"]             = 0; // Recommended ANN
+   Use["MLP"]             = useMLP; // Recommended ANN
    Use["MLPBFGS"]         = 0; // Recommended ANN with optional training method
    Use["MLPBNN"]          = 0; // Recommended ANN with BFGS training method and bayesian regulator
    Use["CFMlpANN"]        = 0; // Depreciated ANN from ALEPH
@@ -92,7 +98,7 @@ void TMVAClassificationApplication( const TString & inputFileName, const TString
    Use["SVM"]             = 0;
    // 
    // --- Boosted Decision Trees
-   Use["BDT"]             = 1; // uses Adaptive Boost
+   Use["BDT"]             = useBDT; // uses Adaptive Boost
    Use["BDTG"]            = 0; // uses Gradient Boost
    Use["BDTB"]            = 0; // uses Bagging
    Use["BDTD"]            = 0; // decorrelation + Adaptive Boost
@@ -139,7 +145,7 @@ void TMVAClassificationApplication( const TString & inputFileName, const TString
 
    // Create a set of variables and declare them to the reader
    // - the variable names MUST corresponds in name and type to those given in the weight file(s) used
-   Float_t dca, pt, l3dsig, chi2dof, delta3d, delta3dSig, alpha, ntrk, minDca, isolation, y, eta, l3d, cosAlphaXY, cosAlpha3D, mu1_dxy, mu2_dxy, mu1_MVAMuonID, mu2_MVAMuonID;
+   Float_t dca, pt, l3dsig, chi2dof, delta3d, delta3dSig, alpha, ntrk, ntrk20, minDca, isolation, y, eta, l3d, cosAlphaXY, cosAlpha3D, mu1_dxy, mu2_dxy, mu1_MVAMuonID, mu2_MVAMuonID;
    // Float_t mu1_GMPT, mu2_GMPT;
 
 
@@ -158,7 +164,8 @@ void TMVAClassificationApplication( const TString & inputFileName, const TString
    reader->AddVariable( "iso := isolation",                 &isolation );
    if( originalVariables ) {
      reader->AddVariable( "docatrk := minDca",              &minDca );
-     reader->AddVariable( "closetrk := ntrk",               &ntrk );
+     //reader->AddVariable( "closetrk := ntrk",               &ntrk );
+     reader->AddVariable( "closetrk := ntrk20",               &ntrk20 );
    }
    reader->AddVariable( "chi2dof := NChi2",                 &chi2dof );
 
@@ -336,7 +343,7 @@ void TMVAClassificationApplication( const TString & inputFileName, const TString
    // in this example, there is a toy tree with signal and one with background events
    // we'll later on use only the "signal" events for the test in this example.
    //   
-   TFile *input(0);
+   // TFile *input(0);
    // TString fname = "";
 
    // TString fnameS = "BsMC12_barrel_preselection.root";
@@ -423,8 +430,8 @@ void TMVAClassificationApplication( const TString & inputFileName, const TString
    // theTree->SetBranchAddress( "mu2_GMPT",                         &mu2_GMPT );
 
    // Efficiency calculator for cut method
-   Int_t    nSelCutsGA = 0;
-   Double_t effS       = 0.7;
+   Int_t    nSelCutsSA = 0;
+   Double_t effS       = cutValue;
 
    std::vector<Float_t> vecVar(4); // vector for EvaluateMVA tests
 
@@ -447,10 +454,24 @@ void TMVAClassificationApplication( const TString & inputFileName, const TString
 
       // --- Return the MVA outputs and fill into histograms
 
-      if (Use["CutsGA"]) {
+      if (Use["CutsSA"]) {
          // Cuts is a special case: give the desired signal efficienciy
-         Bool_t passed = reader->EvaluateMVA( "CutsGA method", effS );
-         if (passed) nSelCutsGA++;
+         Bool_t passed = reader->EvaluateMVA( "CutsSA method", effS );
+         if (passed) { 
+	   nSelCutsSA++;
+	   histMass->Fill(mass);
+	   histPt->Fill(pt);
+	   histEta->Fill(eta);
+	   histFls3d->Fill(l3dsig);
+	   histAlpha->Fill(alpha);
+	   histMaxdoca->Fill(dca);
+	   histPvip->Fill(delta3d);
+	   histPvips->Fill(delta3dSig);
+	   histIso->Fill(isolation);
+	   histDocatrk->Fill(minDca);
+	   histClosetrk->Fill(ntrk);
+	   histChi2dof->Fill(chi2dof);
+	 }
       }
 
       if (Use["Likelihood"   ])   histLk     ->Fill( reader->EvaluateMVA( "Likelihood method"    ) );
@@ -467,7 +488,24 @@ void TMVAClassificationApplication( const TString & inputFileName, const TString
       if (Use["FisherG"      ])   histFiG    ->Fill( reader->EvaluateMVA( "FisherG method"       ) );
       if (Use["BoostedFisher"])   histFiB    ->Fill( reader->EvaluateMVA( "BoostedFisher method" ) );
       if (Use["LD"           ])   histLD     ->Fill( reader->EvaluateMVA( "LD method"            ) );
-      if (Use["MLP"          ])   histNn     ->Fill( reader->EvaluateMVA( "MLP method"           ) );
+      if (Use["MLP"          ])   {
+	histNn     ->Fill( reader->EvaluateMVA( "MLP method"           ) );
+	if (reader->EvaluateMVA( "MLP method"           ) > cutValue) {
+	  histMass->Fill(mass);
+	  histPt->Fill(pt);
+	  histEta->Fill(eta);
+	  histFls3d->Fill(l3dsig);
+	  histAlpha->Fill(alpha);
+	  histMaxdoca->Fill(dca);
+	  histPvip->Fill(delta3d);
+	  histPvips->Fill(delta3dSig);
+	  histIso->Fill(isolation);
+	  histDocatrk->Fill(minDca);
+	  histClosetrk->Fill(ntrk);
+	  histChi2dof->Fill(chi2dof);
+	}
+
+      }
       if (Use["MLPBFGS"      ])   histNnbfgs ->Fill( reader->EvaluateMVA( "MLPBFGS method"       ) );
       if (Use["MLPBNN"       ])   histNnbnn  ->Fill( reader->EvaluateMVA( "MLPBNN method"        ) );
       if (Use["CFMlpANN"     ])   histNnC    ->Fill( reader->EvaluateMVA( "CFMlpANN method"      ) );
@@ -524,21 +562,21 @@ void TMVAClassificationApplication( const TString & inputFileName, const TString
    std::cout << "--- End of event loop: "; sw.Print();
 
    // Get efficiency for cuts classifier
-   if (Use["CutsGA"]) std::cout << "--- Efficiency for CutsGA method: " << double(nSelCutsGA)/theTree->GetEntries()
+   if (Use["CutsSA"]) std::cout << "--- Efficiency for CutsSA method: " << double(nSelCutsSA)/theTree->GetEntries()
                                 << " (for a required signal efficiency of " << effS << ")" << std::endl;
 
-   if (Use["CutsGA"]) {
+   if (Use["CutsSA"]) {
 
       // test: retrieve cuts for particular signal efficiency
       // CINT ignores dynamic_casts so we have to use a cuts-secific Reader function to acces the pointer  
-      TMVA::MethodCuts* mcuts = reader->FindCutsMVA( "CutsGA method" ) ;
+      TMVA::MethodCuts* mcuts = reader->FindCutsMVA( "CutsSA method" ) ;
 
       if (mcuts) {      
          std::vector<Double_t> cutsMin;
          std::vector<Double_t> cutsMax;
-         mcuts->GetCuts( 0.7, cutsMin, cutsMax );
+         mcuts->GetCuts( effS, cutsMin, cutsMax );
          std::cout << "--- -------------------------------------------------------------" << std::endl;
-         std::cout << "--- Retrieve cut values for signal efficiency of 0.7 from Reader" << std::endl;
+         std::cout << "--- Retrieve cut values for signal efficiency of " << effS << " from Reader" << std::endl;
          for (UInt_t ivar=0; ivar<cutsMin.size(); ivar++) {
             std::cout << "... Cut: " 
                       << cutsMin[ivar] 
@@ -584,6 +622,7 @@ void TMVAClassificationApplication( const TString & inputFileName, const TString
    if (Use["FDA_GA"       ])   histFDAGA  ->Write();
    if (Use["Category"     ])   histCat    ->Write();
    if (Use["Plugin"       ])   histPBdt   ->Write();
+
    histMass->Write();
    histPt->Write();
    histEta->Write();
@@ -602,9 +641,11 @@ void TMVAClassificationApplication( const TString & inputFileName, const TString
 
    // Write also probability hists
    if (Use["Fisher"]) { if (probHistFi != 0) probHistFi->Write(); if (rarityHistFi != 0) rarityHistFi->Write(); }
-   target->Close();
 
-   std::cout << "--- Created root file: \"TMVApp.root\" containing the MVA output histograms" << std::endl;
+   target->Close();
+   inputS->Close();
+
+   std::cout << "--- Created root file: \"" << outputFileName << "\" containing the MVA output histograms" << std::endl;
   
    delete reader;
 
@@ -620,6 +661,7 @@ void TMVAClassificationApplication( const TString & inputFileName, const TString
    // histDocatrk->Draw();
    // histClosetrk->Draw();
    // histChi2dof->Draw();
+
     
    std::cout << "==> TMVAClassificationApplication is done!" << endl << std::endl;
 } 
