@@ -15,14 +15,14 @@
 #include "TMarker.h"
 #include <iostream>
 #include <fstream>
-#include "setTDRStyle_modified.C"
+#include "Common/setTDRStyle_modified.C"
 
 TString fileName(const TString & method, const TString & region, const TString & index);
 void significanceCuts(const double & nsig, const double & nbkg, TString method="BDT",TString region="barrel", TString index="", const int subdir = 1);
 
-void significance(const double & nsig, const double & nbkg, TString method="BDT",TString region="barrel", TString index="", const int subdir = 1) {
+void significance(const double & nsig, const double & nbkg, TString method="BDT",TString region="barrel", TString index="0", const int subdir = 1) {
 
-  cout << "processing " << method << " for " << region << endl;
+  cout << "significance: processing " << method << " for " << region << "(sub sample:"<< index << ")" << endl;
   
   if(method.Contains("Cuts")) {
     significanceCuts(nsig,nbkg,method,region,index,1);
@@ -86,8 +86,8 @@ void significance(const double & nsig, const double & nbkg, TString method="BDT"
     signi2 = sumS/(sqrt(sumB)+0.5);
     sign2->SetBinContent(i, signi2);
 
-    printf("--> signif : %f  %f %f\n", 
-	   signi, signi1, signi2 );
+    //printf("--> signif : %f  %f %f\n", signi, signi1, signi2 );
+	   
 
   }
 
@@ -98,21 +98,21 @@ void significance(const double & nsig, const double & nbkg, TString method="BDT"
   TF1 *pol = new TF1("fa1","[0]*(1+[1]*x+[2]*x*x+[3]*x*x*x)",sig_max_mva-0.1,sig_max_mva+0.1);
   pol->SetParameters(1,1,1,1);
   //pol->FixParameter(3,0); pol->SetRange(0.1,0.5);
-  sign->Fit(pol, "r");
+  sign->Fit(pol, "rq");
 
   TF1 *pol1 = (TF1*) pol->Clone();
   sign1 -> Scale(sign->Integral(1,nbins)/sign1->Integral(1,nbins));
-  sign1->Fit(pol1, "r");
+  sign1->Fit(pol1, "rq");
   sign1->Scale(pol->GetMaximum()/pol1->GetMaximum());
-  sign1->Fit(pol1, "r");
+  sign1->Fit(pol1, "rq");
 
   TF1 *pol2 = (TF1*) pol->Clone();
   sign2 -> Scale(sign->Integral(1,nbins)/sign2->Integral(1,nbins));
-  sign2->Fit(pol2, "r");
+  sign2->Fit(pol2, "rq");
   sign2->Scale(pol->GetMaximum()/pol2->GetMaximum());
   sign2->Fit(pol2, "r");
   
-  sign->Fit(pol, "r");
+  sign->Fit(pol, "rq");
 
   double sig_max      = sign->GetBinContent(sig_max_bin);
   double sig_max_effS = effS->GetBinContent(sig_max_bin);
@@ -123,7 +123,7 @@ void significance(const double & nsig, const double & nbkg, TString method="BDT"
   double max_sig_pol_mva  = pol ->GetMaximumX();
   double max_sig_pol1_mva = pol1->GetMaximumX();
   double max_sig_pol2_mva = pol2->GetMaximumX();
-  double max_sig_pol_bin  = sign->GetBinCenter(sign->FindBin(max_sig_pol_mva));
+  //double max_sig_pol_bin  = sign->GetBinCenter(sign->FindBin(max_sig_pol_mva));
   double max_sig_pol_effS = effS->GetBinContent(sign->FindBin(max_sig_pol_mva));
   double max_sig_pol_effB = effB->GetBinContent(sign->FindBin(max_sig_pol_mva));
 
@@ -138,7 +138,7 @@ void significance(const double & nsig, const double & nbkg, TString method="BDT"
    printf("%s \n",ss);
 
    ofstream outputTxt("maxsignificance_"+method+"_"+region+".txt");
-   outputTxt << max_sig_pol_mva << max_sig_pol1_mva << max_sig_pol2_mva;
+   outputTxt << "s/sqrt(s+b): " << max_sig_pol_mva << "\t s/sqrt(b): " << max_sig_pol1_mva << "\t s/sqrt(b)+0.5: "  << max_sig_pol2_mva << " (mva cut maximizing significance estimators)";
    outputTxt.close();
 
   //setTDRStyle(false);
@@ -238,7 +238,7 @@ void significance(const double & nsig, const double & nbkg, TString method="BDT"
 
    c.SaveAs(TString("plots/"+name+"_eff"+ext));
 
-   TString lpath("latex/Figures/");
+   TString lpath("BsMuMuLatex/Figures/");
    if(method == "BDT")  lpath += "bdt/";
    if(method == "MLP")  lpath += "mlp/";
    if(method.Contains("Cuts")) lpath += "cnt/";
@@ -330,7 +330,7 @@ void significanceCuts(const double & nsig, const double & nbkg, TString method,T
     //printf("== ibin %d ibinav %d effs %f  effb %f   sign %f\n",ibin, ibint, effs, effb, signi);
   }
   
-  double sig_max = sign->GetMaximum();
+  //double sig_max = sign->GetMaximum();
   double yoffset = 0;
   for(int i=0; i<nbins/sfac; i++) {
     sign->SetBinContent(i, sign->GetBinContent(i)+yoffset);
@@ -340,43 +340,43 @@ void significanceCuts(const double & nsig, const double & nbkg, TString method,T
   TF1 *pol = new TF1("fa1","[0]*(1+[1]*x+[2]*x*x+[3]*x*x*x)",0.0,0.8);
   pol->SetParameters(1,1,1,1);
   //pol->FixParameter(3,0); pol->SetRange(0.1,0.5);
-  sign->Fit(pol, "r");
+  sign->Fit(pol, "rq");
 
   TF1 *pol1 = (TF1*) pol->Clone();
   sign1 -> Scale(sign->Integral(1,nbins)/sign1->Integral(1,nbins));
-  sign1->Fit(pol1, "r");
+  sign1->Fit(pol1, "rq");
   sign1->Scale(pol->GetMaximum()/pol1->GetMaximum());
-  sign1->Fit(pol1, "r");
+  sign1->Fit(pol1, "rq");
 
   TF1 *pol2 = (TF1*) pol->Clone();
   sign2 -> Scale(sign->Integral(1,nbins)/sign2->Integral(1,nbins));
-  sign2->Fit(pol2, "r");
+  sign2->Fit(pol2, "rq");
   sign2->Scale(pol->GetMaximum()/pol2->GetMaximum());
-  sign2->Fit(pol2, "r");
+  sign2->Fit(pol2, "rq");
 
-  sign->Fit(pol, "r");
+  sign->Fit(pol, "rq");
 
-  int sig_max_bin = sign->GetMaximumBin(); 
+  //int sig_max_bin = sign->GetMaximumBin(); 
   //double sig_max = sign->GetBinContent(sig_max_bin);
-  double sig_max_effS = effB->GetBinCenter(sig_max_bin);
-  double sig_max_effB = effB->GetBinContent(sig_max_bin);
+  //double sig_max_effS = effB->GetBinCenter(sig_max_bin);
+  //double sig_max_effB = effB->GetBinContent(sig_max_bin);
 
   double max_sig_pol_val = pol->GetMaximum();
   double max_sig_pol_x   = pol->GetMaximumX();
   double max_sig_pol1_x  = pol1->GetMaximumX();
   double max_sig_pol2_x  = pol2->GetMaximumX();
-  double max_sig_pol_bin = sign->GetBinCenter(sign->FindBin(max_sig_pol_x));
-  double max_sig_pol_effS = effB->GetBinCenter(sign->FindBin(max_sig_pol_x));
+  //double max_sig_pol_bin = sign->GetBinCenter(sign->FindBin(max_sig_pol_x));
+  //double max_sig_pol_effS = effB->GetBinCenter(sign->FindBin(max_sig_pol_x));
   double max_sig_pol_effB = effB->GetBinContent(sign->FindBin(max_sig_pol_x));
   
-  printf("pol fit to sign: max %f  max-x %f binval: %f\n ", max_sig_pol_val, max_sig_pol_x, max_sig_pol_bin);
+  //printf("pol fit to sign: max %f  max-x %f binval: %f\n ", max_sig_pol_val, max_sig_pol_x, max_sig_pol_bin);
   
   char ss[100];
   sprintf(ss, "%s,  max. significance: %3.1f, %s, #epsilon_{S}=%4.3f, #epsilon_{B}=%5.4f",region.Data(),max_sig_pol_val,method.Data(), pol->GetMaximumX(), max_sig_pol_effB);
   printf("%s \n",ss);
   
   ofstream outputTxt("maxsignificance_"+method+"_"+region+".txt");
-  outputTxt << max_sig_pol_x << "\t" <<  max_sig_pol1_x << "\t" << max_sig_pol2_x; 
+  outputTxt << "s/sqrt(s+b): " << max_sig_pol_x << "\t s/sqrt(b): " <<  max_sig_pol1_x << "\t s/sqrt(b)+0.5: "  <<  max_sig_pol2_x << " (mva cut maximizing significance estimators)"; 
   outputTxt.close();
   
   gStyle->SetOptStat(kFALSE);
@@ -389,8 +389,8 @@ void significanceCuts(const double & nsig, const double & nbkg, TString method,T
 
   sign->GetXaxis()->SetRangeUser(0.,0.76);
 
-  double ymarg = 0.9;
-  Float_t rightmax = sign->GetMaximum();
+  //double ymarg = 0.9;
+  //Float_t rightmax = sign->GetMaximum();
   //Float_t scale = gPad->GetUymax()/rightmax;
   //scale *= (1-sig_max*(1.-ymarg)/rightmax);
   //sign->Scale(scale);
@@ -465,7 +465,7 @@ void significanceCuts(const double & nsig, const double & nbkg, TString method,T
   c.SaveAs(TString("plots/Cuts_"+region+"_eff"+ext));
   TString name = method + "_" + region;
   if(index!="") name += "_"+index;
-  TString lpath("latex/Figures/cnt/");
+  TString lpath("BsMuMuLatex/Figures/cnt/");
   c.SaveAs(TString(lpath+name+"_eff.pdf"));
 
   input->Close();
@@ -474,6 +474,8 @@ void significanceCuts(const double & nsig, const double & nbkg, TString method,T
 
 TString fileName(const TString & method, const TString & region, const TString & index) {
   TString fnameA = "TMVA_" + region;
+  if(index=="merged") 
+    fnameA += "_"+method;
   if(index!="") 
     fnameA += "_"+index;
   fnameA += ".root";

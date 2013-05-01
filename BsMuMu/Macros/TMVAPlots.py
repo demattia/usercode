@@ -29,10 +29,15 @@
 # figuresDir = "/Users/demattia/TMVA-v4.1.2/test/NewTrees/BsMuMuLatex/Figures/"
 # tablesDir = "/Users/demattia/TMVA-v4.1.2/test/NewTrees/BsMuMuLatex/Tables/"
 # For the new analysis
-figuresDir = "/Users/demattia/TMVA-v4.1.2/test/NewAnalysis/BsMuMuLatex/Figures/"
-tablesDir = "/Users/demattia/TMVA-v4.1.2/test/NewAnalysis/BsMuMuLatex/Tables/"
+#figuresDir = "/Users/demattia/TMVA-v4.1.2/test/NewAnalysis/BsMuMuLatex/Figures/"
+#tablesDir = "/Users/demattia/TMVA-v4.1.2/test/NewAnalysis/BsMuMuLatex/Tables/"
+#rootExecutable = "/Users/demattia/Downloads/root-v5-34-00-patches/bin/root"
 
-rootExecutable = "/Users/demattia/Downloads/root-v5-34-00-patches/bin/root"
+figuresDir = "BsMuMuLatex/Figures/"
+tablesDir = "BsMuMuLatex/Tables/"
+rootExecutable = "root"
+#rootExecutable = "/afs/cern.ch/sw/lcg/app/releases/ROOT/5.34.04/x86_64-slc5-gcc43-opt/root/bin/root"
+
 
 # <codecell>
 
@@ -40,7 +45,8 @@ rootExecutable = "/Users/demattia/Downloads/root-v5-34-00-patches/bin/root"
 
 # <codecell>
 
-cd /Users/demattia/TMVA-v4.1.2/test/NewAnalysis/
+#cd /Users/demattia/TMVA-v4.1.2/test/NewAnalysis/
+
 
 # <codecell>
 
@@ -474,32 +480,79 @@ os.system("mv mvaeffs_BDT_"+region+".pdf "+figuresDir)
 
 # <codecell>
 
-os.system(rootExecutable+" -l -b -q mergeTMVAs.C\(\\\"BDT\\\",\\\"barrel\\\"")
-os.system(rootExecutable+" -l -b -q significance.C+\("+str(expectedEventsBarrel)+","+str(estimatedBackgroundBarrel)+",\\\"BDT\\\",\\\"barrel\\\",\\\"merged\\\",0\)")
-maxSigFile = open("maxsignificance_BDT_barrel.txt")
-line = maxSigFile.readline()
-print line
-print "optimal cut barrel S/sqrt(S+B):",  line.split()[0], ", S/sqrt(B):",  line.split()[1],  ", S/sqrt(B)+0.5:",  line.split()[2]  
-optimalCutBarrel = line.split()[0]
-print "chosen optimal BDT cut barrel =", optimalCutBarrel
-os.system(rootExecutable+" -l -b -q mergeTMVAs.C\(\\\"BDT\\\",\\\"endcaps\\\"")
-os.system(rootExecutable+" -l -b -q significance.C+\("+str(expectedEventsEndcaps)+","+str(estimatedBackgroundEndcaps)+",\\\"BDT\\\",\\\"endcaps\\\",\\\"merged\\\",0\)")
-maxSigFile = open("maxsignificance_BDT_endcaps.txt")
-line = maxSigFile.readline()
-print line
-print "optimal cut endcaps S/sqrt(S+B):",  line.split()[0], ", S/sqrt(B):",  line.split()[1],  ", S/sqrt(B)+0.5:",  line.split()[2]  
-optimalCutEndcaps = line.split()[0]
-print "chosen optimal BDT cut endcaps =", optimalCutEndcaps
+methods = ["BDT", "MLP", "CutsSA"]
+regions = ["barrel", "endcaps"]
 
-"""
-#in case the CUTS method was run:
-os.system(rootExecutable+" -l -b -q mergeTMVAs.C\(\\\"CutsSA\\\",\\\"barrel\\\"")
-os.system(rootExecutable+" -l -b -q significance.C+\("+str(expectedEventsBarrel)+","+str(estimatedBackgroundBarrel)+",\\\"CutsSA\\\",\\\"barrel\\\",\\\"merged\\\",0\)")
-maxSigFile = open("maxsignificance_CutsSA_barrel.txt")
-line = maxSigFile.readline()
-print line
-print "optimal cut barrel S/sqrt(S+B):",  line.split()[0], ", S/sqrt(B):",  line.split()[1],  ", S/sqrt(B)+0.5:",  line.split()[2]  
-"""
+expectedYield = { "barrel" : { "signal" : expectedEventsBarrel, "background" : estimatedBackgroundBarrel }, "endcaps" : { "signal" : expectedEventsEndcaps, "background" : estimatedBackgroundEndcaps } }
+
+#get list of significance figures-of-merit
+def getSignFomName(file):
+    signifn = [] 
+    maxSigFile = open(file)
+    line = maxSigFile.readline()
+    for i in range(3):
+        print i, 2*i
+        signifn.append(line.split()[2*i].replace(":",""))
+        maxSigFile.close()
+    return signifn
+
+signi_fom = getSignFomName("maxsignificance_BDT_barrel.txt")
+#print signi_fom
+
+optimalCut = { "barrel"  : { "BDT" : [-99,-99,-99], "MLP" : [-99,-99,-99], "CutsSA" : [-99,-99,-99] },
+               "endcaps" : { "BDT" : [-99,-99,-99], "MLP" : [-99,-99,-99], "CutsSA" : [-99,-99,-99] } }
+
+sampleIndex = ["","0","1","2","merged"]
+               
+for method in methods:
+    for region in regions:
+
+        ## note: CutsSA CANNOT be merged!, cannot add efficiencies!
+        ## TBD: there is no overtraining as such, but could use different sets of cuts using different samples
+        ## skip this for now
+
+        # merge TMVA classification ouputs for the 3 subsamples
+        cmd = rootExecutable+" -l -b -q mergeTMVAs.C\(\\\""+method+"\\\",\\\""+region+"\\\"\)"
+        print cmd
+        if not "Cuts" in method:
+            os.system(cmd)
+
+        # execute the significance macro
+        # main case of interest: merged (bdt,mlp,...), full (not merged, index "") for Cuts
+        # extra cases: subsamples, to comapre roc's
+        for ff in sampleIndex:
+            if "Cuts" in method and ff=="merged": ### for CUTS there is no "merged" file
+                continue
+            cmd = rootExecutable+" -l -b -q significance.C+\("+str(expectedYield[region]["signal"])+","+str(expectedYield[region]["background"])+",\\\""+method+"\\\",\\\""+region+"\\\",\\\""+ff+"\\\",1\)"
+            print cmd
+            os.system(cmd)
+
+        #extra: run signficance also for the separate subsamples, eg to comapre roc's
+       ###     cmd = rootExecutable+" -l -b -q significance.C+\("+str(expectedYield[region]["signal"])+","+str(expectedYield[region]["background"])+",\\\""+method+"\\\",\\\""+region+"\\\",\\\""+str(ii)+"\\\",1\)"
+       ###     print cmd
+       ###     os.system(cmd)
+
+        # retrieve the optimal cut value which maximizes the significance
+        #   note different figures of merit for estimating the signficance are available 
+        maxSigFile = open("maxsignificance_"+method+"_"+region+".txt")
+        signi = maxSigFile.readline()
+        #signi = "a 1 b 2 c 3"
+        for isig in range(3):
+            optimalCut[region][method][isig] = signi.split()[2*isig+1]    
+
+
+def printMvaCut(arr):
+    print "optimal cuts:",
+    for rr in regions:
+        print "\n\t",rr,
+        for mm in methods:
+            print "\n\t\t",mm,
+            for ii in range(3):
+                print "\t",signi_fom[ii],":% 5.3f" % float(arr[rr][mm][ii]), 
+
+#print optimalCut
+printMvaCut(optimalCut)
+
 
 # <headingcell level=3>
 
@@ -520,12 +573,69 @@ class TypeSettings:
         self.color = inputColor
         self.option = inputOption
 
+def applyMVA(inputFileName, outputFileName, weightDir, method, cutValue):
+    #os.system(rootExecutable + " -q -l TMVAClassificationApplication.C+\(\\\""+inputFileName+"\\\",\\\""+outputFileName+"\\\",\\\""+weightDir+"\\\","+str(cutValue)+",\\\""+method+"\\\"\)")
+    p = subprocess.Popen([rootExecutable, "-q", "-l", "TMVAClassificationApplication.C+(\""+inputFileName+"\",\""+outputFileName+"\",\""+weightDir+"\","+str(cutValue)+",\""+method+"\")"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    out, err = p.communicate()
+    # print out
+    # print err
+
+## note: method obsolete: replaced by similar (BDR->MVA) method
 def applyBDT(inputFileName, outputFileName, weightDir, cutValue):
     p = subprocess.Popen([rootExecutable, "-q", "-l", "TMVAClassificationApplication.C+(\""+inputFileName+"\",\""+outputFileName+"\",\""+weightDir+"\","+str(cutValue)+")"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     out, err = p.communicate()
     # print out
     print err
 
+def drawAppMVAOutputPlots(region,method,isMC):
+
+    MCstr = ""
+    if isMC:
+       iMCstr = BsMC12
+    Region = region[:1].upper()+region[1:] #capitalize first letter for retrieving file names
+    HistName = "ApplicationOutput"+MCstr+Region+method
+    CvsName  = "canvasMVA_"+MCstr+method+region
+    canvas = TCanvas(CvsName,CvsName)
+    stackBDT = THStack(HistName,HistName)
+    histos = []
+    appFiles = []
+    canvas.Draw()
+
+    # note: TMVApp file name structure: "TMVApp"+Region+method+sample+".root"
+    #                             "BsMC12TMVApp"+Region+method+sample+".root"
+    appFile = TFile(MCstr+"TMVApp"+Region+method+".root")
+    histo = appFile.Get("MVA_"+method).Clone(HistName)
+    histo.Scale(1/histo.GetEntries())
+    stackBDT.Add(histo)
+
+    for sample in range(3):
+        appFiles.append(TFile(MCstr+"TMVApp"+Region+method+str(sample)+".root"))
+        histos.append(appFiles[sample].Get("MVA_"+method).Clone("HistName"+str(sample)))
+        histos[sample].SetLineColor(2*sample)
+        histos[sample].Scale(1/histos[sample].GetEntries())
+        stackBDT.Add(histos[sample])
+
+
+    stackBDT.Draw("nostack")
+    if isMC:
+        applicationBDTLegend = TLegend(0.2,0.7,0.5,0.9,"","brNDC")
+        #applicationBDTLegend.SetHeader("Bs MC "+region.split("BsMC")[1])
+        applicationBDTLegend.SetHeader("Bs MC "+Region)
+    else:
+        applicationBDTLegend = TLegend(0.55,0.7,0.85,0.9,"","brNDC")
+        applicationBDTLegend.SetHeader(Region)
+
+    applicationBDTLegend.AddEntry(histo, "Full sample", "l")
+    applicationBDTLegend.AddEntry(histos[0], "Trained on 0, tested on 1, applied on 2", "l")
+    applicationBDTLegend.AddEntry(histos[1], "Trained on 1, tested on 2, applied on 0", "l")
+    applicationBDTLegend.AddEntry(histos[2], "Trained on 2, tested on 0, applied on 1", "l")
+    applicationBDTLegend.Draw("same")
+    applicationBDTLegend.SetFillColor(0)
+    applicationBDTLegend.SetLineColor(0)
+    canvas.SaveAs(figuresDir+"Application"+method+"Output_"+MCstr+region+".pdf")
+
+
+## note: method obsolete: replaced by similar (BDR->MVA) method
 def drawAppBDTOutputPlots(region):
     canvas = TCanvas("canvasMVA_BDT"+region, "canvasMVA_BDT"+region)
     stackBDT = THStack("ApplicationBDTOutput_"+region, "ApplicationBDTOutput_"+region)
@@ -578,7 +688,33 @@ def drawAppBDTOutputPlots(region):
     applicationBDTLegend.SetLineColor(0)
     canvas.SaveAs(figuresDir+"ApplicationBDTOutput_"+region+".pdf")
 
+
+#sampleIndex = ["","0","1","2"] ## note not needed (nor precise) to apply the optimal cut to the full "" sample (?..)
+trainedOnIAppliedonJ = ["2","0","1"]
+# Applied on 2, trained on 0 (tested on 1)
+# Applied on 0, trained on 1 (tested on 2)
+# Applied on 1, trained on 2 (tested on 0)
+
 if redoApplication:
+
+    for region in regions:            
+        Region = region[:1].upper()+region[1:] #capitalize first letter for retrieving file names
+        for method in methods:
+            if method is not "BDT": 
+                continue
+            optCut = optimalCut[region][method][0]
+            for sample in range(3):
+                weightDir = region+str(sample)+"Weights/"
+                applyMVA(Region + "_preselection_"+trainedOnIAppliedonJ[sample]+".root", "TMVApp"+Region+method+str(sample)+".root", weightDir, method, optCut)
+                applyMVA("BsMC12_"+region+"_preselection_"+trainedOnIAppliedonJ[sample]+".root", "BsMC12TMVApp"+Region+method+str(sample)+".root", weightDir, method, optCut)
+
+            #applying optimal "merged" cut on the total sample is only for fun
+            applyMVA(Region + "_preselection.root", "TMVApp"+Region+method+".root", region+"Weights/", method, optCut)
+            applyMVA("BsMC12_"+region+"_preselection.root", "BsMC12TMVApp"+Region+method+".root", region+"Weights/", method, optCut)
+
+
+
+"""
     # Barrel
     applyBDT("Barrel_preselection.root", "BarrelTMVApp.root", "barrelWeights/", optimalCutBarrel)
     # Applied on 2, trained on 0 (tested on 1)
@@ -606,12 +742,18 @@ if redoApplication:
     applyBDT("BsMC12_endcaps_preselection_2.root", "BsMCEndcapsTMVApp0.root", "endcaps0Weights/", optimalCutEndcaps)
     applyBDT("BsMC12_endcaps_preselection_0.root", "BsMCEndcapsTMVApp1.root", "endcaps1Weights/", optimalCutEndcaps)
     applyBDT("BsMC12_endcaps_preselection_1.root", "BsMCEndcapsTMVApp2.root", "endcaps2Weights/", optimalCutEndcaps)
+"""
 
 
-drawAppBDTOutputPlots("Barrel")
-drawAppBDTOutputPlots("BsMCBarrel")
-drawAppBDTOutputPlots("Endcaps")
-drawAppBDTOutputPlots("BsMCEndcaps")
+for region in regions:
+    for method in methods:
+        drawAppMVAOutputPlots(region,method,0)
+        drawAppMVAOutputPlots(region,method,1)
+
+#drawAppBDTOutputPlots("Barrel")
+#drawAppBDTOutputPlots("BsMCBarrel")
+#drawAppBDTOutputPlots("Endcaps")
+#drawAppBDTOutputPlots("BsMCEndcaps")
 
 # <headingcell level=2>
 
@@ -624,12 +766,6 @@ from ROOT import TFile
 from ROOT import TLine
 from ROOT import TGraphErrors
 from array import array
-
-def applyBDT(inputFileName, outputFileName, weightDir, cutValue):
-    p = subprocess.Popen([rootExecutable, "-q", "-l", "TMVAClassificationApplication.C+(\""+inputFileName+"\",\""+outputFileName+"\",\""+weightDir+"\","+str(cutValue)+")"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    out, err = p.communicate()
-    # print out
-    # print err
 
 def drawMassPlot(region, plotType = ""):
     # Take the histograms from each application
