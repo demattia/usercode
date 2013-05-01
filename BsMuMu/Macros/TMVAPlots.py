@@ -591,7 +591,7 @@ def drawAppMVAOutputPlots(region,method,isMC):
 
     MCstr = ""
     if isMC:
-       iMCstr = BsMC12
+       MCstr = "BsMC12"
     Region = region[:1].upper()+region[1:] #capitalize first letter for retrieving file names
     HistName = "ApplicationOutput"+MCstr+Region+method
     CvsName  = "canvasMVA_"+MCstr+method+region
