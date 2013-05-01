@@ -26,6 +26,7 @@ TString fileName(const TString & method, const TString & region, const TString &
 // Merge the signal and background entries histograms
 void mergeTMVAs(TString method="BDT",TString region="barrel")
 {
+
   TH1F * tmva_s[3];
   TH1F * tmva_b[3];
   for( int i=0; i<3; ++i ) {
@@ -39,7 +40,7 @@ void mergeTMVAs(TString method="BDT",TString region="barrel")
     tmva_s[i] = (TH1F*)gROOT->FindObject(TString("MVA_"+method+"_S_high"));
     tmva_b[i] = (TH1F*)gROOT->FindObject(TString("MVA_"+method+"_B_high"));
   }
-  TFile * outputFile = new TFile("TMVA_"+region+"_merged.root", "RECREATE");
+  TFile * outputFile = new TFile("TMVA_"+region+"_"+method+"_merged.root", "RECREATE");
   TH1F * merged_s = tmva_s[0]->Clone();
   TH1F * merged_b = tmva_b[0]->Clone();
   merged_s->Add(tmva_s[1]);
