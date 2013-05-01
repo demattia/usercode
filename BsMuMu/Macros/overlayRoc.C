@@ -12,7 +12,7 @@
 #include "TLegend.h"
 #include "TMarker.h"
 #include <iostream>
-#include "../Common/setTDRStyle_modified.C"
+#include "Common/setTDRStyle_modified.C"
 
 TH2F* getplot(TString filename);
 TGraph* getpoint(TString filename);
@@ -29,6 +29,7 @@ void overlayRoc(){
   TH2F* roc0=getplot("plots/signif_BDT_barrel_0.root");
   TH2F* roc1=getplot("plots/signif_BDT_barrel_1.root");
   TH2F* roc2=getplot("plots/signif_BDT_barrel_2.root");
+  TH2F* roc3=getplot("plots/signif_BDT_barrel_merged.root");
   roc->GetXaxis()->SetRangeUser(0.,1);
   roc->GetYaxis()->SetRangeUser(0.99,1.);
 
@@ -36,21 +37,25 @@ void overlayRoc(){
   roc0->SetMarkerColor(2);
   roc1->SetMarkerColor(3);
   roc2->SetMarkerColor(4);  
+  roc3->SetMarkerColor(5);  
 
   roc ->SetMarkerStyle(24);
   roc0->SetMarkerStyle(25);
   roc1->SetMarkerStyle(26);
   roc2->SetMarkerStyle(27);
+  roc3->SetMarkerStyle(28);
 
-  roc ->SetMarkerSize(0.8);
+  roc ->SetMarkerSize(0.4);
   roc0->SetMarkerSize(0.4);
   roc1->SetMarkerSize(0.4);
   roc2->SetMarkerSize(0.4);
+  roc3->SetMarkerSize(0.8);
 
   roc ->Draw();
   roc0->Draw("same");
   roc1->Draw("same");
   roc2->Draw("same");
+  roc3->Draw("same");
 
   /*
   double x, y; 
@@ -65,10 +70,11 @@ void overlayRoc(){
 
   TLegend* leg = new TLegend(0.7,0.7,0.9,0.9);
   //leg->SetHeader("The Legend Title");
-  leg->AddEntry(roc,"combined","p");
+  leg->AddEntry(roc,"full","p");
   leg->AddEntry(roc0,"0","p");
   leg->AddEntry(roc1,"1","p");
   leg->AddEntry(roc2,"2","p");
+  leg->AddEntry(roc2,"combined","p");
   leg->Draw();
   
   c.SaveAs("plots/roc_overlay_barrel.pdf");
