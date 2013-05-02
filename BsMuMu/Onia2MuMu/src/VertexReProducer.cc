@@ -7,7 +7,7 @@
 #include "DataFormats/Provenance/interface/Provenance.h"
 #include "FWCore/MessageLogger/interface/MessageLogger.h"
 
-VertexReProducer::VertexReProducer(const edm::Handle<reco::VertexCollection> &handle, const edm::Event &iEvent) 
+VertexReProducer::VertexReProducer(const edm::Handle<reco::VertexCollection> &handle, const edm::Event &iEvent, const bool forceAdaptive)
 {
   using namespace std;
   const edm::Provenance *prov = handle.provenance();
@@ -22,7 +22,7 @@ VertexReProducer::VertexReProducer(const edm::Handle<reco::VertexCollection> &ha
   if (prov->moduleName() != "PrimaryVertexProducer")
     throw cms::Exception("Configuration") << "Vertices to re-produce don't come from a PrimaryVertexProducer, but from a " << prov->moduleName() <<".\n";
 
-  configure(psetFromProvenance);
+  configure(psetFromProvenance, forceAdaptive);
 
   // Now we also dig out the ProcessName used for the reco::Tracks and reco::Vertices
   std::vector<edm::BranchID> parents = prov->parents();
@@ -46,28 +46,28 @@ VertexReProducer::VertexReProducer(const edm::Handle<reco::VertexCollection> &ha
 }
 
 void
-VertexReProducer::configure(const edm::ParameterSet &iConfig) 
+VertexReProducer::configure(const edm::ParameterSet &iConfig, const bool forceAdaptive)
 {
-    config_ = iConfig;
-    tracksTag_   = iConfig.getParameter<edm::InputTag>("TrackLabel");
-    beamSpotTag_ = iConfig.getParameter<edm::InputTag>("beamSpotLabel");
-    algo_.reset(new PrimaryVertexProducerAlgorithm(iConfig)); 
+  config_ = iConfig;
+  tracksTag_   = iConfig.getParameter<edm::InputTag>("TrackLabel");
+  beamSpotTag_ = iConfig.getParameter<edm::InputTag>("beamSpotLabel");
+  algo_.reset(new PrimaryVertexProducerAlgorithm(iConfig, forceAdaptive));
 }
 
 std::vector<TransientVertex> 
 VertexReProducer::makeVertices(const reco::TrackCollection &tracks, 
                                const reco::BeamSpot &bs, 
-                               const edm::EventSetup &iSetup) const 
+                               const edm::EventSetup &iSetup) const
 {
-    using namespace std;
-    edm::ESHandle<TransientTrackBuilder> theB;
-    iSetup.get<TransientTrackRecord>().get("TransientTrackBuilder",theB);
+  using namespace std;
+  edm::ESHandle<TransientTrackBuilder> theB;
+  iSetup.get<TransientTrackRecord>().get("TransientTrackBuilder",theB);
 
-    std::vector<reco::TransientTrack> t_tks; t_tks.reserve(tracks.size());
-    for (reco::TrackCollection::const_iterator it = tracks.begin(), ed = tracks.end(); it != ed; ++it) {
-        t_tks.push_back((*theB).build(*it));
-        t_tks.back().setBeamSpot(bs);
-    }
+  std::vector<reco::TransientTrack> t_tks; t_tks.reserve(tracks.size());
+  for (reco::TrackCollection::const_iterator it = tracks.begin(), ed = tracks.end(); it != ed; ++it) {
+    t_tks.push_back((*theB).build(*it));
+    t_tks.back().setBeamSpot(bs);
+  }
 
-    return algo_->vertices(t_tks, bs);
+  return algo_->vertices(t_tks, bs);
 }

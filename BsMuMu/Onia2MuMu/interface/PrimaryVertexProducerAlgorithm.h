@@ -16,7 +16,7 @@
 //
 // Original Author:  Pascal Vanlaer
 //         Created:  Tue Feb 28 11:06:34 CET 2006
-// $Id: PrimaryVertexProducerAlgorithm.h,v 1.17 2012/04/27 16:12:39 werdmann Exp $
+// $Id: PrimaryVertexProducerAlgorithm.h,v 1.1 2013/04/05 14:58:48 demattia Exp $
 //
 //
 
@@ -59,7 +59,7 @@
 class PrimaryVertexProducerAlgorithm : public VertexReconstructor {
 public:
 
-  explicit PrimaryVertexProducerAlgorithm(const edm::ParameterSet&);
+  explicit PrimaryVertexProducerAlgorithm(const edm::ParameterSet&, const bool forceAdaptive);
   ~PrimaryVertexProducerAlgorithm();
   
   // obsolete method

@@ -20,6 +20,8 @@
 #include <CommonTools/UtilAlgos/interface/StringCutObjectSelector.h>
 #include "RecoVertex/VertexTools/interface/InvariantMassFromVertex.h"
 #include "HeavyFlavorAnalysis/Onia2MuMu/interface/VertexReProducer.h"
+#include "RecoVertex/KinematicFitPrimitives/interface/ParticleMass.h"
+#include "TrackingTools/TransientTrack/interface/TransientTrackBuilder.h"
 
 template<typename T>
 struct GreaterByVProb {
@@ -49,8 +51,14 @@ class Onia2MuMuPAT : public edm::EDProducer {
   bool searchForTheThirdTrack(const edm::Event&, const edm::EventSetup&, pat::CompositeCandidate&, const pat::Muon*, const pat::Muon*,reco::Vertex&,reco::Track&, bool&);
   std::pair<int, float> findJpsiMCInfo(reco::GenParticleRef genJpsi);
   math::XYZTLorentzVector fromPtEtaPhiToPxPyPz( const double & pt, const double & eta, const double & phi, const double & mass);
-  void fillCandMuons(pat::CompositeCandidate & myCand, const pat::Muon & mu1, const pat::Muon & mu2, const reco::TransientTrack & refittedTrack1, const reco::TransientTrack & refittedTrack2);
+  void fillCandMuons(pat::CompositeCandidate & myCand, const pat::Muon & mu1, const pat::Muon & mu2);
   void buildMuonlessPV(const edm::Event&, const edm::EventSetup&,const pat::Muon *,const pat::Muon *, const reco::Track &, reco::Vertex & );
+  void buildMuonlessPV(// const edm::Event& iEvent, const reco::VertexCollection & priVtxs,
+                       const reco::Muon * rmu1, const reco::Muon * rmu2,
+                       reco::TrackCollection & muonLess, reco::Vertex & thePrimaryV,
+                       const edm::ESHandle<TransientTrackBuilder> &theTTBuilder,
+                       const reco::BeamSpot & bs);
+
   // ----------member data ---------------------------
  private:
   edm::InputTag muons_;
@@ -76,6 +84,9 @@ class Onia2MuMuPAT : public edm::EDProducer {
   float computeDca(const TrajectoryStateClosestToPoint & tt1, const TrajectoryStateClosestToPoint & tt2);
 
   InvariantMassFromVertex massCalculator;
+  ParticleMass muon_mass;
+  float muon_sigma;
+  AdaptiveVertexFitter avtxFitter_;
 
   struct SimpleTrack
   {

@@ -351,7 +351,7 @@ Onia2MuMuPAT::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 
 
 
-
+          double cosAlpha3D = -100.;
 
 
 
@@ -375,6 +375,9 @@ Onia2MuMuPAT::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 
             TransientTrack tt = theTTBuilder->build(b_s->currentState().freeTrajectoryState());
 
+            // Mass from the kinematic vertex fit
+            myCand.addUserFloat("kinMass",b_s->currentState().mass());
+
             // Using the original PV
             pair<bool,Measurement1D> oldDist = IPTools::absoluteImpactParameter3D(tt, theOriginalPV);
             if( oldDist.first ) {
@@ -384,7 +387,7 @@ Onia2MuMuPAT::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
               myCand.addUserFloat("delta3d",oldDist.second.value());
               myCand.addUserFloat("delta3dErr",oldDist.second.error());
             }
-            pair<bool,Measurement1D> oldPvlip = IPTools::signedDecayLength3D(tt,GlobalVector(0,0,1),thePrimaryV);
+            pair<bool,Measurement1D> oldPvlip = IPTools::signedDecayLength3D(tt,GlobalVector(0,0,1),theOriginalPV);
             if( oldPvlip.first ) {
               myCand.addUserFloat("pvlip",oldPvlip.second.value());
               myCand.addUserFloat("pvlipErr",oldPvlip.second.error());
@@ -398,53 +401,21 @@ Onia2MuMuPAT::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
             }
             pair<bool,Measurement1D> pvlip = IPTools::signedDecayLength3D(tt,GlobalVector(0,0,1),thePrimaryV);
             if( pvlip.first ) {
-              std::cout << "new pvip/sigma(pvip) = " << pvlip.second.value() << "/" << pvlip.second.error() << std::endl;
-              std::cout << "new pvips = " << pvlip.second.value()/pvlip.second.error() << std::endl;
+              std::cout << "new pvlip/sigma(pvip) = " << pvlip.second.value() << "/" << pvlip.second.error() << std::endl;
+              std::cout << "new pvlips = " << pvlip.second.value()/pvlip.second.error() << std::endl;
             }
 
 
 
 
-             // RefCountedKinematicVertex b_dec_vertex = vertexFitTree->currentDecayVertex();
-              //if (b_dec_vertex->vertexIsValid()) {
-              //  if( b_dec_vertex->position().x() != myVertex.position().x() ) {
-              //    std::cout << "Decay vertex:                       " << b_dec_vertex->position() <<b_dec_vertex->chiSquared()<< " "<<b_dec_vertex->degreesOfFreedom()<<endl;
-              //  }
-             // }
-            // }
 
-            //          cout << "Bs: \n";
-  //          //accessing the reconstructed Bs meson parameters:
-  //          //SK: uncomment if needed  AlgebraicVector7 bs_par = myParticle->currentState().kinematicParameters().vector();
-  //          //and their joint covariance matrix:
-  //          //SK:uncomment if needed  AlgebraicSymMatrix77 bs_er = myParticle->currentState().kinematicParametersError().matrix();
-  //          cout << "Momentum at vertex: " << b_s->currentState().globalMomentum ()<<endl;
-  //          cout << "Parameters at vertex: " << b_s->currentState().kinematicParameters().vector()<<endl;
 
-  //          // The B_s decay vertex
-  //          RefCountedKinematicVertex b_dec_vertex = vertexFitTree->currentDecayVertex();
-  //          if (b_dec_vertex->vertexIsValid()) {
-  //            cout << "Decay vertex: " << b_dec_vertex->position() <<b_dec_vertex->chiSquared()<< " "<<b_dec_vertex->degreesOfFreedom()<<endl;
-  //          } else cout << "Decay vertex Not valid\n";
-
-  //          // Get all the children of Bs:
-  //          //In this way, the pointer is not moved
-  //          vector< RefCountedKinematicParticle > bs_children = vertexFitTree->finalStateParticles();
-  //          for (unsigned int i=0;i< bs_children.size();++i) {
-  //            cout << "Muon["<<i<<"]: \n";
-  //            cout << "Momentum at vertex: " << bs_children[i]->currentState().globalMomentum ()<<endl;
-  //            cout << "Parameters at vertex: " << bs_children[i]->currentState().kinematicParameters().vector()<<endl;
-  //          }
-
-  ////          //Now navigating down the tree , pointer is moved:
-  ////          bool child = vertexFitTree->movePointerToTheFirstChild();
-
-  ////          if(child) while (vertexFitTree->movePointerToTheNextChild()) {
-  ////            RefCountedKinematicParticle aChild = vertexFitTree->currentParticle();
-  ////            cout << "Child: \n";
-  ////            cout << "Momentum at vertex: " << aChild->currentState().globalMomentum ()<<endl;
-  ////            cout << "Parameters at vertex: " << aChild->currentState().kinematicParameters().vector()<<endl;
-  ////          }
+            TVector3 oldPvtx3D;
+            oldPvtx3D.SetXYZ(theOriginalPV.position().x(),theOriginalPV.position().y(),theOriginalPV.position().z());
+            TVector3 oldVdiff3D = vtx3D - oldPvtx3D;
+            double oldCosAlpha3D = oldVdiff3D.Dot(pCand)/(oldVdiff3D.Mag()*pCand.Mag());
+            std::cout << "old cos(alpha) = " << oldCosAlpha3D << std::endl;
+            cosAlpha3D = oldCosAlpha3D;
           }
 
 
@@ -686,7 +657,8 @@ Onia2MuMuPAT::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 
           pvtx3D.SetXYZ(thePrimaryV.position().x(),thePrimaryV.position().y(),thePrimaryV.position().z());
           TVector3 vdiff3D = vtx3D - pvtx3D;
-          double cosAlpha3D = vdiff3D.Dot(pCand)/(vdiff3D.Mag()*pCand.Mag());
+          // TODO: move to the new cosAlpha3D
+          // double cosAlpha3D = vdiff3D.Dot(pCand)/(vdiff3D.Mag()*pCand.Mag());
           Measurement1D dist3D = vdist3D.distance(Vertex(myVertex), thePrimaryV);
           double l3d = dist3D.value();
           double l3dsig = l3d/dist3D.error();
@@ -769,6 +741,7 @@ Onia2MuMuPAT::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
           myCand.addUserFloat("DCA", -1);
           myCand.addUserFloat("delta3d",-1);
           myCand.addUserFloat("delta3dErr",-1);
+          myCand.addUserFloat("kinMass", -1.);
           if (addCommonVertex_) {
             myCand.addUserData("commonVertex",Vertex());
           }

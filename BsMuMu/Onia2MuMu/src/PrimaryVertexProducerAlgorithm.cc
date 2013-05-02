@@ -17,7 +17,7 @@
 #include "DataFormats/BeamSpot/interface/BeamSpot.h"
 
 
-PrimaryVertexProducerAlgorithm::PrimaryVertexProducerAlgorithm(const edm::ParameterSet& conf)
+PrimaryVertexProducerAlgorithm::PrimaryVertexProducerAlgorithm(const edm::ParameterSet& conf, const bool forceAdaptive = false)
   :theConfig(conf)
 {
 
@@ -65,12 +65,14 @@ PrimaryVertexProducerAlgorithm::PrimaryVertexProducerAlgorithm(const edm::Parame
       
       algo algorithm;
       std::string fitterAlgorithm = algoconf->getParameter<std::string>("algorithm");
+      if( forceAdaptive ) fitterAlgorithm = "AdaptiveVertexFitter";
       if (fitterAlgorithm=="KalmanVertexFitter") {
-	algorithm.fitter= new KalmanVertexFitter();
+        algorithm.fitter= new KalmanVertexFitter();
       } else if( fitterAlgorithm=="AdaptiveVertexFitter") {
-	algorithm.fitter= new AdaptiveVertexFitter();
+        // std::cout << "using AdaptiveVertexFitter" << std::endl;
+        algorithm.fitter= new AdaptiveVertexFitter();
       } else {
-	throw VertexException("PrimaryVertexProducerAlgorithm: unknown algorithm: " + fitterAlgorithm);  
+        throw VertexException("PrimaryVertexProducerAlgorithm: unknown algorithm: " + fitterAlgorithm);
       }
       algorithm.label = algoconf->getParameter<std::string>("label");
       algorithm.minNdof = algoconf->getParameter<double>("minNdof");
