@@ -452,8 +452,9 @@ estimatedBackgroundEndcaps = estimateBackground("Endcaps")
 
 import subprocess
 import os
+#deprecated
 def optimalCutBDT(TMVAFileName, expectedSignalEvents, estimatedBackground):
-    p = subprocess.Popen([rootExecutable, "-q", "-l", "mvaeffs.C(\""+TMVAFileName+"\","+str(expectedSignalEvents)+","+str(estimatedBackground)+")"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    p = subprocess.Popen([rootExecutable, "-b", "-q", "-l", "mvaeffs.C(\""+TMVAFileName+"\","+str(expectedSignalEvents)+","+str(estimatedBackground)+")"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     out, err = p.communicate()
     for line in out.splitlines():
         if line.find("Classifier  ") != -1:
@@ -462,14 +463,14 @@ def optimalCutBDT(TMVAFileName, expectedSignalEvents, estimatedBackground):
             print line
             return line.split()[5]
 
-region = "barrel"
-print region.title()+":"
-optimalCutBarrel = optimalCutBDT(region, expectedEventsBarrel, estimatedBackgroundBarrel)
-os.system("mv mvaeffs_BDT_"+region+".pdf "+figuresDir)
-region = "endcaps"
-print region.title()+":"
-optimalCutEndcaps = optimalCutBDT(region, expectedEventsEndcaps, estimatedBackgroundEndcaps)
-os.system("mv mvaeffs_BDT_"+region+".pdf "+figuresDir)
+#region = "barrel"
+#print region.title()+":"
+#optimalCutBarrel = optimalCutBDT(region, expectedEventsBarrel, estimatedBackgroundBarrel)
+#os.system("mv mvaeffs_BDT_"+region+".pdf "+figuresDir)
+#region = "endcaps"
+#print region.title()+":"
+#optimalCutEndcaps = optimalCutBDT(region, expectedEventsEndcaps, estimatedBackgroundEndcaps)
+#os.system("mv mvaeffs_BDT_"+region+".pdf "+figuresDir)
 
 # <rawcell>
 
@@ -496,9 +497,6 @@ def getSignFomName(file):
         maxSigFile.close()
     return signifn
 
-signi_fom = getSignFomName("maxsignificance_BDT_barrel.txt")
-#print signi_fom
-
 optimalCut = { "barrel"  : { "BDT" : [-99,-99,-99], "MLP" : [-99,-99,-99], "CutsSA" : [-99,-99,-99] },
                "endcaps" : { "BDT" : [-99,-99,-99], "MLP" : [-99,-99,-99], "CutsSA" : [-99,-99,-99] } }
 
@@ -523,12 +521,12 @@ for method in methods:
         for ff in sampleIndex:
             if "Cuts" in method and ff=="merged": ### for CUTS there is no "merged" file
                 continue
-            cmd = rootExecutable+" -l -b -q significance.C+\("+str(expectedYield[region]["signal"])+","+str(expectedYield[region]["background"])+",\\\""+method+"\\\",\\\""+region+"\\\",\\\""+ff+"\\\",1\)"
+            cmd = rootExecutable+" -l -b -q significance.C\("+str(expectedYield[region]["signal"])+","+str(expectedYield[region]["background"])+",\\\""+method+"\\\",\\\""+region+"\\\",\\\""+ff+"\\\",1\)"
             print cmd
             os.system(cmd)
 
         #extra: run signficance also for the separate subsamples, eg to comapre roc's
-       ###     cmd = rootExecutable+" -l -b -q significance.C+\("+str(expectedYield[region]["signal"])+","+str(expectedYield[region]["background"])+",\\\""+method+"\\\",\\\""+region+"\\\",\\\""+str(ii)+"\\\",1\)"
+       ###     cmd = rootExecutable+" -l -b -q significance.C\("+str(expectedYield[region]["signal"])+","+str(expectedYield[region]["background"])+",\\\""+method+"\\\",\\\""+region+"\\\",\\\""+str(ii)+"\\\",1\)"
        ###     print cmd
        ###     os.system(cmd)
 
@@ -541,6 +539,7 @@ for method in methods:
             optimalCut[region][method][isig] = signi.split()[2*isig+1]    
 
 
+signi_fom = getSignFomName("maxsignificance_BDT_barrel.txt")
 def printMvaCut(arr):
     print "optimal cuts:",
     for rr in regions:
@@ -549,6 +548,7 @@ def printMvaCut(arr):
             print "\n\t\t",mm,
             for ii in range(3):
                 print "\t",signi_fom[ii],":% 5.3f" % float(arr[rr][mm][ii]), 
+
 
 #print optimalCut
 printMvaCut(optimalCut)
@@ -574,15 +574,15 @@ class TypeSettings:
         self.option = inputOption
 
 def applyMVA(inputFileName, outputFileName, weightDir, method, cutValue):
-    #os.system(rootExecutable + " -q -l TMVAClassificationApplication.C+\(\\\""+inputFileName+"\\\",\\\""+outputFileName+"\\\",\\\""+weightDir+"\\\","+str(cutValue)+",\\\""+method+"\\\"\)")
-    p = subprocess.Popen([rootExecutable, "-q", "-l", "TMVAClassificationApplication.C+(\""+inputFileName+"\",\""+outputFileName+"\",\""+weightDir+"\","+str(cutValue)+",\""+method+"\")"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    #os.system(rootExecutable + " -q -l TMVAClassificationApplication.C\(\\\""+inputFileName+"\\\",\\\""+outputFileName+"\\\",\\\""+weightDir+"\\\","+str(cutValue)+",\\\""+method+"\\\"\)")
+    p = subprocess.Popen([rootExecutable, "-b", "-q", "-l", "TMVAClassificationApplication.C(\""+inputFileName+"\",\""+outputFileName+"\",\""+weightDir+"\","+str(cutValue)+",\""+method+"\")"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     out, err = p.communicate()
     # print out
     # print err
 
 ## note: method obsolete: replaced by similar (BDR->MVA) method
 def applyBDT(inputFileName, outputFileName, weightDir, cutValue):
-    p = subprocess.Popen([rootExecutable, "-q", "-l", "TMVAClassificationApplication.C+(\""+inputFileName+"\",\""+outputFileName+"\",\""+weightDir+"\","+str(cutValue)+")"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    p = subprocess.Popen([rootExecutable, "-b", "-q", "-l", "TMVAClassificationApplication.C(\""+inputFileName+"\",\""+outputFileName+"\",\""+weightDir+"\","+str(cutValue)+")"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     out, err = p.communicate()
     # print out
     print err
