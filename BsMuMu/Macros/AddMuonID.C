@@ -1,7 +1,8 @@
 #include "TTree.h"
 #include "TFile.h"
 #include <iostream>
-#include "tmvaMuonID/TMVAClassification_BDT_TM.class.C"
+// #include "tmvaMuonID/TMVAClassification_BDT_TM.class.C"
+#include "tmvaMuonID/TMVAClassification_BDT.class.C"
 #include "Common/Selection.h"
 
 // This function adds the mvaMuonId variables to the trees. It also applies the cut.
