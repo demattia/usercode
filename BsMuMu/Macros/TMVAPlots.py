@@ -588,7 +588,6 @@ def applyBDT(inputFileName, outputFileName, weightDir, cutValue):
     print err
 
 def drawAppMVAOutputPlots(region,method,isMC):
-
     MCstr = ""
     if isMC:
        MCstr = "BsMC12"
@@ -700,8 +699,8 @@ if redoApplication:
     for region in regions:            
         Region = region[:1].upper()+region[1:] #capitalize first letter for retrieving file names
         for method in methods:
-            if method is not "BDT": 
-                continue
+            #if method is not "BDT": 
+            #    continue
             optCut = optimalCut[region][method][0]
             for sample in range(3):
                 weightDir = region+str(sample)+"Weights/"
@@ -747,6 +746,7 @@ if redoApplication:
 
 for region in regions:
     for method in methods:
+        if "Cuts" in method: continue
         drawAppMVAOutputPlots(region,method,0)
         drawAppMVAOutputPlots(region,method,1)
 
@@ -767,19 +767,24 @@ from ROOT import TLine
 from ROOT import TGraphErrors
 from array import array
 
-def drawMassPlot(region, plotType = ""):
+    # note: TMVApp file name structure: "TMVApp"+Region+method+sample+".root"
+    #                             "BsMC12TMVApp"+Region+method+sample+".root"
+
+def drawMassPlot(region, method, plotType = ""):
+    print "drawMassPlot ", region, "", method
     # Take the histograms from each application
-    appFile0 = TFile(region+"TMVApp0"+plotType+".root")
-    appFile1 = TFile(region+"TMVApp1"+plotType+".root")
-    appFile2 = TFile(region+"TMVApp2"+plotType+".root")
+    Region = region[:1].upper()+region[1:] #capitalize first letter for retrieving file names
+    appFile0 = TFile("TMVApp"+Region+method+"0"+plotType+".root")
+    appFile1 = TFile("TMVApp"+Region+method+"1"+plotType+".root")
+    appFile2 = TFile("TMVApp"+Region+method+"2"+plotType+".root")
     histoMass0 = appFile0.Get("mass")
     histoMass1 = appFile1.Get("mass")
     histoMass2 = appFile2.Get("mass")
     histoMass = histoMass0.Clone(histoMass0.GetName()+"_merged")
     histoMass.Add(histoMass1)
     histoMass.Add(histoMass2)
-    print "Mass entries "+region+" "+str(histoMass.GetEntries())
-    print "Mass integral "+region+" "+str(histoMass.Integral())
+    #print "Mass entries "+region+" "+str(histoMass.GetEntries())
+    #print "Mass integral "+region+" "+str(histoMass.Integral())
     # Draw the merged histogram
     canvasMass = TCanvas("canvasMass"+region, "Mass "+region)
     canvasMass.Draw()
@@ -814,12 +819,13 @@ def drawMassPlot(region, plotType = ""):
     massLegend.Draw("same")
     massLegend.SetFillColor(0)
     massLegend.SetLineColor(0)
-    canvasMass.SaveAs(figuresDir+region+"MassPlot"+plotType+".pdf")
+    canvasMass.SaveAs(figuresDir+region+method+"MassPlot"+plotType+".pdf")
 
-def drawVariablePlots(region, plotType = ""):
-    appFile0 = TFile(region+"TMVApp0"+plotType+".root")
-    appFile1 = TFile(region+"TMVApp1"+plotType+".root")
-    appFile2 = TFile(region+"TMVApp2"+plotType+".root")
+def drawVariablePlots(region, method, plotType = ""):
+    Region = region[:1].upper()+region[1:] #capitalize first letter for retrieving file names
+    appFile0 = TFile("TMVApp"+Region+method+"0"+plotType+".root")
+    appFile1 = TFile("TMVApp"+Region+method+"1"+plotType+".root")
+    appFile2 = TFile("TMVApp"+Region+method+"2"+plotType+".root")
     for var in ["pt", "eta", "fls3d", "alpha", "maxdoca", "pvip", "pvips", "iso", "docatrk", "closetrk", "chi2dof"]:
         canvas = TCanvas("canvas"+var+region+plotType)
         canvas.Draw()
@@ -827,13 +833,18 @@ def drawVariablePlots(region, plotType = ""):
         varPlot.Add(appFile1.Get(var))
         varPlot.Add(appFile2.Get(var))
         varPlot.Draw()
-        variablePdfFileName = "AfterBDTCut_"+var+"_"+region+plotType+".pdf"
+        variablePdfFileName = "AfterCut_"+var+"_"+region+method+plotType+".pdf"
         canvas.SaveAs(figuresDir+variablePdfFileName)
 
-drawMassPlot("Barrel")
-drawMassPlot("Endcaps")
-drawVariablePlots("Barrel")
-drawVariablePlots("Endcaps")
+for region in regions:
+    for method in methods:
+        drawMassPlot(region,method)
+        drawVariablePlots(region,method)
+
+#drawMassPlot("Barrel")
+#drawMassPlot("Endcaps")
+#drawVariablePlots("Barrel")
+#drawVariablePlots("Endcaps")
 
 # Needs to be fixed. The split files are not available at the moment.
 # drawMassPlot("Barrel", "Unblinded")
