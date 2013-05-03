@@ -125,8 +125,8 @@ void matchevent()
   Comp ceta("xeta", "eta", 100, -2.4, 2.4);
   Comp cmu1pt("mu1_pt", "mu1pt", 100, 0, 50);
   Comp cmu2pt("mu2_pt", "mu2pt", 100, 0, 50);
-  Comp cmu1iso("mu1_iso", "mu1iso", 100, 0, 10); 
-  Comp cmu2iso("mu2_iso", "mu2iso", 100, 0, 10); 
+  Comp cmu1iso("mu1_iso", "mu1iso", 100, 0, 1); 
+  Comp cmu2iso("mu2_iso", "mu2iso", 100, 0, 1); 
   Comp cl3d("l3d","fl3d",40,0,0.5);
   Comp cl3dsig("l3dsig","fls3d",40,0,10);
   Comp cmass("mass","m",40,4.9,5.9);
