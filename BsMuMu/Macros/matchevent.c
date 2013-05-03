@@ -67,18 +67,18 @@ struct Comp
 
 void matchevent()
 {
-  unsigned int maxEvents = 200;
-  TFile *fxchk = new TFile("Barrel_preselection.root");
+  unsigned int maxEvents = 5;
+  TFile *fxchk = new TFile("BsMC12_preselection.root");
   // TFile *fxchk = new TFile("check_barrel_preselection.root");
-  TFile *fmain = new TFile("data_main_barrel.root");
+  TFile *fmain = new TFile("MainAnalysis/MC_afterCuts.root");
 
   TTree *Txchk = (TTree*)fxchk->Get("probe_tree");
   TTree *Tmain = (TTree*)fmain->Get("events");
 
-  Float_t xpt, xeta, mu1_pt, mu2_pt, l3d, l3dsig, mass, dca, delta3d, cosAlpha3D, minDca, isolation, NChi2;
+  Float_t xpt, xeta, mu1_pt, mu2_pt, mu1_iso, mu2_iso, l3d, l3dsig, mass, dca, delta3d, cosAlpha3D, minDca, isolation, NChi2;
   Float_t ntrk20;
   UInt_t event, xrun;
-  Double_t pt, eta, m1pt, m2pt, fl3d, fls3d, m, maxdoca, pvip, cosa, docatrk, iso, chi2, dof;
+  Double_t pt, eta, m1pt, m2pt, m1iso, m2iso, fl3d, fls3d, m, maxdoca, pvip, cosa, docatrk, iso, chi2, dof;
   Int_t closetrk;
   Long64_t evt, run;
 
@@ -86,6 +86,8 @@ void matchevent()
   Txchk->SetBranchAddress("eta",&xeta);
   Txchk->SetBranchAddress("mu1_pt",&mu1_pt);
   Txchk->SetBranchAddress("mu2_pt",&mu2_pt);
+  Txchk->SetBranchAddress("mu1_iso",&mu1_iso);
+  Txchk->SetBranchAddress("mu2_iso",&mu2_iso);
   Txchk->SetBranchAddress("l3d",&l3d);
   Txchk->SetBranchAddress("l3dsig",&l3dsig);
   Txchk->SetBranchAddress("mass",&mass);
@@ -103,6 +105,8 @@ void matchevent()
   Tmain->SetBranchAddress("eta",&eta);
   Tmain->SetBranchAddress("m1pt",&m1pt);
   Tmain->SetBranchAddress("m2pt",&m2pt);
+  Tmain->SetBranchAddress("m1iso",&m1iso);
+  Tmain->SetBranchAddress("m2iso",&m2iso);
   Tmain->SetBranchAddress("fl3d",&fl3d);
   Tmain->SetBranchAddress("fls3d",&fls3d);
   Tmain->SetBranchAddress("m",&m);
@@ -121,6 +125,8 @@ void matchevent()
   Comp ceta("xeta", "eta", 100, -2.4, 2.4);
   Comp cmu1pt("mu1_pt", "mu1pt", 100, 0, 50);
   Comp cmu2pt("mu2_pt", "mu2pt", 100, 0, 50);
+  Comp cmu1iso("mu1_iso", "mu1iso", 100, 0, 10); 
+  Comp cmu2iso("mu2_iso", "mu2iso", 100, 0, 10); 
   Comp cl3d("l3d","fl3d",40,0,0.5);
   Comp cl3dsig("l3dsig","fls3d",40,0,10);
   Comp cmass("mass","m",40,4.9,5.9);
@@ -135,9 +141,9 @@ void matchevent()
   // Int_t nentries_xchk = (Int_t)Txchk->GetEntries();
   Int_t nentries_main = (Int_t)Tmain->GetEntries();
 
-  for (int i=0; i<maxEvents; i++) {
-    Txchk->GetEntry(i);
-    cout<<event<<" "<<xrun<<" "<<xpt<<" "<<xeta<<" "<<mu1_pt<<" "<<mu2_pt<<" "<<l3d<<" "<<l3dsig<<" "<<mass<<" "<<dca<<" "<<delta3d<<" "<<cosAlpha3D<<" "<<minDca<<" "<<isolation<<" "<<ntrk20<<" "<<NChi2<<endl;
+  for (int k=0; k<maxEvents; k++) {
+    Txchk->GetEntry(k);
+    cout<<event<<" "<<xrun<<" "<<xpt<<" "<<xeta<<" "<<mu1_pt<<" "<<mu2_pt<<" "<<mu1_iso<<" "<<mu2_iso<<" "<<l3d<<" "<<l3dsig<<" "<<mass<<" "<<dca<<" "<<delta3d<<" "<<cosAlpha3D<<" "<<minDca<<" "<<isolation<<" "<<ntrk20<<" "<<NChi2<<endl;
     // cout<<event<<" "<<xpt<<" "<<xeta<<" "<<mu1_pt<<" "<<mu2_pt<<" "<<l3d<<" "<<l3dsig<<" "<<mass<<" "<<dca<<" "<<delta3d<<" "<<cosAlpha3D<<" "<<minDca<<" "<<isolation<<" "<<ntrk20<<" "<<NChi2<<endl;
 
     bool match = false;
@@ -146,18 +152,22 @@ void matchevent()
       // cout<<"run: " << run <<endl;
       if (run == xrun && evt==event) {
         //cout<<"found the matched event: "<<endl;
-        cout<<evt<<" "<<run<<" "<<pt<<" "<<eta<<" "<<m1pt<<" "<<m2pt<<" "<<fl3d<<" "<<fls3d<<" "<<m<<" "<<maxdoca<<" "<<pvip<<" "<<cosa<<" "<<docatrk<<" "<<iso<<" "<<closetrk<<" "<<chi2/dof<<endl<<endl;
+        cout<<evt<<" "<<run<<" "<<pt<<" "<<eta<<" "<<m1pt<<" "<<m2pt<<" "<<m1iso<<" "<<m2iso<<" "<<fl3d<<" "<<fls3d<<" "<<m<<" "<<maxdoca<<" "<<pvip<<" "<<cosa<<" "<<docatrk<<" "<<iso<<" "<<closetrk<<" "<<chi2/dof<<endl<<endl;
         // cout<<evt<<" "<<pt<<" "<<eta<<" "<<m1pt<<" "<<m2pt<<" "<<fl3d<<" "<<fls3d<<" "<<m<<" "<<maxdoca<<" "<<pvip<<" "<<cosa<<" "<<docatrk<<" "<<iso<<" "<<closetrk<<" "<<chi2/dof<<endl<<endl;
 
         cpt.fill(xpt, pt);
         ceta.fill(xeta, eta);
         if( m1pt > m2pt ) {
           cmu1pt.fill(mu1_pt, m1pt);
+          cmu1iso.fill(mu1_iso, m1iso);  
           cmu2pt.fill(mu2_pt, m2pt);
+          cmu2iso.fill(mu2_iso, m2iso);
         }
         else {
           cmu1pt.fill(mu1_pt, m2pt);
+          cmu1iso.fill(mu1_iso, m2iso);
           cmu2pt.fill(mu2_pt, m1pt);
+          cmu2iso.fill(mu2_iso, m1iso);
         }
         cl3d.fill(l3d, fl3d);
         cl3dsig.fill(l3dsig, fls3d);
@@ -181,6 +191,8 @@ void matchevent()
       ceta.fill(xeta);
       cmu1pt.fill(mu1_pt);
       cmu2pt.fill(mu2_pt);
+      cmu1iso.fill(mu1_iso);
+      cmu2iso.fill(mu2_iso);
       cl3d.fill(l3d);
       cl3dsig.fill(l3dsig);
       cmass.fill(mass);
@@ -202,12 +214,12 @@ void matchevent()
 
   TCanvas *cDiff = new TCanvas("cDiff","cDiff",1600,1200);
   cDiff->Divide(2,2);
-  const unsigned int nVar = 14;
+  const unsigned int nVar = 16;
   TH1F * histoDiff = new TH1F("diff", "diff", nVar, 1, nVar);
   TH1F * histoAbsDiff = new TH1F("absDiff", "absDiff", nVar, 1, nVar);
   TH1F * histoRelDiff = new TH1F("relDiff", "relDiff", nVar, 1, nVar);
   TH1F * histoRelAbsDiff = new TH1F("relAbsDiff", "relAbsDiff", nVar, 1, nVar);
-  char *ABC[nVar] = {"pt", "eta", "mu1_pt", "mu2_pt", "fl3d", "fls3d", "m", "closetrk", "maxdoca", "pvip", "cosa", "docatrk", "iso", "chi2dof"};
+  char *ABC[nVar] = {"pt", "eta", "mu1_pt", "mu2_pt", "fl3d", "fls3d", "m", "closetrk", "maxdoca", "pvip", "cosa", "docatrk", "iso", "chi2dof", "mu1_iso", "mu2_iso"};
 
   cpt.makeplot(c, unmatched_c, histoDiff, histoAbsDiff, histoRelDiff, histoRelAbsDiff, 1);
   ceta.makeplot(c, unmatched_c, histoDiff, histoAbsDiff, histoRelDiff, histoRelAbsDiff, 2);
@@ -223,6 +235,8 @@ void matchevent()
   cminDca.makeplot(c, unmatched_c, histoDiff, histoAbsDiff, histoRelDiff, histoRelAbsDiff, 12);
   cisolation.makeplot(c, unmatched_c, histoDiff, histoAbsDiff, histoRelDiff, histoRelAbsDiff, 13);
   cchi2dof.makeplot(c, unmatched_c, histoDiff, histoAbsDiff, histoRelDiff, histoRelAbsDiff, 14);
+  cmu1iso.makeplot(c, unmatched_c, histoDiff, histoAbsDiff, histoRelDiff, histoRelAbsDiff, 15);
+  cmu2iso.makeplot(c, unmatched_c, histoDiff, histoAbsDiff, histoRelDiff, histoRelAbsDiff, 16);
 
   c->SaveAs("plots/data_barrel.gif");
   unmatched_c->SaveAs("plots/unmatched_data_barrel.gif");
