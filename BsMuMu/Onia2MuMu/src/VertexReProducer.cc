@@ -31,10 +31,10 @@ VertexReProducer::VertexReProducer(const edm::Handle<reco::VertexCollection> &ha
   for (std::vector<edm::BranchID>::const_iterator it = parents.begin(), ed = parents.end(); it != ed; ++it) {
     edm::Provenance parprov = iEvent.getProvenance(*it);
     if (parprov.friendlyClassName() == "recoTracks") {
-      tracksTag_ = edm::InputTag(parprov.moduleLabel(), parprov.productInstanceName(), parprov.processName());
+      // tracksTag_ = edm::InputTag(parprov.moduleLabel(), parprov.productInstanceName(), parprov.processName());
       foundTracks = true;
     } else if (parprov.friendlyClassName() == "recoBeamSpot") {
-      beamSpotTag_ = edm::InputTag(parprov.moduleLabel(), parprov.productInstanceName(), parprov.processName());
+      // beamSpotTag_ = edm::InputTag(parprov.moduleLabel(), parprov.productInstanceName(), parprov.processName());
       foundBeamSpot = true;
     }
   }
@@ -49,8 +49,8 @@ void
 VertexReProducer::configure(const edm::ParameterSet &iConfig, const bool forceAdaptive)
 {
   config_ = iConfig;
-  tracksTag_   = iConfig.getParameter<edm::InputTag>("TrackLabel");
-  beamSpotTag_ = iConfig.getParameter<edm::InputTag>("beamSpotLabel");
+  // tracksTag_   = iConfig.getParameter<edm::InputTag>("TrackLabel");
+  // beamSpotTag_ = iConfig.getParameter<edm::InputTag>("beamSpotLabel");
   algo_.reset(new PrimaryVertexProducerAlgorithm(iConfig, forceAdaptive));
 }
 

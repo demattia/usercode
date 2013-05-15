@@ -22,8 +22,8 @@ PrimaryVertexProducerAlgorithm::PrimaryVertexProducerAlgorithm(const edm::Parame
 {
 
   fVerbose   = conf.getUntrackedParameter<bool>("verbose", false);
-  trackLabel = conf.getParameter<edm::InputTag>("TrackLabel");
-  beamSpotLabel = conf.getParameter<edm::InputTag>("beamSpotLabel");
+  // trackLabel = conf.getParameter<edm::InputTag>("TrackLabel");
+  // beamSpotLabel = conf.getParameter<edm::InputTag>("beamSpotLabel");
 
 
   // select and configure the track selection
@@ -36,6 +36,7 @@ PrimaryVertexProducerAlgorithm::PrimaryVertexProducerAlgorithm(const edm::Parame
     throw VertexException("PrimaryVertexProducerAlgorithm: unknown track selection algorithm: " + trackSelectionAlgorithm);  
   }
 
+  std::cout << "trackSelectionAlgorithm = " << trackSelectionAlgorithm << std::endl;
 
   // select and configure the track clusterizer
   std::string clusteringAlgorithm=conf.getParameter<edm::ParameterSet>("TkClusParameters").getParameter<std::string>("algorithm");
@@ -140,79 +141,61 @@ PrimaryVertexProducerAlgorithm::vertices(const std::vector<reco::TransientTrack>
 					 const std::string& label
 					 ) const
 {
-
-
-
-
-
   bool validBS = true;
   VertexState beamVertexState(beamSpot);
-  if ( (beamVertexState.error().cxx() <= 0.) || 
+  if ( (beamVertexState.error().cxx() <= 0.) ||
        (beamVertexState.error().cyy() <= 0.) ||
        (beamVertexState.error().czz() <= 0.) ) {
     validBS = false;
     edm::LogError("UnusableBeamSpot") << "Beamspot with invalid errors "<<beamVertexState.error().matrix();
   }
 
-
-//   // get RECO tracks from the event
-//   // `tks` can be used as a ptr to a reco::TrackCollection
-//   edm::Handle<reco::TrackCollection> tks;
-//   iEvent.getByLabel(trackLabel, tks);
-
+  //   // get RECO tracks from the event
+  //   // `tks` can be used as a ptr to a reco::TrackCollection
+  //   edm::Handle<reco::TrackCollection> tks;
+  //   iEvent.getByLabel(trackLabel, tks);
 
   // select tracks
   std::vector<reco::TransientTrack> seltks = theTrackFilter->select( t_tks );
-
 
   // clusterize tracks in Z
   std::vector< std::vector<reco::TransientTrack> > clusters =  theTrackClusterizer->clusterize(seltks);
   if (fVerbose){std::cout <<  " clustering returned  "<< clusters.size() << " clusters  from " << seltks.size() << " selected tracks" <<std::endl;}
 
-
   // vertex fits
-  for( std::vector <algo>::const_iterator algorithm=algorithms.begin(); algorithm!=algorithms.end(); algorithm++){
+  for( std::vector <algo>::const_iterator algorithm=algorithms.begin(); algorithm!=algorithms.end(); algorithm++) {
     if (  ! (algorithm->label == label) )continue;
 
-  //std::auto_ptr<reco::VertexCollection> result(new reco::VertexCollection);
-  // reco::VertexCollection vColl;
+    //std::auto_ptr<reco::VertexCollection> result(new reco::VertexCollection);
+    // reco::VertexCollection vColl;
   
-
     std::vector<TransientVertex> pvs;
     for (std::vector< std::vector<reco::TransientTrack> >::const_iterator iclus
-	   = clusters.begin(); iclus != clusters.end(); iclus++) {
+         = clusters.begin(); iclus != clusters.end(); iclus++) {
 
-
-      TransientVertex v; 
-      if( algorithm->useBeamConstraint && validBS &&((*iclus).size()>1) ){
-	
-	v = algorithm->fitter->vertex(*iclus, beamSpot);
-	
-      }else if( !(algorithm->useBeamConstraint) && ((*iclus).size()>1) ) {
-      
-	v = algorithm->fitter->vertex(*iclus); 
-	
+      TransientVertex v;
+      if( algorithm->useBeamConstraint && validBS &&((*iclus).size()>1) ) {
+        std::cout << "Use beam constraint" << std::endl;
+        v = algorithm->fitter->vertex(*iclus, beamSpot);
+      }
+      else if( !(algorithm->useBeamConstraint) && ((*iclus).size()>1) ) {
+        v = algorithm->fitter->vertex(*iclus);
       }// else: no fit ==> v.isValid()=False
 
-
       if (fVerbose){
-	if (v.isValid()) std::cout << "x,y,z=" << v.position().x() <<" " << v.position().y() << " " <<  v.position().z() << std::endl;
-	else std::cout <<"Invalid fitted vertex\n";
+        if (v.isValid()) std::cout << "x,y,z=" << v.position().x() <<" " << v.position().y() << " " <<  v.position().z() << std::endl;
+        else std::cout <<"Invalid fitted vertex\n";
       }
 
-      if (v.isValid() 
-	    && (v.degreesOfFreedom()>=algorithm->minNdof) 
-	  && (!validBS || (*(algorithm->vertexSelector))(v,beamVertexState))
+      if (v.isValid()
+          && (v.degreesOfFreedom()>=algorithm->minNdof)
+          && (!validBS || (*(algorithm->vertexSelector))(v,beamVertexState))
 	  ) pvs.push_back(v);
     }// end of cluster loop
 
     if(fVerbose){
       std::cout << "PrimaryVertexProducerAlgorithm::vertices  candidates =" << pvs.size() << std::endl;
     }
-
-
-
-    
 
     // sort vertices by pt**2  vertex (aka signal vertex tagging)
     if(pvs.size()>1){
@@ -221,7 +204,7 @@ PrimaryVertexProducerAlgorithm::vertices(const std::vector<reco::TransientTrack>
 
     return pvs;
   }
-  
+
   std::vector<TransientVertex> dummy;
   return dummy;//avoid compiler warning, should never be here
 }

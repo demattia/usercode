@@ -19,5 +19,20 @@ onia2MuMuPAT = cms.EDProducer('Onia2MuMuPAT',
   diMuMassMax= cms.double(3.4),
   diMuPlusTrackMassMin = cms.double(4.9),
   diMuPlusTrackMassMax = cms.double(5.9),
-  preselection = cms.string("")
+  preselection = cms.string(""),
+  # track selection, taken from https://cmssdt.cern.ch/SDT/lxr/source/Validation/RecoVertex/test/redoPV_cfg.py#040
+  TkFilterParameters = cms.PSet(
+    minPt = cms.double(0.0),                   # direct pt cut
+    maxD0Significance = cms.double(5.0),       # impact parameter significance
+    maxNormalizedChi2 = cms.double(5.0),       # loose cut on track chi**2
+    minPixelLayersWithHits = cms.int32(2),     # two or more pixel layers
+    minSiliconLayersWithHits = cms.int32(5),   # five or more tracker layers (includes pixels)
+    trackQuality = cms.string("any")           # track quality not used
+  ),
+  # track clustering, taken from https://cmssdt.cern.ch/SDT/lxr/source/Validation/RecoVertex/test/redoPV_cfg.py#076
+  TkDAClusParameters = cms.PSet(
+    coolingFactor = cms.double(0.8),  #  slow annealing
+    Tmin = cms.double(4.0),           #  freezeout temperature
+    vertexSize = cms.double(0.05)     #  ~ resolution / sqrt(Tmin)
+  )
 )

@@ -99,13 +99,13 @@ def onia2MuMuPAT(process, GlobalTag, MC=False, HLT='HLT', Filter=True):
         # BOTH muons must pass this selection
         lowerPuritySelection  = cms.string("(isGlobalMuon || isTrackerMuon) && abs(innerTrack.dxy)<4 && abs(innerTrack.dz)<35"),
         # The dimuon must pass this selection before vertexing
-        dimuonSelection  = cms.string("(4.5 < mass && mass < 6.3) || (2.7 < mass && mass < 3.3)"),
+        dimuonSelection  = cms.string("4.5 < mass && mass < 6.3"),
         # Embed the full reco::Vertex out of the common vertex fit
         addCommonVertex = cms.bool(True),
         # Embed the primary vertex re-made from all the tracks except the two muons
         addMuonlessPrimaryVertex = cms.bool(True),
         # Add the common MC mother of the two muons, if any
-        addMCTruth = cms.bool(False),
+        addMCTruth = cms.bool(MC),
         # Order PVs by their vicinity to the J/psi vertex, not by sumPt
         resolvePileUpAmbiguity = cms.bool(True),
         addThirdTrack = cms.bool(True),  ## search a third track making a good vertex with the dimuon
@@ -115,6 +115,29 @@ def onia2MuMuPAT(process, GlobalTag, MC=False, HLT='HLT', Filter=True):
         diMuPlusTrackMassMin = cms.double(4.9),
         diMuMassMax = cms.double(3.2),## dimuon mass range where to search for the third track
         diMuMassMin = cms.double(2.8),
+        # track selection, taken from https://cmssdt.cern.ch/SDT/lxr/source/Validation/RecoVertex/test/redoPV_cfg.py#040
+        TkFilterParameters = cms.PSet(
+          algorithm = cms.string('filterWithThreshold'),
+          maxNormalizedChi2 = cms.double(5.0),
+          minSiliconLayersWithHits = cms.int32(0), ## >=0 (was 5 for generalTracks)
+          minPixelLayersWithHits = cms.int32(2),   ## >=2 (was 2 for generalTracks)
+          maxD0Significance = cms.double(3.0),     ## keep most primary tracks (was 5.0)
+          minPt = cms.double(0.0),                 ## better for softish events
+          trackQuality = cms.string("any"),
+          numTracksThreshold = cms.int32(2)
+#          minPt = cms.double(0.0),                   # direct pt cut
+#          maxD0Significance = cms.double(5.0),       # impact parameter significance
+#          maxNormalizedChi2 = cms.double(5.0),       # loose cut on track chi**2
+#          minPixelLayersWithHits = cms.int32(2),     # two or more pixel layers
+#          minSiliconLayersWithHits = cms.int32(5),   # five or more tracker layers (includes pixels)
+#          trackQuality = cms.string("any")           # track quality not used
+        ),
+        # track clustering, taken from https://cmssdt.cern.ch/SDT/lxr/source/Validation/RecoVertex/test/redoPV_cfg.py#076
+        TkDAClusParameters = cms.PSet(
+          coolingFactor = cms.double(0.8),  #  slow annealing
+          Tmin = cms.double(4.0),           #  freezeout temperature
+          vertexSize = cms.double(0.05)     #  ~ resolution / sqrt(Tmin)
+        ),
         # Preselection cuts
         # userInt('Ntrk') < 21 &&
         preselection = cms.string("mass > 4.5 && mass < 6.3 && pt > 5. && pt < 9999. && daughter('muon1').pt > 4. && daughter('muon1').pt < 999. && daughter('muon2').pt > 4. && daughter('muon2').pt < 999. && userFloat('l3d') < 2. && userFloat('l3dsig') > 0. && userFloat('l3dsig') < 120. && userFloat('vNChi2') < 10. && userFloat('delta3d') < 0.1 && userFloat('delta3d')/userFloat('delta3dErr') < 5. && userFloat('DCA') < 0.1 && acos(userFloat('cosAlpha3D')) < 0.3 && userFloat('minDca') < 0.25 && userFloat('Isolation') > 0."),
@@ -127,26 +150,12 @@ def onia2MuMuPAT(process, GlobalTag, MC=False, HLT='HLT', Filter=True):
         minNumber = cms.uint32(1),
     )
 
-    process.onia2MuMuPatTrkTrkFilter3 = cms.EDFilter("CandViewCountFilter",
-        src = cms.InputTag('onia2MuMuPatTrkTrk', 'DiMuTk'),
-        minNumber = cms.uint32(1),
-    )
-
     process.onia2MuMuPatMassFilter = cms.EDFilter("CandViewSelector",
         src = cms.InputTag('onia2MuMuPatTrkTrk', 'DiMu'),
         cut = cms.string("mass > 4.5 && mass < 6.3 && pt > 5. && pt < 9999. && daughter('muon1').pt > 4. && daughter('muon1').pt < 999. && daughter('muon2').pt > 4. && daughter('muon2').pt < 999. && userFloat('l3d') < 2. && userFloat('l3dsig') > 0. && userFloat('l3dsig') < 120. && userFloat('vNChi2') < 10. && userFloat('delta3d') < 0.1 && userFloat('delta3d')/userFloat('delta3dErr') < 5. && userFloat('DCA') < 0.1 && acos(userFloat('cosAlpha3D')) < 0.3 && userInt('Ntrk') < 21 && userFloat('minDca') < 0.25 && userFloat('Isolation') > 0."),
         # cut = cms.string(""),
         filter = cms.bool(True)
     )
-
-
-    process.onia2MuMuPatMassFilter3 = cms.EDFilter("CandViewSelector",
-        src = cms.InputTag('onia2MuMuPatTrkTrk', 'DiMuTk'),
-        cut = cms.string("mass > 4.5 && mass < 6.3 && pt > 5. && pt < 9999. && daughter('muon1').pt > 4. && daughter('muon1').pt < 999. && daughter('muon2').pt > 4. && daughter('muon2').pt < 999. && userFloat('l3d') < 2. && userFloat('l3dsig') > 0. && userFloat('l3dsig') < 120. && userFloat('vNChi2') < 10. && userFloat('delta3d') < 0.1 && userFloat('delta3d')/userFloat('delta3dErr') < 5. && userFloat('DCA') < 0.1 && acos(userFloat('cosAlpha3D')) < 0.3 && userInt('Ntrk') < 21 && userFloat('minDca') < 0.25 && userFloat('Isolation') > 0."),
-        # cut = cms.string(""),
-        filter = cms.bool(True)
-    )
-
 
     # add tracks
     process.load("PhysicsTools.RecoAlgos.allTracks_cfi")
@@ -157,7 +166,6 @@ def onia2MuMuPAT(process, GlobalTag, MC=False, HLT='HLT', Filter=True):
 
     process.nEventsTotal = cms.EDProducer("EventCountProducer")
     process.nEventsAfterFilter = cms.EDProducer("EventCountProducer")
-    process.nEventsAfterFilter3 = cms.EDProducer("EventCountProducer")
     
     # the onia2MuMu path
     process.Onia2MuMuPAT = cms.Path(
@@ -165,21 +173,12 @@ def onia2MuMuPAT(process, GlobalTag, MC=False, HLT='HLT', Filter=True):
         process.patMuonSequence *
         process.onia2MuMuPatTrkTrk *
         process.allTracks *
-        process.goodTracks 
-        #process.onia2MuMuPatTrkTrkFilter *
-        #process.onia2MuMuPatMassFilter *
-        #process.nEventsAfterFilter
+        process.goodTracks *
+        process.onia2MuMuPatTrkTrkFilter *
+        process.onia2MuMuPatMassFilter *
+        process.nEventsAfterFilter
     )
 
-    process.FilterDiMu = cms.Path(process.onia2MuMuPatTrkTrkFilter *
-                                  process.onia2MuMuPatMassFilter *
-                                  process.nEventsAfterFilter
-    )
-
-    process.FilterDiMuTk = cms.Path(process.onia2MuMuPatTrkTrkFilter3 *
-                                  process.onia2MuMuPatMassFilter3  *
-                                  process.nEventsAfterFilter3
-    )
 
     # output
     process.out = cms.OutputModule("PoolOutputModule",
@@ -205,8 +204,7 @@ def onia2MuMuPAT(process, GlobalTag, MC=False, HLT='HLT', Filter=True):
             #'keep *_*_DiMu_*'
         ),
         # outputCommands = cms.untracked.vstring('keep *'),
-        #SelectEvents = cms.untracked.PSet( SelectEvents = cms.vstring('Onia2MuMuPAT') ) if Filter else cms.untracked.PSet()
-        SelectEvents = cms.untracked.PSet( SelectEvents = cms.vstring('FilterDiMuTk','FilterDiMu') ) if Filter else cms.untracked.PSet()                           
+        SelectEvents = cms.untracked.PSet( SelectEvents = cms.vstring('Onia2MuMuPAT') ) if Filter else cms.untracked.PSet()
     )
     process.e = cms.EndPath(process.out)
 

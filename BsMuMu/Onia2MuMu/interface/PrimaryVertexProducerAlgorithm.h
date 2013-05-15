@@ -16,7 +16,7 @@
 //
 // Original Author:  Pascal Vanlaer
 //         Created:  Tue Feb 28 11:06:34 CET 2006
-// $Id: PrimaryVertexProducerAlgorithm.h,v 1.1 2013/04/05 14:58:48 demattia Exp $
+// $Id: PrimaryVertexProducerAlgorithm.h,v 1.2 2013/05/02 17:07:55 demattia Exp $
 //
 //
 
@@ -84,7 +84,7 @@ public:
   edm::InputTag beamSpotLabel;
 private:
   // ----------member data ---------------------------
-  TrackFilterForPVFindingBase* theTrackFilter; 
+  TrackFilterForPVFindingBase* theTrackFilter;
   TrackClusterizerInZ* theTrackClusterizer;
 
   // vtx fitting algorithms
