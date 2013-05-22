@@ -1,15 +1,16 @@
 #include "TTree.h"
 #include "TFile.h"
 #include <iostream>
-// #include "tmvaMuonID/TMVAClassification_BDT_TM.class.C"
-#include "tmvaMuonID/TMVAClassification_BDT.class.C"
+#include "tmvaMuonID/TMVAClassification_BDT_TM.class.C"
 #include "Common/Selection.h"
 
 // This function adds the mvaMuonId variables to the trees. It also applies the cut.
 
-void AddMuonID(const TString & type = "Barrel")
-{
-  TFile * inputFile = new TFile(type);
+void AddMuonID(const TString & file_name = "Barrel") {
+
+  bool cutMUID = false;
+
+  TFile * inputFile = new TFile(file_name);
   TTree *nt1 = (TTree*)inputFile->Get("probe_tree");
   Float_t mu1_validFrac, mu1_globalChi2, mu1_chi2LocPos, mu1_trkEHitsOut, mu1_segComp, mu1_glbTrackProb, mu1_chi2LocMom, mu1_trkVHits, mu1_pt, mu1_eta;
   Float_t mu2_validFrac, mu2_globalChi2, mu2_chi2LocPos, mu2_trkEHitsOut, mu2_segComp, mu2_glbTrackProb, mu2_chi2LocMom, mu2_trkVHits, mu2_pt, mu2_eta;
@@ -35,7 +36,7 @@ void AddMuonID(const TString & type = "Barrel")
   nt1->SetBranchAddress("mu2_pt", &mu2_pt);
   nt1->SetBranchAddress("mu2_eta", &mu2_eta);
 
-  TFile *g = new TFile(type+"_muonID.root", "RECREATE");
+  TFile *g = new TFile(file_name+"_muonID.root", "RECREATE");
   TTree *newtree = nt1->CloneTree(0); // Do no copy the data yet
 
   // DO NOT delete the old tree and close the old file
@@ -96,4 +97,7 @@ void AddMuonID(const TString & type = "Barrel")
   }
 
   g->Write();
+
+  std::cout << "AddMuonID(" << file_name << ")... done." << std::endl;
+
 }

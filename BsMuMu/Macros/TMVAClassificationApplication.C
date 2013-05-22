@@ -7,21 +7,9 @@
  * within an analysis module                                                      *
  **********************************************************************************/
 
-#include <cstdlib>
-#include <vector>
-#include <iostream>
-#include <map>
-#include <string>
-
-#include "TFile.h"
-#include "TTree.h"
-#include "TString.h"
-#include "TSystem.h"
-#include "TROOT.h"
-#include "TStopwatch.h"
+#include "setdirs.h"
 
 #include "TMVAGui.C"
-
 #if not defined(__CINT__) || defined(__MAKECINT__)
 #include "TMVA/Tools.h"
 #include "TMVA/Reader.h"
@@ -30,8 +18,10 @@
 
 using namespace TMVA;
 
-void TMVAClassificationApplication( const TString & inputFileName, const TString & outputFileName, const TString & weightDir, const float & cutValue, TString myMethodList = "BDT" ) 
-{   
+void TMVAClassificationApplication( const TString & inputFileName, const TString & outputFileName, const TString & weightDir, const float & cutValue, TString myMethodList = "BDT" ) {   
+
+  //  cout << "aaaaaa\n" << endl;
+
 #ifdef __CINT__
    gROOT->ProcessLine( ".O0" ); // turn off optimization in CINT
 #endif

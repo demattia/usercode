@@ -1,21 +1,4 @@
-#include "TString.h"
-#include "TF1.h"
-#include "TLine.h"
-#include "TH1.h"
-#include "TH2.h"
-#include "TGraph.h"
-#include "TGaxis.h"
-#include "TFile.h"
-#include "TCanvas.h"
-#include "TTree.h"
-#include "TROOT.h"
-#include "THStack.h"
-#include "TPaveText.h"
-#include "TLegend.h"
-#include "TMarker.h"
-#include <iostream>
-#include <fstream>
-#include "Common/setTDRStyle_modified.C"
+#include "setdirs.h"
 
 TString fileName(const TString & method, const TString & region, const TString & index);
 void significanceCuts(const double & nsig, const double & nbkg, TString method="BDT",TString region="barrel", TString index="", const int subdir = 1);
@@ -110,7 +93,7 @@ void significance(const double & nsig, const double & nbkg, TString method="BDT"
   sign2 -> Scale(sign->Integral(1,nbins)/sign2->Integral(1,nbins));
   sign2->Fit(pol2, "rq");
   sign2->Scale(pol->GetMaximum()/pol2->GetMaximum());
-  sign2->Fit(pol2, "r");
+  sign2->Fit(pol2, "rq");
   
   sign->Fit(pol, "rq");
 
@@ -137,7 +120,7 @@ void significance(const double & nsig, const double & nbkg, TString method="BDT"
 	   region.Data(), max_sig_pol_val, method.Data(), pol->GetMaximumX(), max_sig_pol_effS, max_sig_pol_effB);
    printf("%s \n",ss);
 
-   ofstream outputTxt("maxsignificance_"+method+"_"+region+".txt");
+   ofstream outputTxt(logsDir+"maxsignificance_"+method+"_"+region+".txt");
    outputTxt << "s/sqrt(s+b): " << max_sig_pol_mva << "\t s/sqrt(b): " << max_sig_pol1_mva << "\t s/sqrt(b)+0.5: "  << max_sig_pol2_mva << " (mva cut maximizing significance estimators)";
    outputTxt.close();
 
@@ -236,9 +219,9 @@ void significance(const double & nsig, const double & nbkg, TString method="BDT"
   TString name = method + "_" + region;
   if(index!="") name += "_"+index;
 
-   c.SaveAs(TString("plots/"+name+"_eff"+ext));
+   c.SaveAs(TString(plotsDir+name+"_eff"+ext));
 
-   TString lpath("BsMuMuLatex/Figures/");
+   TString lpath(figuresDir);
    if(method == "BDT")  lpath += "bdt/";
    if(method == "MLP")  lpath += "mlp/";
    if(method.Contains("Cuts")) lpath += "cnt/";
@@ -255,7 +238,7 @@ void significance(const double & nsig, const double & nbkg, TString method="BDT"
    tm->SetMarkerSize(1.5);
    tm->SetMarkerColor(2);
    tm->Draw("same");
-   c2.SaveAs(TString("plots/"+name+"_roc"+ext));
+   c2.SaveAs(TString(plotsDir+name+"_roc"+ext));
    c2.SaveAs(TString(lpath+name+"_roc.pdf"));
 
    TCanvas c3;
@@ -264,14 +247,14 @@ void significance(const double & nsig, const double & nbkg, TString method="BDT"
    roc->Draw();
    //tp->Draw("same");
    tm->Draw("same");
-   c3.SaveAs(TString("plots/"+name+"_roc_zoom"+ext));
+   c3.SaveAs(TString(plotsDir+name+"_roc_zoom"+ext));
    c3.SaveAs(TString(lpath+name+"_roc_zoom.pdf"));
 
    TGraph* mark = new TGraph(1);
    mark->SetPoint(1,sig_max_effS,1.-sig_max_effB);
    mark->SetName("marker");
-   TString outfileName("plots/signif_"+name+".root");
-   TFile* outputFile = TFile::Open( outfileName, "RECREATE" );
+   TString outfileName(plotsDir+"signif_"+name+".root");
+   TFile* outputFile = TFile::Open(outfileName,"RECREATE");
    roc->Write();   
    mark->Write();   
    outputFile->Close();
@@ -326,7 +309,7 @@ void significanceCuts(const double & nsig, const double & nbkg, TString method,T
 
     signi2 = effb?effs*nsig/(sqrt(effb*nbkg) + 0.5):0;
     sign2->SetBinContent(i, signi2);
-    printf("== bin %d effs %f effb %f  signi %f signi1 %f signi2 %f \n", ibin, effs, effb, signi, signi1, signi2);
+    //printf("== bin %d effs %f effb %f  signi %f signi1 %f signi2 %f \n", ibin, effs, effb, signi, signi1, signi2);
     //printf("== ibin %d ibinav %d effs %f  effb %f   sign %f\n",ibin, ibint, effs, effb, signi);
   }
   
@@ -375,7 +358,7 @@ void significanceCuts(const double & nsig, const double & nbkg, TString method,T
   sprintf(ss, "%s,  max. significance: %3.1f, %s, #epsilon_{S}=%4.3f, #epsilon_{B}=%5.4f",region.Data(),max_sig_pol_val,method.Data(), pol->GetMaximumX(), max_sig_pol_effB);
   printf("%s \n",ss);
   
-  ofstream outputTxt("maxsignificance_"+method+"_"+region+".txt");
+  ofstream outputTxt(logsDir+"maxsignificance_"+method+"_"+region+".txt");
   outputTxt << "s/sqrt(s+b): " << max_sig_pol_x << "\t s/sqrt(b): " <<  max_sig_pol1_x << "\t s/sqrt(b)+0.5: "  <<  max_sig_pol2_x << " (mva cut maximizing significance estimators)"; 
   outputTxt.close();
   
@@ -465,7 +448,7 @@ void significanceCuts(const double & nsig, const double & nbkg, TString method,T
   c.SaveAs(TString("plots/Cuts_"+region+"_eff"+ext));
   TString name = method + "_" + region;
   if(index!="") name += "_"+index;
-  TString lpath("BsMuMuLatex/Figures/cnt/");
+  TString lpath(figuresDir+"cnt/");
   c.SaveAs(TString(lpath+name+"_eff.pdf"));
 
   input->Close();
@@ -479,5 +462,5 @@ TString fileName(const TString & method, const TString & region, const TString &
   if(index!="") 
     fnameA += "_"+index;
   fnameA += ".root";
-  return fnameA;
+  return rootDir+fnameA;
 }

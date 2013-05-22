@@ -1,21 +1,7 @@
-#include "TString.h"
-#include "TH1.h"
-#include "TH2.h"
-#include "TGraph.h"
-#include "TGaxis.h"
-#include "TFile.h"
-#include "TCanvas.h"
-#include "TTree.h"
-#include "TROOT.h"
-#include "THStack.h"
-#include "TPaveText.h"
-#include "TLegend.h"
-#include "TMarker.h"
-#include <iostream>
-#include "Common/setTDRStyle_modified.C"
+#include "setdirs.h"
 
 TH2F* getplot(TString filename);
-TGraph* getpoint(TString filename);
+//TGraph* getpoint(TString filename);
 
 void overlayRoc(){
 
@@ -25,11 +11,11 @@ void overlayRoc(){
 
   TCanvas c;
 
-  TH2F* roc =getplot("plots/signif_BDT_barrel.root");
-  TH2F* roc0=getplot("plots/signif_BDT_barrel_0.root");
-  TH2F* roc1=getplot("plots/signif_BDT_barrel_1.root");
-  TH2F* roc2=getplot("plots/signif_BDT_barrel_2.root");
-  TH2F* roc3=getplot("plots/signif_BDT_barrel_merged.root");
+  TH2F* roc =getplot(plotsDir+"signif_BDT_barrel.root");
+  TH2F* roc0=getplot(plotsDir+"signif_BDT_barrel_0.root");
+  TH2F* roc1=getplot(plotsDir+"signif_BDT_barrel_1.root");
+  TH2F* roc2=getplot(plotsDir+"signif_BDT_barrel_2.root");
+  TH2F* roc3=getplot(plotsDir+"signif_BDT_barrel_merged.root");
   roc->GetXaxis()->SetRangeUser(0.,1);
   roc->GetYaxis()->SetRangeUser(0.99,1.);
 
@@ -87,7 +73,7 @@ TH2F* getplot(TString filename){
   return h;
 }
 
-TGraph* getpoint(TString filename){
-  TFile::Open(filename);
-  return (TGraph*)gROOT->FindObject(TString("mark"));
-}
+//TGraph* getpoint(TString filename){
+//  TFile::Open(filename);
+//  return (TGraph*)gROOT->FindObject(TString("mark"));
+//}

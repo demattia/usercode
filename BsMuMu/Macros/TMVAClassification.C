@@ -1,4 +1,4 @@
-// @(#)root/tmva $Id: TMVAClassification.C,v 1.7 2013/04/21 12:39:30 demattia Exp $
+// @(#)root/tmva $Id: TMVAClassification.C,v 1.8 2013/05/01 00:40:07 nuno Exp $
 /**********************************************************************************
  * Project   : TMVA - a ROOT-integrated toolkit for multivariate data analysis    *
  * Package   : TMVA                                                               *
@@ -27,20 +27,9 @@
  *                                                                                *
  **********************************************************************************/
 
-#include <cstdlib>
-#include <iostream>
-#include <map>
-#include <string>
-
-#include "TChain.h"
-#include "TFile.h"
-#include "TTree.h"
-#include "TString.h"
-#include "TObjString.h"
-#include "TSystem.h"
-#include "TROOT.h"
 
 #include "TMVAGui.C"
+#include "setdirs.h"
 
 #if not defined(__CINT__) || defined(__MAKECINT__)
 // needs to be included when makecint runs (ACLIC)
@@ -49,8 +38,12 @@
 #include "TMVA/Config.h"
 #endif
 
+
 void TMVAClassification( const TString & region = "barrel", const TString index = "", TString myMethodList = "BDT")
 {
+
+  std::cout << "running classification for " << region << " for " << myMethodList << std::endl;
+
   if( region != "barrel" && region != "endcaps" ) {
     std::cout << "Error, region can only be barrel or endcaps. Selected region was: " << region << std::endl;
     exit(1);
@@ -59,6 +52,8 @@ void TMVAClassification( const TString & region = "barrel", const TString index 
     std::cout << "Error, index can only be \"\", \"0\", \"1\" or \"2\". Selected index was: " << index << std::endl;
     exit(1);
   }
+
+
    // The explicit loading of the shared libTMVA is done in TMVAlogon.C, defined in .rootrc
    // if you use your private .rootrc, or run from a different directory, please copy the
    // corresponding lines from .rootrc
@@ -154,7 +149,7 @@ void TMVAClassification( const TString & region = "barrel", const TString index 
             std::cout << "Method \"" << regMethod << "\" not known in TMVA under this name. Choose among the following:" << std::endl;
             for (std::map<std::string,int>::iterator it = Use.begin(); it != Use.end(); it++) std::cout << it->first << " ";
             std::cout << std::endl;
-            return;
+	    std::exit(2);
          }
          Use[regMethod] = 1;
       }
@@ -189,12 +184,13 @@ void TMVAClassification( const TString & region = "barrel", const TString index 
      outputFileName += "_"+index;
      weightDirName += index;
    }
-   fnameTrainS += ".root";
-   fnameTrainB += ".root";
-   fnameTestS += ".root";
-   fnameTestB += ".root";
-   outputFileName += ".root";
-   weightDirName += "Weights";
+
+   fnameTrainS     = rootDir + fnameTrainS    + ".root";
+   fnameTrainB     = rootDir + fnameTrainB    + ".root";
+   fnameTestS      = rootDir + fnameTestS     + ".root";
+   fnameTestB      = rootDir + fnameTestB     + ".root";
+   outputFileName  = rootDir + outputFileName + ".root";
+   weightDirName   = weightsDir + weightDirName + "Weights";
 
 
    // --------------------------------------------------------------------------------------------------
@@ -315,13 +311,17 @@ void TMVAClassification( const TString & region = "barrel", const TString index 
    // Read training and test data
    // (it is also possible to use ASCII format as input -> see TMVA Users Guide)
 
-   if (gSystem->AccessPathName( fnameTrainS ))  // file does not exist in local directory
-      gSystem->Exec("wget http://root.cern.ch/files/tmva_class_example.root");
+   if (gSystem->AccessPathName( fnameTrainS )) {  // file does not exist in local directory
+     std::cout << "Did not access " << fnameTrainS << " exiting." << std::endl;
+     std::exit(4);
+   }
+
+     //gSystem->Exec("wget http://root.cern.ch/files/tmva_class_example.root");
    
    TFile *inputTrainS = TFile::Open( fnameTrainS );
    TFile *inputTrainB = TFile::Open( fnameTrainB );
-   TFile *inputTestS = TFile::Open( fnameTestS );
-   TFile *inputTestB = TFile::Open( fnameTestB );
+   TFile *inputTestS  = TFile::Open( fnameTestS  );
+   TFile *inputTestB  = TFile::Open( fnameTestB  );
    // --- Register the training and test trees
    TTree *signalTrainTree     = (TTree*)inputTrainS->Get("probe_tree");
    TTree *backgroundTrainTree = (TTree*)inputTrainB->Get("probe_tree");
