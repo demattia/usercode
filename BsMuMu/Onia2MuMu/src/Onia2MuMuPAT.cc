@@ -433,13 +433,15 @@ Onia2MuMuPAT::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
             // --------------
             if( track->pt() > 0.5 ) {
               if( vertexId == 1 ) {
-                sumPtTk1 += track->pt();
-                sumPtTk2 += track->pt();
+                if( deltaR(track->eta(),track->phi(),rmu1->eta(),rmu1->phi()) < 0.5 )
+                  sumPtTk1 += track->pt();
+                if( deltaR(track->eta(),track->phi(),rmu2->eta(),rmu2->phi()) < 0.5 )
+                  sumPtTk2 += track->pt();
               }
               else if( vertexId == 0 ) {
                 TrajectoryStateClosestToPoint tscp = tt.impactPointTSCP();
-                if( computeDca(tscp, mu1TS) < 0.1 ) sumPtTk1 += track->pt();
-                if( computeDca(tscp, mu2TS) < 0.1 ) sumPtTk2 += track->pt();
+                if( computeDca(tscp, mu1TS) < 0.1 && deltaR(track->eta(),track->phi(),rmu1->eta(),rmu1->phi()) < 0.5 ) sumPtTk1 += track->pt();
+                if( computeDca(tscp, mu2TS) < 0.1 && deltaR(track->eta(),track->phi(),rmu2->eta(),rmu2->phi()) < 0.5 ) sumPtTk2 += track->pt();
               }
             }
             simpleTracks.push_back(SimpleTrack(track->pt(), track->eta(), track->phi(), track->ndof(), doca, docaSig, vertexId, highPurity));
