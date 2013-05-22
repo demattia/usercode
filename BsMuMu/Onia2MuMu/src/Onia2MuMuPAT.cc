@@ -340,18 +340,7 @@ Onia2MuMuPAT::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 
           std::cout << "refitted PV = (" << thePrimaryV.x() << "," << thePrimaryV.y() << "," << thePrimaryV.z() << "), " << thePrimaryV.chi2() << ", " << thePrimaryV.ndof() << std::endl;
 
-
-
           // -------------------------------------------------------------------------------------------------------------------------------
-
-
-          double oldCosAlpha3D = -10.;
-
-
-
-
-
-
 
           // -------------------------------------------------------------------------------------------------------------------------------
           // Kinematic vertex fit
@@ -521,11 +510,13 @@ Onia2MuMuPAT::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
             if( deltaR(tk->eta ,tk->phi, myCand.eta(), myCand.phi()) > 0.7 ) continue;
             if( tk->vertexId == 1 ) {
               sumNdofPV += tk->ndof;
+              std::cout << "track from PV pt = " << tk->pt << std::endl;
               sumPTPV += tk->pt;
             }
             // In this case the doca is also required to be less than 500 microns
             else if( tk->vertexId == 0 && tk->doca < 0.05 ) {
               sumNdofNoVtx += tk->ndof;
+              std::cout << "track from no PV pt = " << tk->pt << std::endl;
               sumPTNoVtx += tk->pt;
             }
           }
@@ -601,7 +592,6 @@ Onia2MuMuPAT::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
           myCand.addUserFloat("ppdlPV",ctauPV);
           myCand.addUserFloat("ppdlErrPV",ctauErrPV);
           myCand.addUserFloat("cosAlphaXY",cosAlphaXY);
-          myCand.addUserFloat("oldCosAlpha3D",oldCosAlpha3D);
           myCand.addUserFloat("cosAlpha3D",cosAlpha3D);
           myCand.addUserFloat("l3d",l3d);
           myCand.addUserFloat("l3dsig",l3dsig);
@@ -636,7 +626,6 @@ Onia2MuMuPAT::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
           myCand.addUserFloat("ppdlPV",-100);
           myCand.addUserFloat("ppdlErrPV",-100);
           myCand.addUserFloat("cosAlphaXY",-100);
-          myCand.addUserFloat("oldCosAlpha3D",-100);
           myCand.addUserFloat("cosAlpha3D",-100);
           myCand.addUserFloat("pvlip",-9999);
           myCand.addUserFloat("pvlipErr",-9999);
@@ -1002,6 +991,7 @@ bool Onia2MuMuPAT::searchForTheThirdTrack(const edm::Event& iEvent, const edm::E
     Cand.addUserFloat("PVndof",(float) PVndof);
     Cand.addUserFloat("pvw8",(float) (thePrimaryV.ndof()+2)/(2*thePrimaryV.tracksSize()));
 
+    std::cout << "tracks in the PV = " << std::endl;
     for(reco::Vertex::trackRef_iterator itVtx = thePrimaryV.tracks_begin(); itVtx != thePrimaryV.tracks_end(); itVtx++){
       if(itVtx->isNonnull()){
         const reco::Track& trk = **itVtx;
@@ -1035,6 +1025,7 @@ bool Onia2MuMuPAT::searchForTheThirdTrack(const edm::Event& iEvent, const edm::E
           }
 
           if(track.pt() < 0.9) continue; //reject all rejects from counting if less than 900 MeV
+          std::cout << "track.pt() = " << track.pt() << std::endl;
           sumPTPV += track.pt();
         }
         sumNdof += track.ndof();
@@ -1043,6 +1034,7 @@ bool Onia2MuMuPAT::searchForTheThirdTrack(const edm::Event& iEvent, const edm::E
     }
     
     // now tracks outside the PV fit
+    std::cout << "tracks outside the PV fit" << std::endl;
     int countTksOfNoVtx = 0;
 
     for (TrackCollection::const_iterator tk = tkColl->begin(); tk != tkColl->end(); ++tk) {
