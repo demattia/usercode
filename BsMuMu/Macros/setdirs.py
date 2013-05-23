@@ -28,15 +28,15 @@ countersDir = "Trees/BsMC/"
 weightsDir = "weights/"
 rootDir = "rootfiles/"
 rootExecutable = "root" #check if this is needed (currently not enforced) for running in specific environments
+dirList = ["figuresDir","tablesDir","plotsDir","logsDir","countersDir","weightsDir","rootDir"]
 
 # check otherwise create root directories
-def checkdir(dirname):
-    if not os.path.exists(dirname):
-        print "creating directory:", dirname
-        os.system("mkdir "+dirname)
-checkdir(rootDir)
-checkdir(logsDir)
-checkdir(weightsDir)
+def checkdirs():
+    for dir in dirList: #needed are: rootDir,logsDir,plotsDir,weightsDir,figuresDir
+        if not os.path.exists(dir):
+            print "creating directory:", dir, ":", globals()[dir] 
+            os.system("mkdir -p "+globals()[dir])
+checkdirs()
 
 # generate c++ header
 def genheader():
@@ -45,7 +45,7 @@ def genheader():
     with open(hf,'r+') as f:
         content = f.read()
         #print content
-        for dir in ["figuresDir","tablesDir","plotsDir","logsDir","countersDir","weightsDir","rootDir"]: #needed are: rootDir,logsDir,plotsDir,weightsDir,figuresDir
+        for dir in dirList: #needed are: rootDir,logsDir,plotsDir,weightsDir,figuresDir
             if dir not in content: 
                 f.write("TString "+dir+"(\""+globals()[dir]+"\");\n")
 genheader()
