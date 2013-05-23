@@ -32,6 +32,9 @@ dirList = ["figuresDir","tablesDir","plotsDir","logsDir","countersDir","weightsD
 
 # check otherwise create root directories
 def checkdirs():
+    if not os.path.exists("Trees"):
+        print "no input trees found, exiting..."
+        exit(3)
     for dir in dirList: #needed are: rootDir,logsDir,plotsDir,weightsDir,figuresDir
         if not os.path.exists(dir):
             print "creating directory:", dir, ":", globals()[dir] 
