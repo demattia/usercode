@@ -11,26 +11,27 @@ the common variables and imports are in setdirs.py
 def main():
 
     print "starting analysis..."
+    print "select the analysis step to be executed!"
     ##SELECT what is to be done:
 
     print "applying preselection, trigger, muonid..."
-    doSelection()
+    #doSelection()
 
     print "starting mva classification..."
-    doMVATraining()
+    #doMVATraining()
 
     print "doing mva comparisons..."
-    doComparisons()
+    #doComparisons()
     #doComparisonsExtra()
 
     print "mva significance optimization..."
-    doSignificance()
+    #doSignificance()
 
     print "applying mva selection"
-    doApplication()
+    #doApplication()
 
     print "drawing mva output and mass"
-    doDrawMVA()
+    #doDrawMVA()
     print "...ending analysis"
 
 
