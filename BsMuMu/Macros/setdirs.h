@@ -1,5 +1,6 @@
 #include <iostream>
 #include <fstream>
+#include <sstream>
 #include <string>
 #include <vector>
 #include <map>
@@ -29,6 +30,7 @@
 
 TString figuresDir("BsMuMuLatex/Figures/");
 TString tablesDir("BsMuMuLatex/Tables/");
+TString plotsDir("plots/");
 TString logsDir("logs/");
 TString countersDir("Trees/BsMC/");
 TString weightsDir("weights/");

@@ -44,8 +44,8 @@ def genheader():
     os.system("cp _includes.h "+hf)
     with open(hf,'r+') as f:
         content = f.read()
-        print content
-        for dir in ["figuresDir","tablesDir","logsDir","countersDir","weightsDir","rootDir"]: #needed are: rootDir,logsDir,plotsDir,weightsDir,figuresDir
+        #print content
+        for dir in ["figuresDir","tablesDir","plotsDir","logsDir","countersDir","weightsDir","rootDir"]: #needed are: rootDir,logsDir,plotsDir,weightsDir,figuresDir
             if dir not in content: 
                 f.write("TString "+dir+"(\""+globals()[dir]+"\");\n")
 genheader()

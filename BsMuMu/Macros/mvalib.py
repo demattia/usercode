@@ -101,13 +101,7 @@ def TMVAPlots(region):
                 leg.Draw()
                 canvas.SaveAs(figuresDir+name+"_"+region+".pdf")
 
-
-# <headingcell level=3>
-
 # Build ranking tables
-
-# <codecell>
-
 def prepareTable(region, rankingType):
     outputFileBase = open(tablesDir+"ranking_"+region+".txt", "w")
 
@@ -187,12 +181,8 @@ def prepareMultiTable(region, rankingType):
     outputFileBase.close()
     print "created table:", outputFileBase.name
 
-# <headingcell level=2>
 
 # Extract number of entries in each tree (= number of candidates after preselection)
-
-# <codecell>
-
 def numEvents(fileName, dirName = ""):
     inputFile = TFile(fileName, "READ")
     h = 0
@@ -362,18 +352,9 @@ def estimateSignal(region):
     print region+" estimated signal =", expected[region]
     return expected[region]
 
-# <headingcell level=2>
 
 # Background estimation
-
-# <rawcell>
-
 # To estimate the background take the number of events from the sidebands, average them, and normalize them to the area of the signal region.
-
-# <codecell>
-
-from ROOT import TROOT
-
 def estimateBackground(region):
     Region = region[:1].upper()+region[1:] #capitalize first letter for retrieving file names
     inputFile = TFile(rootDir + Region+"_preselection.root")
@@ -411,18 +392,14 @@ def estimateBackground(region):
     print region+" estimated background =", background
     return background
 
-# <rawcell>
 
 # With these signal and background estimated the best cuts are:
 # - for the barrel 0.1361
 # - for the endcaps 0.2163
 # Extract the numbers for the optimal cut value. This requires the previous steps for signal and background estimates to have already run.
 
-# <codecell>
 
-import subprocess
-import os
-#deprecated
+#note: deprecated !!!
 def optimalCutBDT(TMVAFileName, expectedSignalEvents, estimatedBackground):
     p = subprocess.Popen([rootExecutable, "-b", "-q", "-l", "mvaeffs.C+(\""+TMVAFileName+"\","+str(expectedSignalEvents)+","+str(estimatedBackground)+")"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     out, err = p.communicate()
@@ -442,15 +419,11 @@ def optimalCutBDT(TMVAFileName, expectedSignalEvents, estimatedBackground):
 #optimalCutEndcaps = optimalCutBDT(region, expectedEventsEndcaps, estimatedBackgroundEndcaps)
 #os.system("mv mvaeffs_BDT_"+region+".pdf "+figuresDir)
 
-# <rawcell>
 
 # Extract the optimal BDT cuts for each BDT in the subsamples:
 # - merge the TMVA output files for each BDT training
 # - run the significance macro to extract the maximum significance
 # Since the significance macro only uses the number of entries to recompute internally the efficiencies it is possible to merge the input files.
-
-# <codecell>
-
 
 #get list of significance figures-of-merit
 def getSignFomName(file):
@@ -476,16 +449,8 @@ def printMvaCut(arr,regions,methods):
 
 
 
-# <headingcell level=3>
-
 # BDT Application Overlay Plots
-
-# <codecell>
-
 # Change this to redo also the BDT application #
-# -------------------------------------------- #
-
-# -------------------------------------------- #
 
 class TypeSettings:
     def __init__(self, inputIndex, inputColor, inputOption):
@@ -619,15 +584,9 @@ def drawAppBDTOutputPlots(region):
 #drawAppBDTOutputPlots("Endcaps")
 #drawAppBDTOutputPlots("BsMCEndcaps")
 
-# <headingcell level=2>
-
 # Draw the mass plot combining the results of the three BDTs
-
-# <codecell>
-
-
-    # note: TMVApp file name structure: "TMVApp"+Region+method+sample+".root"
-    #                             "BsMC12TMVApp"+Region+method+sample+".root"
+# note: TMVApp file name structure: "TMVApp"+Region+method+sample+".root"
+#                             "BsMC12TMVApp"+Region+method+sample+".root"
 
 def drawMassPlot(region, method, plotType = ""):
     print "drawMassPlot ", region, "", method
