@@ -1,0 +1,11 @@
+universe = vanilla
+Executable = Run.csh
+Requirements = Memory >= 199 &&OpSys == "LINUX"&& (Arch != "DUMMY" )&& Disk > 1000000
+Should_Transfer_Files = YES
+Transfer_Input_Files = Run.csh, makeSelectionBs_cfg.py
+WhenToTransferOutput = ON_EXIT
+Output = condor_rereco_pp_$(Cluster)_$(Process).stdout
+Error = condor_rereco_pp_$(Cluster)_$(Process).stderr
+Log = condor_rereco_pp_$(Cluster)_$(Process).log
+notify_user = demattia@cern.ch
+Queue 1
