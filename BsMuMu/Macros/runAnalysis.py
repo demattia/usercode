@@ -18,7 +18,7 @@ def main():
     #doSelection()
 
     print "starting mva classification..."
-    #doMVATraining()
+    #doMVATraining("3000") # "0" will train all the events 
 
     print "doing mva comparisons..."
     #doComparisons()
@@ -55,7 +55,7 @@ def doSelection():
         addMuonID(appendName)
 
 
-def doMVATraining():
+def doMVATraining(eventsToTrain):
 
     mvastr=""
     for im,method in enumerate(methods):
@@ -66,7 +66,7 @@ def doMVATraining():
     #runClassification("BDT")
 
     #OR run all default classifiers
-    runClassification(mvastr)
+    runClassification(mvastr, eventsToTrain)
 
 
 

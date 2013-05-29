@@ -658,14 +658,14 @@ def drawVariablePlots(region, method, plotType = ""):
 
 ### part B
 
-def runClassification(methodlist):
+def runClassification(methodlist, eventsToTrain):
 
     print "running tmva classification, for methods ", methodlist
     os.system("root -l -b -q compileTMVA.C")
     
     for region in regions:
         for isplit in range(-1,3):
-            cmd = '\\\"'+region+'\\\",\\\"'
+            cmd = '\\\"'+eventsToTrain+'\\\",\\\"'+region+'\\\",\\\"'
             log = logsDir+"TMVALog_"+region
             if isplit != -1: 
                 cmd += str(isplit)

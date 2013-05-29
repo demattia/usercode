@@ -1,4 +1,4 @@
-// @(#)root/tmva $Id: TMVAClassification.C,v 1.8 2013/05/01 00:40:07 nuno Exp $
+// @(#)root/tmva $Id: TMVAClassification.C,v 1.9 2013/05/22 23:56:13 nuno Exp $
 /**********************************************************************************
  * Project   : TMVA - a ROOT-integrated toolkit for multivariate data analysis    *
  * Package   : TMVA                                                               *
@@ -39,7 +39,7 @@
 #endif
 
 
-void TMVAClassification( const TString & region = "barrel", const TString index = "", TString myMethodList = "BDT")
+void TMVAClassification( TString eventsToTrain = "0", const TString & region = "barrel", const TString index = "", TString myMethodList = "BDT")
 {
 
   std::cout << "running classification for " << region << " for " << myMethodList << std::endl;
@@ -377,7 +377,7 @@ void TMVAClassification( const TString & region = "barrel", const TString index 
 
 
    factory->PrepareTrainingAndTestTree( mycuts, mycutb,
-                                        "nTrain_Signal=0:nTrain_Background=0:SplitMode=Random:NormMode=NumEvents:!V" );
+                                        "nTrain_Signal="+eventsToTrain+":nTrain_Background="+eventsToTrain+":SplitMode=Random:NormMode=NumEvents:!V" );
    // factory->PrepareTrainingAndTestTree( mycuts, mycutb,
    //                                      "nTrain_Signal=3000:nTrain_Background=3000:nTest_Signal=3000:nTest_Background=3000:SplitMode=Random:NormMode=NumEvents:!V" );
    // factory->PrepareTrainingAndTestTree( mycuts, mycutb,
