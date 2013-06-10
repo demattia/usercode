@@ -397,7 +397,9 @@ Onia2MuMuPAT::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 
           // count the number of high Purity tracks with pT > 900 MeV attached to the chosen vertex
           double sumPTPV = 0., sumPTNoVtx = 0.;
+          double sumPTPV20 = 0., sumPTNoVtx20 = 0.;
           double sumPtTk1 = 0., sumPtTk2 = 0.;
+          double sumPtTk1_20 = 0., sumPtTk2_20 = 0.;
           int countTksOfPV = 0, countTksOfNoVtx = 0;
           int Ntrk = 0, Ntrkhp = 0, Ntrk20 = 0, Ntrkhp20 = 0;
           int Ntrk1sigma = 0, Ntrk1sigmahp = 0, Ntrk1sigma20 = 0, Ntrk1sigmahp20 = 0;
@@ -443,23 +445,30 @@ Onia2MuMuPAT::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 
             // Muon isolation
             // --------------
+            double isoMu1Pt = 0.;
+            double isoMu2Pt = 0.;
             if( track->pt() > 0.5 ) {
               if( vertexId == 1 ) {
                 if( deltaR(track->eta(),track->phi(),rmu1->eta(),rmu1->phi()) < 0.5 )
-                  sumPtTk1 += track->pt();
+                  // sumPtTk1 += track->pt();
+                  isoMu1Pt = track->pt();
                 if( deltaR(track->eta(),track->phi(),rmu2->eta(),rmu2->phi()) < 0.5 )
-                  sumPtTk2 += track->pt();
+                  // sumPtTk2 += track->pt();
+                  isoMu2Pt = track->pt();
               }
               else if( vertexId == 0 ) {
                 TrajectoryStateClosestToPoint tscp = tt.impactPointTSCP();
-                if( computeDca(tscp, mu1TS) < 0.1 && deltaR(track->eta(),track->phi(),rmu1->eta(),rmu1->phi()) < 0.5 ) sumPtTk1 += track->pt();
-                if( computeDca(tscp, mu2TS) < 0.1 && deltaR(track->eta(),track->phi(),rmu2->eta(),rmu2->phi()) < 0.5 ) sumPtTk2 += track->pt();
+                if( computeDca(tscp, mu1TS) < 0.1 && deltaR(track->eta(),track->phi(),rmu1->eta(),rmu1->phi()) < 0.5 )
+                  // sumPtTk1 += track->pt();
+                  isoMu1Pt = track->pt();
+                if( computeDca(tscp, mu2TS) < 0.1 && deltaR(track->eta(),track->phi(),rmu2->eta(),rmu2->phi()) < 0.5 )
+                  // sumPtTk2 += track->pt();
+                  isoMu2Pt = track->pt();
               }
             }
-            simpleTracks.push_back(SimpleTrack(track->pt(), track->eta(), track->phi(), track->ndof(), doca, docaSig, vertexId, highPurity));
+            simpleTracks.push_back(SimpleTrack(track->pt(), track->eta(), track->phi(), track->ndof(),
+                                               doca, docaSig, vertexId, highPurity, isoMu1Pt, isoMu2Pt));
           }
-          double isoMu1 = mu1.pt()/(mu1.pt()+sumPtTk1);
-          double isoMu2 = mu2.pt()/(mu2.pt()+sumPtTk2);
 
           // Sort the simpleTracks. Smallest doca first.
           std::sort(simpleTracks.begin(), simpleTracks.end());
@@ -475,6 +484,13 @@ Onia2MuMuPAT::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 
             // From here on use only tracks from the candidate PV or no PV
             if( tk->vertexId == 2 ) continue;
+
+            sumPtTk1 += tk->isoMu1Pt;
+            sumPtTk2 += tk->isoMu2Pt;
+            if( tkCount < 20 ) {
+              sumPtTk1_20 += tk->isoMu1Pt;
+              sumPtTk2_20 += tk->isoMu2Pt;
+            }
 
             // Take the minimum doca
             if( minDca > tk->doca ) minDca = tk->doca;
@@ -524,19 +540,29 @@ Onia2MuMuPAT::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
             if( deltaR(tk->eta ,tk->phi, myCand.eta(), myCand.phi()) > 0.7 ) continue;
             if( tk->vertexId == 1 ) {
               sumNdofPV += tk->ndof;
-              std::cout << "track from PV pt = " << tk->pt << std::endl;
+              // std::cout << "track from PV pt = " << tk->pt << std::endl;
               sumPTPV += tk->pt;
+              if( tkCount < 20 ) sumPTPV20 += tk->pt;
             }
             // In this case the doca is also required to be less than 500 microns
             else if( tk->vertexId == 0 && tk->doca < 0.05 ) {
               sumNdofNoVtx += tk->ndof;
               std::cout << "track from no PV pt = " << tk->pt << std::endl;
               sumPTNoVtx += tk->pt;
+              if( tkCount < 20 ) sumPTNoVtx20 += tk->pt;
             }
           }
           double Iso = myCand.pt()/(myCand.pt()+sumPTNoVtx+sumPTPV);
+          double Iso20 = myCand.pt()/(myCand.pt()+sumPTNoVtx20+sumPTPV20);
+
+          // Muon isolation
+          double isoMu1 = mu1.pt()/(mu1.pt()+sumPtTk1);
+          double isoMu2 = mu2.pt()/(mu2.pt()+sumPtTk2);
+          double isoMu1_20 = mu1.pt()/(mu1.pt()+sumPtTk1_20);
+          double isoMu2_20 = mu2.pt()/(mu2.pt()+sumPtTk2_20);
 
           myCand.addUserFloat("Isolation", (float) Iso);
+          myCand.addUserFloat("Isolation20", (float) Iso20);
           myCand.addUserFloat("minDca", (float) minDca);
           myCand.addUserInt("Ntrk", Ntrk);
           myCand.addUserInt("Ntrkhp", Ntrkhp);
@@ -562,6 +588,8 @@ Onia2MuMuPAT::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
           myCand.addUserFloat("sumNdofNoVtx", (float) sumNdofNoVtx);
           myCand.addUserFloat("isoMu1", (float) isoMu1);
           myCand.addUserFloat("isoMu2", (float) isoMu2);
+          myCand.addUserFloat("isoMu1_20", (float) isoMu1_20);
+          myCand.addUserFloat("isoMu2_20", (float) isoMu2_20);
 
           // DCA
           // Compute both the dca in the transverse plane (dcaxy) and in 3D.
@@ -650,6 +678,7 @@ Onia2MuMuPAT::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
           myCand.addUserFloat("ppdlBS",-100);
           myCand.addUserFloat("ppdlErrBS",-100);
           myCand.addUserFloat("Isolation", -1);
+          myCand.addUserFloat("Isolation20", -1);
           myCand.addUserFloat("minDca", -1);
           myCand.addUserInt("Ntrk", 9999);
           myCand.addUserInt("Ntrkhp", 9999);
@@ -675,6 +704,8 @@ Onia2MuMuPAT::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
           myCand.addUserFloat("sumNdofNoVtx", -1);
           myCand.addUserFloat("isoMu1", -1);
           myCand.addUserFloat("isoMu2", -1);
+          myCand.addUserFloat("isoMu1_20", -1);
+          myCand.addUserFloat("isoMu2_20", -1);
           myCand.addUserFloat("DCAXY", -1);
           myCand.addUserFloat("DCA", -1);
           myCand.addUserFloat("delta3d",-1);
