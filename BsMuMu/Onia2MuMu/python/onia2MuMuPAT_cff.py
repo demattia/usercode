@@ -140,7 +140,7 @@ def onia2MuMuPAT(process, GlobalTag, MC=False, HLT='HLT', Filter=True):
         ),
         # Preselection cuts
         # userInt('Ntrk') < 21 &&
-        preselection = cms.string("mass > 4.5 && mass < 6.3 && pt > 5. && pt < 9999. && daughter('muon1').pt > 4. && daughter('muon1').pt < 999. && daughter('muon2').pt > 4. && daughter('muon2').pt < 999. && userFloat('l3d') < 2. && userFloat('l3dsig') > 0. && userFloat('l3dsig') < 120. && userFloat('vNChi2') < 10. && userFloat('delta3d') < 0.1 && userFloat('delta3d')/userFloat('delta3dErr') < 5. && userFloat('DCA') < 0.1 && acos(userFloat('cosAlpha3D')) < 0.3 && userFloat('minDca') < 0.25 && userFloat('Isolation') > 0."),
+        preselection = cms.string("userFloat('kinMass') > 4.5 && userFloat('kinMass') < 6.3 && pt > 5. && pt < 9999. && daughter('muon1').pt > 4. && daughter('muon1').pt < 999. && daughter('muon2').pt > 4. && daughter('muon2').pt < 999. && userFloat('l3d') < 2. && userFloat('l3dsig') > 0. && userFloat('l3dsig') < 200. && userFloat('vNChi2') < 20. && userFloat('delta3d') < 0.1 && userFloat('delta3d')/userFloat('delta3dErr') < 5. && userFloat('DCA') < 0.1 && acos(userFloat('cosAlpha3D')) < 1.0 && userFloat('minDca') < 2.50 && userFloat('Isolation') > 0. && userFloat('lxysig') > 2. && abs(userFloat('pvlip')) < 1. && (abs(userFloat('pvlip'))/abs(userFloat('pvlipErr'))) < 5."),
         # preselection = cms.string("mass > 4.5 && mass < 6.3 && pt > 5. && pt < 9999. && daughter('muon1').pt > 4. && daughter('muon1').pt < 999. && daughter('muon2').pt > 4. && daughter('muon2').pt < 999."),
     )
 
@@ -152,7 +152,7 @@ def onia2MuMuPAT(process, GlobalTag, MC=False, HLT='HLT', Filter=True):
 
     process.onia2MuMuPatMassFilter = cms.EDFilter("CandViewSelector",
         src = cms.InputTag('onia2MuMuPatTrkTrk', 'DiMu'),
-        cut = cms.string("mass > 4.5 && mass < 6.3 && pt > 5. && pt < 9999. && daughter('muon1').pt > 4. && daughter('muon1').pt < 999. && daughter('muon2').pt > 4. && daughter('muon2').pt < 999. && userFloat('l3d') < 2. && userFloat('l3dsig') > 0. && userFloat('l3dsig') < 120. && userFloat('vNChi2') < 10. && userFloat('delta3d') < 0.1 && userFloat('delta3d')/userFloat('delta3dErr') < 5. && userFloat('DCA') < 0.1 && acos(userFloat('cosAlpha3D')) < 0.3 && userInt('Ntrk') < 21 && userFloat('minDca') < 0.25 && userFloat('Isolation') > 0."),
+        cut = cms.string("userFloat('kinMass') > 4.5 && userFloat('kinMass') < 6.3 && pt > 5. && pt < 9999. && daughter('muon1').pt > 4. && daughter('muon1').pt < 999. && daughter('muon2').pt > 4. && daughter('muon2').pt < 999. && userFloat('l3d') < 2. && userFloat('l3dsig') > 0. && userFloat('l3dsig') < 200. && userFloat('vNChi2') < 20. && userFloat('delta3d') < 0.1 && userFloat('delta3d')/userFloat('delta3dErr') < 5. && userFloat('DCA') < 0.1 && acos(userFloat('cosAlpha3D')) < 1.0 && userFloat('minDca') < 2.50 && userFloat('Isolation') > 0. && userFloat('lxysig') > 2. && abs(userFloat('pvlip')) < 1. && (abs(userFloat('pvlip'))/abs(userFloat('pvlipErr'))) < 5."),
         # cut = cms.string(""),
         filter = cms.bool(True)
     )
