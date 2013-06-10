@@ -108,11 +108,13 @@ class Onia2MuMuPAT : public edm::EDProducer {
     SimpleTrack(const double & inPt, const double & inEta, const double & inPhi,
                 const int inNdof, const double & inDoca,
                 const double & inDocaSignificance,
-                const int inVertexId, const bool inHighPurity) :
+                const int inVertexId, const bool inHighPurity,
+                const double & inIsoMu1Pt, const double & inIsoMu2Pt) :
       pt(inPt), eta(inEta), phi(inPhi),
       ndof(inNdof), doca(inDoca),
       docaSignificance(inDocaSignificance),
-      vertexId(inVertexId), highPurity(inHighPurity)
+      vertexId(inVertexId), highPurity(inHighPurity),
+      isoMu1Pt(inIsoMu1Pt), isoMu2Pt(inIsoMu2Pt)
     {}
 
     bool operator<(const SimpleTrack & compTrack) const {
@@ -127,6 +129,8 @@ class Onia2MuMuPAT : public edm::EDProducer {
     double docaSignificance;
     int vertexId;
     bool highPurity;
+    double isoMu1Pt;
+    double isoMu2Pt;
   };
 };
 
