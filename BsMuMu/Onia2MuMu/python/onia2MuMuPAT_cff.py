@@ -108,7 +108,7 @@ def onia2MuMuPAT(process, GlobalTag, MC=False, HLT='HLT', Filter=True):
         addMCTruth = cms.bool(MC),
         # Order PVs by their vicinity to the J/psi vertex, not by sumPt
         resolvePileUpAmbiguity = cms.bool(True),
-        addThirdTrack = cms.bool(True),  ## search a third track making a good vertex with the dimuon
+        addThirdTrack = cms.bool(False),  ## search a third track making a good vertex with the dimuon
         minTrackPt =cms.double(0.5), ## minimum pt of the third track
         trackMass = cms.double(0.4936), ## mass for the track
         diMuPlusTrackMassMax = cms.double(5.9),
