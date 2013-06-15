@@ -26,6 +26,11 @@
 #include "RecoVertex/PrimaryVertexProducer/interface/TrackFilterForPVFinding.h"
 #include "RecoVertex/PrimaryVertexProducer/interface/HITrackFilterForPVFinding.h"
 
+// Kinematic vertex fit
+#include <RecoVertex/KinematicFitPrimitives/interface/KinematicParticleFactoryFromTransientTrack.h>
+#include "RecoVertex/KinematicFit/interface/KinematicConstrainedVertexFitter.h"
+#include "RecoVertex/KinematicFit/interface/KinematicParticleVertexFitter.h"
+
 template<typename T>
 struct GreaterByVProb {
   typedef T first_argument_type;
@@ -53,7 +58,7 @@ class Onia2MuMuPAT : public edm::EDProducer {
   bool isAMixedbHadron(int pdgID, int momPdgID);
   bool searchForTheThirdTrack(const edm::Event&, const edm::EventSetup&, pat::CompositeCandidate&, const pat::Muon*, const pat::Muon*,reco::Vertex&,reco::Track&, bool&);
   std::pair<int, float> findJpsiMCInfo(reco::GenParticleRef genJpsi);
-  math::XYZTLorentzVector fromPtEtaPhiToPxPyPz( const double & pt, const double & eta, const double & phi, const double & mass);
+  math::XYZTLorentzVector fromPtEtaPhiToPxPyPz( const double & pt, const double & eta, const double & phi, const double & mass) const;
   void fillCandMuons(pat::CompositeCandidate & myCand, const pat::Muon & mu1, const pat::Muon & mu2);
   void buildMuonLessCollection(const edm::Event& iEvent, const pat::Muon &mu1, const pat::Muon &mu2, reco::TrackCollection &muonLess);
   void buildMuonlessPV(const edm::Event&, const edm::EventSetup&,const pat::Muon *,const pat::Muon *, const reco::Track &, reco::Vertex & );
@@ -64,9 +69,6 @@ class Onia2MuMuPAT : public edm::EDProducer {
                                reco::TrackCollection & muonLess, const reco::Vertex &thePrimaryV,
                                const edm::ESHandle<TransientTrackBuilder> &theTTBuilder,
                                const reco::BeamSpot & bs);
-  // reco::VertexCollection
-//  std::vector<TransientVertex> buildMuonlessPVs(const reco::TrackCollection & muonLess, const reco::BeamSpot &bs,
-//                                                edm::ESHandle<TransientTrackBuilder> theTTBuilder);
 
   // ----------member data ---------------------------
  private:
@@ -93,15 +95,15 @@ class Onia2MuMuPAT : public edm::EDProducer {
                     const reco::Track & track, const double & maxDeltaR );
   float computeDcaXY(const TrajectoryStateClosestToPoint & tt1, const TrajectoryStateClosestToPoint & tt2);
   float computeDca(const TrajectoryStateClosestToPoint & tt1, const TrajectoryStateClosestToPoint & tt2);
+  void setP4AndCharge(RefCountedKinematicTree & vertexFitTree, pat::Muon & mu,
+                      const edm::ESHandle<TransientTrackBuilder> &theTTBuilder) const;
 
   InvariantMassFromVertex massCalculator;
   ParticleMass muon_mass;
   float muon_sigma;
   AdaptiveVertexFitter avtxFitter_;
-  // std::auto_ptr<PrimaryVertexProducerAlgorithm> PValgo_;
-  // std::auto_ptr<TrackFilterForPVFindingBase> theTrackFilter_;
-  // std::auto_ptr<TrackClusterizerInZ> theTrackClusterizer_;
 
+  std::vector<double> muMasses_;
 
   struct SimpleTrack
   {
