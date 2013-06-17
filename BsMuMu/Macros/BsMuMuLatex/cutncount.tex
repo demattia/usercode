@@ -1,70 +1,13 @@
 \section{Cut and count analysis}
 
 %\subsection{optimization} 
+%The following cuts are selected such that the selection signal efficiency matches that of the BDT -- could get these as well
 
 The same varibale set as used for MVA training is employed.
 The Simulating Annealing method in TMVA is used.
 
-The following cuts are selected such that the selection signal efficiency matches that of the BDT:
-
-\begin{verbatim}
-Barrel:
-	 5.66532 < "pt" <= 108.395
-	 -1.34013 < "eta" <= 1.90538
-	 13.4938 < "fls3d" <= 113.735
-	 -0.00248177 < "alpha" <= 0.0554104
-	 -0.000113258 < "maxdoca" <= 0.0140014
-	 -0.00089438 < "pvip" <= 0.055899
-	 0.0869982 < "pvips" <= 4.19143
-	 0.425172 < "iso" <= 1.03777
-	 0.00903932 < "docatrk" <= 0.196985
-	 -0.0104609 < "closetrk" <= 8.94004
-	 -0.0949024 < "chi2dof" <= 5.55102
-
-Endcaps:
-	6.81716 < "pt" <= 58.3142
-	-2.26185 < "eta" <= 2.35863
-	12.9774 < "fls3d" <= 122.734
-	-0.00186433 < "alpha" <= 0.236627
-	-0.000172019 < "maxdoca" <= 0.0192271
-	0.000376399 < "pvip" <= 0.0379179
-	0.0897054 < "pvips" <= 1.20388
-	0.59898 < "iso" <= 1.2262
-	0.011315 < "docatrk" <= 0.163787
-	-0.196135 < "closetrk" <= 17.3713
-	-0.0797694 < "chi2dof" <= 3.64842
-\end{verbatim}
-
-
-%\subsection{blinded results}
-
-
-
-\begin{figure}[!h]
-  \centering
-  \includegraphics[width=0.45\textwidth]{Figures/cnt/SA_barrel_mass}
-  \includegraphics[width=0.45\textwidth]{Figures/cnt/SA_endcaps_mass}
-\caption{Blinded cut results for barrel (left) and endcaps (right), using same signal efficiency as for BDT.}
-\end{figure}
-
-The following cuts are are those obtained with CutsSA optimization:
-
-%--- Retrieve cut values for signal efficiency of 0.3 from Reader
-\begin{verbatim}
-Barrel:
-
- 		 5.9942 < "pt" <= 121.049
- 		 -1.25077 < "eta" <= 1.37007
- 		 16.9689 < "fls3d" <= 81.03
- 		 0.00252547 < "alpha" <= 0.128236
- 		 6.32349e-05 < "maxdoca" <= 0.0295907
- 		 -0.000639053 < "pvip" <= 0.0741967
- 		 0.208293 < "pvips" <= 1.5732
- 		 0.77493 < "iso" <= 1.24891
- 		 1.48865e-05 < "docatrk" <= 0.100205
- 		 -0.167867 < "closetrk" <= 2.93966
- 		 -0.042743 < "chi2dof" <= 7.25043
-\end{verbatim}
+\input{Tables/CutsValues_barrel}
+\input{Tables/CutsValues_endcaps}
 
 \begin{figure}[!h]
   \centering
@@ -72,8 +15,6 @@ Barrel:
    %\includegraphics[width=0.45\textwidth]{Figures/cnt/SA_endcaps_mass}
 \caption{Blinded cut results for barrel (left) and endcaps (right), after optimization.}
 \end{figure}
-
-
 
 
 %\subsection{unblind}
@@ -84,3 +25,38 @@ Barrel:
 %  \includegraphics[width=0.45\textwidth]{Figures/cnt/SA_endcaps_mass_unblind}
 %\caption{Unblinded cut results for barrel (left) and endcaps (right).}
 %\end{figure}
+
+
+\newpage
+
+
+
+\begin{figure}[!h]
+  \centering
+  \includegraphics[width=0.45\textwidth]{Figures/barrelBDTMassPlot}
+  \includegraphics[width=0.45\textwidth]{Figures/endcapsBDTMassPlot}
+  \includegraphics[width=0.45\textwidth]{Figures/barrelMLPMassPlot}
+  \includegraphics[width=0.45\textwidth]{Figures/endcapsMLPMassPlot}
+  \includegraphics[width=0.45\textwidth]{Figures/barrelCutsSAMassPlot}
+  \includegraphics[width=0.45\textwidth]{Figures/endcapsCutsSAMassPlot}
+  \caption{mass plots: barrel (left) and edncaps (right); BDT (top), MLP (middle), Cuts (bottom).}
+\end{figure}
+
+\begin{figure}[!h]
+  \centering
+  \includegraphics[width=0.45\textwidth]{Figures/cnt/CutsSA_barrel_eff}
+  \includegraphics[width=0.45\textwidth]{Figures/cnt/CutsSA_endcaps_eff}
+  \includegraphics[width=0.45\textwidth]{Figures/cnt/SA_barrel_mass}
+  \includegraphics[width=0.45\textwidth]{Figures/cnt/SA_endcaps_mass}
+  \includegraphics[width=0.45\textwidth]{Figures/cnt/mass_sa_barrel}
+  \includegraphics[width=0.45\textwidth]{Figures/cnt/mass_sa_endcaps}
+  %\includegraphics[width=0.45\textwidth]{Figures/cnt/SA_barrel_mass_opt}
+  %\includegraphics[width=0.45\textwidth]{Figures/cnt/SA_endcaps_mass_opt}
+  \caption{cut 'n count}
+\end{figure}
+
+
+
+
+
+
