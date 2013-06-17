@@ -2,8 +2,7 @@
 #include <sstream>
 #include <iostream>
 
-TString Selection(const bool endcaps, const bool data, const bool cut_based = false, const bool blinding = false, const int splitting = 0, const TString & maxRun = "")
-{
+TString Selection(const bool endcaps, const bool data, const bool cut_based = false, const bool blinding = false, const int splitting = 0, const TString & maxRun = "") {
   TString cuts = "";
 
   // TString trigger("((mu1_HLT_DoubleMu2BarrelBsL3 && mu2_HLT_DoubleMu2BarrelBsL3) || (mu1_HLT_DoubleMu2BsL3 && mu2_HLT_DoubleMu2BsL3) || (mu1_HLT_DoubleMu2Dimuon6BsL3 && mu2_HLT_DoubleMu2Dimuon6BsL3) || (mu1_HLT_DoubleMu3BsL3 && mu2_HLT_DoubleMu3BsL3) || (mu1_HLT_VertexmumuFilterBs345 && mu2_HLT_VertexmumuFilterBs345) || (mu1_HLT_VertexmumuFilterBs3p545 && mu2_HLT_VertexmumuFilterBs3p545) || (mu1_HLT_VertexmumuFilterBs4 && mu2_HLT_VertexmumuFilterBs4) || (mu1_HLT_VertexmumuFilterBs47 && mu2_HLT_VertexmumuFilterBs47) || (mu1_HLT_VertexmumuFilterBs6 && mu2_HLT_VertexmumuFilterBs6))");
@@ -27,8 +26,11 @@ TString Selection(const bool endcaps, const bool data, const bool cut_based = fa
   if( muId != "" ) cuts += " && " + muId;
 
   // Preselection cuts
-  TString preselection("(mass > 4.9 && mass < 5.9 && pt > 5. && pt < 9999. && mu1_pt > 4. && mu1_pt < 999. && mu2_pt > 4. && mu2_pt < 999. && l3d < 2. && l3dsig > 0. && l3dsig < 120. && NChi2 < 10. && delta3d < 0.1 && delta3d/delta3dErr < 5. && dca < 0.1 && acos(cosAlpha3D) < 0.3 && ntrk20 < 21 && minDca < 0.25 && isolation > 0. && (mu1_charge*mu2_charge == -1) && (lxysig > 3) && (abs(pvlip) < 1.0) && (abs(pvlip)/abs(pvlipErr) < 5.0))");
+  TString preselection("(kinMass > 4.9 && kinMass < 5.9 && pt > 5. && pt < 9999. && mu1_pt > 4. && mu1_pt < 999. && mu2_pt > 4. && mu2_pt < 999. && l3d < 2. && l3dsig > 0. && l3dsig < 200. && NChi2 < 20. && delta3d < 0.1 && delta3d/delta3dErr < 5. && dca < 0.1 && acos(cosAlpha3D) < 1.0 && ntrk20 < 21 && minDca < 2.5 && isolation20 > 0. && (mu1_charge*mu2_charge == -1) && (lxysig > 3) && (abs(pvlip) < 1.0) && (abs(pvlip)/abs(pvlipErr) < 5.0) && kinMassError < 20)");
   cuts += " && " + preselection;
+  //for new tree: mass -> kinMass, me<20 ie kinMassError < 20; isolation -> isolation20 ;  
+  //http://cmssw.cvs.cern.ch/cgi-bin/cmssw.cgi/CMSSW/HeavyFlavorAnalysis/Bs2MuMu/macros2/preselection.cc?revision=1.13&view=markup
+  //main analysis pre-selection: gmuid && (5.00<pt)&&(pt<9999.00) && (4.00<m1pt)&&(m1pt<999.00) &&(4.00<m2pt)&&(m2pt<999.00) && (flsxy>2.00) && (fl3d<2.00) && (pvip<0.10) && !(TMath::IsNaN(pvips)) && (pvips>0) && (pvips<5.00) && abs(pvlip) < 1.00 && abs(pvlips) < 5.00 &&  (closetrk<21) && (fls3d>0.00) && (fls3d<200.00) && (docatrk<2.50) && (maxdoca<0.10) && (chi2dof<20.00) && (iso>0.00) && (alpha<1.00) && (me<0.20)
 
   TString barrelCuts("(mu1_eta < 1.4 && mu1_eta > -1.4 && mu2_eta < 1.4 && mu2_eta > -1.4)");
   if( endcaps ) {
@@ -42,22 +44,20 @@ TString Selection(const bool endcaps, const bool data, const bool cut_based = fa
   // Cut-based analysis
   if( cut_based ) {
     TString lifetimeCuts("(delta3d < 0.008 && delta3d/delta3dErr < 2.000)");
-    TString trackCuts("(isolation > 0.8 && dca > 0.015 && ntrk20 < 2)");
+    TString trackCuts("(isolation20 > 0.8 && dca > 0.015 && ntrk20 < 2 && pvw8 > 0.6)"); 
     cuts += " && " + lifetimeCuts + " && " + trackCuts;
-
     if( endcaps ) {
       TString endcapsPtCuts("((mu1_pt > mu2_pt && mu1_pt > 4.5 && mu2_pt > 4.2)||(mu1_pt < mu2_pt && mu1_pt > 4.2 && mu2_pt > 4.5))");
-      TString candidateEndcapsCuts("(pt > 8.5 && cosAlpha3D > 0.99955 && ctauPV/ctauErrPV > 15.0)");
+      TString candidateEndcapsCuts("(pt > 8.5 && cosAlpha3D > 0.99955 && l3dsig > 15.0 && NChi2 < 1.8)");
       cuts += " && " + endcapsPtCuts + " && " + candidateEndcapsCuts;
-    }
-    else {
+    } else {
       TString barrelPtCuts("((mu1_pt > mu2_pt && mu1_pt > 4.5 && mu2_pt > 4.0)||(mu1_pt < mu2_pt && mu1_pt > 4.0 && mu2_pt > 4.5))");
-      TString candidateBarrelCuts("(pt > 6.5 && cosAlpha3D > 0.99875 && ctauPV/ctauErrPV > 13.0)");
+      TString candidateBarrelCuts("(pt > 6.5 && cosAlpha3D > 0.99875 && l3dsig > 13.0 && NChi2 < 2.2)");
       cuts += " && " + barrelPtCuts + " && " + candidateBarrelCuts;
     }
   }
 
-  TString blindingCuts("&& ((mass > 4.9 && mass < 5.2) || (mass > 5.45 && mass < 5.9))");
+  TString blindingCuts("&& ((kinMass > 4.9 && kinMass < 5.2) || (kinMass > 5.45 && kinMass < 5.9))");
   if( !blinding || !data ) blindingCuts = "";
   cuts += blindingCuts;
 

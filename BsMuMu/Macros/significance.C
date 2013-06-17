@@ -228,7 +228,7 @@ void significance(const double & nsig, const double & nbkg, TString method="BDT"
    c.SaveAs(TString(lpath+name+"_eff.pdf"));
 
    TCanvas c2;
-   roc->SetTitle("");
+   roc->SetTitle(TString::Format("ROC "+ method + " " + region));
    roc->GetXaxis()->SetTitle("#epsilon_{S}");
    roc->GetYaxis()->SetTitle("1-#epsilon_{B}");
    //roc->SetMarkerStyle(7);
