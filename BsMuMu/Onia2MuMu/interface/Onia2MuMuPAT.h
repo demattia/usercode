@@ -60,15 +60,13 @@ class Onia2MuMuPAT : public edm::EDProducer {
   std::pair<int, float> findJpsiMCInfo(reco::GenParticleRef genJpsi);
   math::XYZTLorentzVector fromPtEtaPhiToPxPyPz( const double & pt, const double & eta, const double & phi, const double & mass) const;
   void fillCandMuons(pat::CompositeCandidate & myCand, const pat::Muon & mu1, const pat::Muon & mu2);
-  void buildMuonLessCollection(const edm::Event& iEvent, const pat::Muon &mu1, const pat::Muon &mu2, reco::TrackCollection &muonLess);
+//  void buildMuonLessCollection(const edm::Event& iEvent, const pat::Muon &mu1, const pat::Muon &mu2, reco::TrackCollection &muonLess);
   void buildMuonlessPV(const edm::Event&, const edm::EventSetup&,const pat::Muon *,const pat::Muon *, const reco::Track &, reco::Vertex & );
 
-  reco::Vertex
-  buildMuonlessPV(// const edm::Event& iEvent, const reco::VertexCollection & priVtxs,
-                               const reco::Muon * rmu1, const reco::Muon * rmu2,
-                               reco::TrackCollection & muonLess, const reco::Vertex &thePrimaryV,
-                               const edm::ESHandle<TransientTrackBuilder> &theTTBuilder,
-                               const reco::BeamSpot & bs);
+  std::pair<reco::Vertex, reco::Vertex> buildMuonlessPV(const reco::Muon * rmu1, const reco::Muon * rmu2,
+                                                        reco::TrackCollection & muonLess, const reco::Vertex &thePrimaryV,
+                                                        const edm::ESHandle<TransientTrackBuilder> &theTTBuilder,
+                                                        const reco::BeamSpot & bs);
 
   // ----------member data ---------------------------
  private:
@@ -91,8 +89,9 @@ class Onia2MuMuPAT : public edm::EDProducer {
   StringCutObjectSelector<reco::Candidate, true> prefilter_;
 
   // int findVertexId( const TransientVertex & theOriginalPV, const std::vector<TransientVertex> & priVtxs,
-  int findVertexId( const reco::Vertex & theOriginalPV, const reco::VertexCollection & priVtxs,
-                    const reco::Track & track, const double & maxDeltaR );
+  int findVertexId(const std::pair<reco::Vertex, reco::Vertex> &theOriginalPV,
+                   const std::vector<std::pair<reco::Vertex, reco::Vertex> > &priVtxs,
+                   const reco::Track & track, const double & maxDeltaR );
   float computeDcaXY(const TrajectoryStateClosestToPoint & tt1, const TrajectoryStateClosestToPoint & tt2);
   float computeDca(const TrajectoryStateClosestToPoint & tt1, const TrajectoryStateClosestToPoint & tt2);
   void setP4AndCharge(RefCountedKinematicTree & vertexFitTree, pat::Muon & mu,
@@ -104,6 +103,7 @@ class Onia2MuMuPAT : public edm::EDProducer {
   AdaptiveVertexFitter avtxFitter_;
 
   std::vector<double> muMasses_;
+  reco::TrackCollection muonLess_;
 
   struct SimpleTrack
   {
@@ -111,12 +111,12 @@ class Onia2MuMuPAT : public edm::EDProducer {
                 const int inNdof, const double & inDoca,
                 const double & inDocaSignificance,
                 const int inVertexId, const bool inHighPurity,
-                const double & inIsoMu1Pt, const double & inIsoMu2Pt) :
+                const double & inIsoMu1P, const double & inIsoMu2P) :
       pt(inPt), eta(inEta), phi(inPhi),
       ndof(inNdof), doca(inDoca),
       docaSignificance(inDocaSignificance),
       vertexId(inVertexId), highPurity(inHighPurity),
-      isoMu1Pt(inIsoMu1Pt), isoMu2Pt(inIsoMu2Pt)
+      isoMu1P(inIsoMu1P), isoMu2P(inIsoMu2P)
     {}
 
     bool operator<(const SimpleTrack & compTrack) const {
@@ -131,8 +131,8 @@ class Onia2MuMuPAT : public edm::EDProducer {
     double docaSignificance;
     int vertexId;
     bool highPurity;
-    double isoMu1Pt;
-    double isoMu2Pt;
+    double isoMu1P;
+    double isoMu2P;
   };
 };
 
