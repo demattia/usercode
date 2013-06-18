@@ -1,0 +1,110 @@
+\section{Selection}
+
+\subsection{pre-selection}
+
+The same preselection as in \cite{MainAN} is used. 
+
+
+\subsection{muon identification}
+
+The muons are chosen to pass global muon prompt tight
+selection (GM\_PT). [to be updated]
+
+
+
+\subsection{variable distributions}
+
+The distributions of the variables used for the BDT training are shown in Figures \ref{fig:TMVAPlotsBarrel} and \ref{fig:TMVAPlotsEndcaps}.
+
+\newpage
+
+\begin{figure}
+  \centering
+  \includegraphics[width=0.3\textwidth]{Figures/pt_barrel}
+  %\label{fig:ptBarrel}
+  \includegraphics[width=0.3\textwidth]{Figures/eta_barrel}
+  %\label{fig:etaBarrel}
+  \includegraphics[width=0.3\textwidth]{Figures/fls3d_barrel}
+  %\label{fig:fls3dBarrel}
+  \includegraphics[width=0.3\textwidth]{Figures/chi2dof_barrel}
+  %\label{fig:chi2dofBarrel}
+  \includegraphics[width=0.3\textwidth]{Figures/alpha_barrel}
+  %\label{fig:alphaBarrel}
+  \includegraphics[width=0.3\textwidth]{Figures/iso_barrel}
+  %\label{fig:isoBarrel}
+  \includegraphics[width=0.3\textwidth]{Figures/closetrk_barrel}
+  %\label{fig:closetrkBarrel}
+  \includegraphics[width=0.3\textwidth]{Figures/docatrk_barrel}
+  %\label{fig:docatrkBarrel}
+  \includegraphics[width=0.3\textwidth]{Figures/pvip_barrel}
+  %\label{fig:pvipBarrel}
+  \includegraphics[width=0.3\textwidth]{Figures/pvips_barrel}
+  %\label{fig:pvipsBarrel}
+  \includegraphics[width=0.3\textwidth]{Figures/maxdoca_barrel}
+  %\label{fig:maxdocaBarrel}
+  \caption{Standard TMVA plot of the input variables for the barrel BDT for signal (blue) and background (red). The background is extracted from data dimuon sidebands.}
+  \label{fig:TMVAPlotsBarrel}
+\end{figure}
+
+\begin{figure}
+  \centering
+  \includegraphics[width=0.3\textwidth]{Figures/pt_endcaps}
+  %\label{fig:ptEndcaps}
+  \includegraphics[width=0.3\textwidth]{Figures/eta_endcaps}
+  %\label{fig:etaEndcaps}
+  \includegraphics[width=0.3\textwidth]{Figures/fls3d_endcaps}
+  %%\label{fig:fls3dEndcaps}
+  \includegraphics[width=0.3\textwidth]{Figures/chi2dof_endcaps}
+  %\label{fig:chi2dofEndcaps}
+  \includegraphics[width=0.3\textwidth]{Figures/alpha_endcaps}
+  %\label{fig:alphaEndcaps}
+  \includegraphics[width=0.3\textwidth]{Figures/iso_endcaps}
+  %\label{fig:isoEndcaps}
+  \includegraphics[width=0.3\textwidth]{Figures/closetrk_endcaps}
+  %\label{fig:closetrkEndcaps}
+  \includegraphics[width=0.3\textwidth]{Figures/docatrk_endcaps}
+  %\label{fig:docatrkEndcaps}
+  \includegraphics[width=0.3\textwidth]{Figures/pvip_endcaps}
+  %\label{fig:pvipEndcaps}
+  \includegraphics[width=0.3\textwidth]{Figures/pvips_endcaps}
+  %\label{fig:pvipsEncaps}
+  \includegraphics[width=0.3\textwidth]{Figures/maxdoca_endcaps}
+  %\label{fig:maxdocaEndcaps}
+  \caption{Standard TMVA plot of the input variables for the endcaps BDT for signal (blue) and background (red). The background is extracted from data dimuon sidebands.}
+  \label{fig:TMVAPlotsEndcaps}
+\end{figure}
+
+
+
+\subsection{variable ranking and correlations}
+
+\begin{figure}
+  \centering
+  \includegraphics[width=0.45\textwidth]{Figures/correlationMatrixS_barrel}
+  \label{fig:matrixSBarrel}
+  \includegraphics[width=0.45\textwidth]{Figures/correlationMatrixS_endcaps}
+  \label{fig:matrixSEndcaps}
+  \caption{Correlation matrix for signal events in the barrel (left) and the endcap (right).}
+  \label{fig:correlationMatricesSignal}
+\end{figure}
+
+\begin{figure}
+  \centering
+  \includegraphics[width=0.45\textwidth]{Figures/correlationMatrixB_barrel}
+  \label{fig:matrixBBarrel}
+  \includegraphics[width=0.45\textwidth]{Figures/correlationMatrixB_endcaps}
+  \label{fig:matrixBEndcaps}
+  \caption{Correlation matrix for background events in the barrel (left) and the endcap (right).}
+  \label{fig:correlationMatricesBackground}
+\end{figure}
+
+Tables \ref{tab:datasetsbarrelIdTransformation} and \ref{tab:datasetsendcapsIdTransformation} show the ranking of variables before
+the BDT training.
+
+\input{Tables/ranking_barrel_IdTransformation.txt}
+\input{Tables/ranking_endcaps_IdTransformation.txt}
+
+
+%what code prodcues these?
+%\include{VariablesComparison}
+%\include{VariablesComparison_3h}
