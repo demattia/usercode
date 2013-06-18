@@ -166,6 +166,13 @@ Onia2MuMuPAT::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
       Track track;
       LeafCandidate tkcand;
 
+      double originalMu1P = it->track()->p();
+      double originalMu2P = it2->track()->p();
+      double originalMu1Eta = it->track()->eta();
+      double originalMu2Eta = it2->track()->eta();
+      double originalMu1Phi = it->track()->phi();
+      double originalMu2Phi = it2->track()->phi();
+
       // Compute invariant mass to reject candidates before the vertex fit
       math::XYZTLorentzVector m1p4(fromPtEtaPhiToPxPyPz(it->track()->pt(),
                                                         it->track()->eta(),
@@ -226,6 +233,7 @@ Onia2MuMuPAT::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
         // -------------------------------------------------------------------------------------------------------------------------------
         // Kinematic vertex fit
         // -------------------------------------------------------------------------------------------------------------------------------
+        std::cout << "starting" << std::endl;
         vector<RefCountedKinematicParticle> muonParticles;
         muonParticles.push_back(pFactory.particle (t_tks[0],muon_mass,0.,0.,muon_sigma));
         muonParticles.push_back(pFactory.particle (t_tks[1],muon_mass,0.,0.,muon_sigma));
@@ -245,10 +253,11 @@ Onia2MuMuPAT::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
             reco::TransientTrack tt = theTTBuilder->build(b_s->currentState().freeTrajectoryState());
 
             // Mass from the kinematic vertex fit
+            myCand.addUserFloat("mass",b_s->currentState().mass());
             myCand.addUserFloat("kinMass",b_s->currentState().mass());
             // Mass is parameter [6], the error matrix has 7 entries and parameter [6] should be the error on the mass.
             // According to https://cmssdt.cern.ch/SDT/doxygen/CMSSW_5_3_8/doc/html/d4/de9/classKinematicParametersError.html
-            myCand.addUserFloat("kinMassError",b_s->currentState().kinematicParametersError().matrix()(6,6));
+            myCand.addUserFloat("kinMassError",sqrt(b_s->currentState().kinematicParametersError().matrix()(6,6)));
 
             float vChi2 = myVertex->chiSquared();
             float vNDF  = myVertex->degreesOfFreedom();
@@ -269,6 +278,8 @@ Onia2MuMuPAT::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
               fillCandMuons(myCand, mu2, mu1);
               fillCandMuons(my3Cand, mu2, mu1);
             }
+            std::cout << "mu1 pt = " << myCand.daughter("muon1")->pt() << std::endl;
+            std::cout << "mu2 pt = " << myCand.daughter("muon2")->pt() << std::endl;
 
             myCand.addUserFloat("vNChi2",vChi2/vNDF);
             myCand.addUserFloat("vProb",vProb);
@@ -347,8 +358,8 @@ Onia2MuMuPAT::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
             double sumNdofPV = 0., sumNdofNoVtx = 0.;
             double PVndof = thePrimaryV.first.ndof();
             myCand.addUserFloat("PVndof",(float) PVndof);
-            myCand.addUserFloat("pvw8",(float) (thePrimaryV.first.ndof()+2)/(2*thePrimaryV.first.tracksSize()));
-            myCand.addUserFloat("pvw8Orig",(float) (thePrimaryV.second.ndof()+2)/(2*thePrimaryV.second.tracksSize()));
+            myCand.addUserFloat("pvw8Refit",(float) (thePrimaryV.first.ndof()+2)/(2*thePrimaryV.first.tracksSize()));
+            myCand.addUserFloat("pvw8",(float) (thePrimaryV.second.ndof()+2)/(2*thePrimaryV.second.tracksSize()));
 
             TrajectoryStateClosestToPoint mu1TS = t_tks[0].impactPointTSCP();
             TrajectoryStateClosestToPoint mu2TS = t_tks[1].impactPointTSCP();
@@ -384,28 +395,44 @@ Onia2MuMuPAT::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
               // Muon isolation
               // --------------
               double isoMu1P = 0.;
+              double deltaRMu1 = 0.;
+              bool usedPVMu1 = false;
               double isoMu2P = 0.;
+              double deltaRMu2 = 0.;
+              bool usedPVMu2 = false;
               // std::cout << "doca = " << doca << ", p = " << track->p() << std::endl;
               // if( doca < 0.1 && track->p() > 0.5 ) {
               //   if( vertexId == 0 || vertexId == 1 ) {
-              if( (vertexId == 0 && doca < 0.1) || vertexId == 1 ) {
-                if( track->p() > 0.5 ) {
-                  if( deltaR(track->eta(),track->phi(),rmu1->eta(),rmu1->phi()) < 0.5 ) {
-//                    std::cout << "vertexId = " << vertexId << std::endl;
-//                    std::cout << "doca = " << doca << ", p = " << track->p() << std::endl;
-//                    std::cout << "mu1_20 iso deltaR = " << deltaR(track->eta(),track->phi(),rmu1->eta(),rmu1->phi()) << std::endl;
-                    isoMu1P = track->p();
-                  }
-                  if( deltaR(track->eta(),track->phi(),rmu2->eta(),rmu2->phi()) < 0.5 ) {
-//                    std::cout << "vertexId = " << vertexId << std::endl;
-//                    std::cout << "doca = " << doca << ", p = " << track->p() << std::endl;
-//                    std::cout << "mu2_20 iso deltaR = " << deltaR(track->eta(),track->phi(),rmu2->eta(),rmu2->phi()) << std::endl;
-                    isoMu2P = track->p();
-                  }
-                }
+              // if( (vertexId == 0 && doca < 0.1) || vertexId == 1 ) {
+              if( vertexId != 2 ) {
+                // if( track->p() > 0.5 ) {
+                // if( deltaR(track->eta(),track->phi(),rmu1->eta(),rmu1->phi()) < 0.5 ) {
+                    //                    std::cout << "vertexId = " << vertexId << std::endl;
+                    //                    std::cout << "doca = " << doca << ", p = " << track->p() << std::endl;
+                    //                    std::cout << "mu1_20 iso deltaR = " << deltaR(track->eta(),track->phi(),rmu1->eta(),rmu1->phi()) << std::endl;
+
+                // deltaRMu1 = deltaR(track->eta(),track->phi(),rmu1->eta(),rmu1->phi());
+                deltaRMu1 = deltaR(track->eta(),track->phi(),originalMu1Eta,originalMu1Phi);
+                // deltaRMu1 = deltaR(track->eta(),track->phi(),myCand.daughter("muon1")->eta(),myCand.daughter("muon1")->phi());
+                isoMu1P = track->p();
+                if( deltaRMu1 < 0.5 && isoMu1P > 0.5 && vertexId == 1 ) usedPVMu1 = true;
+                  //}
+                  // if( deltaR(track->eta(),track->phi(),rmu2->eta(),rmu2->phi()) < 0.5 ) {
+                    //                    std::cout << "vertexId = " << vertexId << std::endl;
+                    //                    std::cout << "doca = " << doca << ", p = " << track->p() << std::endl;
+                    //                    std::cout << "mu2_20 iso deltaR = " << deltaR(track->eta(),track->phi(),rmu2->eta(),rmu2->phi()) << std::endl;
+                // deltaRMu2 = deltaR(track->eta(),track->phi(),rmu2->eta(),rmu2->phi());
+                deltaRMu2 = deltaR(track->eta(),track->phi(),originalMu2Eta,originalMu2Phi);
+                // deltaRMu2 = deltaR(track->eta(),track->phi(),myCand.daughter("muon2")->eta(),myCand.daughter("muon2")->phi());
+                isoMu2P = track->p();
+                if( deltaRMu2 < 0.5 && isoMu2P > 0.5 && vertexId == 1 ) usedPVMu2 = true;
+                  // }
+                // }
               }
               simpleTracks.push_back(SimpleTrack(track->pt(), track->eta(), track->phi(), track->ndof(),
-                                                 doca, docaSig, vertexId, highPurity, isoMu1P, isoMu2P));
+                                                 doca, docaSig, vertexId, highPurity,
+                                                 deltaRMu1, isoMu1P, usedPVMu1,
+                                                 deltaRMu2, isoMu2P, usedPVMu2));
             }
 
             // Sort the simpleTracks. Smallest doca first.
@@ -417,22 +444,72 @@ Onia2MuMuPAT::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
             int tkCount = 0;
             for( auto tk = simpleTracks.begin(); tk != simpleTracks.end(); ++tk, ++tkCount ) {
 
-              if( tk->vertexId == 1 ) ++countTksOfPV;
-              else if( tk->vertexId == 0 ) ++countTksOfNoVtx;
-
               // From here on use only tracks from the candidate PV or no PV
               if( tk->vertexId == 2 ) continue;
 
-              sumPTkMu1 += tk->isoMu1P;
-              // if( tk->isoMu1P > 0. ) std::cout << "mu1 iso track = " << tk->isoMu1P << std::endl;
-              sumPTkMu2 += tk->isoMu2P;
-              // if( tk->isoMu2P > 0. ) std::cout << "mu2 iso track = " << tk->isoMu2P << std::endl;
-              if( tkCount < 20 ) {
-                sumPTkMu1_20 += tk->isoMu1P;
-                // if( tk->isoMu1P > 0. ) std::cout << "mu1_20 iso track = " << tk->isoMu1P << std::endl;
-                sumPTkMu2_20 += tk->isoMu2P;
-                // if( tk->isoMu2P > 0. ) std::cout << "mu2_20 iso track = " << tk->isoMu2P << std::endl;
+              if( tk->vertexId == 1 ) ++countTksOfPV;
+              else if( tk->vertexId == 0 ) ++countTksOfNoVtx;
+
+//              if( tk->isoMu1P < 0.63 && tk->isoMu1P > 0.628 ) {
+//                std::cout << "NOCUT: tk->p = " << tk->isoMu1P << ", deltaRMu1 = " << tk->deltaRMu1 << ", deltaRMu2 = " << tk->deltaRMu2 << ", doca = " << tk->doca << std::endl;
+//              }
+
+              double deltaRMuIsoCut = 0.5;
+
+              // if( iEvent.id().event() == 238755924 || iEvent.id().event() == 238795635 ) {
+                if( tk->deltaRMu1 < deltaRMuIsoCut || tk->deltaRMu2 < deltaRMuIsoCut ) {
+                  if( (tk->vertexId == 0 && tk->doca < 0.1 && tkCount < 20) || (tk->vertexId == 1) ) {
+                  // if( tk->vertexId == 1 ) {
+                    if( tk->deltaRMu1 < deltaRMuIsoCut ) std::cout << "For mu1, ";
+                    if( tk->deltaRMu2 < deltaRMuIsoCut ) std::cout << "For mu2, ";
+                    if( tk->vertexId == 1 ) std::cout << "PV:   ";
+                    if( tk->vertexId == 0 ) std::cout << "NOPV: ";
+                    std::cout << "tk->p = " << tk->isoMu1P
+                              // << ", tk->pt = " << tk->pt
+                              << ", deltaRMu1 = " << tk->deltaRMu1
+                              << ", deltaRMu2 = " << tk->deltaRMu2
+                              << ", doca = " << tk->doca << std::endl;
+                    // }
+                  }
+                }
+              // }
+
+
+              if( tk->vertexId == 1 ) {
+                if( tk->deltaRMu1 < deltaRMuIsoCut && tk->isoMu1P > 0.5 ) sumPTkMu1 += tk->isoMu1P;
+                // if( tk->isoMu1P > 0. ) std::cout << "mu1 iso track = " << tk->isoMu1P << std::endl;
+                if( tk->deltaRMu2 < deltaRMuIsoCut && tk->isoMu2P > 0.5 ) sumPTkMu2 += tk->isoMu2P;
+                // if( tk->isoMu2P > 0. ) std::cout << "mu2 iso track = " << tk->isoMu2P << std::endl;
               }
+              // if( tkCount < 20 ) {
+              //   sumPTkMu1_20 += tk->isoMu1P;
+                // if( tk->isoMu1P > 0. ) std::cout << "mu1_20 iso track = " << tk->isoMu1P << std::endl;
+              //   sumPTkMu2_20 += tk->isoMu2P;
+                // if( tk->isoMu2P > 0. ) std::cout << "mu2_20 iso track = " << tk->isoMu2P << std::endl;
+              // }
+
+
+
+//              if( tkCount < 20 && tk->vertexId == 0 && tk->doca < 0.1 ) {
+//                if( tk->deltaRMu1 < 0.5 && tk->isoMu1P > 0.5 ) {
+//                  // if( ((tk->vertexId == 1 && tk->isoMu1P < 0.5) ||
+//                  sumPTkMu1_20 += tk->isoMu1P;
+//                }
+//                if( tk->deltaRMu2 < 0.5 && tk->isoMu2P > 0.5 ) {
+//                  sumPTkMu2_20 += tk->isoMu2P;
+//                }
+//              }
+
+
+
+              if( tk->vertexId == 0 && tk->doca < 0.1 && tkCount < 20 ) {
+                if( ( tk->deltaRMu1 < 0.5 && tk->isoMu1P > 0.5) )
+                  sumPTkMu1_20 += tk->isoMu1P;
+                if( ( tk->deltaRMu2 < 0.5 && tk->isoMu2P > 0.5) )
+                  sumPTkMu2_20 += tk->isoMu2P;
+              }
+
+
 
               // Take the minimum doca
               if( minDca > tk->doca ) minDca = tk->doca;
@@ -500,8 +577,12 @@ Onia2MuMuPAT::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
             // Muon isolation
             double isoMu1 = mu1.p()/(mu1.p()+sumPTkMu1);
             double isoMu2 = mu2.p()/(mu2.p()+sumPTkMu2);
-            double isoMu1_20 = mu1.p()/(mu1.p()+sumPTkMu1_20);
-            double isoMu2_20 = mu2.p()/(mu2.p()+sumPTkMu2_20);
+            double isoMu1_20 = originalMu1P/(originalMu1P+sumPTkMu1+sumPTkMu1_20);
+            double isoMu2_20 = originalMu2P/(originalMu2P+sumPTkMu2+sumPTkMu2_20);
+            // double isoMu1_20 = myCand.daughter("muon1")->p()/(myCand.daughter("muon1")->p()+sumPTkMu1+sumPTkMu1_20);
+            // double isoMu2_20 = myCand.daughter("muon2")->p()/(myCand.daughter("muon2")->p()+sumPTkMu2+sumPTkMu2_20);
+            // double isoMu1_20 = mu1.p()/(mu1.p()+sumPTkMu1+sumPTkMu1_20);
+            // double isoMu2_20 = mu2.p()/(mu2.p()+sumPTkMu2+sumPTkMu2_20);
 
             myCand.addUserFloat("Isolation", (float) Iso);
             myCand.addUserFloat("Isolation20", (float) Iso20);
@@ -588,7 +669,7 @@ Onia2MuMuPAT::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
           myCand.addUserFloat("vProb", -1);
           myCand.addUserFloat("PVndof", -1.);
           myCand.addUserFloat("pvw8", -1.);
-          myCand.addUserFloat("pvw8Orig", -1.);
+          myCand.addUserFloat("pvw8Refit", -1.);
           myCand.addUserFloat("ppdlPV",-100);
           myCand.addUserFloat("ppdlErrPV",-100);
           myCand.addUserFloat("cosAlphaXY",-100);
