@@ -107,24 +107,23 @@ class Onia2MuMuPAT : public edm::EDProducer {
 
   struct SimpleTrack
   {
-    SimpleTrack(const double & inPt, const double & inEta, const double & inPhi,
+    SimpleTrack(const double & inP, const double & inPt, const double & inEta, const double & inPhi,
                 const int inNdof, const double & inDoca,
                 const double & inDocaSignificance,
                 const int inVertexId, const bool inHighPurity,
-                const double & inDeltaRMu1, const double & inIsoMu1P, const bool inUsedPVMu1,
-                const double & inDeltaRMu2, const double & inIsoMu2P, const bool inUsedPVMu2) :
-      pt(inPt), eta(inEta), phi(inPhi),
+                const double & inDeltaRMu1, const double & inDeltaRMu2, const double inDeltaRCand) :
+      p(inP), pt(inPt), eta(inEta), phi(inPhi),
       ndof(inNdof), doca(inDoca),
       docaSignificance(inDocaSignificance),
       vertexId(inVertexId), highPurity(inHighPurity),
-      deltaRMu1(inDeltaRMu1), isoMu1P(inIsoMu1P), usedPVMu1(inUsedPVMu1),
-      deltaRMu2(inDeltaRMu2), isoMu2P(inIsoMu2P), usedPVMu2(inUsedPVMu2)
+      deltaRMu1(inDeltaRMu1), deltaRMu2(inDeltaRMu2), deltaRCand(inDeltaRCand)
     {}
 
     bool operator<(const SimpleTrack & compTrack) const {
       return( doca < compTrack.doca );
     }
 
+    double p;
     double pt;
     double eta;
     double phi;
@@ -134,11 +133,8 @@ class Onia2MuMuPAT : public edm::EDProducer {
     int vertexId;
     bool highPurity;
     double deltaRMu1;
-    double isoMu1P;
-    bool usedPVMu1;
     double deltaRMu2;
-    double isoMu2P;
-    bool usedPVMu2;
+    double deltaRCand;
   };
 };
 
