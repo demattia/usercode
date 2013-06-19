@@ -90,7 +90,7 @@ void AddMuonID(const TString & file_name = "Barrel") {
     inputValues[5] = mu1_chi2LocMom;
     inputValues[6] = mu1_chi2LocPos;
     inputValues[7] = mu1_glbTrackProb;
-    inputValues[8] = mu1_NTkVHits;
+    inputValues[8] = mu1_NTrkVHits;
     inputValues[9] = mu1_NTrkEHitsOut;
     mu1_MVAMuonID = muonID.GetMvaValue( inputValues );
 
