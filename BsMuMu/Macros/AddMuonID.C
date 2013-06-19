@@ -6,44 +6,32 @@
 
 // This function adds the mvaMuonId variables to the trees. It also applies the cut.
 
-/*
-mu1_validFrac   -> trkValidFract
-mu1_globalChi2  -> glbNChi2
-<missing pt, eta>
-mu1_segComp
-mu1_chi2LocMom 
-mu1_chi2LocPos 
-mu1_glbTrackProb
-mu1_trkVHits -> NTrkVHits
-mu1_trkEHitsOut   -> NTrkEHisOut
-*/
-
 void AddMuonID(const TString & file_name = "Barrel") {
 
   TFile * inputFile = new TFile(file_name);
   TTree *nt1 = (TTree*)inputFile->Get("probe_tree");
-  Float_t mu1_trkValidFract, mu1_glbNChi2, mu1_chi2LocPos, mu1_NTrkEHitsOut, mu1_segComp, mu1_glbTrackProb, mu1_chi2LocMom, mu1_NTrkVHits, mu1_pt, mu1_eta;
-  Float_t mu2_trkValidFract, mu2_glbNChi2, mu2_chi2LocPos, mu2_NTrkEHitsOut, mu2_segComp, mu2_glbTrackProb, mu2_chi2LocMom, mu2_NTrkVHits, mu2_pt, mu2_eta;
+  Float_t mu1_validFrac, mu1_globalChi2, mu1_chi2LocPos, mu1_trkEHitsOut, mu1_segComp, mu1_glbTrackProb, mu1_chi2LocMom, mu1_trkVHits, mu1_pt, mu1_eta;
+  Float_t mu2_validFrac, mu2_globalChi2, mu2_chi2LocPos, mu2_trkEHitsOut, mu2_segComp, mu2_glbTrackProb, mu2_chi2LocMom, mu2_trkVHits, mu2_pt, mu2_eta;
   Float_t mu1_MVAMuonID, mu2_MVAMuonID;
   Float_t cosa, alpha;
-  nt1->SetBranchAddress("mu1_validFrac", &mu1_trkValidFract);
-  nt1->SetBranchAddress("mu1_globalChi2", &mu1_glbNChi2);
+  nt1->SetBranchAddress("mu1_validFrac", &mu1_validFrac);
+  nt1->SetBranchAddress("mu1_globalChi2", &mu1_globalChi2);
   nt1->SetBranchAddress("mu1_chi2LocPos", &mu1_chi2LocPos);
-  nt1->SetBranchAddress("mu1_trkEHitsOut", &mu1_NTrkEHitsOut);
+  nt1->SetBranchAddress("mu1_trkEHitsOut", &mu1_trkEHitsOut);
   nt1->SetBranchAddress("mu1_segComp", &mu1_segComp);
   nt1->SetBranchAddress("mu1_glbTrackProb", &mu1_glbTrackProb);
   nt1->SetBranchAddress("mu1_chi2LocMom", &mu1_chi2LocMom);
-  nt1->SetBranchAddress("mu1_trkVHits", &mu1_NTrkVHits);
+  nt1->SetBranchAddress("mu1_trkVHits", &mu1_trkVHits);
   nt1->SetBranchAddress("m1pt", &mu1_pt);
   nt1->SetBranchAddress("m1eta", &mu1_eta);
-  nt1->SetBranchAddress("mu2_validFrac", &mu2_trkValidFract);
-  nt1->SetBranchAddress("mu2_globalChi2", &mu2_glbNChi2);
+  nt1->SetBranchAddress("mu2_validFrac", &mu2_validFrac);
+  nt1->SetBranchAddress("mu2_globalChi2", &mu2_globalChi2);
   nt1->SetBranchAddress("mu2_chi2LocPos", &mu2_chi2LocPos);
-  nt1->SetBranchAddress("mu2_trkEHitsOut", &mu2_NTrkEHitsOut);
+  nt1->SetBranchAddress("mu2_trkEHitsOut", &mu2_trkEHitsOut);
   nt1->SetBranchAddress("mu2_segComp", &mu2_segComp);
   nt1->SetBranchAddress("mu2_glbTrackProb", &mu2_glbTrackProb);
   nt1->SetBranchAddress("mu2_chi2LocMom", &mu2_chi2LocMom);
-  nt1->SetBranchAddress("mu2_trkVHits", &mu2_NTrkVHits);
+  nt1->SetBranchAddress("mu2_trkVHits", &mu2_trkVHits);
   nt1->SetBranchAddress("m2pt", &mu2_pt);
   nt1->SetBranchAddress("m2eta", &mu2_eta);
   nt1->SetBranchAddress("cosa", &cosa);
@@ -82,28 +70,28 @@ void AddMuonID(const TString & file_name = "Barrel") {
     if( i%1000 == 0 ) std::cout << "processed: " << i << " events" << std::endl;
     nt1->GetEntry(i);
 
-    inputValues[0] = mu1_trkValidFract;
-    inputValues[1] = mu1_glbNChi2;
+    inputValues[0] = mu1_validFrac;
+    inputValues[1] = mu1_globalChi2;
     inputValues[2] = mu1_pt;
     inputValues[3] = mu1_eta;
     inputValues[4] = mu1_segComp;
     inputValues[5] = mu1_chi2LocMom;
     inputValues[6] = mu1_chi2LocPos;
     inputValues[7] = mu1_glbTrackProb;
-    inputValues[8] = mu1_NTrkVHits;
-    inputValues[9] = mu1_NTrkEHitsOut;
+    inputValues[8] = mu1_trkVHits;
+    inputValues[9] = mu1_trkEHitsOut;
     mu1_MVAMuonID = muonID.GetMvaValue( inputValues );
 
-    inputValues[0] = mu2_trkValidFract;
-    inputValues[1] = mu2_glbNChi2;
+    inputValues[0] = mu2_validFrac;
+    inputValues[1] = mu2_globalChi2;
     inputValues[2] = mu2_pt;
     inputValues[3] = mu2_eta;
     inputValues[4] = mu2_segComp;
     inputValues[5] = mu2_chi2LocMom;
     inputValues[6] = mu2_chi2LocPos;
     inputValues[7] = mu2_glbTrackProb;
-    inputValues[8] = mu2_NTrkVHits;
-    inputValues[9] = mu2_NTrkEHitsOut;
+    inputValues[8] = mu2_trkVHits;
+    inputValues[9] = mu2_trkEHitsOut;
     mu2_MVAMuonID = muonID.GetMvaValue( inputValues );
 
     alpha = acos(cosa);
