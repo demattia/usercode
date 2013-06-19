@@ -48,19 +48,19 @@ void comp(const TString & parallelAnalysisFile = "Barrel_preselection.root",
 
 
   std::vector<Vars> vars;
-  vars.push_back(Vars("mass", "m", 40, 4.9, 5.9));
+  vars.push_back(Vars("m", "m", 40, 4.9, 5.9));
   vars.push_back(Vars("pt", "pt", 40, 0, 50));
-  vars.push_back(Vars("dca", "maxdoca", 40, 0, 0.1));
-  vars.push_back(Vars("mu1_pt", "m1pt", 40, 0, 50));
-  vars.push_back(Vars("mu2_pt", "m2pt", 40, 0, 50));
-  vars.push_back(Vars("delta3d", "pvip", 40, 0, 0.05));
-  vars.push_back(Vars("delta3d/delta3dErr", "pvips", 40, 0, 5));
-  vars.push_back(Vars("cosAlpha3D", "cosa", 40, 0.95, 1.));
-  vars.push_back(Vars("ntrk20", "closetrk", 40, 0, 20));
-  vars.push_back(Vars("minDca", "docatrk", 40, 0, 0.2));
-  vars.push_back(Vars("isolation", "iso", 40, 0, 1));
-  vars.push_back(Vars("l3d", "fl3d", 40, 0, 5));
-  vars.push_back(Vars("l3dsig", "fls3d", 40, 0, 10));
+  vars.push_back(Vars("maxdoca", "maxdoca", 40, 0, 0.1));
+  vars.push_back(Vars("m1pt", "m1pt", 40, 0, 50));
+  vars.push_back(Vars("m2pt", "m2pt", 40, 0, 50));
+  vars.push_back(Vars("pvip", "pvip", 40, 0, 0.05));
+  vars.push_back(Vars("pvips", "pvips", 40, 0, 5));
+  vars.push_back(Vars("cosa", "cosa", 40, 0.95, 1.));
+  vars.push_back(Vars("closetrk", "closetrk", 40, 0, 20));
+  vars.push_back(Vars("docatrk", "docatrk", 40, 0, 0.2));
+  vars.push_back(Vars("iso", "iso", 44, 0, 1.1));
+  vars.push_back(Vars("fl3d", "fl3d", 40, 0, 5));
+  vars.push_back(Vars("fls3d", "fls3d", 40, 0, 10));
   vars.push_back(Vars("pvw8", "pvw8", 40, 0, 1.1));
   // vars.push_back(Vars("alpha3D", "alpha"));
 

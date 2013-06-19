@@ -15,30 +15,27 @@ def main():
     ##SELECT what is to be done:
 
     print "applying preselection, trigger, muonid..."
-    #doSelection()
+    # doSelection()
 
     print "starting mva classification..."
-    #doMVATraining("3000") # "0" will train all the events 
+    # doMVATraining("3000") # "0" will train all the events 
 
     print "doing mva comparisons..."
-    #doComparisons()
-    #doComparisonsExtra()
+    doComparisons()
+    doComparisonsExtra()
 
     print "mva significance optimization..."
-    #doSignificance()
+    # doSignificance()
 
     print "applying mva selection"
-    #doApplication()
+    # doApplication()
 
     print "drawing mva output and mass"
-    #doDrawMVA()
+    # doDrawMVA()
     print "...ending analysis"
 
-
 def doSelection():
-
-   for isplit in range(-1,3):
-
+    for isplit in range(-1,3):
         appendName = "_preselection.root"
         if isplit != -1:            
             appendName = appendName.split(".")[0] +"_"+str(isplit)+".root"
@@ -48,7 +45,7 @@ def doSelection():
         combineSamples(appendName)
         addMuonID(appendName)
 
-        print "processing unblinded sample", isplit 
+        # print "processing unblinded sample", isplit 
         applySelectionAndSplit(inputTrees, isplit, maxRun, False)
         appendName = appendName.split(".")[0] +"_unblinded"+".root"
         combineSamples(appendName)

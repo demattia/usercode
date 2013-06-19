@@ -1,6 +1,7 @@
 #include "TLegend.h"
 #include "TText.h"
 #include "TH2.h"
+#include <algorithm>
 
 #include "tmvaglob.C"
 
@@ -116,10 +117,10 @@ void mvas( TString fin = "TMVA.root", HistType htype = MVAType, Bool_t useTMVASt
          //Float_t xmax = TMath::Min( TMath::Max(sig->GetMean() + nrms*sig->GetRMS(), 
          //                                      bgd->GetMean() + nrms*bgd->GetRMS() ),
          //                           sig->GetXaxis()->GetXmax() );
-		 Float_t xmin = -1;
-		 Float_t xmax = 1;
- 		 Float_t ymin = 0;
-		 Float_t ymax = 9;
+	 Float_t xmin = -1;
+	 Float_t xmax = 1;
+	 Float_t ymin = 0;
+	 Float_t ymax = 9;
          Float_t maxMult = (htype == CompareType) ? 1.3 : 1.2;
          //Float_t ymax = TMath::Max( sig->GetMaximum(), bgd->GetMaximum() )*maxMult;
    
@@ -199,7 +200,8 @@ void mvas( TString fin = "TMVA.root", HistType htype = MVAType, Bool_t useTMVASt
             bgdOv->SetLineColor( col );
             bgdOv->Draw("e1same");
 
-            ymax = TMath::Max( ymax, TMath::Max( sigOv->GetMaximum(), bgdOv->GetMaximum() )*maxMult );
+            ymax = TMath::Max( ymax, Float_t(TMath::Max( sigOv->GetMaximum(), bgdOv->GetMaximum() )*maxMult) );
+            // ymax = std::max( ymax, std::max( sigOv->GetMaximum(), bgdOv->GetMaximum() )*maxMult );
             frame->GetYaxis()->SetLimits( 0, ymax );
       
             // for better visibility, plot thinner lines

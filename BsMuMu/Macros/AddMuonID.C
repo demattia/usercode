@@ -1,20 +1,19 @@
 #include "TTree.h"
 #include "TFile.h"
 #include <iostream>
-#include "tmvaMuonID/TMVAClassification_BDT_TM.class.C"
+#include "tmvaMuonID/TMVAClassification_BDT.class.C"
 #include "Common/Selection.h"
 
 // This function adds the mvaMuonId variables to the trees. It also applies the cut.
 
 void AddMuonID(const TString & file_name = "Barrel") {
 
-  bool cutMUID = false;
-
   TFile * inputFile = new TFile(file_name);
   TTree *nt1 = (TTree*)inputFile->Get("probe_tree");
   Float_t mu1_validFrac, mu1_globalChi2, mu1_chi2LocPos, mu1_trkEHitsOut, mu1_segComp, mu1_glbTrackProb, mu1_chi2LocMom, mu1_trkVHits, mu1_pt, mu1_eta;
   Float_t mu2_validFrac, mu2_globalChi2, mu2_chi2LocPos, mu2_trkEHitsOut, mu2_segComp, mu2_glbTrackProb, mu2_chi2LocMom, mu2_trkVHits, mu2_pt, mu2_eta;
   Float_t mu1_MVAMuonID, mu2_MVAMuonID;
+  Float_t cosa, alpha;
   nt1->SetBranchAddress("mu1_validFrac", &mu1_validFrac);
   nt1->SetBranchAddress("mu1_globalChi2", &mu1_globalChi2);
   nt1->SetBranchAddress("mu1_chi2LocPos", &mu1_chi2LocPos);
@@ -23,8 +22,8 @@ void AddMuonID(const TString & file_name = "Barrel") {
   nt1->SetBranchAddress("mu1_glbTrackProb", &mu1_glbTrackProb);
   nt1->SetBranchAddress("mu1_chi2LocMom", &mu1_chi2LocMom);
   nt1->SetBranchAddress("mu1_trkVHits", &mu1_trkVHits);
-  nt1->SetBranchAddress("mu1_pt", &mu1_pt);
-  nt1->SetBranchAddress("mu1_eta", &mu1_eta);
+  nt1->SetBranchAddress("m1pt", &mu1_pt);
+  nt1->SetBranchAddress("m1eta", &mu1_eta);
   nt1->SetBranchAddress("mu2_validFrac", &mu2_validFrac);
   nt1->SetBranchAddress("mu2_globalChi2", &mu2_globalChi2);
   nt1->SetBranchAddress("mu2_chi2LocPos", &mu2_chi2LocPos);
@@ -33,8 +32,9 @@ void AddMuonID(const TString & file_name = "Barrel") {
   nt1->SetBranchAddress("mu2_glbTrackProb", &mu2_glbTrackProb);
   nt1->SetBranchAddress("mu2_chi2LocMom", &mu2_chi2LocMom);
   nt1->SetBranchAddress("mu2_trkVHits", &mu2_trkVHits);
-  nt1->SetBranchAddress("mu2_pt", &mu2_pt);
-  nt1->SetBranchAddress("mu2_eta", &mu2_eta);
+  nt1->SetBranchAddress("m2pt", &mu2_pt);
+  nt1->SetBranchAddress("m2eta", &mu2_eta);
+  nt1->SetBranchAddress("cosa", &cosa);
 
   TFile *g = new TFile(file_name+"_muonID.root", "RECREATE");
   TTree *newtree = nt1->CloneTree(0); // Do no copy the data yet
@@ -43,10 +43,11 @@ void AddMuonID(const TString & file_name = "Barrel") {
   // add the branch to the new tree and try to fill it
   newtree->Branch("mu1_MVAMuonID", &mu1_MVAMuonID);
   newtree->Branch("mu2_MVAMuonID", &mu2_MVAMuonID);
+  newtree->Branch("alpha", &alpha);
 
   std::vector<std::string> theInputVariables;
-  theInputVariables.push_back("validFrac");
-  theInputVariables.push_back("globalChi2");
+  theInputVariables.push_back("trkValidFract");
+  theInputVariables.push_back("glbNChi2");
   theInputVariables.push_back("pt");
   theInputVariables.push_back("eta");
   theInputVariables.push_back("segComp");
@@ -93,6 +94,7 @@ void AddMuonID(const TString & file_name = "Barrel") {
     inputValues[9] = mu2_trkEHitsOut;
     mu2_MVAMuonID = muonID.GetMvaValue( inputValues );
 
+    alpha = acos(cosa);
     if( mvaMuonIDSelection(mu1_MVAMuonID, mu2_MVAMuonID) ) newtree->Fill();
   }
 

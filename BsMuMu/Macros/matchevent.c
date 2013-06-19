@@ -67,10 +67,9 @@ struct Comp
 
 void matchevent()
 {
-  unsigned int maxEvents = 5;
-  TFile *fxchk = new TFile("BsMC12_preselection.root");
+  TFile *fxchk = new TFile("rootfiles/BsMC12_barrel_preselection.root");
   // TFile *fxchk = new TFile("check_barrel_preselection.root");
-  TFile *fmain = new TFile("MainAnalysis/MC_afterCuts.root");
+  TFile *fmain = new TFile("MainAnalysis/MC_afterCuts_0.root");
 
   TTree *Txchk = (TTree*)fxchk->Get("probe_tree");
   TTree *Tmain = (TTree*)fmain->Get("events");
@@ -141,9 +140,11 @@ void matchevent()
   // Int_t nentries_xchk = (Int_t)Txchk->GetEntries();
   Int_t nentries_main = (Int_t)Tmain->GetEntries();
 
+  Int_t maxEvents = (Int_t)Txchk->GetEntries();
+  maxEvents = 5;
   for (int k=0; k<maxEvents; k++) {
     Txchk->GetEntry(k);
-    cout<<event<<" "<<xrun<<" "<<xpt<<" "<<xeta<<" "<<mu1_pt<<" "<<mu2_pt<<" "<<mu1_iso<<" "<<mu2_iso<<" "<<l3d<<" "<<l3dsig<<" "<<mass<<" "<<dca<<" "<<delta3d<<" "<<cosAlpha3D<<" "<<minDca<<" "<<isolation<<" "<<ntrk20<<" "<<NChi2<<endl;
+    // cout<<event<<" "<<xrun<<" "<<xpt<<" "<<xeta<<" "<<mu1_pt<<" "<<mu2_pt<<" "<<mu1_iso<<" "<<mu2_iso<<" "<<l3d<<" "<<l3dsig<<" "<<mass<<" "<<dca<<" "<<delta3d<<" "<<cosAlpha3D<<" "<<minDca<<" "<<isolation<<" "<<ntrk20<<" "<<NChi2<<endl;
     // cout<<event<<" "<<xpt<<" "<<xeta<<" "<<mu1_pt<<" "<<mu2_pt<<" "<<l3d<<" "<<l3dsig<<" "<<mass<<" "<<dca<<" "<<delta3d<<" "<<cosAlpha3D<<" "<<minDca<<" "<<isolation<<" "<<ntrk20<<" "<<NChi2<<endl;
 
     bool match = false;

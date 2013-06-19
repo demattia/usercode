@@ -239,7 +239,9 @@ def getNumEvtTable():
 
 
 def saveBDTControlPlots(region):
+    print rootDir+"TMVA_"+region+".root"
     inputFile = TFile(rootDir+"TMVA_"+region+".root")
+    print inputFile
     dir = inputFile.Get("Method_BDT").Get("BDT")
     canvasBDT = TCanvas("BDTControlPlots"+region, "BDT control plots "+region, 600, 500)
     canvasBDT.Divide(1,3)
@@ -360,8 +362,8 @@ def estimateBackground(region):
     inputFile = TFile(rootDir + Region+"_preselection.root")
     inputDir = inputFile.Get("probe_tree")
     canvas = TCanvas()
-    inputDir.Draw("mass>>mass")
-    massPlot = TROOT.gROOT.FindObject("mass")
+    inputDir.Draw("m>>m")
+    massPlot = TROOT.gROOT.FindObject("m")
     # canvas.Draw()
     lowSideband = massPlot.Integral(massPlot.FindBin(4.9), massPlot.FindBin(5.2))
     lowSidebandWidth = 5.2-4.9
@@ -661,7 +663,7 @@ def drawVariablePlots(region, method, plotType = ""):
 def runClassification(methodlist, eventsToTrain):
 
     print "running tmva classification, for methods ", methodlist
-    os.system("root -l -b -q compileTMVA.C")
+    os.system(rootExecutable+" -l -b -q compileTMVA.C")
     
     for region in regions:
         for isplit in range(-1,3):
@@ -675,7 +677,7 @@ def runClassification(methodlist, eventsToTrain):
             print cmd,log
             if os.path.exists(log):os.system("rm "+log)
             #os.system(rootExecutable + " -l -b -q TMVAClassification.C\("+cmd+"\) >& "+log+" &")
-            os.system("root -l -b -q TMVAClassification.C+\("+cmd+"\) >& "+log)
+            os.system(rootExecutable+" -l -b -q TMVAClassification.C+\("+cmd+"\) >& "+log+" &")
 
     #root -b -q -l compileTMVA.C
     #root -b -q -l TMVAClassification.C\(\"barrel\",\"\",\"BDT,MLP,CutsSA\"\)   >& logs/TMVALog_barrel.txt    &
@@ -737,8 +739,8 @@ def addMuonID(appendName):
         Region = region[:1].upper()+region[1:]  # capitalize
         fname = rootDir + Region + appendName
 
-        os.system("root -l -b -q AddMuonID.C+\(\\\""+fname+"\\\"\)")
-            #os.system("root -l -b -q AddMuonID.C+\(\\\"Endcaps"+appendName+"\\\"\)")
+        os.system(rootExecutable+" -l -b -q AddMuonID.C+\(\\\""+fname+"\\\"\)")
+            #os.system(rootExecutable+" -l -b -q AddMuonID.C+\(\\\"Endcaps"+appendName+"\\\"\)")
         os.system("mv " + fname + "_muonID.root " + fname)
             #os.system("mv Endcaps"+appendName+"_muonID.root Endcaps"+appendName)
     
@@ -747,8 +749,8 @@ def addMuonID(appendName):
             fname = rootDir + "BsMC12_" + region + appendName
                 #os.system("mv BsMC_barrel"+appendName+" BsMC12_barrel"+appendName)
                 #os.system("mv BsMC_endcaps"+appendName+" BsMC12_endcaps"+appendName)
-            os.system("root -l -b -q AddMuonID.C+\(\\\""+fname+"\\\"\)")
-                #os.system("root -l -b -q AddMuonID.C+\(\\\"BsMC12_endcaps"+appendName+"\\\"\)")
+            os.system(rootExecutable+" -l -b -q AddMuonID.C+\(\\\""+fname+"\\\"\)")
+                #os.system(rootExecutable+" -l -b -q AddMuonID.C+\(\\\"BsMC12_endcaps"+appendName+"\\\"\)")
             os.system("mv "+fname+"_muonID.root " + fname)
                 #os.system("mv BsMC12_endcaps"+appendName+"_muonID.root BsMC12_endcaps"+appendName)
         
@@ -770,6 +772,7 @@ def combineSamples(appendName):
             addlist += rootDir + run +"_" + region + appendName + " "
 
         print "hadd-ing files:", addlist,  " created:", fname
+        print "hadd "+ fname + " " + addlist
         os.system("hadd "+ fname + " " + addlist)
 
         #rename MC samples
@@ -801,10 +804,10 @@ def applySelectionAndSplit(inputTrees, splitting, maxRun, blindData = True, cut_
         for regidx, region in enumerate(regions):
             outputTree = tree.split("/")[-2]+'_'+region
             if not cut_based:
-                print "Applying preselection cuts"
+                # print "Applying preselection cuts"
                 outputTree += appendName
             else:
-                print "Applying analysis cuts"
+                # print "Applying analysis cuts"
                 outputTree += '.root'
             blinding = False
             if data:
@@ -816,6 +819,6 @@ def applySelectionAndSplit(inputTrees, splitting, maxRun, blindData = True, cut_
                     outputTree = outputTree.split(".")[0]+"_MainCNCSelected.root"                
             outputTree = rootDir + outputTree
             # print 'root -l -b -q cutTree_BsMuMu.C\(\\"'+tree+'\\",\\"'+outputTree+'\\",'+str(regionIndex)+','+data+','+cut_based+','+blinding+','+str(splitting)+','+maxRun+'\)'
-            print "applying selection and creating:", outputTree
-            os.system('root -l -b -q cutTree_BsMuMu.C\(\\"'+tree+'\\",\\"'+outputTree+'\\",'+str(regidx)+','+str(data)+','+str(cut_based)+','+str(blinding)+','+str(splitting)+','+maxRun+'\)')
+            # print "applying selection and creating:", outputTree
+            os.system(rootExecutable+' -l -b -q cutTree_BsMuMu.C\(\\"'+tree+'\\",\\"'+outputTree+'\\",'+str(regidx)+','+str(data)+','+str(cut_based)+','+str(blinding)+','+str(splitting)+','+maxRun+'\)')
 

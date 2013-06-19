@@ -54,19 +54,19 @@ void comp_3h(const TString & inputFileA = "Barrel_preselection_0.root",
 
 
   std::vector<Vars> vars;
-  vars.push_back(Vars("mass", "mass", "mass", 40, 4.9, 5.9));
+  vars.push_back(Vars("m", "m", "m", 40, 4.9, 5.9));
   vars.push_back(Vars("pt", "pt", "pt", 40, 0, 50));
-  vars.push_back(Vars("dca", "dca", "dca", 40, 0, 0.1));
-  vars.push_back(Vars("mu1_pt", "mu1_pt", "mu1_pt", 40, 0, 50));
-  vars.push_back(Vars("mu2_pt", "mu2_pt", "mu2_pt", 40, 0, 50));
-  vars.push_back(Vars("delta3d", "delta3d", "delta3d", 40, 0, 0.05));
-  vars.push_back(Vars("delta3d/delta3dErr", "delta3d/delta3dErr", "delta3d/delta3dErr", 40, 0, 5));
-  vars.push_back(Vars("cosAlpha3D", "cosAlpha3D", "cosAlpha3D", 40, 0.95, 1.));
-  vars.push_back(Vars("ntrk20", "ntrk20", "ntrk20", 40, 0, 20));
-  vars.push_back(Vars("minDca", "minDca", "minDca", 40, 0, 0.2));
-  vars.push_back(Vars("isolation", "isolation", "isolation", 40, 0, 1));
-  vars.push_back(Vars("l3d", "l3d", "l3d", 40, 0, 5));
-  vars.push_back(Vars("l3dsig", "l3dsig", "l3dsig", 40, 0, 10));
+  vars.push_back(Vars("maxdoca", "maxdoca", "maxdoca", 40, 0, 0.1));
+  vars.push_back(Vars("m1pt", "m1pt", "m1pt", 40, 0, 50));
+  vars.push_back(Vars("m2pt", "m2pt", "m2pt", 40, 0, 50));
+  vars.push_back(Vars("pvip", "pvip", "pvip", 40, 0, 0.05));
+  vars.push_back(Vars("pvips", "pvips", "pvips", 40, 0, 5));
+  vars.push_back(Vars("cosa", "cosa", "cosa", 40, 0.95, 1.));
+  vars.push_back(Vars("closetrk", "closetrk", "closetrk", 40, 0, 20));
+  vars.push_back(Vars("docatrk", "docatrk", "docatrk", 40, 0, 0.2));
+  vars.push_back(Vars("iso", "iso", "iso", 40, 0, 1));
+  vars.push_back(Vars("fl3d", "fl3d", "fl3d", 40, 0, 5));
+  vars.push_back(Vars("fls3d", "fls3d", "fls3d", 40, 0, 10));
   vars.push_back(Vars("pvw8", "pvw8", "pvw8", 40, 0, 1.1));
   // vars.push_back(Vars("alpha3D", "alpha"));
 

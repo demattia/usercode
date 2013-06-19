@@ -15,19 +15,20 @@ import os
 
 ## select mva methods
 regions = ["barrel", "endcaps"]
-methods = ["BDT", "MLP", "CutsSA"]
+# methods = ["BDT", "MLP", "CutsSA"]
 #regions = ["barrel"]
-#methods = ["BDT"]
+methods = ["BDT"]
 
 
 figuresDir = "BsMuMuLatex/Figures/"
 tablesDir = "BsMuMuLatex/Tables/"
 plotsDir = "plots/"
 logsDir = "logs/"  # note: this is set in TMVAClassification.C
-countersDir = "Trees/BsMC/"
+countersDir = "/Users/demattia/TMVA-v4.1.2/test/NewAnalysis/Trees/BsMC/"
 weightsDir = "weights/"
 rootDir = "rootfiles/"
-rootExecutable = "root" #check if this is needed (currently not enforced) for running in specific environments
+# rootExecutable = "root" #check if this is needed (currently not enforced) for running in specific environments
+rootExecutable = "/Users/demattia/root-v5-34-00-patches/bin/root"
 dirList = ["figuresDir","tablesDir","plotsDir","logsDir","countersDir","weightsDir","rootDir"]
 
 # check otherwise create root directories
@@ -54,14 +55,15 @@ def genheader():
 genheader()
 
 # list of input trees
-inputTrees = ['Trees/Run2012A/selection_test.root',
-              'Trees/Run2012ARecover/selection_test.root',
-              'Trees/Run2012B/selection_test.root',
-              'Trees/Run2012C1/selection_test.root',
-              'Trees/Run2012DRereco/selection_test.root',
-              'Trees/Run2012C2/selection_test.root',
-              'Trees/Run2012D/selection_test.root',
-              'Trees/BsMC/selection_test.root',
+inputTrees = [
+#    'Trees/Run2012A/selection_test.root',
+    'Trees/Run2012ARecover/selection_test.root',
+    'Trees/Run2012B/selection_test.root',
+#    'Trees/Run2012C1/selection_test.root',
+    'Trees/Run2012DRereco/selection_test.root',
+    'Trees/Run2012C2/selection_test.root',
+    'Trees/Run2012D/selection_test.root',
+    'Trees/BsMC/selection_test.root',
               ]
 #runlistA = ["Run2012A","Run2012ARecover","Run2012B","Run2012C1","Run2012DRereco","Run2012C2","Run2012D"]
 runlist = []
@@ -70,4 +72,5 @@ for idx, tree in enumerate(inputTrees):
         runlist.append(tree.split("/")[-2])
 #print runlist
 
-maxRun = "203002"  # this is the maximum run number (included) considered for data
+# maxRun = "203002"  # this is the maximum run number (included) considered for data
+maxRun = "999999"  # this is the maximum run number (included) considered for data

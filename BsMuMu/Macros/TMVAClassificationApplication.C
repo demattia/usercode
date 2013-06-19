@@ -145,19 +145,19 @@ void TMVAClassificationApplication( const TString & inputFileName, const TString
    reader->AddVariable( "pt", &pt );
    if( originalVariables ) {
      reader->AddVariable( "eta", &eta );
-     reader->AddVariable( "fls3d := l3dsig", &l3dsig );
-     reader->AddVariable( "alpha := acos(cosAlpha3D)",      &alpha );
+     reader->AddVariable( "fls3d", &l3dsig );
+     reader->AddVariable( "alpha",      &alpha );
    }
-   reader->AddVariable( "maxdoca := dca",                   &dca );
-   reader->AddVariable( "pvip := delta3d",                  &delta3d );
-   reader->AddVariable( "pvips := delta3d/delta3dErr",      &delta3dSig );
-   reader->AddVariable( "iso := isolation",                 &isolation );
+   reader->AddVariable( "maxdoca",                   &dca );
+   reader->AddVariable( "pvip",                  &delta3d );
+   reader->AddVariable( "pvips",      &delta3dSig );
+   reader->AddVariable( "iso",                 &isolation );
    if( originalVariables ) {
-     reader->AddVariable( "docatrk := minDca",              &minDca );
+     reader->AddVariable( "docatrk",              &minDca );
      //reader->AddVariable( "closetrk := ntrk",               &ntrk );
-     reader->AddVariable( "closetrk := ntrk20",               &ntrk20 );
+     reader->AddVariable( "closetrk",               &ntrk20 );
    }
-   reader->AddVariable( "chi2dof := NChi2",                 &chi2dof );
+   reader->AddVariable( "chi2dof",                 &chi2dof );
 
    if( !originalVariables) {
      reader->AddVariable( "y",                              &y );
@@ -396,22 +396,22 @@ void TMVAClassificationApplication( const TString & inputFileName, const TString
    // theTree->SetBranchAddress( "y",                                &userY );
 
    Float_t delta3dErr;//, cosAlpha3D;
-   theTree->SetBranchAddress( "dca",                              &dca );
+   theTree->SetBranchAddress( "maxdoca",                              &dca );
    theTree->SetBranchAddress( "pt",                               &pt );
-   theTree->SetBranchAddress( "l3dsig",                           &l3dsig );
-   theTree->SetBranchAddress( "NChi2",                            &chi2dof );
-   theTree->SetBranchAddress( "delta3d",                          &delta3d );
-   theTree->SetBranchAddress( "delta3dErr",                       &delta3dErr );
-   theTree->SetBranchAddress( "cosAlpha3D",                       &alpha );
-   theTree->SetBranchAddress( "ntrk",                             &ntrk );
-   theTree->SetBranchAddress( "minDca",                           &minDca );
-   theTree->SetBranchAddress( "isolation",                        &isolation );
+   theTree->SetBranchAddress( "fls3d",                           &l3dsig );
+   theTree->SetBranchAddress( "chi2dof",                            &chi2dof );
+   theTree->SetBranchAddress( "pvip",                          &delta3d );
+   theTree->SetBranchAddress( "pvips",                       &delta3dErr );
+   theTree->SetBranchAddress( "cosa",                       &alpha );
+   theTree->SetBranchAddress( "closetrk",                             &ntrk );
+   theTree->SetBranchAddress( "docatrk",                           &minDca );
+   theTree->SetBranchAddress( "iso",                        &isolation );
    theTree->SetBranchAddress( "eta",                              &eta );
    theTree->SetBranchAddress( "y",                                &y );
-   theTree->SetBranchAddress( "mass",                             &mass );
-   theTree->SetBranchAddress( "l3d",                              &l3d );
+   theTree->SetBranchAddress( "m",                             &mass );
+   theTree->SetBranchAddress( "fl3d",                              &l3d );
    theTree->SetBranchAddress( "cosAlphaXY",                       &cosAlphaXY );
-   theTree->SetBranchAddress( "cosAlpha3D",                       &cosAlpha3D );
+   theTree->SetBranchAddress( "cosa",                       &cosAlpha3D );
    theTree->SetBranchAddress( "mu1_dxy",                          &mu1_dxy );
    theTree->SetBranchAddress( "mu2_dxy",                          &mu2_dxy );
    theTree->SetBranchAddress( "mu1_MVAMuonID",                    &mu1_MVAMuonID );

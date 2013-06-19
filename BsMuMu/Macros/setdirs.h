@@ -32,6 +32,6 @@ TString figuresDir("BsMuMuLatex/Figures/");
 TString tablesDir("BsMuMuLatex/Tables/");
 TString plotsDir("plots/");
 TString logsDir("logs/");
-TString countersDir("Trees/BsMC/");
+TString countersDir("/Users/demattia/TMVA-v4.1.2/test/NewAnalysis/Trees/BsMC/");
 TString weightsDir("weights/");
 TString rootDir("rootfiles/");

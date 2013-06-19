@@ -1,4 +1,4 @@
-// @(#)root/tmva $Id: TMVAClassification.C,v 1.9 2013/05/22 23:56:13 nuno Exp $
+// @(#)root/tmva $Id: TMVAClassification.C,v 1.10 2013/05/29 00:10:31 zhenhu Exp $
 /**********************************************************************************
  * Project   : TMVA - a ROOT-integrated toolkit for multivariate data analysis    *
  * Package   : TMVA                                                               *
@@ -225,33 +225,31 @@ void TMVAClassification( TString eventsToTrain = "0", const TString & region = "
    // note that you may also use variable expressions, such as: "3*var1/var2*abs(var3)"
    // [all types of expressions that can also be parsed by TTree::Draw( "expression" )]
 
-   bool originalVariables = true;
    bool useNewMuonID = false;
 
-   factory->AddVariable( "pt",                               "pt", "GeV/c", 'F' );
-   if( originalVariables ) {
-     factory->AddVariable( "eta",                            "eta", "", 'F' );
-     factory->AddVariable( "fls3d := l3dsig",                "fls3d", "", 'F' );
-     factory->AddVariable( "alpha := acos(cosAlpha3D)",      "alpha", "", 'F' );
+   factory->AddVariable( "fls3d",      "fls3d", "", 'F' );
+   factory->AddVariable( "alpha",      "alpha", "", 'F' );
+   factory->AddVariable( "pvips",      "pvips", "", 'F' );
+   factory->AddVariable( "iso",        "iso", "", 'F' );
+   factory->AddVariable( "m1iso",      "m1iso", "", 'F' );
+   factory->AddVariable( "m2iso",      "m2iso", "", 'F' );
+   if( region == "barrel" ) {
+     factory->AddVariable( "docatrk",    "docatrk", "cm", 'F' );
    }
-   factory->AddVariable( "maxdoca := dca",                   "maxdoca", "cm", 'F' );
-   factory->AddVariable( "pvip := delta3d",                  "pvip", "cm", 'F' );
-   factory->AddVariable( "pvips := delta3d/delta3dErr",      "pvips", "", 'F' );
-   factory->AddVariable( "iso := isolation",                 "iso", "", 'F' );
-   if( originalVariables ) {
-     factory->AddVariable( "docatrk := minDca",              "docatrk", "cm", 'F' );
-     // factory->AddVariable( "closetrk := ntrk",               "closetrk", "", 'I' );
-     factory->AddVariable( "closetrk := ntrk20",               "closetrk", "", 'I' );
+   else {
+     factory->AddVariable( "closetrk",   "closetrk", "", 'I' );
+     factory->AddVariable( "pt",         "pt", "GeV/c", 'F' );
    }
-   factory->AddVariable( "chi2dof := NChi2",                 "chi2/dof", "", 'F' );
-
-   if( !originalVariables) {
-     factory->AddVariable( "y",                              "y", "", 'F' );
-     factory->AddVariable( "l3d",                            "l3d", "cm", 'F' );
-     factory->AddVariable( "cosAlphaXY",                     "cosAlphaXY", "", 'F' );
-     factory->AddVariable( "mu1_dxy",                        "mu1_dxy", "cm", 'F' );
-     factory->AddVariable( "mu2_dxy",                        "mu2_dxy", "cm", 'F' );
-   }
+   factory->AddVariable( "chi2dof",    "chi2/dof", "", 'F' );
+   factory->AddVariable( "eta",        "eta", "", 'F' );
+   // factory->AddVariable( "maxdoca",    "maxdoca", "cm", 'F' );
+   // factory->AddVariable( "pt",         "pt", "GeV/c", 'F' );
+   // factory->AddVariable( "pvip",                  "pvip", "cm", 'F' );
+   // factory->AddVariable( "y",                              "y", "", 'F' );
+   // factory->AddVariable( "l3d",                            "l3d", "cm", 'F' );
+   // factory->AddVariable( "cosAlphaXY",                     "cosAlphaXY", "", 'F' );
+   // factory->AddVariable( "mu1_dxy",                        "mu1_dxy", "cm", 'F' );
+   // factory->AddVariable( "mu2_dxy",                        "mu2_dxy", "cm", 'F' );
 
    if( useNewMuonID ) {
      // New Muon-id
