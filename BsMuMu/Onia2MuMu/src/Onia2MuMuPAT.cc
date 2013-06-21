@@ -139,7 +139,7 @@ Onia2MuMuPAT::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
   KinematicParticleVertexFitter fitter;
 
   // dimuon candidates only from muons
-  for(View<pat::Muon>::const_iterator it = muons->begin(), itend = muons->end(); it != itend; ++it){
+  for(View<pat::Muon>::const_iterator it = muons->begin(), itend = muons->end(); it != itend; ++it) {
     // both must pass low quality
     if(!lowerPuritySelection_(*it)) continue;
     if( !(it->innerTrack()->quality(TrackBase::highPurity)) ) continue;
@@ -507,20 +507,20 @@ Onia2MuMuPAT::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
               if( deltaR(tk->eta ,tk->phi, myCand.eta(), myCand.phi()) > 0.7 ) continue;
               if( tk->vertexId == 1 ) {
                 sumNdofPV += tk->ndof;
-                // std::cout << "track from PV pt = " << tk->pt << std::endl;
+                // std::cout << "track(" << tkCount << ") from PV pt = " << tk->pt << std::endl;
                 sumPTPV += tk->pt;
                 if( tkCount < 20 ) sumPTPV20 += tk->pt;
               }
               // In this case the doca is also required to be less than 500 microns
               else if( tk->vertexId == 0 && tk->doca < 0.05 ) {
                 sumNdofNoVtx += tk->ndof;
-                // std::cout << "track from no PV pt = " << tk->pt << std::endl;
+                // std::cout << "track(" << tkCount << ") from no PV pt = " << tk->pt << std::endl;
                 sumPTNoVtx += tk->pt;
                 if( tkCount < 20 ) sumPTNoVtx20 += tk->pt;
               }
             }
             double Iso = myCand.pt()/(myCand.pt()+sumPTNoVtx+sumPTPV);
-            double Iso20 = myCand.pt()/(myCand.pt()+sumPTNoVtx20+sumPTPV20);
+            double Iso20 = myCand.pt()/(myCand.pt()+sumPTNoVtx20+sumPTPV);
 
             // Muon isolation
             // double isoMu1 = mu1.p()/(mu1.p()+sumPTkMu1);
@@ -607,6 +607,7 @@ Onia2MuMuPAT::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
             myCand.addUserFloat("ppdlErrPV",ctauErrPV);
             myCand.addUserFloat("cosAlphaXY",cosAlphaXY);
             myCand.addUserFloat("cosAlpha3D",cosAlpha3D);
+            myCand.addUserFloat("alpha",acos(cosAlpha3D));
             myCand.addUserFloat("l3d",l3d);
             myCand.addUserFloat("l3dsig",l3dsig);
             myCand.addUserFloat("lxy",lxy);
@@ -624,8 +625,9 @@ Onia2MuMuPAT::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
           myCand.addUserFloat("pvw8Refit", -1.);
           myCand.addUserFloat("ppdlPV",-100);
           myCand.addUserFloat("ppdlErrPV",-100);
-          myCand.addUserFloat("cosAlphaXY",-100);
-          myCand.addUserFloat("cosAlpha3D",-100);
+          myCand.addUserFloat("cosAlphaXY",100);
+          myCand.addUserFloat("cosAlpha3D",100);
+          myCand.addUserFloat("alpha",-100);
           myCand.addUserFloat("pvlip",-9999);
           myCand.addUserFloat("pvlipErr",-9999);
           myCand.addUserFloat("l3d",-100);
@@ -725,6 +727,29 @@ Onia2MuMuPAT::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
         }
       }
 
+//      std::cout << "---------------------------------------" << std::endl;
+//      std::cout << "event = " << iEvent.id().event() << std::endl;
+//      std::cout << "pt = " << myCand.pt() << std::endl;
+//      std::cout << "m = " << myCand.userFloat("kinMass") << std::endl;
+//      try{
+//        std::cout << "mu1_pt = " << myCand.daughter("muon1")->pt() << std::endl;
+//        std::cout << "mu2_pt = " << myCand.daughter("muon2")->pt() << std::endl;
+//      } catch (...) {
+//        std::cout << "daughter not found" << std::endl;
+//      }
+//      std::cout << "l3d = " << myCand.userFloat("l3d") << std::endl;
+//      std::cout << "l3dsig = " << myCand.userFloat("l3dsig") << std::endl;
+//      std::cout << "chi2dof = " << myCand.userFloat("vNChi2") << std::endl;
+//      std::cout << "delta3d = " << myCand.userFloat("delta3d") << std::endl;
+//      std::cout << "delta3dSig = " << myCand.userFloat("delta3d")/myCand.userFloat("delta3dErr") << std::endl;
+//      std::cout << "dca = " << myCand.userFloat("DCA") << std::endl;
+//      std::cout << "alpha = " << acos(myCand.userFloat("cosAlpha3D")) << std::endl;
+//      std::cout << "minDca = " << myCand.userFloat("minDca") << std::endl;
+//      std::cout << "iso = " << myCand.userFloat("Isolation20") << std::endl;
+//      std::cout << "lxysig = " << myCand.userFloat("lxysig") << std::endl;
+//      std::cout << "pvlip = " << abs(myCand.userFloat("pvlip")) << std::endl;
+//      std::cout << "pvlipsig = " << (abs(myCand.userFloat("pvlip"))/abs(myCand.userFloat("pvlipErr"))) << std::endl;
+//      std::cout << "---------------------------------------" << std::endl;
 
       // Save the candidate if it passes preselection cuts
       if( prefilter_(myCand) ) {
