@@ -20,9 +20,9 @@ using namespace TMVA;
 
 void TMVAClassificationApplication_main( const TString & inputFileName = "rootfiles/Barrel_preselection.root", const TString & outputFileName = "test_mvaApp.root", const TString & weightfile = "weights_main/TMVA-0-Events0_BDT.weights.xml", const float & cutValue = 0.1, TString myMethodList = "BDT" ) {   
 
-  bool barrel = False;
-  if(outputFineName.Contains("arrel"))
-    barrel = True;
+  bool barrel = false;
+  if(outputFileName.Contains("arrel"))
+    barrel = true;
 
   //const TString & weightfile = "weights/barrelWeights/TMVAClassification_BDT.weights.xml",
   //weightfile = "weights_main/TMVA-0-Events0_BDT.weights.xml"
@@ -34,11 +34,11 @@ void TMVAClassificationApplication_main( const TString & inputFileName = "rootfi
    gROOT->ProcessLine( ".O0" ); // turn off optimization in CINT
 #endif
 
-   bool useBDT = myMethodList=="BDT"?1:0;
-   bool useMLP = myMethodList=="MLP"?1:0;
-   bool useCutsSA = myMethodList=="CutsSA"?1:0;
+   //bool useBDT = myMethodList=="BDT"?1:0;
+   //bool useMLP = myMethodList=="MLP"?1:0;
+   //bool useCutsSA = myMethodList=="CutsSA"?1:0;
 
-   cout << "running TMVAClassificationApplication for method:" << myMethodList << " BDT:" << useBDT << " MLP:" << useMLP << " Cuts:" << useCutsSA <<endl;
+   //   cout << "running TMVAClassificationApplication for method:" << myMethodList << " BDT:" << useBDT << " MLP:" << useMLP << " Cuts:" << useCutsSA <<endl;
 
    //---------------------------------------------------------------
 
@@ -53,7 +53,7 @@ void TMVAClassificationApplication_main( const TString & inputFileName = "rootfi
    Use["CutsD"]           = 0;
    Use["CutsPCA"]         = 0;
    Use["CutsGA"]          = 0;
-   Use["CutsSA"]          = useCutsSA;
+   Use["CutsSA"]          = 0;//useCutsSA;
    // 
    // --- 1-dimensional likelihood ("naive Bayes estimator")
    Use["Likelihood"]      = 0;
@@ -86,7 +86,7 @@ void TMVAClassificationApplication_main( const TString & inputFileName = "rootfi
    Use["FDA_MCMT"]        = 0;
    //
    // --- Neural Networks (all are feed-forward Multilayer Perceptrons)
-   Use["MLP"]             = useMLP; // Recommended ANN
+   Use["MLP"]             = 0;//useMLP; // Recommended ANN
    Use["MLPBFGS"]         = 0; // Recommended ANN with optional training method
    Use["MLPBNN"]          = 0; // Recommended ANN with BFGS training method and bayesian regulator
    Use["CFMlpANN"]        = 0; // Depreciated ANN from ALEPH
@@ -96,7 +96,7 @@ void TMVAClassificationApplication_main( const TString & inputFileName = "rootfi
    Use["SVM"]             = 0;
    // 
    // --- Boosted Decision Trees
-   Use["BDT"]             = useBDT; // uses Adaptive Boost
+   Use["BDT"]             = 1;//useBDT; // uses Adaptive Boost
    Use["BDTG"]            = 0; // uses Gradient Boost
    Use["BDTB"]            = 0; // uses Bagging
    Use["BDTD"]            = 0; // decorrelation + Adaptive Boost
@@ -175,8 +175,9 @@ void TMVAClassificationApplication_main( const TString & inputFileName = "rootfi
    // Float_t spec1,spec2;
    // reader->AddSpectator( "spec1 := var1*2",   &spec1 );
    // reader->AddSpectator( "spec2 := var1*3",   &spec2 );
-   Float_t mass;
-   reader->AddSpectator( "mass", &mass );
+
+   Float_t m;
+   reader->AddSpectator( "m", &m );
 
    Float_t Category_cat1, Category_cat2, Category_cat3;
    if (Use["Category"]){
@@ -327,13 +328,14 @@ void TMVAClassificationApplication_main( const TString & inputFileName = "rootfi
    // theTree->SetBranchAddress( "var3", &var3 );
    // theTree->SetBranchAddress( "var4", &var4 );
 
+   theTree->SetBranchAddress( "m",                             &m );
   if(barrel) {
      theTree->SetBranchAddress( "fls3d",                           &fls3d );
      theTree->SetBranchAddress( "alpha",                           &alpha );
      theTree->SetBranchAddress( "pvips",                           &pvips );
      theTree->SetBranchAddress( "iso",                             &iso );
-     theTree->SetBranchAddress( "mu1iso",                          &mu1iso );
-     theTree->SetBranchAddress( "mu2iso",                          &mu2iso );
+     theTree->SetBranchAddress( "m1iso",                           &m1iso );
+     theTree->SetBranchAddress( "m2iso",                           &m2iso );
      theTree->SetBranchAddress( "chi2dof",                         &chi2dof );
      theTree->SetBranchAddress( "eta",                             &eta );
      theTree->SetBranchAddress( "maxdoca",                         &maxdoca );
@@ -343,14 +345,15 @@ void TMVAClassificationApplication_main( const TString & inputFileName = "rootfi
      theTree->SetBranchAddress( "alpha",                           &alpha );
      theTree->SetBranchAddress( "pvips",                           &pvips );
      theTree->SetBranchAddress( "iso",                             &iso );
-     theTree->SetBranchAddress( "mu1iso",                          &mu1iso );
-     theTree->SetBranchAddress( "mu2iso",                          &mu2iso );
+     theTree->SetBranchAddress( "m1iso",                           &m1iso );
+     theTree->SetBranchAddress( "m2iso",                          &m2iso );
      theTree->SetBranchAddress( "chi2dof",                         &chi2dof );
      theTree->SetBranchAddress( "pt",                              &pt );
      theTree->SetBranchAddress( "pvip",                            &pvip );
      theTree->SetBranchAddress( "docatrk",                         &docatrk );
    }
   
+  //   theTree->SetBranchAddress( "ntrk",                             &ntrk );
   /* 
    theTree->SetBranchAddress( "fls3d",                           &fls3d );
    theTree->SetBranchAddress( "maxdoca",                              &maxdoca );
@@ -391,22 +394,23 @@ void TMVAClassificationApplication_main( const TString & inputFileName = "rootfi
       // --- Return the MVA outputs and fill into histograms
 
       if (Use["CutsSA"]) {
+	assert(1); //should not pass here
          // Cuts is a special case: give the desired signal efficienciy
          Bool_t passed = reader->EvaluateMVA( "CutsSA method", effS );
          if (passed) { 
-	   nSelCutsSA++;
-	   histMass->Fill(mass);
-	   histPt->Fill(pt);
-	   histEta->Fill(eta);
-	   histFls3d->Fill(fls3d);
-	   histAlpha->Fill(alpha);
-	   histMaxdoca->Fill(maxdoca);
-	   histPvip->Fill(pvip);
-	   histPvips->Fill(pvips);
-	   histIso->Fill(iso);
-	   histDocatrk->Fill(docatrk);
-	   histClosetrk->Fill(ntrk);
-	   histChi2dof->Fill(chi2dof);
+//	   nSelCutsSA++;
+//	   histMass->Fill(m);
+//	   histPt->Fill(pt);
+//	   histEta->Fill(eta);
+//	   histFls3d->Fill(fls3d);
+//	   histAlpha->Fill(alpha);
+//	   histMaxdoca->Fill(maxdoca);
+//	   histPvip->Fill(pvip);
+//	   histPvips->Fill(pvips);
+//	   histIso->Fill(iso);
+//	   histDocatrk->Fill(docatrk);
+//	   //	   histClosetrk->Fill(ntrk);
+//	   histChi2dof->Fill(chi2dof);
 	 }
       }
 
@@ -425,20 +429,21 @@ void TMVAClassificationApplication_main( const TString & inputFileName = "rootfi
       if (Use["BoostedFisher"])   histFiB    ->Fill( reader->EvaluateMVA( "BoostedFisher method" ) );
       if (Use["LD"           ])   histLD     ->Fill( reader->EvaluateMVA( "LD method"            ) );
       if (Use["MLP"          ])   {
+	assert(1); //should not pass here!!
 	histNn     ->Fill( reader->EvaluateMVA( "MLP method"           ) );
 	if (reader->EvaluateMVA( "MLP method"           ) > cutValue) {
-	  histMass->Fill(mass);
-	  histPt->Fill(pt);
-	  histEta->Fill(eta);
-	  histFls3d->Fill(fls3d);
-	  histAlpha->Fill(alpha);
-	  histMaxdoca->Fill(maxdoca);
-	  histPvip->Fill(pvip);
-	  histPvips->Fill(pvips);
-	  histIso->Fill(iso);
-	  histDocatrk->Fill(docatrk);
-	  histClosetrk->Fill(ntrk);
-	  histChi2dof->Fill(chi2dof);
+//	  histMass->Fill(m);
+//	  histPt->Fill(pt);
+//	  histEta->Fill(eta);
+//	  histFls3d->Fill(fls3d);
+//	  histAlpha->Fill(alpha);
+//	  histMaxdoca->Fill(maxdoca);
+//	  histPvip->Fill(pvip);
+//	  histPvips->Fill(pvips);
+//	  histIso->Fill(iso);
+//	  histDocatrk->Fill(docatrk);
+//	  //	  histClosetrk->Fill(ntrk);
+//	  histChi2dof->Fill(chi2dof);
 	}
 
       }
@@ -447,9 +452,11 @@ void TMVAClassificationApplication_main( const TString & inputFileName = "rootfi
       if (Use["CFMlpANN"     ])   histNnC    ->Fill( reader->EvaluateMVA( "CFMlpANN method"      ) );
       if (Use["TMlpANN"      ])   histNnT    ->Fill( reader->EvaluateMVA( "TMlpANN method"       ) );
       if (Use["BDT"          ]) {
+	//should always pass here!
 	histBdt    ->Fill( reader->EvaluateMVA( "BDT method"           ) );
 	if (reader->EvaluateMVA( "BDT method"           ) > cutValue) {
-	  histMass->Fill(mass);
+	  printf("-- %3.2f %3.2f %3.2f %3.2f %3.2f %3.2f %3.2f %3.2f %3.2f %3.2f %3.2f\n",m, pt, eta, fls3d, alpha, maxdoca, pvip, pvips, iso, docatrk, chi2dof);
+	  histMass->Fill(m);
 	  histPt->Fill(pt);
 	  histEta->Fill(eta);
 	  histFls3d->Fill(fls3d);
@@ -459,7 +466,7 @@ void TMVAClassificationApplication_main( const TString & inputFileName = "rootfi
 	  histPvips->Fill(pvips);
 	  histIso->Fill(iso);
 	  histDocatrk->Fill(docatrk);
-	  histClosetrk->Fill(ntrk);
+	  //	  histClosetrk->Fill(ntrk);
 	  histChi2dof->Fill(chi2dof);
 	}
 	// if (reader->EvaluateMVA( "BDT method"           ) > 0.1361) histMass->Fill(mass);

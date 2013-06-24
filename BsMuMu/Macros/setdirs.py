@@ -1,13 +1,8 @@
-from ROOT import TFile
-from ROOT import TH1F
-from ROOT import TH2F
-from ROOT import TCanvas
-from ROOT import TLegend
-from ROOT import THStack
-from ROOT import TROOT
-from ROOT import TLine
-from ROOT import TGraphErrors
+from ROOT import TROOT, TLine, TGraphErrors, TLatex
+from ROOT import TFile, TH1F, TH2F, TCanvas, THStack, TLegend
+from ROOT import gBenchmark, gStyle, gROOT
 from array import array
+
 
 import subprocess
 import sys
@@ -15,21 +10,24 @@ import os
 
 ## select mva methods
 regions = ["barrel", "endcaps"]
-# methods = ["BDT", "MLP", "CutsSA"]
+methods = ["BDT", "MLP", "CutsSA"]
 #regions = ["barrel"]
-methods = ["BDT"]
+#methods = ["BDT"]
 
 
 figuresDir = "BsMuMuLatex/Figures/"
+figuresDira = "BsMuMuLatex/Figures/bdt/"
+figuresDirb = "BsMuMuLatex/Figures/mlp/"
+figuresDirc = "BsMuMuLatex/Figures/cnt/"
+figuresDird = "BsMuMuLatex/Figures/mainAnaSel/"
 tablesDir = "BsMuMuLatex/Tables/"
 plotsDir = "plots/"
 logsDir = "logs/"  # note: this is set in TMVAClassification.C
-countersDir = "/Users/demattia/TMVA-v4.1.2/test/NewAnalysis/Trees/BsMC/"
+countersDir = "Trees/BsMC/"
 weightsDir = "weights/"
 rootDir = "rootfiles/"
-# rootExecutable = "root" #check if this is needed (currently not enforced) for running in specific environments
-rootExecutable = "/Users/demattia/root-v5-34-00-patches/bin/root"
-dirList = ["figuresDir","tablesDir","plotsDir","logsDir","countersDir","weightsDir","rootDir"]
+rootExecutable = "root" #check if this is needed (currently not enforced) for running in specific environments
+dirList = ["figuresDir","tablesDir","plotsDir","logsDir","countersDir","weightsDir","rootDir","figuresDira","figuresDirb","figuresDirc","figuresDird"]
 
 # check otherwise create root directories
 def checkdirs():

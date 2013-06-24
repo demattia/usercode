@@ -15,23 +15,23 @@ def main():
     ##SELECT what is to be done:
 
     print "applying preselection, trigger, muonid..."
-    # doSelection()
+    #doSelection()
 
     print "starting mva classification..."
-    # doMVATraining("3000") # "0" will train all the events 
+    #doMVATraining("0") # "0" will train all the events 
 
     print "doing mva comparisons..."
-    doComparisons()
-    doComparisonsExtra()
+    #doComparisons()
+    #doComparisonsExtra()
 
     print "mva significance optimization..."
-    # doSignificance()
+    #doSignificance()
 
     print "applying mva selection"
-    # doApplication()
+    #doApplication()
 
     print "drawing mva output and mass"
-    # doDrawMVA()
+    #doDrawMVA()
     print "...ending analysis"
 
 def doSelection():
@@ -119,12 +119,12 @@ def doSignificance():
                 # execute the significance macro
                 # main case of interest: merged (bdt,mlp,...), full (not merged, index "") for Cuts
                 # extra cases: subsamples, to compare roc's
-                for ff in sampleIndex:
-                    if "Cuts" in method and ff=="merged": ### for CUTS there is no "merged" file
-                        continue
-                    cmd = rootExecutable+" -l -b -q significance.C+\("+str(expectedYield[region]["signal"])+","+str(expectedYield[region]["background"])+",\\\""+method+"\\\",\\\""+region+"\\\",\\\""+ff+"\\\",1\)"
-                    print cmd
-                    os.system(cmd)
+            for ff in sampleIndex:
+                if "Cuts" in method and ff=="merged": ### for CUTS there is no "merged" file
+                    continue
+                cmd = rootExecutable+" -l -b -q significance.C+\("+str(expectedYield[region]["signal"])+","+str(expectedYield[region]["background"])+",\\\""+method+"\\\",\\\""+region+"\\\",\\\""+ff+"\\\",1\)"
+                print cmd
+                os.system(cmd)
                     
         #extra: run signficance also for the separate subsamples, eg to comapre roc's
        ###     cmd = rootExecutable+" -l -b -q significance.C+\("+str(expectedYield[region]["signal"])+","+str(expectedYield[region]["background"])+",\\\""+method+"\\\",\\\""+region+"\\\",\\\""+str(ii)+"\\\",1\)"
@@ -133,11 +133,11 @@ def doSignificance():
                     
                     # retrieve the optimal cut value which maximizes the significance
                     #   note different figures of merit for estimating the signficance are available 
-                    maxSigFile = open(logsDir+"maxsignificance_"+method+"_"+region+".txt")
-                    signi = maxSigFile.readline()
-        #signi = "a 1 b 2 c 3"
-                    for isig in range(3):
-                        optimalCut[region][method][isig] = signi.split()[2*isig+1]    
+                maxSigFile = open(logsDir+"maxsignificance_"+method+"_"+region+".txt")
+                signi = maxSigFile.readline()
+                #signi = "a 1 b 2 c 3"
+                for isig in range(3):
+                    optimalCut[region][method][isig] = signi.split()[2*isig+1]    
                         
                         
 

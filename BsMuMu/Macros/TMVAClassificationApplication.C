@@ -26,6 +26,11 @@ void TMVAClassificationApplication( const TString & inputFileName, const TString
    gROOT->ProcessLine( ".O0" ); // turn off optimization in CINT
 #endif
 
+   bool barrel = false;
+   if(outputFileName.Contains("arrel"))
+     barrel = true;
+
+
    bool useBDT = myMethodList=="BDT"?1:0;
    bool useMLP = myMethodList=="MLP"?1:0;
    bool useCutsSA = myMethodList=="CutsSA"?1:0;
@@ -135,22 +140,73 @@ void TMVAClassificationApplication( const TString & inputFileName, const TString
 
    // Create a set of variables and declare them to the reader
    // - the variable names MUST corresponds in name and type to those given in the weight file(s) used
-   Float_t dca, pt, l3dsig, chi2dof, delta3d, delta3dSig, alpha, ntrk, ntrk20, minDca, isolation, y, eta, l3d, cosAlphaXY, cosAlpha3D, mu1_dxy, mu2_dxy, mu1_MVAMuonID, mu2_MVAMuonID;
+   //Float_t dca, pt, l3dsig, chi2dof, delta3d, delta3dSig, alpha, ntrk, ntrk20, minDca, isolation, y, eta, l3d, cosAlphaXY, cosAlpha3D, mu1_dxy, mu2_dxy, mu1_MVAMuonID, mu2_MVAMuonID;
    // Float_t mu1_GMPT, mu2_GMPT;
 
+   Float_t fls3d, alpha, pvips, iso, m1iso, m2iso, chi2dof, eta, pt, maxdoca, docatrk, pvip, closetrk;
+   //   bool originalVariables = true;
+   //bool useNewMuonID = false;
 
-   bool originalVariables = true;
-   bool useNewMuonID = false;
+
+   reader->AddVariable( "fls3d",                        &fls3d );
+   reader->AddVariable( "alpha",     			&alpha );
+   reader->AddVariable( "pvips",     			&pvips );
+   reader->AddVariable( "iso",       			&iso );
+   reader->AddVariable( "m1iso",     			&m1iso );
+   reader->AddVariable( "m2iso",     			&m2iso );
+   if(barrel) {
+     reader->AddVariable( "docatrk",   			&docatrk );
+   } else {
+     reader->AddVariable( "closetrk",                   &closetrk);
+     reader->AddVariable( "pt",                         &pt );
+   }
+   reader->AddVariable( "chi2dof",   			&chi2dof );
+   reader->AddVariable( "eta",       			&eta );
+
+   /*
+     reader->AddVariable( "maxdoca",                    &maxdoca );
+
+     reader->AddVariable( "fls3d",                      &fls3d );
+     reader->AddVariable( "alpha",     			&alpha );
+     reader->AddVariable( "pvips",     			&pvips );
+     reader->AddVariable( "iso",       			&iso );
+     reader->AddVariable( "m1iso",     			&m1iso );
+     reader->AddVariable( "m2iso",     			&m2iso );
+     reader->AddVariable( "chi2dof",   			&chi2dof );
+     reader->AddVariable( "pt",                         &pt );
+     reader->AddVariable( "pvip",      			&pvip );
+     reader->AddVariable( "docatrk",   			&docatrk );
+   */
+
+   /*
+   reader->AddVariable( "fls3d", &l3dsig );
+   reader->AddVariable( "alpha", &alpha );
+   reader->AddVariable( "pvips", &delta3dSig );
+   reader->AddVariable( "iso",   &isolation );
+   reader->AddVariable( "iso",   &isolation );
+
+   factory->AddVariable( "m1iso",      "m1iso", "", 'F' );
+   factory->AddVariable( "m2iso",      "m2iso", "", 'F' );
+   if( region == "barrel" ) {
+     factory->AddVariable( "docatrk",    "docatrk", "cm", 'F' );
+   }
+   else {
+     factory->AddVariable( "closetrk",   "closetrk", "", 'I' );
+     factory->AddVariable( "pt",         "pt", "GeV/c", 'F' );
+   }
+   factory->AddVariable( "chi2dof",    "chi2/dof", "", 'F' );
+   factory->AddVariable( "eta",        "eta", "", 'F' );
+
 
    reader->AddVariable( "pt", &pt );
    if( originalVariables ) {
      reader->AddVariable( "eta", &eta );
-     reader->AddVariable( "fls3d", &l3dsig );
-     reader->AddVariable( "alpha",      &alpha );
+
+
    }
    reader->AddVariable( "maxdoca",                   &dca );
    reader->AddVariable( "pvip",                  &delta3d );
-   reader->AddVariable( "pvips",      &delta3dSig );
+
    reader->AddVariable( "iso",                 &isolation );
    if( originalVariables ) {
      reader->AddVariable( "docatrk",              &minDca );
@@ -172,7 +228,7 @@ void TMVAClassificationApplication( const TString & inputFileName, const TString
      reader->AddVariable( "mu1_MVAMuonID",                   &mu1_MVAMuonID );
      reader->AddVariable( "mu2_MVAMuonID",                   &mu2_MVAMuonID );
    }
-
+*/
 
    // reader->AddVariable( "pt",                               &pt );
    // reader->AddVariable( "dca",                              &dca );
@@ -395,27 +451,29 @@ void TMVAClassificationApplication( const TString & inputFileName, const TString
    // theTree->SetBranchAddress( "isolation",                        &userIsolation );
    // theTree->SetBranchAddress( "y",                                &userY );
 
-   Float_t delta3dErr;//, cosAlpha3D;
-   theTree->SetBranchAddress( "maxdoca",                              &dca );
+   // Float_t delta3dErr;//, cosAlpha3D;
+   Float_t fl3d, cosAlphaXY, cosa;
+
+   theTree->SetBranchAddress( "maxdoca",                              &maxdoca );
    theTree->SetBranchAddress( "pt",                               &pt );
-   theTree->SetBranchAddress( "fls3d",                           &l3dsig );
+   theTree->SetBranchAddress( "fls3d",                           &fls3d);
    theTree->SetBranchAddress( "chi2dof",                            &chi2dof );
-   theTree->SetBranchAddress( "pvip",                          &delta3d );
-   theTree->SetBranchAddress( "pvips",                       &delta3dErr );
+   theTree->SetBranchAddress( "pvip",                          &pvip );
+   theTree->SetBranchAddress( "pvips",                       &pvips );
    theTree->SetBranchAddress( "cosa",                       &alpha );
-   theTree->SetBranchAddress( "closetrk",                             &ntrk );
-   theTree->SetBranchAddress( "docatrk",                           &minDca );
-   theTree->SetBranchAddress( "iso",                        &isolation );
+   theTree->SetBranchAddress( "closetrk",                             &closetrk );
+   theTree->SetBranchAddress( "docatrk",                           &docatrk );
+   theTree->SetBranchAddress( "iso",                        &iso );
    theTree->SetBranchAddress( "eta",                              &eta );
-   theTree->SetBranchAddress( "y",                                &y );
-   theTree->SetBranchAddress( "m",                             &mass );
-   theTree->SetBranchAddress( "fl3d",                              &l3d );
+   //theTree->SetBranchAddress( "y",                                &y );
+   theTree->SetBranchAddress( "mass",                             &mass );
+   theTree->SetBranchAddress( "fl3d",                              &fl3d );
    theTree->SetBranchAddress( "cosAlphaXY",                       &cosAlphaXY );
-   theTree->SetBranchAddress( "cosa",                       &cosAlpha3D );
-   theTree->SetBranchAddress( "mu1_dxy",                          &mu1_dxy );
-   theTree->SetBranchAddress( "mu2_dxy",                          &mu2_dxy );
-   theTree->SetBranchAddress( "mu1_MVAMuonID",                    &mu1_MVAMuonID );
-   theTree->SetBranchAddress( "mu2_MVAMuonID",                    &mu2_MVAMuonID );
+   theTree->SetBranchAddress( "cosa",                       &cosa );
+   //   theTree->SetBranchAddress( "mu1_dxy",                          &mu1_dxy );
+   //   theTree->SetBranchAddress( "mu2_dxy",                          &mu2_dxy );
+   //   theTree->SetBranchAddress( "mu1_MVAMuonID",                    &mu1_MVAMuonID );
+   //   theTree->SetBranchAddress( "mu2_MVAMuonID",                    &mu2_MVAMuonID );
    // theTree->SetBranchAddress( "mu1_GMPT",                         &mu1_GMPT );
    // theTree->SetBranchAddress( "mu2_GMPT",                         &mu2_GMPT );
 
@@ -436,8 +494,8 @@ void TMVAClassificationApplication( const TString & inputFileName, const TString
 
       // if( !mu1_GMPT && !mu2_GMPT ) continue;
 
-      delta3dSig = delta3d/delta3dErr;
-      alpha = acos(cosAlpha3D);
+      //delta3dSig = delta3d/delta3dErr;
+      //alpha = acos(cosAlpha3D);
 
       // var1 = userVar1 + userVar2;
       // var2 = userVar1 - userVar2;
@@ -452,14 +510,14 @@ void TMVAClassificationApplication( const TString & inputFileName, const TString
 	   histMass->Fill(mass);
 	   histPt->Fill(pt);
 	   histEta->Fill(eta);
-	   histFls3d->Fill(l3dsig);
+	   histFls3d->Fill(fls3d);
 	   histAlpha->Fill(alpha);
-	   histMaxdoca->Fill(dca);
-	   histPvip->Fill(delta3d);
-	   histPvips->Fill(delta3dSig);
-	   histIso->Fill(isolation);
-	   histDocatrk->Fill(minDca);
-	   histClosetrk->Fill(ntrk);
+	   histMaxdoca->Fill(maxdoca);
+	   histPvip->Fill(pvip);
+	   histPvips->Fill(pvips);
+	   histIso->Fill(iso);
+	   histDocatrk->Fill(docatrk);
+	   histClosetrk->Fill(closetrk);
 	   histChi2dof->Fill(chi2dof);
 	 }
       }
@@ -481,18 +539,18 @@ void TMVAClassificationApplication( const TString & inputFileName, const TString
       if (Use["MLP"          ])   {
 	histNn     ->Fill( reader->EvaluateMVA( "MLP method"           ) );
 	if (reader->EvaluateMVA( "MLP method"           ) > cutValue) {
-	  histMass->Fill(mass);
-	  histPt->Fill(pt);
-	  histEta->Fill(eta);
-	  histFls3d->Fill(l3dsig);
-	  histAlpha->Fill(alpha);
-	  histMaxdoca->Fill(dca);
-	  histPvip->Fill(delta3d);
-	  histPvips->Fill(delta3dSig);
-	  histIso->Fill(isolation);
-	  histDocatrk->Fill(minDca);
-	  histClosetrk->Fill(ntrk);
-	  histChi2dof->Fill(chi2dof);
+	   histMass->Fill(mass);
+	   histPt->Fill(pt);
+	   histEta->Fill(eta);
+	   histFls3d->Fill(fls3d);
+	   histAlpha->Fill(alpha);
+	   histMaxdoca->Fill(maxdoca);
+	   histPvip->Fill(pvip);
+	   histPvips->Fill(pvips);
+	   histIso->Fill(iso);
+	   histDocatrk->Fill(docatrk);
+	   histClosetrk->Fill(closetrk);
+	   histChi2dof->Fill(chi2dof);
 	}
 
       }
@@ -503,18 +561,18 @@ void TMVAClassificationApplication( const TString & inputFileName, const TString
       if (Use["BDT"          ]) {
 	histBdt    ->Fill( reader->EvaluateMVA( "BDT method"           ) );
 	if (reader->EvaluateMVA( "BDT method"           ) > cutValue) {
-	  histMass->Fill(mass);
-	  histPt->Fill(pt);
-	  histEta->Fill(eta);
-	  histFls3d->Fill(l3dsig);
-	  histAlpha->Fill(alpha);
-	  histMaxdoca->Fill(dca);
-	  histPvip->Fill(delta3d);
-	  histPvips->Fill(delta3dSig);
-	  histIso->Fill(isolation);
-	  histDocatrk->Fill(minDca);
-	  histClosetrk->Fill(ntrk);
-	  histChi2dof->Fill(chi2dof);
+	   histMass->Fill(mass);
+	   histPt->Fill(pt);
+	   histEta->Fill(eta);
+	   histFls3d->Fill(fls3d);
+	   histAlpha->Fill(alpha);
+	   histMaxdoca->Fill(maxdoca);
+	   histPvip->Fill(pvip);
+	   histPvips->Fill(pvips);
+	   histIso->Fill(iso);
+	   histDocatrk->Fill(docatrk);
+	   histClosetrk->Fill(closetrk);
+	   histChi2dof->Fill(chi2dof);
 	}
 	// if (reader->EvaluateMVA( "BDT method"           ) > 0.1361) histMass->Fill(mass);
 	// if (reader->EvaluateMVA( "BDT method"           ) > 0.2163) histMass->Fill(mass);

@@ -30,7 +30,7 @@ TString Selection(const bool endcaps, const bool data, const bool cut_based = fa
   // TString preselection("(m > 4.9 && m < 5.9 && me < 0.2 && pt > 5. && pt < 9999. && m1pt > 4. && m1pt < 999. && m2pt > 4. && m2pt < 999. && fl3d < 2. && fls3d > 0. && fls3d < 200. && chi2dof < 10. && pvip < 0.1 && pvips < 5. && maxdoca < 0.1 && acos(cosa) < 0.3 && closetrk < 21 && docatrk < 0.25 && iso > 0. && (mu1_charge*mu2_charge == -1) && (lxysig > 3) && (abs(pvlip) < 1.0) && (abs(pvlip)/abs(pvlipErr) < 5.0))");
   TString preselection("(m > 4.9 && m < 5.9 && me < 0.2 && pt > 5. && pt < 9999. && m1pt > 4. && m1pt < 999. && m2pt > 4. && m2pt < 999. && fl3d < 2. && fls3d > 0. && fls3d < 200. && chi2dof < 20. && pvip < 0.1 && pvips < 5. && maxdoca < 0.1 && acos(cosa) < 1. && closetrk < 21 && docatrk < 2.5 && iso > 0. && (mu1_charge*mu2_charge == -1) && (lxysig > 2) && (abs(pvlip) < 1.0) && (abs(pvlip)/abs(pvlipErr) < 5.0))");
   cuts += " && " + preselection;
-  //for new tree: mass -> kinMass, me<20 ie kinMassError < 20; isolation -> isolation20 ;  
+  // TBD: lxysig>2  ->   >3 (on preapproval)
   //http://cmssw.cvs.cern.ch/cgi-bin/cmssw.cgi/CMSSW/HeavyFlavorAnalysis/Bs2MuMu/macros2/preselection.cc?revision=1.13&view=markup
   //main analysis pre-selection: gmuid && (5.00<pt)&&(pt<9999.00) && (4.00<m1pt)&&(m1pt<999.00) &&(4.00<m2pt)&&(m2pt<999.00) && (flsxy>2.00) && (fl3d<2.00) && (pvip<0.10) && !(TMath::IsNaN(pvips)) && (pvips>0) && (pvips<5.00) && abs(pvlip) < 1.00 && abs(pvlips) < 5.00 &&  (closetrk<21) && (fls3d>0.00) && (fls3d<200.00) && (docatrk<2.50) && (maxdoca<0.10) && (chi2dof<20.00) && (iso>0.00) && (alpha<1.00) && (me<0.20)
 
