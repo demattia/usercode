@@ -35,7 +35,7 @@ void TMVAClassificationApplication( const TString & inputFileName, const TString
    bool useMLP = myMethodList=="MLP"?1:0;
    bool useCutsSA = myMethodList=="CutsSA"?1:0;
 
-   cout << "running TMVAClassificationApplication for method:" << myMethodList << " BDT:" << useBDT << " MLP:" << useMLP << " Cuts:" << useCutsSA <<endl;
+   cout << "running TMVAClassificationApplication for method:" << myMethodList << " BDT:" << useBDT << " MLP:" << useMLP << " Cuts:" << useCutsSA << "with cutValue > " << cutValue  <<endl;
 
    //---------------------------------------------------------------
 
@@ -683,6 +683,13 @@ void TMVAClassificationApplication( const TString & inputFileName, const TString
    histDocatrk->Write();
    histClosetrk->Write();
    histChi2dof->Write();
+
+   TCanvas cvs;
+   histMass->Draw();
+   TString outputFileName_(outputFileName);
+   outputFileName_ = outputFileName_.ReplaceAll(rootDir,"");
+   outputFileName_ = outputFileName_.ReplaceAll(".root","");
+   cvs.SaveAs("plots/mass_"+outputFileName_+".gif");
 
    // Write also error and significance histos
    if (Use["PDEFoam"]) { histPDEFoam->Write(); histPDEFoamErr->Write(); histPDEFoamSig->Write(); }

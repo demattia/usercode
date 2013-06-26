@@ -31,8 +31,9 @@ def main():
     #doApplication()
 
     print "drawing mva output and mass"
-    #doDrawMVA()
+    doDrawMVA()
     print "...ending analysis"
+
 
 def doSelection():
     for isplit in range(-1,3):
@@ -158,10 +159,20 @@ def doApplication():
     for region in regions:            
         Region = region[:1].upper()+region[1:] #capitalize first letter for retrieving file names
         for method in methods:
-            #if method is not "BDT": 
-            #    continue
-            optCut = optimalCut[region][method][0]
+            #if method is not "BDT": continue  #test
+
+            #read in optimal cut
+            maxSigFile = open(logsDir+"maxsignificance_"+method+"_"+region+".txt")
+            signi = maxSigFile.readline()
+            #signi = "a 1 b 2 c 3"
+            optimalCut[region][method][0] = signi.split()[1] # [1] here corresponds to main significance figure of merit (S/sqrt(S+B))    
+            #print "optimalCut for ", method, "in ",region," is:", optimalCut[region][method][0]
+
             for sample in range(3):
+                #if sample>0: continue  # test
+
+                optCut = optimalCut[region][method][0]
+
                 weightDir = region+str(sample)+"Weights/"
                 applyMVA(Region + "_preselection_"+trainedOnIAppliedonJ[sample]+".root", "TMVApp"+Region+method+str(sample)+".root", weightDir, method, optCut)
                 applyMVA("BsMC12_"+region+"_preselection_"+trainedOnIAppliedonJ[sample]+".root", "BsMC12TMVApp"+Region+method+str(sample)+".root", weightDir, method, optCut)

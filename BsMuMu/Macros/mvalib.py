@@ -464,7 +464,7 @@ def applyMVA(inputFileName, outputFileName, weightDir, method, cutValue):
     inputFileName  = rootDir    + inputFileName
     outputFileName = rootDir    + outputFileName
     weightDir      = weightsDir + weightDir
-    print "applying MVA selection ", method, " output:", outputFileName
+    print "applying MVA selection ", method, ">",cutValue," input:", inputFileName, " output:", outputFileName
     os.system(rootExecutable + " -q -l TMVAClassificationApplication.C+\(\\\""+inputFileName+"\\\",\\\""+outputFileName+"\\\",\\\""+weightDir+"\\\","+str(cutValue)+",\\\""+method+"\\\"\)")
     #p = subprocess.Popen([rootExecutable, "-b", "-q", "-l", "TMVAClassificationApplication.C+(\""+inputFileName+"\",\""+outputFileName+"\",\""+weightDir+"\","+str(cutValue)+",\""+method+"\")"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     #out, err = p.communicate()
