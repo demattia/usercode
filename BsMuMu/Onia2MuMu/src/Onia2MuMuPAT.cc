@@ -113,6 +113,8 @@ Onia2MuMuPAT::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
   ESHandle<MagneticField> magneticField;
   iSetup.get<IdealMagneticFieldRecord>().get(magneticField);
 
+  AnalyticalImpactPointExtrapolator extrapolator(&*magneticField);
+
   Handle<BeamSpot> theBeamSpot;
   iEvent.getByLabel(thebeamspot_,theBeamSpot);
   BeamSpot bs = *theBeamSpot;
@@ -120,12 +122,6 @@ Onia2MuMuPAT::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 
   Handle<VertexCollection> priVtxs;
   iEvent.getByLabel(thePVs_, priVtxs);
-//  if ( priVtxs->begin() != priVtxs->end() ) {
-//    thePrimaryV = Vertex(*(priVtxs->begin()));
-//  }
-//  else {
-//    thePrimaryV = Vertex(bs.position(), bs.covariance3D());
-//  }
 
   Handle< View<pat::Muon> > muons;
   iEvent.getByLabel(muons_,muons);
@@ -277,8 +273,6 @@ Onia2MuMuPAT::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
               fillCandMuons(myCand, mu2, mu1);
               fillCandMuons(my3Cand, mu2, mu1);
             }
-//            std::cout << "mu1 pt = " << myCand.daughter("muon1")->pt() << std::endl;
-//            std::cout << "mu2 pt = " << myCand.daughter("muon2")->pt() << std::endl;
 
             myCand.addUserFloat("vNChi2",vChi2/vNDF);
             myCand.addUserFloat("vProb",vProb);
@@ -337,7 +331,9 @@ Onia2MuMuPAT::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
               myCand.addUserFloat("delta3d",dist.second.value());
               myCand.addUserFloat("delta3dErr",dist.second.error());
             }
-            pair<bool,Measurement1D> pvlip = IPTools::signedDecayLength3D(tt,GlobalVector(0,0,1),thePrimaryV.first);
+            TrajectoryStateOnSurface extrapolated(extrapolator.extrapolate(b_s->currentState().freeTrajectoryState(),
+                                                                           RecoVertex::convertPos(thePrimaryV.first.position())));
+            pair<bool,Measurement1D> pvlip = IPTools::signedDecayLength3D(extrapolated,GlobalVector(0,0,1),thePrimaryV.first);
             if( pvlip.first ) {
               myCand.addUserFloat("pvlip",pvlip.second.value());
               myCand.addUserFloat("pvlipErr",pvlip.second.error());
