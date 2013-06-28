@@ -2,7 +2,7 @@
 #include <sstream>
 #include <iostream>
 
-TString Selection(const bool endcaps, const bool data, const bool cut_based = false, const bool blinding = false, const int splitting = 0, const TString & maxRun = "") {
+TString Selection(const bool endcaps, const bool data, const bool mcMatched, const bool cut_based = false, const bool blinding = false, const int splitting = 0, const TString & maxRun = "") {
   TString cuts = "";
 
   // TString trigger("((mu1_HLT_DoubleMu2BarrelBsL3 && mu2_HLT_DoubleMu2BarrelBsL3) || (mu1_HLT_DoubleMu2BsL3 && mu2_HLT_DoubleMu2BsL3) || (mu1_HLT_DoubleMu2Dimuon6BsL3 && mu2_HLT_DoubleMu2Dimuon6BsL3) || (mu1_HLT_DoubleMu3BsL3 && mu2_HLT_DoubleMu3BsL3) || (mu1_HLT_VertexmumuFilterBs345 && mu2_HLT_VertexmumuFilterBs345) || (mu1_HLT_VertexmumuFilterBs3p545 && mu2_HLT_VertexmumuFilterBs3p545) || (mu1_HLT_VertexmumuFilterBs4 && mu2_HLT_VertexmumuFilterBs4) || (mu1_HLT_VertexmumuFilterBs47 && mu2_HLT_VertexmumuFilterBs47) || (mu1_HLT_VertexmumuFilterBs6 && mu2_HLT_VertexmumuFilterBs6))");
@@ -18,6 +18,15 @@ TString Selection(const bool endcaps, const bool data, const bool cut_based = fa
   cuts += split;
   if( maxRun != "" && data ) cuts += " && (run <= "+maxRun+")";
 
+  if( !data && mcMatched ) {
+    // Selecting MC-truth matched to Bs or Bs*
+    // cuts += " && (abs(PDGid) == 531 || abs(PDGid) == 533 || abs(PDGid) == 92 || abs(PDGid) == 91)";
+    // Keep Bs, Bs*, Bc+, Strings. Remove only cases where a (common) mother was not found
+    // cuts += " && (abs(PDGid) != 0)";
+    // cuts += " && (abs(PDGid) == 91 || abs(PDGid) == 92)";
+    cuts += "";
+  }
+
   // Muon-id: GlobalMuon prompt tight
   // TString muId = "(mu1_GMPT && mu2_GMPT)";
   // No MVA muon-id, it will be applied later.
@@ -28,7 +37,7 @@ TString Selection(const bool endcaps, const bool data, const bool cut_based = fa
 
   // Preselection cuts
   // TString preselection("(m > 4.9 && m < 5.9 && me < 0.2 && pt > 5. && pt < 9999. && m1pt > 4. && m1pt < 999. && m2pt > 4. && m2pt < 999. && fl3d < 2. && fls3d > 0. && fls3d < 200. && chi2dof < 10. && pvip < 0.1 && pvips < 5. && maxdoca < 0.1 && acos(cosa) < 0.3 && closetrk < 21 && docatrk < 0.25 && iso > 0. && (mu1_charge*mu2_charge == -1) && (lxysig > 3) && (abs(pvlip) < 1.0) && (abs(pvlip)/abs(pvlipErr) < 5.0))");
-  TString preselection("(m > 4.9 && m < 5.9 && me < 0.2 && pt > 5. && pt < 9999. && m1pt > 4. && m1pt < 999. && m2pt > 4. && m2pt < 999. && fl3d < 2. && fls3d > 0. && fls3d < 200. && chi2dof < 20. && pvip < 0.1 && pvips < 5. && maxdoca < 0.1 && acos(cosa) < 1. && closetrk < 21 && docatrk < 2.5 && iso > 0. && (mu1_charge*mu2_charge == -1) && (lxysig > 2) && (abs(pvlip) < 1.0) && (abs(pvlip)/abs(pvlipErr) < 5.0))");
+  TString preselection("(m > 4.9 && m < 5.9 && me < 0.2 && pt > 5. && pt < 9999. && m1pt > 4. && m1pt < 999. && m2pt > 4. && m2pt < 999. && fl3d < 2. && fls3d > 0. && fls3d < 200. && chi2dof < 20. && pvip < 0.1 && pvips < 5. && maxdoca < 0.1 && alpha < 1. && closetrk < 21 && docatrk < 2.5 && iso > 0. && (mu1_charge*mu2_charge == -1) && (lxysig > 3.) && (abs(pvlip) < 1.0) && (abs(pvlip)/abs(pvlipErr) < 5.0))");
   cuts += " && " + preselection;
   // TBD: lxysig>2  ->   >3 (on preapproval)
   //http://cmssw.cvs.cern.ch/cgi-bin/cmssw.cgi/CMSSW/HeavyFlavorAnalysis/Bs2MuMu/macros2/preselection.cc?revision=1.13&view=markup
@@ -76,7 +85,7 @@ bool mvaMuonIDSelection(const double & mva1, const double & mva2 )
 }
 
 
-// TString Selection2(const bool endcaps, const bool data, const bool cut_based = false, const bool blinding = false)
+// This is used to apply the cuts of the cut-based analysis to the main tree
 TString Selection2(const bool endcaps, const bool cut_based = false)
 {
   TString cuts("");
