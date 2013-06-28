@@ -6,7 +6,7 @@
 
 void cutTree_BsMuMu( TString inFile,
 		     TString outFile,
-		     const bool endcaps, const bool data,
+		     const bool endcaps, const bool data, const bool mcMatched,
 		     const bool cut_based, const bool blinding,
 		     const int splitting, const TString & maxRun ) {
 
@@ -20,7 +20,7 @@ void cutTree_BsMuMu( TString inFile,
 
   TFile outfile(outFile,"recreate");
   
-  TString selection(Selection(endcaps, data, cut_based, blinding, splitting, maxRun));
+  TString selection(Selection(endcaps, data, mcMatched, cut_based, blinding, splitting, maxRun));
   //std::cout << "SELECTION = " << selection << std::endl;
 
   TTree* outTree = (TTree*)inTree->CopyTree(selection);
