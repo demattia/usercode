@@ -39,3 +39,4 @@ TString figuresDira("BsMuMuLatex/Figures/bdt/");
 TString figuresDirb("BsMuMuLatex/Figures/mlp/");
 TString figuresDirc("BsMuMuLatex/Figures/cnt/");
 TString figuresDird("BsMuMuLatex/Figures/mainAnaSel/");
+typedef float mytype;

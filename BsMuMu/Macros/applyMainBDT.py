@@ -12,6 +12,22 @@ method="BDT"
 Region = ""
 cutValue = -999
 
+runOnMainData = False
+
+tree_name = "probe_tree"
+if runOnMainData: tree_name = "events"
+    
+with open("setdirs.h", "a") as myfile:
+    if runOnMainData: 
+        myfile.write("typedef double mytype;")
+    else:
+        myfile.write("typedef float mytype;")
+
+strname_ = ""
+if runOnMainData:
+    strname_ = "_mainBDTonMainData.root"
+else:
+    strname_ = "_mainBDTonXcheckData.root"
 
 def main():
 
@@ -24,30 +40,40 @@ def main():
 
     #main ana BDT application
     for isample in range(3):
-        for ireg in range(2,4):
-            #if isample!=0 or ireg!=2:
-            #    continue
-            if ireg==2:
-                Region="Barrel"
-                cutValue = mainBdtCut["barrel"]
-            elif ireg==3:
-                Region="Endcaps"
-                cutValue = mainBdtCut["endcaps"]
-            mainWeightFile = "weights_main/TMVA-"+str(ireg)+"-Events"+str(isample)+"_BDT.weights.xml"
+        for ireg,region in enumerate(regions):
+            Region = region[:1].upper()+region[1:] #capitalize first letter for retrieving file names
+            cutValue = mainBdtCut[region]
+
+            mainWeightFile = "weights_main/TMVA-"+str(ireg+2)+"-Events"+str(isample)+"_BDT.weights.xml"
+
             inputFile = rootDir + Region + "_preselection_"+str(isample)+".root"
-            outputFile = inputFile.split(".")[0] + "_mainBDTapplied.root"
+            if runOnMainData:
+                inputFile = "trees_main/data_afterCuts_"+str(ireg)+"_"+str(isample)+".root"
+
+            outputFile = inputFile.split(".")[0].split("/")[1]
+            outputFile = rootDir + outputFile + strname_
+
             outputfilelist += " " + outputFile
-            if ireg==2:outputfilelistB += " " + outputFile
-            if ireg==3:outputfilelistE += " " + outputFile
+            if region is "barrel": outputfilelistB += " " + outputFile
+            else:                  outputfilelistE += " " + outputFile
 
             print isample, Region, mainWeightFile, inputFile, outputFile
-            os.system("root -l -b -q TMVAClassificationApplication_main.C+\(\\\""+inputFile+"\\\",\\\""+outputFile+"\\\",\\\""+mainWeightFile+"\\\","+str(cutValue)+",\\\""+method+"\\\"\)")
+            os.system("root -l -b -q TMVAClassificationApplication_main.C+\(\\\""+inputFile+"\\\",\\\""+outputFile+"\\\",\\\""+mainWeightFile+"\\\","+str(cutValue)+",\\\""+method+"\\\",\\\""+region+"\\\",\\\""+tree_name+"\\\"\)")
 
-    #merge files
-    #print "hadd rootfiles/all_mainBDTapplied.root",outputfilelist
-    os.system("hadd -f "+rootDir+"all_mainBDTapplied.root"+outputfilelist)
-    os.system("hadd -f "+rootDir+"barrel_mainBDTapplied.root"+outputfilelistB)
-    os.system("hadd -f "+rootDir+"endcaps_mainBDTapplied.root"+outputfilelistE)
+#    #merge files
+#    #print "hadd rootfiles/all_mainBDTapplied.root",outputfilelist
+#    os.system("hadd -f "+rootDir+"all"+strname_+outputfilelist)
+#    os.system("hadd -f "+rootDir+"barrel"+strname_+outputfilelistB)
+#    os.system("hadd -f "+rootDir+"endcaps"+strname_+outputfilelistE)
+#
+#    arr = ["a","b.root","c.root"]
+#    arra = []
+#    for i,a in enumerate(arr):
+#        b=a
+#        if i: b = a.split(".")[0] + "_tree." + a.split(".")[1]
+#        arra.append(b)
+#        print arra
+
 
 
     # display plots
@@ -142,7 +168,8 @@ def sequential_count(region):
 
 
 def TMVAPlots(region):
-    inputFile = TFile(rootDir+region+"_mainBDTapplied.root")
+    inputFile = TFile(rootDir+region+strname_)
+    strname = strname_.split(".")[0]
     #names = [k.GetName() for k in inputFile.GetListOfKeys()]
     #print names
     histoList = inputFile.GetListOfKeys()
@@ -162,8 +189,8 @@ def TMVAPlots(region):
             #leg = TLegend(0.5536913,0.770979,0.9345638,0.9702797,"","brNDC")
             #leg.AddEntry(histo, hType, "f")
             canvas.Draw()
-            canvas.SaveAs(plotsDir+name+"_"+region+".gif")
-            canvas.SaveAs(figuresDird+name+"_"+region+".pdf")
+            canvas.SaveAs(plotsDir+name+"_"+region+strname+".gif")
+            canvas.SaveAs(figuresDird+name+"_"+region+strname+".pdf")
 
 
 
@@ -172,10 +199,21 @@ if __name__=="__main__":
 
 
 """
-TMVA-2-Events0_BDT.weights.xml is for type-0 events in 2012 barrel
-TMVA-3-Events0_BDT.weights.xml is for type-0 events in 2013 endcap
+MAIN TMVA dictionary:
+  TMVA-2-Events0_BDT.weights.xml is for type-0 events in 2012 barrel
+  TMVA-3-Events0_BDT.weights.xml is for type-0 events in 2013 endcap
+  TMVA-2-Events1_BDT.weights.xml is for type-1 events in 2012 barrel
+  TMVA-3-Events1_BDT.weights.xml is for type-1 events in 2013 endcap
+  in directory linked as: weights_main
+  =>   ireg(=0,1) + 2 -> 2 (barrel), 3 (endcaps) 
 
-TMVA-2-Events1_BDT.weights.xml is for type-1 events in 2012 barrel
-TMVA-3-Events1_BDT.weights.xml is for type-1 events in 2013 endcap
+MAIN input filename dictionary:
+  data_afterCuts_0_0.root is barrel (0) for sample type 0
+  data_afterCuts_1_1.root is endcap (1) for sample type 1
+  in directory linked as: trees_main
+  =>   ireg(=0,1) + 2 -> 2 (barrel), 3 (endcaps)
+  
+XCHECK input filename (no need for dictionary, self explanatory):
+  inputFile = rootDir + Region + \"_preselection_\"+str(isample)+\".root\"
 
 """

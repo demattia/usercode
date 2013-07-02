@@ -16,16 +16,80 @@
 #include "TMVA/MethodCuts.h"
 #endif
 
+//typedef double mytype;
+
 using namespace TMVA;
 
-void TMVAClassificationApplication_main( const TString & inputFileName = "rootfiles/Barrel_preselection.root", const TString & outputFileName = "test_mvaApp.root", const TString & weightfile = "weights_main/TMVA-0-Events0_BDT.weights.xml", const float & cutValue = 0.1, TString myMethodList = "BDT" ) {   
-
+void TMVAClassificationApplication_main( const TString & inputFileName = 
+					 //"trees_main/data_afterCuts_0_0.root", 
+					 "rootfiles/Barrel_preselection.root", 
+					 const TString & outputFileName = "test_mvaApp.root", const TString & weightfile = "weights_main/TMVA-2-Events0_BDT.weights.xml", const float & cutValue=0.35, TString myMethodList = "BDT", TString region = "barrel", TString tree_name = "probe tree" ) {   
+  
   bool barrel = false;
-  if(outputFileName.Contains("arrel"))
+  //  if(outputFileName.Contains("arrel"))
+  if(region=="barrel")
     barrel = true;
+
+  /*
+  bool mainData = false;
+  if(inputFileName.Contains("trees_main"))
+    mainData = true;
+  cout << "mainData:" << mainData << endl;
+  */
 
   //const TString & weightfile = "weights/barrelWeights/TMVAClassification_BDT.weights.xml",
   //weightfile = "weights_main/TMVA-0-Events0_BDT.weights.xml"
+
+  TFile *inputS = TFile::Open( inputFileName );
+  
+  std::cout << "--- TMVAClassificationApplication       : Using input file: " << inputS->GetName() << std::endl;
+  
+//  TTree *theTree;
+//  if(!mainData)
+//    theTree = (TTree*)inputS->Get("probe_tree");
+//  else
+//    theTree = (TTree*)inputS->Get("events");
+
+  TTree *theTree = (TTree*)inputS->Get(tree_name); 
+  //theTree->Show();
+
+  TString treefilename(outputFileName);
+  treefilename.ReplaceAll(".root","_tree.root");
+  cout << treefilename << endl;
+
+  TFile *resTreeFile = new TFile(treefilename,"recreate");
+  TTree *resTree = (TTree*) theTree->Clone();
+  //if (resTree == 0) return 0;
+  resTree->Reset();
+
+  //TCanvas c;
+  //theTree->Draw("m");
+  //c.SaveAs("plots/tmp.gif");
+  
+  // this redefinition is necessary as the different trees are formed with floats or doubles
+  //  reading a float tree with a double variable (or vice-versa) gives garbish!!
+  // the workaround works with interpreter root, but does not compile
+  // ... however there is a limitation of the TMVA::Reader which accpepts only floats, not doubles!!!!
+  /*
+  if(!mainData) {
+    typedef float mytype;
+  } else {
+    typedef double mytype;
+  }
+  */
+
+
+
+  /*
+  /// test of double vs float -- use of typedef
+  mytype m;
+  theTree->SetBranchAddress( "m",                            &m );
+  for (Long64_t ievt=0; ievt<theTree->GetEntries();ievt++) {
+    theTree->GetEntry(ievt);
+    cout << "mass:"  << m << endl;
+  }
+  return;
+  */
 
 
   //  cout << "aaaaaa\n" << endl;
@@ -34,11 +98,12 @@ void TMVAClassificationApplication_main( const TString & inputFileName = "rootfi
    gROOT->ProcessLine( ".O0" ); // turn off optimization in CINT
 #endif
 
-   //bool useBDT = myMethodList=="BDT"?1:0;
-   //bool useMLP = myMethodList=="MLP"?1:0;
-   //bool useCutsSA = myMethodList=="CutsSA"?1:0;
+   bool useBDT = myMethodList=="BDT"?1:0;
+   bool useMLP = myMethodList=="MLP"?1:0;
+   bool useCutsSA = myMethodList=="CutsSA"?1:0;
 
-   //   cout << "running TMVAClassificationApplication for method:" << myMethodList << " BDT:" << useBDT << " MLP:" << useMLP << " Cuts:" << useCutsSA <<endl;
+   cout << "running TMVAClassificationApplication_main for method:" << myMethodList << " BDT:" << useBDT << " MLP:" << useMLP << " Cuts:" << useCutsSA << " withy cut value:" << cutValue << " for " << region << endl;
+
 
    //---------------------------------------------------------------
 
@@ -144,40 +209,71 @@ void TMVAClassificationApplication_main( const TString & inputFileName = "rootfi
    // Create a set of variables and declare them to the reader
    // - the variable names MUST corresponds in name and type to those given in the weight file(s) used
 
-   Float_t fls3d, alpha, pvips, iso, m1iso, m2iso, chi2dof, eta, pt, maxdoca, docatrk, pvip;
-   //maxdoca, pt, fls3d, chi2dof, pvip, pvips, alpha, ntrk, ntrk20, docatrk, iso, y, eta, l3d, cosAlphaXY, cosAlpha3D, mu1_dxy, mu2_dxy, mu1_MVAMuonID, mu2_MVAMuonID, m1iso,m2iso;
+   //mytype
+     //  float 
+     //  double 
+     //m, fls3d, alpha, pvips, iso, m1iso, m2iso, chi2dof, eta, pt, maxdoca, docatrk, pvip;
+   float m_, fls3d_, alpha_, pvips_, iso_, m1iso_, m2iso_, chi2dof_, eta_, pt_, maxdoca_, docatrk_, pvip_; // MVA reader requires float!!
+
+     //float m_(m), fls3d_(fls3d), alpha_(alpha), pvips_(pvips), iso_(iso), m1iso_(m1iso), m2iso_(m2iso), chi2dof_(chi2dof), eta_(eta), pt_(pt), maxdoca_(maxdoca), docatrk_(docatrk), pvip_(pvip);
 
    if(barrel) {
-     reader->AddVariable( "fls3d",                      &fls3d );
-     reader->AddVariable( "alpha",     			&alpha );
-     reader->AddVariable( "pvips",     			&pvips );
-     reader->AddVariable( "iso",       			&iso );
-     reader->AddVariable( "m1iso",     			&m1iso );
-     reader->AddVariable( "m2iso",     			&m2iso );
-     reader->AddVariable( "chi2dof",   			&chi2dof );
-     reader->AddVariable( "eta",       			&eta );
-     reader->AddVariable( "maxdoca",                    &maxdoca );
-     reader->AddVariable( "docatrk",   			&docatrk );
+     reader->AddVariable( "fls3d",                     (&fls3d_) );
+     reader->AddVariable( "alpha",     		       (&alpha_) );
+     reader->AddVariable( "pvips",     		       (&pvips_) );
+     reader->AddVariable( "iso",       		       (&iso_) );
+     reader->AddVariable( "m1iso",     		       (&m1iso_) );
+     reader->AddVariable( "m2iso",     		       (&m2iso_) );
+     reader->AddVariable( "chi2dof",   		       (&chi2dof_) );
+     reader->AddVariable( "eta",       		       (&eta_) );
+     reader->AddVariable( "maxdoca",                   (&maxdoca_) );
+     reader->AddVariable( "docatrk",   		       (&docatrk_) );
    } else {
-     reader->AddVariable( "fls3d",                      &fls3d );
-     reader->AddVariable( "alpha",     			&alpha );
-     reader->AddVariable( "pvips",     			&pvips );
-     reader->AddVariable( "iso",       			&iso );
-     reader->AddVariable( "m1iso",     			&m1iso );
-     reader->AddVariable( "m2iso",     			&m2iso );
-     reader->AddVariable( "chi2dof",   			&chi2dof );
-     reader->AddVariable( "pt",                         &pt );
-     reader->AddVariable( "pvip",      			&pvip );
-     reader->AddVariable( "docatrk",   			&docatrk );
+     reader->AddVariable( "fls3d",                     (&fls3d_) );
+     reader->AddVariable( "alpha",     		       (&alpha_) );
+     reader->AddVariable( "pvips",     		       (&pvips_) );
+     reader->AddVariable( "iso",       		       (&iso_) );
+     reader->AddVariable( "m1iso",     		       (&m1iso_) );
+     reader->AddVariable( "m2iso",     		       (&m2iso_) );
+     reader->AddVariable( "chi2dof",   		       (&chi2dof_) );
+     reader->AddVariable( "pt",                        (&pt_) );
+     reader->AddVariable( "pvip",      		       (&pvip_) );
+     reader->AddVariable( "docatrk",   		       (&docatrk_) );
    }
  
+   /*
+   if(barrel) {
+     reader->AddVariable( "fls3d",                      static_cast<float*> (&fls3d) );
+     reader->AddVariable( "alpha",     			static_cast<float*> (&alpha) );
+     reader->AddVariable( "pvips",     			static_cast<float*> (&pvips) );
+     reader->AddVariable( "iso",       			static_cast<float*> (&iso) );
+     reader->AddVariable( "m1iso",     			static_cast<float*> (&m1iso) );
+     reader->AddVariable( "m2iso",     			static_cast<float*> (&m2iso) );
+     reader->AddVariable( "chi2dof",   			static_cast<float*> (&chi2dof) );
+     reader->AddVariable( "eta",       			static_cast<float*> (&eta) );
+     reader->AddVariable( "maxdoca",                    static_cast<float*> (&maxdoca) );
+     reader->AddVariable( "docatrk",   			static_cast<float*> (&docatrk) );
+   } else {
+     reader->AddVariable( "fls3d",                      static_cast<float*> (&fls3d) );
+     reader->AddVariable( "alpha",     			static_cast<float*> (&alpha) );
+     reader->AddVariable( "pvips",     			static_cast<float*> (&pvips) );
+     reader->AddVariable( "iso",       			static_cast<float*> (&iso) );
+     reader->AddVariable( "m1iso",     			static_cast<float*> (&m1iso) );
+     reader->AddVariable( "m2iso",     			static_cast<float*> (&m2iso) );
+     reader->AddVariable( "chi2dof",   			static_cast<float*> (&chi2dof) );
+     reader->AddVariable( "pt",                         static_cast<float*> (&pt) );
+     reader->AddVariable( "pvip",      			static_cast<float*> (&pvip) );
+     reader->AddVariable( "docatrk",   			static_cast<float*> (&docatrk) );
+   }
+ */
    // Spectator variables declared in the training have to be added to the reader, too
    // Float_t spec1,spec2;
    // reader->AddSpectator( "spec1 := var1*2",   &spec1 );
    // reader->AddSpectator( "spec2 := var1*3",   &spec2 );
 
-   Float_t m;
-   reader->AddSpectator( "m", &m );
+   reader->AddSpectator( "m", (&m_) );
+   //reader->AddSpectator( "m", static_cast<float*> (&m) );
+
 
    Float_t Category_cat1, Category_cat2, Category_cat3;
    if (Use["Category"]){
@@ -299,20 +395,9 @@ void TMVAClassificationApplication_main( const TString & inputFileName = "rootfi
 
    // TFile *inputS = TFile::Open( fnameS );
    // TFile *inputB = TFile::Open( fnameB );
-   TFile *inputS = TFile::Open( inputFileName );
 
-   std::cout << "--- TMVAClassificationApplication       : Using input file: " << inputS->GetName() << std::endl;
-   // std::cout << "--- and file: " << inputB->GetName() << std::endl;
-   
-   // --- Register the training and test trees
 
-   // TTree *signal     = (TTree*)inputS->Get("detailedDimuonTree/probe_tree");
-   // TTree *background = (TTree*)inputB->Get("detailedDimuonTree/probe_tree");
-   TTree *signal     = (TTree*)inputS->Get("probe_tree");
-   // TTree *background = (TTree*)inputB->Get("probe_tree");
-   
-   TTree *theTree = signal;
-
+  
    // --- Event loop
 
    // Prepare the event tree
@@ -328,8 +413,12 @@ void TMVAClassificationApplication_main( const TString & inputFileName = "rootfi
    // theTree->SetBranchAddress( "var3", &var3 );
    // theTree->SetBranchAddress( "var4", &var4 );
 
-   theTree->SetBranchAddress( "m",                             &m );
-  if(barrel) {
+   mytype m, fls3d, alpha, pvips, iso, m1iso, m2iso, chi2dof, eta, pt, maxdoca, docatrk, pvip;
+
+   //theTree->SetBranchAddress( "m",                            static_cast<float*> (&m) );
+   theTree->SetBranchAddress( "m",                            &m );
+
+   if(barrel) {
      theTree->SetBranchAddress( "fls3d",                           &fls3d );
      theTree->SetBranchAddress( "alpha",                           &alpha );
      theTree->SetBranchAddress( "pvips",                           &pvips );
@@ -390,6 +479,21 @@ void TMVAClassificationApplication_main( const TString & inputFileName = "rootfi
       if (ievt%1000 == 0) std::cout << "--- ... Processing event: " << ievt << std::endl;
 
       theTree->GetEntry(ievt);
+
+      m_       =m; 
+      fls3d_   =fls3d 	 ;
+      alpha_   =alpha 	 ;
+      pvips_   =pvips 	 ;
+      iso_     =iso 	 ;
+      m1iso_   =m1iso 	 ;
+      m2iso_   =m2iso 	 ;
+      chi2dof_ =chi2dof ;
+      eta_     =eta 	 ;
+      pt_      =pt 	 ;
+      maxdoca_ =maxdoca ;
+      docatrk_ =docatrk ;
+      pvip_    =pvip    ;
+      
 
       // --- Return the MVA outputs and fill into histograms
 
@@ -455,7 +559,13 @@ void TMVAClassificationApplication_main( const TString & inputFileName = "rootfi
 	//should always pass here!
 	histBdt    ->Fill( reader->EvaluateMVA( "BDT method"           ) );
 	if (reader->EvaluateMVA( "BDT method"           ) > cutValue) {
-	  printf("-- %3.2f %3.2f %3.2f %3.2f %3.2f %3.2f %3.2f %3.2f %3.2f %3.2f %3.2f\n",m, pt, eta, fls3d, alpha, maxdoca, pvip, pvips, iso, docatrk, chi2dof);
+
+	  resTree->Fill();
+
+	  cout << "BDT value:" << reader->EvaluateMVA( "BDT method") << endl;
+
+	  printf("-- m:%3.2f pt:%3.2f eta:%3.2f fls3d:%3.2f alpha:%3.2f maxdoca:%3.2f pvip:%3.2f pvips:%3.2f iso:%3.2f docatrk:%3.2f chi2dof:%3.2f\n",m, pt, eta, fls3d, alpha, maxdoca, pvip, pvips, iso, docatrk, chi2dof);
+
 	  histMass->Fill(m);
 	  histPt->Fill(pt);
 	  histEta->Fill(eta);
@@ -605,6 +715,7 @@ void TMVAClassificationApplication_main( const TString & inputFileName = "rootfi
    // histClosetrk->Draw();
    // histChi2dof->Draw();
 
-    
+   resTreeFile->Write();  
+  
    std::cout << "==> TMVAClassificationApplication is done!" << endl << std::endl;
 } 
