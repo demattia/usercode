@@ -784,9 +784,9 @@ def combineSamples(appendName):
 
 
 
-def applySelectionAndSplit(inputTrees, splitting, maxRun, blindData = True, cut_based=False):
+def applySelectionAndSplit(inputTrees, splitting, maxRun, blindData = True, cut_based=False, mc_matched=False):
 
-    print "applySelectionAndSplit(",inputTrees,",", splitting,",", maxRun,",", blindData,",",cut_based,")"
+    print "applySelectionAndSplit(",inputTrees,",", splitting,",", maxRun,",", blindData,",",cut_based,",",mc_matched,")"
 
     splitString =""
     if splitting != -1:
@@ -820,5 +820,4 @@ def applySelectionAndSplit(inputTrees, splitting, maxRun, blindData = True, cut_
             outputTree = rootDir + outputTree
             # print 'root -l -b -q cutTree_BsMuMu.C\(\\"'+tree+'\\",\\"'+outputTree+'\\",'+str(regionIndex)+','+data+','+cut_based+','+blinding+','+str(splitting)+','+maxRun+'\)'
             # print "applying selection and creating:", outputTree
-            os.system(rootExecutable+' -l -b -q cutTree_BsMuMu.C\(\\"'+tree+'\\",\\"'+outputTree+'\\",'+str(regidx)+','+str(data)+','+str(cut_based)+','+str(blinding)+','+str(splitting)+','+maxRun+'\)')
-
+            os.system(rootExecutable+' -l -b -q cutTree_BsMuMu.C\(\\"'+tree+'\\",\\"'+outputTree+'\\",'+str(regidx)+','+str(data)+','+str(mc_matched)+','+str(cut_based)+','+str(blinding)+','+str(splitting)+','+maxRun+'\)')

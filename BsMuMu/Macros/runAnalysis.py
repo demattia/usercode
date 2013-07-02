@@ -32,22 +32,22 @@ def main():
     #doApplication()
 
     print "drawing mva output and mass"
-    doDrawMVA()
+    #doDrawMVA()
     print "...ending analysis"
 
 def doSelection(mcMatched):
     for isplit in range(-1,3):
         appendName = "_preselection.root"
-        if isplit != -1:            
+        if isplit != -1:            \
             appendName = appendName.split(".")[0] +"_"+str(isplit)+".root"
 
         print "processing blinded sample", isplit 
-        applySelectionAndSplit(inputTrees, isplit, maxRun, True, mcMatched)   
+        applySelectionAndSplit(inputTrees, isplit, maxRun, True, False, mcMatched)   
         combineSamples(appendName)
         addMuonID(appendName)
 
         # print "processing unblinded sample", isplit 
-        applySelectionAndSplit(inputTrees, isplit, maxRun, False, mcMatched)
+        applySelectionAndSplit(inputTrees, isplit, maxRun, False, False, mcMatched)
         appendName = appendName.split(".")[0] +"_unblinded"+".root"
         combineSamples(appendName)
         addMuonID(appendName)
