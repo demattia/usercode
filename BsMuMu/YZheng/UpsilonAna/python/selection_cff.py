@@ -207,9 +207,46 @@ def selection(process, GlobalTag="GR_R_38X_V8::All", MC=False, SelectionTrigger=
         maxd0 = cms.double(2)	
     )
 
+    if MC:
+        process.triggerSelection = cms.EDFilter( "TriggerResultsFilter",
+            triggerConditions = cms.vstring(
+                'HLT_DoubleMu*Dimuon*'
+            ),
+            hltResults = cms.InputTag( "TriggerResults", "", "HLT" ),
+            l1tResults = cms.InputTag( "" ),
+            l1tIgnoreMask = cms.bool( False ),
+            l1techIgnorePrescales = cms.bool( False ),
+            daqPartitions = cms.uint32( 1 ),
+            throw = cms.bool( True )
+        )
+    else:
+        process.triggerSelection = cms.EDFilter( "TriggerResultsFilter",
+            triggerConditions = cms.vstring(
+                'HLT_DoubleMu3_4_Dimuon5_Bs_Central_v2',
+                'HLT_DoubleMu3_4_Dimuon5_Bs_Central_v3',
+                'HLT_DoubleMu3_4_Dimuon5_Bs_Central_v4',
+                'HLT_DoubleMu3_4_Dimuon5_Bs_Central_v5',
+                'HLT_DoubleMu3p5_4_Dimuon5_Bs_Central_v2',
+                'HLT_DoubleMu3p5_4_Dimuon5_Bs_Central_v3',
+                'HLT_DoubleMu3p5_4_Dimuon5_Bs_Central_v4',
+                'HLT_DoubleMu3p5_4_Dimuon5_Bs_Central_v5',
+                'HLT_DoubleMu4_Dimuon7_Bs_Forward_v2',
+                'HLT_DoubleMu4_Dimuon7_Bs_Forward_v3',
+                'HLT_DoubleMu4_Dimuon7_Bs_Forward_v4',
+                'HLT_DoubleMu4_Dimuon7_Bs_Forward_v5'
+            ),
+            hltResults = cms.InputTag( "TriggerResults", "", "HLT" ),
+            l1tResults = cms.InputTag( "" ),
+            l1tIgnoreMask = cms.bool( False ),
+            l1techIgnorePrescales = cms.bool( False ),
+            daqPartitions = cms.uint32( 1 ),
+            throw = cms.bool( True )
+        )
+
     process.detailedDimuonTree = detailedDimuonTree
 
     process.detailedDimuonTreePath = cms.Path(
+        process.triggerSelection *
         process.detailedDimuonTree
     )
 
