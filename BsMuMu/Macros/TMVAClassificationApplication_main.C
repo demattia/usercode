@@ -16,7 +16,7 @@
 #include "TMVA/MethodCuts.h"
 #endif
 
-typedef float mytype;
+//typedef float mytype;
 
 using namespace TMVA;
 
