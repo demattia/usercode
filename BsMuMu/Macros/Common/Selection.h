@@ -55,7 +55,7 @@ TString Selection(const bool endcaps, const bool data, const bool mcMatched, con
   // Cut-based analysis
   if( cut_based ) {
     TString lifetimeCuts("(pvip < 0.008 && pvips < 2.000)");
-    TString trackCuts("(iso > 0.8 && maxdoca > 0.015 && closetrk < 2 && pvw8 > 0.6)"); 
+    TString trackCuts("(iso > 0.8 && docatrk > 0.015 && closetrk < 2 && pvw8 > 0.6)"); 
     cuts += " && " + lifetimeCuts + " && " + trackCuts;
     if( endcaps ) {
       TString endcapsPtCuts("((m1pt > m2pt && m1pt > 4.5 && m2pt > 4.2)||(m1pt < m2pt && m1pt > 4.2 && m2pt > 4.5))");
