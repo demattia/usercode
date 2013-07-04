@@ -16,14 +16,22 @@
 #include "TMVA/MethodCuts.h"
 #endif
 
-//typedef double mytype;
+typedef float mytype;
 
 using namespace TMVA;
 
-void TMVAClassificationApplication_main( const TString & inputFileName = 
-					 //"trees_main/data_afterCuts_0_0.root", 
-					 "rootfiles/Barrel_preselection.root", 
-					 const TString & outputFileName = "test_mvaApp.root", const TString & weightfile = "weights_main/TMVA-2-Events0_BDT.weights.xml", const float & cutValue=0.35, TString myMethodList = "BDT", TString region = "barrel", TString tree_name = "probe tree" ) {   
+Int_t TMVAClassificationApplication_main( const TString inputFileName = 
+					  "test_t3.root",
+					  //"trees_main/data_afterCuts_0_0.root", 
+					  //"/home/data/MainAnalysis/data_afterCuts_0_0.root",
+					 //"rootfiles/Barrel_preselection.root", 
+					  const TString outputFileName = "test_mvaApp.root", 
+					  const TString weightfile = //"weights_main/TMVA-2-Events0_BDT.weights.xml", 
+					  "/home/nuno/TMVA-2-Events0_BDT.weights.xml",
+					  const float cutValue=0.35, TString myMethodList = "BDT", TString region = "barrel", 
+					 //TString tree_name = "probe_tree" 
+					 TString tree_name = "events" 
+					 ) {   
   
   bool barrel = false;
   //  if(outputFileName.Contains("arrel"))
@@ -40,27 +48,15 @@ void TMVAClassificationApplication_main( const TString & inputFileName =
   //const TString & weightfile = "weights/barrelWeights/TMVAClassification_BDT.weights.xml",
   //weightfile = "weights_main/TMVA-0-Events0_BDT.weights.xml"
 
-  TFile *inputS = TFile::Open( inputFileName );
-  
-  std::cout << "--- TMVAClassificationApplication       : Using input file: " << inputS->GetName() << std::endl;
-  
-//  TTree *theTree;
-//  if(!mainData)
-//    theTree = (TTree*)inputS->Get("probe_tree");
-//  else
-//    theTree = (TTree*)inputS->Get("events");
-
-  TTree *theTree = (TTree*)inputS->Get(tree_name); 
   //theTree->Show();
 
-  TString treefilename(outputFileName);
-  treefilename.ReplaceAll(".root","_tree.root");
-  cout << treefilename << endl;
+  //TString treefilename = outputFileName;
+  //treefilename.ReplaceAll(".root","_tree.root");
+  //cout << treefilename << endl;
 
-  TFile *resTreeFile = new TFile(treefilename,"recreate");
-  TTree *resTree = (TTree*) theTree->Clone();
-  //if (resTree == 0) return 0;
-  resTree->Reset();
+
+   //  return 1;
+
 
   //TCanvas c;
   //theTree->Draw("m");
@@ -90,6 +86,9 @@ void TMVAClassificationApplication_main( const TString & inputFileName =
   }
   return;
   */
+
+
+
 
 
   //  cout << "aaaaaa\n" << endl;
@@ -193,7 +192,7 @@ void TMVAClassificationApplication_main( const TString & inputFileName =
                std::cout << it->first << " ";
             }
             std::cout << std::endl;
-            return;
+            return 10;
          }
          Use[regMethod] = 1;
       }
@@ -213,7 +212,7 @@ void TMVAClassificationApplication_main( const TString & inputFileName =
      //  float 
      //  double 
      //m, fls3d, alpha, pvips, iso, m1iso, m2iso, chi2dof, eta, pt, maxdoca, docatrk, pvip;
-   float m_, fls3d_, alpha_, pvips_, iso_, m1iso_, m2iso_, chi2dof_, eta_, pt_, maxdoca_, docatrk_, pvip_; // MVA reader requires float!!
+   Float_t m_, fls3d_, alpha_, pvips_, iso_, m1iso_, m2iso_, chi2dof_, eta_, pt_, maxdoca_, docatrk_, pvip_; // MVA reader requires float!!
 
      //float m_(m), fls3d_(fls3d), alpha_(alpha), pvips_(pvips), iso_(iso), m1iso_(m1iso), m2iso_(m2iso), chi2dof_(chi2dof), eta_(eta), pt_(pt), maxdoca_(maxdoca), docatrk_(docatrk), pvip_(pvip);
 
@@ -240,32 +239,7 @@ void TMVAClassificationApplication_main( const TString & inputFileName =
      reader->AddVariable( "pvip",      		       (&pvip_) );
      reader->AddVariable( "docatrk",   		       (&docatrk_) );
    }
- 
-   /*
-   if(barrel) {
-     reader->AddVariable( "fls3d",                      static_cast<float*> (&fls3d) );
-     reader->AddVariable( "alpha",     			static_cast<float*> (&alpha) );
-     reader->AddVariable( "pvips",     			static_cast<float*> (&pvips) );
-     reader->AddVariable( "iso",       			static_cast<float*> (&iso) );
-     reader->AddVariable( "m1iso",     			static_cast<float*> (&m1iso) );
-     reader->AddVariable( "m2iso",     			static_cast<float*> (&m2iso) );
-     reader->AddVariable( "chi2dof",   			static_cast<float*> (&chi2dof) );
-     reader->AddVariable( "eta",       			static_cast<float*> (&eta) );
-     reader->AddVariable( "maxdoca",                    static_cast<float*> (&maxdoca) );
-     reader->AddVariable( "docatrk",   			static_cast<float*> (&docatrk) );
-   } else {
-     reader->AddVariable( "fls3d",                      static_cast<float*> (&fls3d) );
-     reader->AddVariable( "alpha",     			static_cast<float*> (&alpha) );
-     reader->AddVariable( "pvips",     			static_cast<float*> (&pvips) );
-     reader->AddVariable( "iso",       			static_cast<float*> (&iso) );
-     reader->AddVariable( "m1iso",     			static_cast<float*> (&m1iso) );
-     reader->AddVariable( "m2iso",     			static_cast<float*> (&m2iso) );
-     reader->AddVariable( "chi2dof",   			static_cast<float*> (&chi2dof) );
-     reader->AddVariable( "pt",                         static_cast<float*> (&pt) );
-     reader->AddVariable( "pvip",      			static_cast<float*> (&pvip) );
-     reader->AddVariable( "docatrk",   			static_cast<float*> (&docatrk) );
-   }
- */
+
    // Spectator variables declared in the training have to be added to the reader, too
    // Float_t spec1,spec2;
    // reader->AddSpectator( "spec1 := var1*2",   &spec1 );
@@ -305,6 +279,62 @@ void TMVAClassificationApplication_main( const TString & inputFileName =
       }
    }
    
+   /// END READER
+
+   /// START INPUT TREE
+
+   TFile *inputS = TFile::Open( inputFileName, "READ" );
+   std::cout << "--- TMVAClassificationApplication       : Using input file: " << inputS->GetName() << std::endl;
+   TTree *theTree = (TTree*)inputS->Get(tree_name); 
+
+
+   mytype m, fls3d, alpha, pvips, iso, m1iso, m2iso, chi2dof, eta, pt, maxdoca, docatrk, pvip;
+ 
+   //theTree->SetBranchAddress( "m",                            static_cast<float*> (&m) );
+   theTree->SetBranchAddress( "m",                            &m );
+
+   if(barrel) {
+     theTree->SetBranchAddress( "fls3d",                           &fls3d );
+     theTree->SetBranchAddress( "alpha",                           &alpha );
+     theTree->SetBranchAddress( "pvips",                           &pvips );
+     theTree->SetBranchAddress( "iso",                             &iso );
+     theTree->SetBranchAddress( "m1iso",                           &m1iso );
+     theTree->SetBranchAddress( "m2iso",                           &m2iso );
+     theTree->SetBranchAddress( "chi2dof",                         &chi2dof );
+     theTree->SetBranchAddress( "eta",                             &eta );
+     theTree->SetBranchAddress( "maxdoca",                         &maxdoca );
+     theTree->SetBranchAddress( "docatrk",                         &docatrk );
+   } else {
+     theTree->SetBranchAddress( "fls3d",                           &fls3d );
+     theTree->SetBranchAddress( "alpha",                           &alpha );
+     theTree->SetBranchAddress( "pvips",                           &pvips );
+     theTree->SetBranchAddress( "iso",                             &iso );
+     theTree->SetBranchAddress( "m1iso",                           &m1iso );
+     theTree->SetBranchAddress( "m2iso",                          &m2iso );
+     theTree->SetBranchAddress( "chi2dof",                         &chi2dof );
+     theTree->SetBranchAddress( "pt",                              &pt );
+     theTree->SetBranchAddress( "pvip",                            &pvip );
+     theTree->SetBranchAddress( "docatrk",                         &docatrk );
+   }
+  
+
+   /// END INPUT TREE
+
+   /// START OUTPUT TREE
+
+   TFile *resTreeFile = new TFile( outputFileName,"RECREATE" );
+   TTree *resTree = (TTree*) theTree->CloneTree(0);
+   //TTree* resTree = (TTree*)theTree->CopyTree("");
+   //if (resTree == 0) return 0;
+   //resTree->Reset();
+   
+   Float_t bdt_v;
+   TBranch* bdtOutput = resTree->Branch("bdt_v", &bdt_v, "bdt_v/F");
+
+   Float_t new_m;
+   TBranch *newBranch = resTree->Branch("new_m", &new_m, "new_m/F");
+
+
    // Book output histograms
    UInt_t nbin = 100;
    TH1F   *histLk(0), *histLkD(0), *histLkPCA(0), *histLkKDE(0), *histLkMIX(0), *histPD(0), *histPDD(0);
@@ -344,6 +374,8 @@ void TMVAClassificationApplication_main( const TString & inputFileName =
    if (Use["Category"])      histCat     = new TH1F( "MVA_Category",      "MVA_Category",      nbin, -2., 2. );
    if (Use["Plugin"])        histPBdt    = new TH1F( "MVA_PBDT",          "MVA_BDT",           nbin, -0.8, 0.8 );
 
+
+
    TH1F *histMass = new TH1F("mass", "mass", 40, 4.9, 5.9);
    TH1F *histPt = new TH1F("pt", "pt", 50, 0., 50.);
    TH1F *histEta = new TH1F("eta", "eta", 24, -2.4, 2.4);
@@ -380,7 +412,7 @@ void TMVAClassificationApplication_main( const TString & inputFileName =
 
    // TString fnameS = "BsMC12_barrel_preselection.root";
    // TString fnameS = "Endcaps_preselection_unblinded.root";
-   TString fnameS = "Barrel_preselection_unblinded.root";
+   //TString fnameS = "Barrel_preselection_unblinded.root";
 
    // if (!gSystem->AccessPathName( fname ))
    //    input = TFile::Open( fname ); // check if file in local directory exists
@@ -413,61 +445,13 @@ void TMVAClassificationApplication_main( const TString & inputFileName =
    // theTree->SetBranchAddress( "var3", &var3 );
    // theTree->SetBranchAddress( "var4", &var4 );
 
-   mytype m, fls3d, alpha, pvips, iso, m1iso, m2iso, chi2dof, eta, pt, maxdoca, docatrk, pvip;
-
-   //theTree->SetBranchAddress( "m",                            static_cast<float*> (&m) );
-   theTree->SetBranchAddress( "m",                            &m );
-
-   if(barrel) {
-     theTree->SetBranchAddress( "fls3d",                           &fls3d );
-     theTree->SetBranchAddress( "alpha",                           &alpha );
-     theTree->SetBranchAddress( "pvips",                           &pvips );
-     theTree->SetBranchAddress( "iso",                             &iso );
-     theTree->SetBranchAddress( "m1iso",                           &m1iso );
-     theTree->SetBranchAddress( "m2iso",                           &m2iso );
-     theTree->SetBranchAddress( "chi2dof",                         &chi2dof );
-     theTree->SetBranchAddress( "eta",                             &eta );
-     theTree->SetBranchAddress( "maxdoca",                         &maxdoca );
-     theTree->SetBranchAddress( "docatrk",                         &docatrk );
-   } else {
-     theTree->SetBranchAddress( "fls3d",                           &fls3d );
-     theTree->SetBranchAddress( "alpha",                           &alpha );
-     theTree->SetBranchAddress( "pvips",                           &pvips );
-     theTree->SetBranchAddress( "iso",                             &iso );
-     theTree->SetBranchAddress( "m1iso",                           &m1iso );
-     theTree->SetBranchAddress( "m2iso",                          &m2iso );
-     theTree->SetBranchAddress( "chi2dof",                         &chi2dof );
-     theTree->SetBranchAddress( "pt",                              &pt );
-     theTree->SetBranchAddress( "pvip",                            &pvip );
-     theTree->SetBranchAddress( "docatrk",                         &docatrk );
-   }
-  
-  //   theTree->SetBranchAddress( "ntrk",                             &ntrk );
-  /* 
-   theTree->SetBranchAddress( "fls3d",                           &fls3d );
-   theTree->SetBranchAddress( "maxdoca",                              &maxdoca );
-   theTree->SetBranchAddress( "pt",                               &pt );
-   theTree->SetBranchAddress( "NChi2",                            &chi2dof );
-   theTree->SetBranchAddress( "pvip",                          &pvip );
-   theTree->SetBranchAddress( "cosAlpha3D",                       &alpha );
-   theTree->SetBranchAddress( "ntrk",                             &ntrk );
-   theTree->SetBranchAddress( "docatrk",                           &docatrk );
-   theTree->SetBranchAddress( "iso",                        &iso );
-   theTree->SetBranchAddress( "eta",                              &eta );
-   theTree->SetBranchAddress( "y",                                &y );
-   theTree->SetBranchAddress( "mass",                             &mass );
-   theTree->SetBranchAddress( "l3d",                              &l3d );
-   theTree->SetBranchAddress( "cosAlphaXY",                       &cosAlphaXY );
-   theTree->SetBranchAddress( "cosAlpha3D",                       &cosAlpha3D );
-   theTree->SetBranchAddress( "mu1_dxy",                          &mu1_dxy );
-   theTree->SetBranchAddress( "mu2_dxy",                          &mu2_dxy );
-   theTree->SetBranchAddress( "mu1_MVAMuonID",                    &mu1_MVAMuonID );
-   theTree->SetBranchAddress( "mu2_MVAMuonID",                    &mu2_MVAMuonID );
-  */
-
+ 
    // Efficiency calculator for cut method
    Int_t    nSelCutsSA = 0;
    Double_t effS       = cutValue;
+
+
+
 
    std::vector<Float_t> vecVar(4); // vector for EvaluateMVA tests
 
@@ -478,22 +462,40 @@ void TMVAClassificationApplication_main( const TString & inputFileName =
 
       if (ievt%1000 == 0) std::cout << "--- ... Processing event: " << ievt << std::endl;
 
+      //if(ievt>4000) continue;
+
       theTree->GetEntry(ievt);
 
-      m_       =m; 
-      fls3d_   =fls3d 	 ;
-      alpha_   =alpha 	 ;
-      pvips_   =pvips 	 ;
-      iso_     =iso 	 ;
-      m1iso_   =m1iso 	 ;
-      m2iso_   =m2iso 	 ;
-      chi2dof_ =chi2dof ;
-      eta_     =eta 	 ;
-      pt_      =pt 	 ;
-      maxdoca_ =maxdoca ;
-      docatrk_ =docatrk ;
-      pvip_    =pvip    ;
+      /*
+      new_m = m;  
+      bdt_v = 10.2;
+      printf("==: %f %f\n",m,bdt_v);
+
+      histMass->Fill(m);
+      bdtOutput->Fill(); //this does not work for some reason XXXXX
+      newBranch->Fill();
+      resTree->Fill();
+
+      continue;
+      */
+
+
+      m_       =(Float_t)m       ; 
+      fls3d_   =(Float_t)fls3d 	 ;
+      alpha_   =(Float_t)alpha 	 ;
+      pvips_   =(Float_t)pvips 	 ;
+      iso_     =(Float_t)iso 	 ;
+      m1iso_   =(Float_t)m1iso 	 ;
+      m2iso_   =(Float_t)m2iso 	 ;
+      chi2dof_ =(Float_t)chi2dof ;
+      eta_     =(Float_t)eta 	 ;
+      pt_      =(Float_t)pt 	 ;
+      maxdoca_ =(Float_t)maxdoca ;
+      docatrk_ =(Float_t)docatrk ;
+      pvip_    =(Float_t)pvip    ;
       
+
+      //cout << " xxx m:" << m << " m_:" << m_ << endl;
 
       // --- Return the MVA outputs and fill into histograms
 
@@ -557,14 +559,32 @@ void TMVAClassificationApplication_main( const TString & inputFileName =
       if (Use["TMlpANN"      ])   histNnT    ->Fill( reader->EvaluateMVA( "TMlpANN method"       ) );
       if (Use["BDT"          ]) {
 	//should always pass here!
-	histBdt    ->Fill( reader->EvaluateMVA( "BDT method"           ) );
+	//	histBdt    ->Fill( reader->EvaluateMVA( "BDT method"           ) );
 	if (reader->EvaluateMVA( "BDT method"           ) > cutValue) {
 
+
+	  new_m = m;  
+	  bdt_v = (reader->EvaluateMVA( "BDT method"));
+	  printf("==: %f %f\n",m,bdt_v);
+	  
+	  //	  histMass->Fill(m);
+	  histBdt ->Fill(bdt_v); //this works
+
+	  //bdtOutput->Fill(); //this does not work for some reason XXXXX
+	  //newBranch->Fill();
 	  resTree->Fill();
+	  
+	  //bdt_v = (mytype)(reader->EvaluateMVA( "BDT method"));
+	  //resTree->Fill(); 
+	  //bdtOutput->Fill(); //this does not work for some reason XXXXX
 
 	  cout << "BDT value:" << reader->EvaluateMVA( "BDT method") << endl;
+	  printf("%s %f %f\n",region.Data(),m,bdt_v);
 
 	  printf("-- m:%3.2f pt:%3.2f eta:%3.2f fls3d:%3.2f alpha:%3.2f maxdoca:%3.2f pvip:%3.2f pvips:%3.2f iso:%3.2f docatrk:%3.2f chi2dof:%3.2f\n",m, pt, eta, fls3d, alpha, maxdoca, pvip, pvips, iso, docatrk, chi2dof);
+
+	  //	  continue;
+
 
 	  histMass->Fill(m);
 	  histPt->Fill(pt);
@@ -642,9 +662,15 @@ void TMVAClassificationApplication_main( const TString & inputFileName =
       }
    }
 
+
+   // --- Write filtered tree   
+
+   resTree->Write();  
+   resTree->Write("", TObject::kOverwrite);
+
    // --- Write histograms
 
-   TFile *target  = new TFile( outputFileName,"RECREATE" );
+   //TFile *target  = new TFile( outputFileName,"RECREATE" );
    if (Use["Likelihood"   ])   histLk     ->Write();
    if (Use["LikelihoodD"  ])   histLkD    ->Write();
    if (Use["LikelihoodPCA"])   histLkPCA  ->Write();
@@ -695,8 +721,6 @@ void TMVAClassificationApplication_main( const TString & inputFileName =
    // Write also probability hists
    if (Use["Fisher"]) { if (probHistFi != 0) probHistFi->Write(); if (rarityHistFi != 0) rarityHistFi->Write(); }
 
-   target->Close();
-   inputS->Close();
 
    std::cout << "--- Created root file: \"" << outputFileName << "\" containing the MVA output histograms" << std::endl;
   
@@ -715,7 +739,12 @@ void TMVAClassificationApplication_main( const TString & inputFileName =
    // histClosetrk->Draw();
    // histChi2dof->Draw();
 
-   resTreeFile->Write();  
+
+   resTreeFile->Close();
+   //target->Close();
+   inputS->Close();
+
+
   
    std::cout << "==> TMVAClassificationApplication is done!" << endl << std::endl;
 } 
