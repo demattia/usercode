@@ -37,7 +37,7 @@ TString Selection(const bool endcaps, const bool data, const bool mcMatched, con
 
   // Preselection cuts
   // TString preselection("(m > 4.9 && m < 5.9 && me < 0.2 && pt > 5. && pt < 9999. && m1pt > 4. && m1pt < 999. && m2pt > 4. && m2pt < 999. && fl3d < 2. && fls3d > 0. && fls3d < 200. && chi2dof < 10. && pvip < 0.1 && pvips < 5. && maxdoca < 0.1 && acos(cosa) < 0.3 && closetrk < 21 && docatrk < 0.25 && iso > 0. && (mu1_charge*mu2_charge == -1) && (lxysig > 3) && (abs(pvlip) < 1.0) && (abs(pvlip)/abs(pvlipErr) < 5.0))");
-  TString preselection("(m > 4.9 && m < 5.9 && me < 0.2 && pt > 5. && pt < 9999. && m1pt > 4. && m1pt < 999. && m2pt > 4. && m2pt < 999. && fl3d < 2. && fls3d > 0. && fls3d < 200. && chi2dof < 20. && pvip < 0.1 && pvips < 5. && maxdoca < 0.1 && alpha < 1. && closetrk < 21 && docatrk < 2.5 && iso > 0. && (mu1_charge*mu2_charge == -1) && (lxysig > 3.) && (abs(pvlip) < 1.0) && (abs(pvlip)/abs(pvlipErr) < 5.0))");
+  TString preselection("(m > 4.9 && m < 5.9 && me < 0.2 && pt > 5. && pt < 9999. && m1pt > 4. && m1pt < 999. && m2pt > 4. && m2pt < 999. && fl3d < 2. && fls3d > 0. && fls3d < 200. && chi2dof < 20. && pvip < 0.1 && pvips < 5. && maxdoca < 0.1 && alpha < 1. && closetrk < 21 && docatrk < 2.5 && iso > 0. && (mu1_charge*mu2_charge == -1) && (lxysig > 3.) && (abs(pvlip) < 1.0) && (abs(pvlip)/abs(pvlipErr) < 5.0)) && pvw8>0.7");
   cuts += " && " + preselection;
   // TBD: lxysig>2  ->   >3 (on preapproval)
   //http://cmssw.cvs.cern.ch/cgi-bin/cmssw.cgi/CMSSW/HeavyFlavorAnalysis/Bs2MuMu/macros2/preselection.cc?revision=1.13&view=markup
@@ -45,7 +45,7 @@ TString Selection(const bool endcaps, const bool data, const bool mcMatched, con
 
   TString barrelCuts("(m1eta < 1.4 && m1eta > -1.4 && m2eta < 1.4 && m2eta > -1.4)");
   if( endcaps ) {
-    TString endcapsCuts("!"+barrelCuts+" && m1eta < 2.4 && m2eta < 2.4 && m1eta > -2.4 && m2eta > -2.4");
+    TString endcapsCuts("!"+barrelCuts+" && m1eta < 2.0 && m2eta < 2.0 && m1eta > -2.0 && m2eta > -2.0");
     cuts += " && " + endcapsCuts;
   }
   else {
