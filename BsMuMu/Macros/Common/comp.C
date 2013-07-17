@@ -1,17 +1,17 @@
-#include "TString.h"
-#include "TFile.h"
-#include "TCanvas.h"
-#include "TTree.h"
-#include "TROOT.h"
-#include "THStack.h"
-#include "TLegend.h"
-#include "TGraph.h"
-#include "TText.h"
-#include <iostream>
-#include "setTDRStyle_modified.C"
+#include "setdirs.h"
+//#include "TString.h"
+//#include "TFile.h"
+//#include "TCanvas.h"
+//#include "TTree.h"
+//#include "TROOT.h"
+//#include "THStack.h"
+//#include "TLegend.h"
+//#include "TGraph.h"
+//#include "TText.h"
+//#include <iostream>
+//#include "setTDRStyle_modified.C"
 
-struct Vars
-{
+struct Vars {
   Vars(const TString & inVarA, const TString & inVarB, const Int_t inNbins, const Double_t & inMin, const Double_t & inMax)
     : varA(inVarA), varB(inVarB), nbins(inNbins), min(inMin), max(inMax) {}
   // varA is the name in the parallel analysis tree, while varB in the reference tree from the main analysis
@@ -23,9 +23,43 @@ struct Vars
 };
 
 
-void comp(const TString & parallelAnalysisFile = "Barrel_preselection.root",
-	  const TString & mainAnalysisFile = "data_main_barrel.root")
-{
+void comp(TString parallelAnalysisFile = "rootfiles/barrel_mainBDTonXcheckData.root",
+	  TString mainAnalysisFile =  "rootfiles/barrel_mainBDTonMainData.root",
+	  TString dir = "figu/") {
+
+
+  TString regions[2]={"endcaps","barrel"};
+
+  /*
+  int doBarrel = 1;
+  bool bdtzero = false;
+  bool bdtnone = true;
+  //cd  rootfiles/; ls -1 *mainBDT* | grep -v none | sed s/".root"/""/ | awk '{print "mv",$1".root",$1"-bdtnone.root"}'       
+  parallelAnalysisFile = "rootfiles/"+regions[doBarrel]+"_mainBDTonXcheckData";
+  mainAnalysisFile     = "rootfiles/"+regions[doBarrel]+"_mainBDTonMainData";
+  if(bdtzero) {
+    parallelAnalysisFile += "-bdtzero";
+    mainAnalysisFile     += "-bdtzero";
+  }
+  else if(bdtnone) {
+    parallelAnalysisFile += "-bdtnone";
+    mainAnalysisFile     += "-bdtnone";
+  }
+  parallelAnalysisFile += ".root";
+  mainAnalysisFile     += ".root";
+
+  if(doBarrel) {
+    dir = "figs/barrel";
+  } else {
+    dir = "figs/endcaps";
+  }
+  if(bdtzero)
+    dir += "-bdtzero/";
+  else if(bdtnone)
+    dir += "-bdtnone/";
+  dir += "/";
+*/
+
   TString fnameA(parallelAnalysisFile);
   TFile* inputA = TFile::Open( fnameA );
   
@@ -34,11 +68,12 @@ void comp(const TString & parallelAnalysisFile = "Barrel_preselection.root",
 
   gDirectory->Cd(fnameA+":/");
   TTree* treeA = (TTree*)gROOT->FindObject("probe_tree");
-  //treeB->Show();
+  //treeA->Show();
 
   gDirectory->Cd(fnameB+":/");
   TTree* treeB = (TTree*)gROOT->FindObject("events");
-  //treeA->Show();
+  treeA->Show();
+  //return;
 
   TFile outfile("comp.root","recreate");
   //gDirectory->Cd(*outfile+":/");
@@ -49,8 +84,11 @@ void comp(const TString & parallelAnalysisFile = "Barrel_preselection.root",
 
   std::vector<Vars> vars;
   vars.push_back(Vars("m", "m", 40, 4.9, 5.9));
+
   vars.push_back(Vars("pt", "pt", 40, 0, 50));
   vars.push_back(Vars("eta", "eta", 40, -2.4, 2.4));
+  vars.push_back(Vars("m1eta", "m1eta", 40, -2.4, 2.4));
+  vars.push_back(Vars("m2eta", "m2eta", 40, -2.4, 2.4));
   vars.push_back(Vars("maxdoca", "maxdoca", 40, 0, 0.1));
   vars.push_back(Vars("m1pt", "m1pt", 40, 0, 50));
   vars.push_back(Vars("m2pt", "m2pt", 40, 0, 50));
@@ -71,9 +109,10 @@ void comp(const TString & parallelAnalysisFile = "Barrel_preselection.root",
   vars.push_back(Vars("chi2dof", "chi2dof", 40, 0, 5.));
   vars.push_back(Vars("lxysig", "flsxy", 40, 0, 40.));
   vars.push_back(Vars("alpha", "alpha", 44, 0, 1.1));
+  vars.push_back(Vars("bdt_v", "bdt_v", 40, -1, 1));
   // vars.push_back(Vars("mu1_globalChi2", "mu1_globalChi2",40, 0, 10));
 
-  TString dir = "figs/";
+  //TString dir = "figs/";
   TString ext = ".pdf";
   char tmp[100];
 
@@ -81,7 +120,7 @@ void comp(const TString & parallelAnalysisFile = "Barrel_preselection.root",
   // TCanvas cvs[nvar];
 
   Double_t ks = 0;
-  Int_t i=0;
+  //Int_t i=0;
   TH1F *KTest = new TH1F("KTest","KTest",50,0,1);
 
   // for(int i=0; i<nvar; i++) {
@@ -100,27 +139,44 @@ void comp(const TString & parallelAnalysisFile = "Barrel_preselection.root",
     varA+=lim; 
     varB+=lim;
     std::cout << "plot: " <<varA << " " << varB << std::endl << std::flush;
+    std::cout << "xxxx 1 " << std::endl;
+    TCanvas x;
+    treeB->Draw("m");
+    x.SaveAs("aa.gif");
     treeA->Draw(varA.Data());
     treeB->Draw(varB.Data());
     TH1F *hA = (TH1F*)gDirectory->Get("hA");
     TH1F *hB = (TH1F*)gDirectory->Get("hB");
 
+    std::cout << "xxxx 2 " << std::endl;
+
     hA->Sumw2();
     hB->Sumw2();
+    std::cout << "xxxx 3 " << std::endl;
     if(hA)    
-      //hA->Scale(1.);
-      hA->Scale(1./hA->Integral());
+      hA->Scale(1.);
+    //hA->Scale(1./hA->Integral());
     if(hB)
+      hA->Scale(1.);
       //hB->Scale(1. * hA->Integral()/hB->Integral());
-      hB->Scale(1./hB->Integral());
+      //hB->Scale(1./hB->Integral());
+
+    std::cout << "xxxx 4 " << std::endl;
+
     hA->SetLineColor(kRed);
     hB->SetLineColor(kBlue);
 
     hA->SetLineWidth(2);
     hB->SetLineWidth(2);
-    TLegend leg(0.5,0.7,0.7,0.8);
+    double xx = 0.5;
+    bool blind = true;
+    if(blind)
+      xx = 0.4;
+    TLegend leg(xx,0.7,xx+0.2,0.8);
     leg.AddEntry(hA,"xcheck","pl");
     leg.AddEntry(hB,"main","pl");
+
+    std::cout << "xxxx 5 " << std::endl;
 
     cvs.cd(); 
     THStack hs("hs",hA->GetTitle());
@@ -128,17 +184,25 @@ void comp(const TString & parallelAnalysisFile = "Barrel_preselection.root",
     hs.Add(hB);
     hs.Draw("HISTnostack");
 
-	cout<<hA->GetBinContent(5)<<endl;
-	cout<<hB->GetBinContent(5)<<endl;
+    std::cout << "xxxx 6 " << std::endl;
+
+    cout<<hA->GetBinContent(5)<<endl;
+    cout<<hB->GetBinContent(5)<<endl;
+
     ks=hA->KolmogorovTest(hB,"D");
     cout<<"KS = "<<ks<<endl;
     TString probatext = Form( "P(KS) = %5.3g", ks );
-    TText* tt = new TText( 0.55, 0.65, probatext );
+    TText* tt = new TText( xx, 0.65, probatext );
     tt->SetNDC(); tt->SetTextSize( 0.032 ); tt->AppendPad();
     KTest->Fill(ks);
 
+    std::cout << "xxxx 7 " << std::endl;
+
     leg.Draw("same");
     cvs.SaveAs(cvsn);
+
+    std::cout << "xxxx 8 " << std::endl;
+
   }
 
   TCanvas Kcvs(dir+"KS");

@@ -14,16 +14,17 @@ def main():
     print "select the analysis step to be executed!"
     ##SELECT what is to be done:
 
+
     print "applying preselection, trigger, muonid..."
-    mcMatched = False
-    doSelection(mcMatched)
+    #mcMatched = False
+    #doSelection(mcMatched)
 
     print "starting mva classification..."
-    # doMVATraining("5000") # "0" will train all the events 
+    #doMVATraining("0") # "0" will train all the events 
 
     print "doing mva comparisons..."
-    # doComparisons()
-    # doComparisonsExtra()
+    #doComparisons()
+    doComparisonsExtra()
 
     print "mva significance optimization..."
     #doSignificance()
@@ -34,6 +35,8 @@ def main():
     print "drawing mva output and mass"
     #doDrawMVA()
     print "...ending analysis"
+
+
 
 def doSelection(mcMatched):
     for isplit in range(-1,3):

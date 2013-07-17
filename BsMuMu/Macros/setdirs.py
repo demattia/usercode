@@ -13,19 +13,20 @@ regions = ["barrel", "endcaps"]
 methods = ["BDT", "MLP", "CutsSA"]
 #regions = ["barrel"]
 #methods = ["BDT"]
+unblind = True
 
-
-figuresDir = "BsMuMuLatex/Figures/"
+figuresDir  = "BsMuMuLatex/Figures/"
 figuresDira = "BsMuMuLatex/Figures/bdt/"
 figuresDirb = "BsMuMuLatex/Figures/mlp/"
 figuresDirc = "BsMuMuLatex/Figures/cnt/"
-figuresDird = "BsMuMuLatex/Figures/mainAnaSel/"
+figuresDird = "BsMuMuLatex/Figures/mainSel/"
 tablesDir = "BsMuMuLatex/Tables/"
 plotsDir = "plots/"
 logsDir = "logs/"  # note: this is set in TMVAClassification.C
 countersDir = "Trees/BsMC/"
 weightsDir = "weights/"
 rootDir = "rootfiles/"
+#rootDir = "rootfiles_ams/"
 rootExecutable = "root" #check if this is needed (currently not enforced) for running in specific environments
 dirList = ["figuresDir","tablesDir","plotsDir","logsDir","countersDir","weightsDir","rootDir","figuresDira","figuresDirb","figuresDirc","figuresDird"]
 
@@ -54,21 +55,22 @@ genheader()
 
 # list of input trees
 inputTrees = [
-#    'Trees/Run2012A/selection_test.root',
+    'Trees/Run2012D/selection_test.root',
+    'Trees/Run2012A/selection_test.root',
     'Trees/Run2012ARecover/selection_test.root',
     'Trees/Run2012B/selection_test.root',
-#    'Trees/Run2012C1/selection_test.root',
+    'Trees/Run2012C1/selection_test.root',
     'Trees/Run2012DRereco/selection_test.root',
     'Trees/Run2012C2/selection_test.root',
-    'Trees/Run2012D/selection_test.root',
-    'Trees/BsMC/selection_test.root',
+#    'trees-run2012dcleaned/selection_test.root',
+#    'Trees/BsMC/selection_test.root',
               ]
 #runlistA = ["Run2012A","Run2012ARecover","Run2012B","Run2012C1","Run2012DRereco","Run2012C2","Run2012D"]
 runlist = []
 for idx, tree in enumerate(inputTrees):
     if not "MC" in tree:
         runlist.append(tree.split("/")[-2])
-#print runlist
+#print "runlist:", runlist
 
 # maxRun = "203002"  # this is the maximum run number (included) considered for data
 maxRun = "999999"  # this is the maximum run number (included) considered for data

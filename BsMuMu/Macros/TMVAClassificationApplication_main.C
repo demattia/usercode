@@ -21,9 +21,9 @@
 using namespace TMVA;
 
 Int_t TMVAClassificationApplication_main( const TString inputFileName = 
-					  "test_t3.root",
+					  //"test_t3.root",
 					  //"trees_main/data_afterCuts_0_0.root", 
-					  //"/home/data/MainAnalysis/data_afterCuts_0_0.root",
+					  "/home/data/MainAnalysis/data_afterCuts_0_0.root",
 					 //"rootfiles/Barrel_preselection.root", 
 					  const TString outputFileName = "test_mvaApp.root", 
 					  const TString weightfile = //"weights_main/TMVA-2-Events0_BDT.weights.xml", 
@@ -293,7 +293,7 @@ Int_t TMVAClassificationApplication_main( const TString inputFileName =
    //theTree->SetBranchAddress( "m",                            static_cast<float*> (&m) );
    theTree->SetBranchAddress( "m",                            &m );
 
-   if(barrel) {
+   //   if(barrel) {
      theTree->SetBranchAddress( "fls3d",                           &fls3d );
      theTree->SetBranchAddress( "alpha",                           &alpha );
      theTree->SetBranchAddress( "pvips",                           &pvips );
@@ -304,20 +304,41 @@ Int_t TMVAClassificationApplication_main( const TString inputFileName =
      theTree->SetBranchAddress( "eta",                             &eta );
      theTree->SetBranchAddress( "maxdoca",                         &maxdoca );
      theTree->SetBranchAddress( "docatrk",                         &docatrk );
-   } else {
-     theTree->SetBranchAddress( "fls3d",                           &fls3d );
-     theTree->SetBranchAddress( "alpha",                           &alpha );
-     theTree->SetBranchAddress( "pvips",                           &pvips );
-     theTree->SetBranchAddress( "iso",                             &iso );
-     theTree->SetBranchAddress( "m1iso",                           &m1iso );
-     theTree->SetBranchAddress( "m2iso",                          &m2iso );
-     theTree->SetBranchAddress( "chi2dof",                         &chi2dof );
+//   } else {
+//     theTree->SetBranchAddress( "fls3d",                           &fls3d );
+//     theTree->SetBranchAddress( "alpha",                           &alpha );
+//     theTree->SetBranchAddress( "pvips",                           &pvips );
+//     theTree->SetBranchAddress( "iso",                             &iso );
+//     theTree->SetBranchAddress( "m1iso",                           &m1iso );
+//     theTree->SetBranchAddress( "m2iso",                          &m2iso );
+//     theTree->SetBranchAddress( "chi2dof",                         &chi2dof );
      theTree->SetBranchAddress( "pt",                              &pt );
      theTree->SetBranchAddress( "pvip",                            &pvip );
-     theTree->SetBranchAddress( "docatrk",                         &docatrk );
-   }
+//     theTree->SetBranchAddress( "docatrk",                         &docatrk );
+//   }
   
 
+   /// should try to confirm preselection cuts, to avoid inconsistencies
+
+   // read extra variables
+
+     mytype me, pvw8, closetrk, m1pt, m2pt, m1eta,m2eta, fl3d, pvlip, pvlips;
+     int evtnum;
+     //lxysig, flsxy, .. these names differ for main and xcheck
+
+     //theTree->SetBranchAddress( "evt",                            &evtnum ); //main
+     theTree->SetBranchAddress( "event",                            &evtnum ); //xcheck
+     theTree->SetBranchAddress( "me",                            &me );
+     theTree->SetBranchAddress( "pvw8",                              &pvw8 );
+     theTree->SetBranchAddress( "closetrk",                              &closetrk );
+     theTree->SetBranchAddress( "m1pt",                              &m1pt );
+     theTree->SetBranchAddress( "m2pt",                              &m2pt );
+     theTree->SetBranchAddress( "m1eta",                              &m1eta );
+     theTree->SetBranchAddress( "m2eta",                              &m2eta );
+     theTree->SetBranchAddress( "fl3d",                              &fl3d );
+     theTree->SetBranchAddress( "pvlip",                              &pvlip );
+     theTree->SetBranchAddress( "pvlips",                              &pvlips );
+      
    /// END INPUT TREE
 
    /// START OUTPUT TREE
@@ -376,7 +397,8 @@ Int_t TMVAClassificationApplication_main( const TString inputFileName =
 
 
 
-   TH1F *histMass = new TH1F("mass", "mass", 40, 4.9, 5.9);
+   TH1F *histMass = new TH1F("mass", "mass", 44, 4.85, 5.95);
+   //TH1F *histMass = new TH1F("mass", "mass", 40, 4.9, 5.9);
    TH1F *histPt = new TH1F("pt", "pt", 50, 0., 50.);
    TH1F *histEta = new TH1F("eta", "eta", 24, -2.4, 2.4);
    TH1F *histFls3d = new TH1F("fls3d", "fls3d", 100, 0., 100.);
@@ -451,7 +473,8 @@ Int_t TMVAClassificationApplication_main( const TString inputFileName =
    Double_t effS       = cutValue;
 
 
-
+   bool preSelPass = false;
+   bool maskDuplicateEvents = false;
 
    std::vector<Float_t> vecVar(4); // vector for EvaluateMVA tests
 
@@ -479,6 +502,43 @@ Int_t TMVAClassificationApplication_main( const TString inputFileName =
       continue;
       */
 
+
+      //TString massCut = "m > 4.9 && m < 5.9";
+      //      massCut = massCut + "&& ( m < 5.2 || m > 5.45)";
+      bool massCutPass = m > 4.9 && m < 5.9;
+
+      preSelPass =  me < 0.2 && pt > 5. && pt < 9999. && m1pt > 4. && m2pt > 4. && m1eta<2.0 && m1eta>-2.0 && m2eta<2.0 && m2eta>-2.0 && fl3d < 2. && fls3d > 0. && fls3d < 200. && chi2dof < 20. && pvip < 0.1 && pvips < 5. && maxdoca < 0.1 && alpha < 1. && closetrk < 21 && docatrk < 2.5 && iso > 0. && pvlip < 1.0 && pvlip>-1.0 && pvlips < 5.0 && pvlips>-5.0 && pvw8>0.7;  // && (lxysig > 3.) 
+
+      //maskDuplicateEvents = evtnum == 659534454 || evtnum == 1127720136 || evtnum == 262785584 || evtnum == 249102695 || (evtnum == 491167455 && 18.5-fls3d<0.1) || (evtnum==997510994 && 52.5-fls3d<0.1);
+
+   preSelPass = preSelPass && !maskDuplicateEvents && massCutPass;
+
+      //preSelPass = false;
+      //preSelPass =  m > 4.9 && m < 5.9 && me < 0.2 && m1eta<2.0 && m1eta>-2.0 && m2eta<2.0 && m2eta>-2.0;// &&  m1pt>4.0 && m2pt>4.0;
+      //cout << "pass:" << preSelPass;
+      //preSelPass = preSelPass && pvw8>0.7;  
+      //cout << " " << preSelPass;
+      //preSelPass = preSelPass && fl3d < 2. && fls3d > 0. && fls3d < 200. && chi2dof < 20. && pvip < 0.1 && pvips < 5. && maxdoca < 0.1 && alpha < 1. && closetrk < 21 && docatrk < 2.5 && iso > 0. && pvlip < 1.0 && pvlip>-1.0 && pvlips < 5.0 && pvlips>-5.0;
+      //cout << " " << preSelPass << endl;
+   // && (lxysig > 3.) 
+   
+      if(!preSelPass) {
+	printf("%f(4.9-5.9) %f(<0.2) %f(<2) %f(<2) %f(>4) %f(>4) %f(>0.7)\t",m,me,m1eta,m2eta,m1pt,m2pt,pvw8);
+	printf("%f(<1) %f(<5) %f(>0) %d(<21) %f(<0.1) %f(<2.5) %f(<1)\n",pvlip,pvlips,iso,closetrk,maxdoca,docatrk,alpha);
+	cout << "failed pre selection!" << endl;
+	continue;
+      }
+   /*
+   TString preselection("(m > 4.9 && m < 5.9 && me < 0.2 && pt > 5. && pt < 9999. && m1pt > 4. && m1pt < 999. && m2pt > 4. && m2pt < 999. && fl3d < 2. && fls3d > 0. && fls3d < 200. && chi2dof < 20. && pvip < 0.1 && pvips < 5. && maxdoca < 0.1 && alpha < 1. && closetrk < 21 && docatrk < 2.5 && iso > 0. && (mu1_charge*mu2_charge == -1) && (lxysig > 3.) && (abs(pvlip) < 1.0) && (abs(pvlips) < 5.0) && pvw8>0.7");
+   TString barrelCuts("(m1eta < 1.4 && m1eta > -1.4 && m2eta < 1.4 && m2eta > -1.4)");
+   if( endcaps ) 
+   TString endcapsCuts("!"+barrelCuts+" && m1eta < 2.0 && m2eta < 2.0 && m1eta > -2.0 && m2eta > -2.0");
+   */
+
+
+
+
+      //assign variables for mva reader (need to eb floats)
 
       m_       =(Float_t)m       ; 
       fls3d_   =(Float_t)fls3d 	 ;
@@ -581,6 +641,7 @@ Int_t TMVAClassificationApplication_main( const TString inputFileName =
 	  cout << "BDT value:" << reader->EvaluateMVA( "BDT method") << endl;
 	  printf("%s %f %f\n",region.Data(),m,bdt_v);
 
+	  //note: when running either barrel or endcap, pt or eta will have no sense as they are only read in turn for one of the two cases
 	  printf("-- m:%3.2f pt:%3.2f eta:%3.2f fls3d:%3.2f alpha:%3.2f maxdoca:%3.2f pvip:%3.2f pvips:%3.2f iso:%3.2f docatrk:%3.2f chi2dof:%3.2f\n",m, pt, eta, fls3d, alpha, maxdoca, pvip, pvips, iso, docatrk, chi2dof);
 
 	  //	  continue;

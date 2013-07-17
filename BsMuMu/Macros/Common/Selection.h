@@ -35,9 +35,12 @@ TString Selection(const bool endcaps, const bool data, const bool mcMatched, con
   TString muId = "mu1_GMPT && (mu1_globalChi2 < 10.) && (mu1_numMatchedStations > 1.) && (mu1_numberOfValidPixelHits > 0.) && (mu1_trackerLayersWithMeasurement > 5.) && mu2_GMPT && (mu2_globalChi2 < 10.) && (mu2_numMatchedStations > 1.) && (mu2_numberOfValidPixelHits > 0.) && (mu2_trackerLayersWithMeasurement > 5.)";
   if( muId != "" ) cuts += " && " + muId;
 
+
   // Preselection cuts
-  // TString preselection("(m > 4.9 && m < 5.9 && me < 0.2 && pt > 5. && pt < 9999. && m1pt > 4. && m1pt < 999. && m2pt > 4. && m2pt < 999. && fl3d < 2. && fls3d > 0. && fls3d < 200. && chi2dof < 10. && pvip < 0.1 && pvips < 5. && maxdoca < 0.1 && acos(cosa) < 0.3 && closetrk < 21 && docatrk < 0.25 && iso > 0. && (mu1_charge*mu2_charge == -1) && (lxysig > 3) && (abs(pvlip) < 1.0) && (abs(pvlip)/abs(pvlipErr) < 5.0))");
-  TString preselection("(m > 4.9 && m < 5.9 && me < 0.2 && pt > 5. && pt < 9999. && m1pt > 4. && m1pt < 999. && m2pt > 4. && m2pt < 999. && fl3d < 2. && fls3d > 0. && fls3d < 200. && chi2dof < 20. && pvip < 0.1 && pvips < 5. && maxdoca < 0.1 && alpha < 1. && closetrk < 21 && docatrk < 2.5 && iso > 0. && (mu1_charge*mu2_charge == -1) && (lxysig > 3.) && (abs(pvlip) < 1.0) && (abs(pvlip)/abs(pvlipErr) < 5.0)) && pvw8>0.7");
+  // TString preselection("(me < 0.2 && pt > 5. && pt < 9999. && m1pt > 4. && m1pt < 999. && m2pt > 4. && m2pt < 999. && fl3d < 2. && fls3d > 0. && fls3d < 200. && chi2dof < 10. && pvip < 0.1 && pvips < 5. && maxdoca < 0.1 && acos(cosa) < 0.3 && closetrk < 21 && docatrk < 0.25 && iso > 0. && (mu1_charge*mu2_charge == -1) && (lxysig > 3) && (abs(pvlip) < 1.0) && (abs(pvlip)/abs(pvlipErr) < 5.0))");
+
+
+  TString preselection("(me < 0.2 && pt > 5. && pt < 9999. && m1pt > 4. && m1pt < 999. && m2pt > 4. && m2pt < 999. && fl3d < 2. && fls3d > 0. && fls3d < 200. && chi2dof < 20. && pvip < 0.1 && pvips < 5. && maxdoca < 0.1 && alpha < 1. && closetrk < 21 && docatrk < 2.5 && iso > 0. && (mu1_charge*mu2_charge == -1) && (lxysig > 3.) && (abs(pvlip) < 1.0) && (abs(pvlip)/abs(pvlipErr) < 5.0)) && pvw8>0.7");
   cuts += " && " + preselection;
   // TBD: lxysig>2  ->   >3 (on preapproval)
   //http://cmssw.cvs.cern.ch/cgi-bin/cmssw.cgi/CMSSW/HeavyFlavorAnalysis/Bs2MuMu/macros2/preselection.cc?revision=1.13&view=markup
@@ -68,8 +71,11 @@ TString Selection(const bool endcaps, const bool data, const bool mcMatched, con
     }
   }
 
-  TString blindingCuts("&& ((m > 4.9 && m < 5.2) || (m > 5.45 && m < 5.9))");
-  if( !blinding || !data ) blindingCuts = "";
+  TString massCut("&& m > 4.0 && m < 7.0");
+  cuts+= massCut; 
+
+  TString blindingCuts("&& (m < 5.2 || m > 5.45)");
+  if( !blinding || !data) blindingCuts = "";
   cuts += blindingCuts;
 
   return cuts;
@@ -82,6 +88,7 @@ bool mvaMuonIDSelection(const double & mva1, const double & mva2 )
 {
   // return true;
   return( (mva1 > mvaMuonIDCut) && (mva2 > mvaMuonIDCut) );
+  //return !( (mva1 > mvaMuonIDCut) && (mva2 > mvaMuonIDCut) );
 }
 
 
