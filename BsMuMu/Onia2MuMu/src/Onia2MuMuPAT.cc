@@ -97,7 +97,7 @@ math::XYZTLorentzVector Onia2MuMuPAT::fromPtEtaPhiToPxPyPz( const double & pt, c
 void
 Onia2MuMuPAT::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 {
-  std::cout << iEvent.id() << std::endl;
+  // std::cout << iEvent.id() << std::endl;
 
   using namespace edm;
   using namespace std;
@@ -264,15 +264,6 @@ Onia2MuMuPAT::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
             // Get second muon
             pat::Muon mu2(*it2);
             if( vertexFitTree->movePointerToTheNextChild() ) setP4AndCharge(vertexFitTree, mu2, theTTBuilder);
-            // Make sure mu1 is the highest pt muon
-            if( mu1.pt() > mu2.pt() ) {
-              fillCandMuons(myCand, mu1, mu2);
-              fillCandMuons(my3Cand, mu1, mu2);
-            }
-            else {
-              fillCandMuons(myCand, mu2, mu1);
-              fillCandMuons(my3Cand, mu2, mu1);
-            }
 
             myCand.addUserFloat("vNChi2",vChi2/vNDF);
             myCand.addUserFloat("vProb",vProb);
@@ -435,7 +426,7 @@ Onia2MuMuPAT::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 //                }
 //              }
 
-              // Consistent
+              // Old
               if( tk->vertexId == 1 && tk->p > 0.5 ) {
                 if( (tk->deltaRCand < deltaRMuIsoCut && tk->doca < 0.1 && tkCount < 20) || tk->deltaRMu1 < deltaRMuIsoCut ) sumPTkMu1_20 += tk->p;
                 if( (tk->deltaRCand < deltaRMuIsoCut && tk->doca < 0.1 && tkCount < 20) || tk->deltaRMu2 < deltaRMuIsoCut ) sumPTkMu2_20 += tk->p;
@@ -445,7 +436,7 @@ Onia2MuMuPAT::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
                 if( tk->deltaRCand < deltaRMuIsoCut ) sumPTkMu2_20 += tk->p;
               }
 
-              // Correct
+              // Consistent
               if( tk->vertexId == 1 && tk->p > 0.5 ) {
                 if( tk->deltaRMu1 < deltaRMuIsoCut ) sumPTkMu1 += tk->p;
                 if( tk->deltaRMu2 < deltaRMuIsoCut ) sumPTkMu2 += tk->p;
@@ -532,6 +523,26 @@ Onia2MuMuPAT::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
             // double isoMu1_20 = mu1.p()/(mu1.p()+sumPTkMu1+sumPTkMu1_20);
             // double isoMu2_20 = mu2.p()/(mu2.p()+sumPTkMu2+sumPTkMu2_20);
 
+
+            // Make sure mu1 is the highest pt muon
+            if( mu1.pt() > mu2.pt() ) {
+              fillCandMuons(myCand, mu1, mu2);
+              fillCandMuons(my3Cand, mu1, mu2);
+              myCand.addUserFloat("isoMu1", (float) isoMu1);
+              myCand.addUserFloat("isoMu2", (float) isoMu2);
+              myCand.addUserFloat("isoMu1_20", (float) isoMu1_20);
+              myCand.addUserFloat("isoMu2_20", (float) isoMu2_20);
+            }
+            else {
+              fillCandMuons(myCand, mu2, mu1);
+              fillCandMuons(my3Cand, mu2, mu1);
+              myCand.addUserFloat("isoMu1", (float) isoMu2);
+              myCand.addUserFloat("isoMu2", (float) isoMu1);
+              myCand.addUserFloat("isoMu1_20", (float) isoMu2_20);
+              myCand.addUserFloat("isoMu2_20", (float) isoMu1_20);
+            }
+
+
             myCand.addUserFloat("Isolation", (float) Iso);
             myCand.addUserFloat("Isolation20", (float) Iso20);
             myCand.addUserFloat("minDca", (float) minDca);
@@ -557,10 +568,6 @@ Onia2MuMuPAT::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
             myCand.addUserFloat("sumPTNoVtx", (float) sumPTNoVtx);
             myCand.addUserFloat("sumNdofPV", (float) sumNdofPV);
             myCand.addUserFloat("sumNdofNoVtx", (float) sumNdofNoVtx);
-            myCand.addUserFloat("isoMu1", (float) isoMu1);
-            myCand.addUserFloat("isoMu2", (float) isoMu2);
-            myCand.addUserFloat("isoMu1_20", (float) isoMu1_20);
-            myCand.addUserFloat("isoMu2_20", (float) isoMu2_20);
 
             // DCA
             // Compute both the dca in the transverse plane (dcaxy) and in 3D.
@@ -689,6 +696,7 @@ Onia2MuMuPAT::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
             if (mom1.isNonnull() && (mom1 == mom2)) {
               myCand.setGenParticleRef(mom1); // set
               myCand.embedGenParticle();      // and embed
+              // std::cout << "testing pdg id 1" << std::endl;
               std::pair<int, float> MCinfo = findJpsiMCInfo(mom1);
               myCand.addUserInt("momPDGId",MCinfo.first);
               myCand.addUserFloat("ppdlTrue",MCinfo.second);
@@ -733,6 +741,8 @@ Onia2MuMuPAT::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 //      } catch (...) {
 //        std::cout << "daughter not found" << std::endl;
 //      }
+//      std::cout << "mu1_GM = " << myCand.daughter("muon1")->isGlobalMuon() << std::endl;
+//      std::cout << "mu2_GM = " << myCand.daughter("muon2")->isGlobalMuon() << std::endl;
 //      std::cout << "l3d = " << myCand.userFloat("l3d") << std::endl;
 //      std::cout << "l3dsig = " << myCand.userFloat("l3dsig") << std::endl;
 //      std::cout << "chi2dof = " << myCand.userFloat("vNChi2") << std::endl;
@@ -793,9 +803,11 @@ Onia2MuMuPAT::findJpsiMCInfo(reco::GenParticleRef genJpsi)
     trueP.SetXYZ(genJpsi->momentum().x(),genJpsi->momentum().y(),genJpsi->momentum().z());
 
     bool aBhadron = false;
+    // std::cout << "mother id = " << genJpsi.id() << std::endl;
     reco::GenParticleRef Jpsimom = genJpsi->motherRef();       // find mothers
     if (Jpsimom.isNull()) {
       std::pair<int, float> result = std::make_pair(momJpsiID, trueLife);
+      // std::cout << "null mom" << std::endl;
       return result;
     } else {
       reco::GenParticleRef Jpsigrandmom = Jpsimom->motherRef();
@@ -807,6 +819,7 @@ Onia2MuMuPAT::findJpsiMCInfo(reco::GenParticleRef genJpsi)
           momJpsiID = Jpsimom->pdgId();
           trueVtxMom.SetXYZ(Jpsimom->vertex().x(),Jpsimom->vertex().y(),Jpsimom->vertex().z());
         }
+        // std::cout << "found mom with id = " << momJpsiID << std::endl;
         aBhadron = true;
       } else {
         if (Jpsigrandmom.isNonnull() && isAbHadron(Jpsigrandmom->pdgId())) {
@@ -818,11 +831,13 @@ Onia2MuMuPAT::findJpsiMCInfo(reco::GenParticleRef genJpsi)
             momJpsiID = Jpsigrandmom->pdgId();
             trueVtxMom.SetXYZ(Jpsigrandmom->vertex().x(),Jpsigrandmom->vertex().y(),Jpsigrandmom->vertex().z());
           }
+          // std::cout << "found grandmom with id = " << momJpsiID << std::endl;
           aBhadron = true;
         }
       }
       if (!aBhadron) {
         momJpsiID = Jpsimom->pdgId();
+        // std::cout << "not a b hadron, id = " << momJpsiID << std::endl;
         trueVtxMom.SetXYZ(Jpsimom->vertex().x(),Jpsimom->vertex().y(),Jpsimom->vertex().z());
       }
     }
@@ -1379,6 +1394,7 @@ void
 Onia2MuMuPAT::endJob()
 {
 }
+
 
 //define this as a plug-in
 DEFINE_FWK_MODULE(Onia2MuMuPAT);
