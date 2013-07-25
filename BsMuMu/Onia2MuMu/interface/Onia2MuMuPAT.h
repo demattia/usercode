@@ -138,6 +138,61 @@ class Onia2MuMuPAT : public edm::EDProducer {
     double deltaRMu2;
     double deltaRCand;
   };
+
+//  template <class T>
+//  int numberOfTrackerLayers(const T & pTrack) {
+//    bool pixl[3], tibl[4], tobl[6];
+//    bool pixd[2], tidw[3], tecw[9];
+
+//    for (int i = 0; i < 3; ++i) pixl[i] = false;
+//    for (int i = 0; i < 4; ++i) tibl[i] = false;
+//    for (int i = 0; i < 6; ++i) tobl[i] = false;
+
+//    for (int i = 0; i < 2; ++i) pixd[i] = false;
+//    for (int i = 0; i < 3; ++i) tidw[i] = false;
+//    for (int i = 0; i < 9; ++i) tecw[i] = false;
+
+//    int hits = pTrack->found();
+//    if(hits>20) hits=20; // pattern has only 20 locations
+//    //  cout << "----------------------------------------------------------------------" << endl;
+//    int hit(0), hitmask(3);
+//    int det(0), detpos(7), detmask(0);
+//    int lay(0), layerpos(3), layermask(0);
+//    detmask = 0x7 << detpos;
+//    layermask = 0xf << layerpos;
+//    //  cout << "detmask = " << std::hex << detmask << " laymask = " << layermask << std::dec << endl;
+//    for(int i =0; i<hits; ++i){
+//      unsigned int pat = pTrack->hitPattern();
+
+//      hit = (pat & hitmask);
+//      det = 0;
+//      det = (pat & detmask)>>detpos;
+//      lay = 0;
+//      lay = (pat & layermask)>>layerpos;
+
+//      if ((1 == det) && (0 == hit)) pixl[lay] = true;
+//      if ((2 == det) && (0 == hit)) pixd[lay] = true;
+
+//      if ((3 == det) && (0 == hit)) tibl[lay] = true;
+//      if ((4 == det) && (0 == hit)) tidw[lay] = true;
+
+//      if ((5 == det) && (0 == hit)) tobl[lay] = true;
+//      if ((6 == det) && (0 == hit)) tecw[lay] = true;
+
+//    }
+
+//    int trkHits(0);
+//    for (int i = 0; i < 3; ++i) if (pixl[i]) ++trkHits;
+//    for (int i = 0; i < 4; ++i) if (tibl[i]) ++trkHits;
+//    for (int i = 0; i < 6; ++i) if (tobl[i]) ++trkHits;
+
+//    for (int i = 0; i < 2; ++i) if (pixd[i]) ++trkHits;
+//    for (int i = 0; i < 3; ++i) if (tidw[i]) ++trkHits;
+//    for (int i = 0; i < 9; ++i) if (tecw[i]) ++trkHits;
+
+//    return trkHits;
+//  }
+
 };
 
 //
