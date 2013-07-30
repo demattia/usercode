@@ -50,8 +50,8 @@ Onia2MuMuPAT::Onia2MuMuPAT(const edm::ParameterSet& iConfig)
   produces<pat::CompositeCandidateCollection>("DiMuTk");
   muon_mass = 0.1056583;
   muon_sigma = 0.0000001;
-  muMasses_.push_back( 0.1134289256 );
-  muMasses_.push_back( 0.1134289256 );
+  muMasses_.push_back( 0.1056583 );
+  muMasses_.push_back( 0.1056583 );
 }
 
 
