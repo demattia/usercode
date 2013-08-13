@@ -1,0 +1,15 @@
+fsfu		0.256		0.025
+BuToKpsiK	0.001016	0.000033
+JpsiToMuMu	0.0593		0.0006
+Bs2MuMu_BF	3.57e-9		0.
+Bd2MuMu_BF	1.0e-10		0.
+Acceptance_0	0.035
+Acceptance_1	0.05
+MassScale_0	0.00		
+MassScale_1	0.00
+KaonTrack_0	0.04
+KaonTrack_1	0.04
+Trigger_0	0.03
+Trigger_1	0.03
+MuonID_0	0.045
+MuonID_1	0.045

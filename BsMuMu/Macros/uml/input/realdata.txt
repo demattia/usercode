@@ -1,0 +1,2 @@
+input/2011/small-SgData-unblinded.root
+input/2012/small-SgData-unblinded.root

@@ -1,0 +1,2563 @@
+digraph pdf_ext_simul{
+"pdf_ext_simul" [ color=red, label="RooSimultaneous
+pdf_ext_simul"];
+"allcat" [ color=blue, label="RooCategory
+allcat"];
+"pdf_ext_total_0_0" [ color=red, label="RooProdPdf
+pdf_ext_total_0_0"];
+"pdf_ext_sum_0_0" [ color=red, label="RooAddPdf
+pdf_ext_sum_0_0"];
+"pdf_bs_0_0" [ color=red, label="RooProdPdf
+pdf_bs_0_0"];
+"CB_bs_0_0" [ color=red, label="RooCBShape
+CB_bs_0_0"];
+"Mean_bs_0_0" [ color=blue, label="RooRealVar
+Mean_bs_0_0"];
+"Alpha_bs_0_0" [ color=blue, label="RooRealVar
+Alpha_bs_0_0"];
+"Enne_bs_0_0" [ color=blue, label="RooRealVar
+Enne_bs_0_0"];
+"Mass" [ color=blue, label="RooRealVar
+Mass"];
+"SigmaRes_bs_0_0" [ color=red, label="RooFormulaVar
+SigmaRes_bs_0_0"];
+"PeeK_bs_0_0" [ color=blue, label="RooRealVar
+PeeK_bs_0_0"];
+"ReducedMassRes" [ color=blue, label="RooRealVar
+ReducedMassRes"];
+"ReducedMassRes_pdf_bs_0_0" [ color=red, label="RooKeysPdf
+ReducedMassRes_pdf_bs_0_0"];
+"N_bs_formula_corr_0_0" [ color=red, label="RooFormulaVar
+N_bs_formula_corr_0_0"];
+"BF_bs_SM" [ color=blue, label="RooRealVar
+BF_bs_SM"];
+"R_bs" [ color=blue, label="RooRealVar
+R_bs"];
+"N_bu_0_0" [ color=blue, label="RooRealVar
+N_bu_0_0"];
+"fs_over_fu" [ color=blue, label="RooRealVar
+fs_over_fu"];
+"effratio_bs_0_0" [ color=blue, label="RooRealVar
+effratio_bs_0_0"];
+"one_over_BRBR" [ color=blue, label="RooRealVar
+one_over_BRBR"];
+"pdf_bd_0_0" [ color=red, label="RooProdPdf
+pdf_bd_0_0"];
+"CB_bd_0_0" [ color=red, label="RooCBShape
+CB_bd_0_0"];
+"Mean_bd_0_0" [ color=blue, label="RooRealVar
+Mean_bd_0_0"];
+"Alpha_bd_0_0" [ color=blue, label="RooRealVar
+Alpha_bd_0_0"];
+"Enne_bd_0_0" [ color=blue, label="RooRealVar
+Enne_bd_0_0"];
+"SigmaRes_bd_0_0" [ color=red, label="RooFormulaVar
+SigmaRes_bd_0_0"];
+"PeeK_bd_0_0" [ color=blue, label="RooRealVar
+PeeK_bd_0_0"];
+"ReducedMassRes_pdf_bd_0_0" [ color=red, label="RooKeysPdf
+ReducedMassRes_pdf_bd_0_0"];
+"N_bd_formula_corr_0_0" [ color=red, label="RooFormulaVar
+N_bd_formula_corr_0_0"];
+"BF_bd_SM" [ color=blue, label="RooRealVar
+BF_bd_SM"];
+"effratio_bd_0_0" [ color=blue, label="RooRealVar
+effratio_bd_0_0"];
+"R_bd_over_bs" [ color=blue, label="RooRealVar
+R_bd_over_bs"];
+"pdf_1comb_0_0" [ color=red, label="RooProdPdf
+pdf_1comb_0_0"];
+"mass_1comb_0_0" [ color=red, label="RooBernstein
+mass_1comb_0_0"];
+"B_1comb_0_0" [ color=blue, label="RooRealVar
+B_1comb_0_0"];
+"B_2comb_0_0" [ color=red, label="RooFormulaVar
+B_2comb_0_0"];
+"ReducedMassRes_pdf_comb_0_0" [ color=red, label="RooKeysPdf
+ReducedMassRes_pdf_comb_0_0"];
+"N_comb_0_0" [ color=blue, label="RooRealVar
+N_comb_0_0"];
+"pdf_semi_0_0" [ color=red, label="RooProdPdf
+pdf_semi_0_0"];
+"ReducedMassRes_pdf_semi_0_0" [ color=red, label="RooKeysPdf
+ReducedMassRes_pdf_semi_0_0"];
+"keys_semi_0_0" [ color=red, label="RooKeysPdf
+keys_semi_0_0"];
+"N_semi_0_0" [ color=blue, label="RooRealVar
+N_semi_0_0"];
+"pdf_peak_0_0" [ color=red, label="RooProdPdf
+pdf_peak_0_0"];
+"mass_peak_0_0" [ color=red, label="RooAddPdf
+mass_peak_0_0"];
+"Gau_peak_0_0" [ color=red, label="RooGaussian
+Gau_peak_0_0"];
+"Mean_peak_0_0" [ color=blue, label="RooRealVar
+Mean_peak_0_0"];
+"Sigma_peak_0_0" [ color=blue, label="RooRealVar
+Sigma_peak_0_0"];
+"CoeffGauss_peak_0_0" [ color=blue, label="RooRealVar
+CoeffGauss_peak_0_0"];
+"CB_peak_0_0" [ color=red, label="RooCBShape
+CB_peak_0_0"];
+"Sigma2_peak_0_0" [ color=blue, label="RooRealVar
+Sigma2_peak_0_0"];
+"Alpha_peak_0_0" [ color=blue, label="RooRealVar
+Alpha_peak_0_0"];
+"Enne_peak_0_0" [ color=blue, label="RooRealVar
+Enne_peak_0_0"];
+"ReducedMassRes_pdf_peak_0_0" [ color=red, label="RooKeysPdf
+ReducedMassRes_pdf_peak_0_0"];
+"N_peak_0_0" [ color=blue, label="RooRealVar
+N_peak_0_0"];
+"pdf_constraints_0_0" [ color=red, label="RooProdPdf
+pdf_constraints_0_0"];
+"N_bu_gau_0_0" [ color=red, label="RooGaussian
+N_bu_gau_0_0"];
+"50690" [ color=red, label="RooConstVar
+50690"];
+"2558" [ color=red, label="RooConstVar
+2558"];
+"effratio_gau_bs_0_0" [ color=red, label="RooGaussian
+effratio_gau_bs_0_0"];
+"3.66197" [ color=red, label="RooConstVar
+3.66197"];
+"0.445498" [ color=red, label="RooConstVar
+0.445498"];
+"N_peak_gau_0_0" [ color=red, label="RooLognormal
+N_peak_gau_0_0"];
+"0.572" [ color=red, label="RooConstVar
+0.572"];
+"1.72032" [ color=red, label="RooConstVar
+1.72032"];
+"N_semi_gau_0_0" [ color=red, label="RooGaussian
+N_semi_gau_0_0"];
+"43.12" [ color=red, label="RooConstVar
+43.12"];
+"39.5348" [ color=red, label="RooConstVar
+39.5348"];
+"effratio_gau_bd_0_0" [ color=red, label="RooGaussian
+effratio_gau_bd_0_0"];
+"3.94366" [ color=red, label="RooConstVar
+3.94366"];
+"0.479767" [ color=red, label="RooConstVar
+0.479767"];
+"pdf_ext_total_0_1" [ color=red, label="RooProdPdf
+pdf_ext_total_0_1"];
+"pdf_ext_sum_0_1" [ color=red, label="RooAddPdf
+pdf_ext_sum_0_1"];
+"pdf_bs_0_1" [ color=red, label="RooProdPdf
+pdf_bs_0_1"];
+"CB_bs_0_1" [ color=red, label="RooCBShape
+CB_bs_0_1"];
+"Mean_bs_0_1" [ color=blue, label="RooRealVar
+Mean_bs_0_1"];
+"Alpha_bs_0_1" [ color=blue, label="RooRealVar
+Alpha_bs_0_1"];
+"Enne_bs_0_1" [ color=blue, label="RooRealVar
+Enne_bs_0_1"];
+"SigmaRes_bs_0_1" [ color=red, label="RooFormulaVar
+SigmaRes_bs_0_1"];
+"PeeK_bs_0_1" [ color=blue, label="RooRealVar
+PeeK_bs_0_1"];
+"ReducedMassRes_pdf_bs_0_1" [ color=red, label="RooKeysPdf
+ReducedMassRes_pdf_bs_0_1"];
+"N_bs_formula_corr_0_1" [ color=red, label="RooFormulaVar
+N_bs_formula_corr_0_1"];
+"N_bu_0_1" [ color=blue, label="RooRealVar
+N_bu_0_1"];
+"effratio_bs_0_1" [ color=blue, label="RooRealVar
+effratio_bs_0_1"];
+"pdf_bd_0_1" [ color=red, label="RooProdPdf
+pdf_bd_0_1"];
+"CB_bd_0_1" [ color=red, label="RooCBShape
+CB_bd_0_1"];
+"Mean_bd_0_1" [ color=blue, label="RooRealVar
+Mean_bd_0_1"];
+"Alpha_bd_0_1" [ color=blue, label="RooRealVar
+Alpha_bd_0_1"];
+"Enne_bd_0_1" [ color=blue, label="RooRealVar
+Enne_bd_0_1"];
+"SigmaRes_bd_0_1" [ color=red, label="RooFormulaVar
+SigmaRes_bd_0_1"];
+"PeeK_bd_0_1" [ color=blue, label="RooRealVar
+PeeK_bd_0_1"];
+"ReducedMassRes_pdf_bd_0_1" [ color=red, label="RooKeysPdf
+ReducedMassRes_pdf_bd_0_1"];
+"N_bd_formula_corr_0_1" [ color=red, label="RooFormulaVar
+N_bd_formula_corr_0_1"];
+"effratio_bd_0_1" [ color=blue, label="RooRealVar
+effratio_bd_0_1"];
+"pdf_1comb_0_1" [ color=red, label="RooProdPdf
+pdf_1comb_0_1"];
+"mass_1comb_0_1" [ color=red, label="RooBernstein
+mass_1comb_0_1"];
+"B_1comb_0_1" [ color=blue, label="RooRealVar
+B_1comb_0_1"];
+"B_2comb_0_1" [ color=red, label="RooFormulaVar
+B_2comb_0_1"];
+"ReducedMassRes_pdf_comb_0_1" [ color=red, label="RooKeysPdf
+ReducedMassRes_pdf_comb_0_1"];
+"N_comb_0_1" [ color=blue, label="RooRealVar
+N_comb_0_1"];
+"pdf_semi_0_1" [ color=red, label="RooProdPdf
+pdf_semi_0_1"];
+"ReducedMassRes_pdf_semi_0_1" [ color=red, label="RooKeysPdf
+ReducedMassRes_pdf_semi_0_1"];
+"keys_semi_0_1" [ color=red, label="RooKeysPdf
+keys_semi_0_1"];
+"N_semi_0_1" [ color=blue, label="RooRealVar
+N_semi_0_1"];
+"pdf_peak_0_1" [ color=red, label="RooProdPdf
+pdf_peak_0_1"];
+"mass_peak_0_1" [ color=red, label="RooAddPdf
+mass_peak_0_1"];
+"Gau_peak_0_1" [ color=red, label="RooGaussian
+Gau_peak_0_1"];
+"Mean_peak_0_1" [ color=blue, label="RooRealVar
+Mean_peak_0_1"];
+"Sigma_peak_0_1" [ color=blue, label="RooRealVar
+Sigma_peak_0_1"];
+"CoeffGauss_peak_0_1" [ color=blue, label="RooRealVar
+CoeffGauss_peak_0_1"];
+"CB_peak_0_1" [ color=red, label="RooCBShape
+CB_peak_0_1"];
+"Sigma2_peak_0_1" [ color=blue, label="RooRealVar
+Sigma2_peak_0_1"];
+"Alpha_peak_0_1" [ color=blue, label="RooRealVar
+Alpha_peak_0_1"];
+"Enne_peak_0_1" [ color=blue, label="RooRealVar
+Enne_peak_0_1"];
+"ReducedMassRes_pdf_peak_0_1" [ color=red, label="RooKeysPdf
+ReducedMassRes_pdf_peak_0_1"];
+"N_peak_0_1" [ color=blue, label="RooRealVar
+N_peak_0_1"];
+"pdf_constraints_0_1" [ color=red, label="RooProdPdf
+pdf_constraints_0_1"];
+"N_bu_gau_0_1" [ color=red, label="RooGaussian
+N_bu_gau_0_1"];
+"65819" [ color=red, label="RooConstVar
+65819"];
+"7756" [ color=red, label="RooConstVar
+7756"];
+"effratio_gau_bs_0_1" [ color=red, label="RooGaussian
+effratio_gau_bs_0_1"];
+"3.11111" [ color=red, label="RooConstVar
+3.11111"];
+"0.378483" [ color=red, label="RooConstVar
+0.378483"];
+"N_peak_gau_0_1" [ color=red, label="RooLognormal
+N_peak_gau_0_1"];
+"0.546" [ color=red, label="RooConstVar
+0.546"];
+"1.71978" [ color=red, label="RooConstVar
+1.71978"];
+"N_semi_gau_0_1" [ color=red, label="RooGaussian
+N_semi_gau_0_1"];
+"27.184" [ color=red, label="RooConstVar
+27.184"];
+"23.0042" [ color=red, label="RooConstVar
+23.0042"];
+"effratio_gau_bd_0_1" [ color=red, label="RooGaussian
+effratio_gau_bd_0_1"];
+"3.33333" [ color=red, label="RooConstVar
+3.33333"];
+"0.405518" [ color=red, label="RooConstVar
+0.405518"];
+"pdf_ext_total_1_0" [ color=red, label="RooProdPdf
+pdf_ext_total_1_0"];
+"pdf_ext_sum_1_0" [ color=red, label="RooAddPdf
+pdf_ext_sum_1_0"];
+"pdf_bs_1_0" [ color=red, label="RooProdPdf
+pdf_bs_1_0"];
+"CB_bs_1_0" [ color=red, label="RooCBShape
+CB_bs_1_0"];
+"Mean_bs_1_0" [ color=blue, label="RooRealVar
+Mean_bs_1_0"];
+"Alpha_bs_1_0" [ color=blue, label="RooRealVar
+Alpha_bs_1_0"];
+"Enne_bs_1_0" [ color=blue, label="RooRealVar
+Enne_bs_1_0"];
+"SigmaRes_bs_1_0" [ color=red, label="RooFormulaVar
+SigmaRes_bs_1_0"];
+"PeeK_bs_1_0" [ color=blue, label="RooRealVar
+PeeK_bs_1_0"];
+"ReducedMassRes_pdf_bs_1_0" [ color=red, label="RooKeysPdf
+ReducedMassRes_pdf_bs_1_0"];
+"N_bs_formula_corr_1_0" [ color=red, label="RooFormulaVar
+N_bs_formula_corr_1_0"];
+"N_bu_1_0" [ color=blue, label="RooRealVar
+N_bu_1_0"];
+"effratio_bs_1_0" [ color=blue, label="RooRealVar
+effratio_bs_1_0"];
+"pdf_bd_1_0" [ color=red, label="RooProdPdf
+pdf_bd_1_0"];
+"CB_bd_1_0" [ color=red, label="RooCBShape
+CB_bd_1_0"];
+"Mean_bd_1_0" [ color=blue, label="RooRealVar
+Mean_bd_1_0"];
+"Alpha_bd_1_0" [ color=blue, label="RooRealVar
+Alpha_bd_1_0"];
+"Enne_bd_1_0" [ color=blue, label="RooRealVar
+Enne_bd_1_0"];
+"SigmaRes_bd_1_0" [ color=red, label="RooFormulaVar
+SigmaRes_bd_1_0"];
+"PeeK_bd_1_0" [ color=blue, label="RooRealVar
+PeeK_bd_1_0"];
+"ReducedMassRes_pdf_bd_1_0" [ color=red, label="RooKeysPdf
+ReducedMassRes_pdf_bd_1_0"];
+"N_bd_formula_corr_1_0" [ color=red, label="RooFormulaVar
+N_bd_formula_corr_1_0"];
+"effratio_bd_1_0" [ color=blue, label="RooRealVar
+effratio_bd_1_0"];
+"pdf_1comb_1_0" [ color=red, label="RooProdPdf
+pdf_1comb_1_0"];
+"mass_1comb_1_0" [ color=red, label="RooBernstein
+mass_1comb_1_0"];
+"B_1comb_1_0" [ color=blue, label="RooRealVar
+B_1comb_1_0"];
+"B_2comb_1_0" [ color=red, label="RooFormulaVar
+B_2comb_1_0"];
+"ReducedMassRes_pdf_comb_1_0" [ color=red, label="RooKeysPdf
+ReducedMassRes_pdf_comb_1_0"];
+"N_comb_1_0" [ color=blue, label="RooRealVar
+N_comb_1_0"];
+"pdf_semi_1_0" [ color=red, label="RooProdPdf
+pdf_semi_1_0"];
+"ReducedMassRes_pdf_semi_1_0" [ color=red, label="RooKeysPdf
+ReducedMassRes_pdf_semi_1_0"];
+"keys_semi_1_0" [ color=red, label="RooKeysPdf
+keys_semi_1_0"];
+"N_semi_1_0" [ color=blue, label="RooRealVar
+N_semi_1_0"];
+"pdf_peak_1_0" [ color=red, label="RooProdPdf
+pdf_peak_1_0"];
+"mass_peak_1_0" [ color=red, label="RooAddPdf
+mass_peak_1_0"];
+"Gau_peak_1_0" [ color=red, label="RooGaussian
+Gau_peak_1_0"];
+"Mean_peak_1_0" [ color=blue, label="RooRealVar
+Mean_peak_1_0"];
+"Sigma_peak_1_0" [ color=blue, label="RooRealVar
+Sigma_peak_1_0"];
+"CoeffGauss_peak_1_0" [ color=blue, label="RooRealVar
+CoeffGauss_peak_1_0"];
+"CB_peak_1_0" [ color=red, label="RooCBShape
+CB_peak_1_0"];
+"Sigma2_peak_1_0" [ color=blue, label="RooRealVar
+Sigma2_peak_1_0"];
+"Alpha_peak_1_0" [ color=blue, label="RooRealVar
+Alpha_peak_1_0"];
+"Enne_peak_1_0" [ color=blue, label="RooRealVar
+Enne_peak_1_0"];
+"ReducedMassRes_pdf_peak_1_0" [ color=red, label="RooKeysPdf
+ReducedMassRes_pdf_peak_1_0"];
+"N_peak_1_0" [ color=blue, label="RooRealVar
+N_peak_1_0"];
+"pdf_constraints_1_0" [ color=red, label="RooProdPdf
+pdf_constraints_1_0"];
+"N_bu_gau_1_0" [ color=red, label="RooGaussian
+N_bu_gau_1_0"];
+"15616" [ color=red, label="RooConstVar
+15616"];
+"846" [ color=red, label="RooConstVar
+846"];
+"effratio_gau_bs_1_0" [ color=red, label="RooGaussian
+effratio_gau_bs_1_0"];
+"7.24138" [ color=red, label="RooConstVar
+7.24138"];
+"0.834834" [ color=red, label="RooConstVar
+0.834834"];
+"N_peak_gau_1_0" [ color=red, label="RooLognormal
+N_peak_gau_1_0"];
+"0.264" [ color=red, label="RooConstVar
+0.264"];
+"1.72165" [ color=red, label="RooConstVar
+1.72165"];
+"N_semi_gau_1_0" [ color=red, label="RooGaussian
+N_semi_gau_1_0"];
+"17.968" [ color=red, label="RooConstVar
+17.968"];
+"15.9613" [ color=red, label="RooConstVar
+15.9613"];
+"effratio_gau_bd_1_0" [ color=red, label="RooGaussian
+effratio_gau_bd_1_0"];
+"pdf_ext_total_1_1" [ color=red, label="RooProdPdf
+pdf_ext_total_1_1"];
+"pdf_ext_sum_1_1" [ color=red, label="RooAddPdf
+pdf_ext_sum_1_1"];
+"pdf_bs_1_1" [ color=red, label="RooProdPdf
+pdf_bs_1_1"];
+"CB_bs_1_1" [ color=red, label="RooCBShape
+CB_bs_1_1"];
+"Mean_bs_1_1" [ color=blue, label="RooRealVar
+Mean_bs_1_1"];
+"Alpha_bs_1_1" [ color=blue, label="RooRealVar
+Alpha_bs_1_1"];
+"Enne_bs_1_1" [ color=blue, label="RooRealVar
+Enne_bs_1_1"];
+"SigmaRes_bs_1_1" [ color=red, label="RooFormulaVar
+SigmaRes_bs_1_1"];
+"PeeK_bs_1_1" [ color=blue, label="RooRealVar
+PeeK_bs_1_1"];
+"ReducedMassRes_pdf_bs_1_1" [ color=red, label="RooKeysPdf
+ReducedMassRes_pdf_bs_1_1"];
+"N_bs_formula_corr_1_1" [ color=red, label="RooFormulaVar
+N_bs_formula_corr_1_1"];
+"N_bu_1_1" [ color=blue, label="RooRealVar
+N_bu_1_1"];
+"effratio_bs_1_1" [ color=blue, label="RooRealVar
+effratio_bs_1_1"];
+"pdf_bd_1_1" [ color=red, label="RooProdPdf
+pdf_bd_1_1"];
+"CB_bd_1_1" [ color=red, label="RooCBShape
+CB_bd_1_1"];
+"Mean_bd_1_1" [ color=blue, label="RooRealVar
+Mean_bd_1_1"];
+"Alpha_bd_1_1" [ color=blue, label="RooRealVar
+Alpha_bd_1_1"];
+"Enne_bd_1_1" [ color=blue, label="RooRealVar
+Enne_bd_1_1"];
+"SigmaRes_bd_1_1" [ color=red, label="RooFormulaVar
+SigmaRes_bd_1_1"];
+"PeeK_bd_1_1" [ color=blue, label="RooRealVar
+PeeK_bd_1_1"];
+"ReducedMassRes_pdf_bd_1_1" [ color=red, label="RooKeysPdf
+ReducedMassRes_pdf_bd_1_1"];
+"N_bd_formula_corr_1_1" [ color=red, label="RooFormulaVar
+N_bd_formula_corr_1_1"];
+"effratio_bd_1_1" [ color=blue, label="RooRealVar
+effratio_bd_1_1"];
+"pdf_1comb_1_1" [ color=red, label="RooProdPdf
+pdf_1comb_1_1"];
+"mass_1comb_1_1" [ color=red, label="RooBernstein
+mass_1comb_1_1"];
+"B_1comb_1_1" [ color=blue, label="RooRealVar
+B_1comb_1_1"];
+"B_2comb_1_1" [ color=red, label="RooFormulaVar
+B_2comb_1_1"];
+"ReducedMassRes_pdf_comb_1_1" [ color=red, label="RooKeysPdf
+ReducedMassRes_pdf_comb_1_1"];
+"N_comb_1_1" [ color=blue, label="RooRealVar
+N_comb_1_1"];
+"pdf_semi_1_1" [ color=red, label="RooProdPdf
+pdf_semi_1_1"];
+"ReducedMassRes_pdf_semi_1_1" [ color=red, label="RooKeysPdf
+ReducedMassRes_pdf_semi_1_1"];
+"keys_semi_1_1" [ color=red, label="RooKeysPdf
+keys_semi_1_1"];
+"N_semi_1_1" [ color=blue, label="RooRealVar
+N_semi_1_1"];
+"pdf_peak_1_1" [ color=red, label="RooProdPdf
+pdf_peak_1_1"];
+"mass_peak_1_1" [ color=red, label="RooAddPdf
+mass_peak_1_1"];
+"Gau_peak_1_1" [ color=red, label="RooGaussian
+Gau_peak_1_1"];
+"Mean_peak_1_1" [ color=blue, label="RooRealVar
+Mean_peak_1_1"];
+"Sigma_peak_1_1" [ color=blue, label="RooRealVar
+Sigma_peak_1_1"];
+"CoeffGauss_peak_1_1" [ color=blue, label="RooRealVar
+CoeffGauss_peak_1_1"];
+"CB_peak_1_1" [ color=red, label="RooCBShape
+CB_peak_1_1"];
+"Sigma2_peak_1_1" [ color=blue, label="RooRealVar
+Sigma2_peak_1_1"];
+"Alpha_peak_1_1" [ color=blue, label="RooRealVar
+Alpha_peak_1_1"];
+"Enne_peak_1_1" [ color=blue, label="RooRealVar
+Enne_peak_1_1"];
+"ReducedMassRes_pdf_peak_1_1" [ color=red, label="RooKeysPdf
+ReducedMassRes_pdf_peak_1_1"];
+"N_peak_1_1" [ color=blue, label="RooRealVar
+N_peak_1_1"];
+"pdf_constraints_1_1" [ color=red, label="RooProdPdf
+pdf_constraints_1_1"];
+"N_bu_gau_1_1" [ color=red, label="RooGaussian
+N_bu_gau_1_1"];
+"24133" [ color=red, label="RooConstVar
+24133"];
+"1219" [ color=red, label="RooConstVar
+1219"];
+"effratio_gau_bs_1_1" [ color=red, label="RooGaussian
+effratio_gau_bs_1_1"];
+"5.60976" [ color=red, label="RooConstVar
+5.60976"];
+"0.64673" [ color=red, label="RooConstVar
+0.64673"];
+"N_peak_gau_1_1" [ color=red, label="RooLognormal
+N_peak_gau_1_1"];
+"0.277" [ color=red, label="RooConstVar
+0.277"];
+"1.71994" [ color=red, label="RooConstVar
+1.71994"];
+"N_semi_gau_1_1" [ color=red, label="RooGaussian
+N_semi_gau_1_1"];
+"11.946" [ color=red, label="RooConstVar
+11.946"];
+"9.90706" [ color=red, label="RooConstVar
+9.90706"];
+"effratio_gau_bd_1_1" [ color=red, label="RooGaussian
+effratio_gau_bd_1_1"];
+"5.36585" [ color=red, label="RooConstVar
+5.36585"];
+"0.618611" [ color=red, label="RooConstVar
+0.618611"];
+"pdf_ext_total_2_0" [ color=red, label="RooProdPdf
+pdf_ext_total_2_0"];
+"pdf_ext_sum_2_0" [ color=red, label="RooAddPdf
+pdf_ext_sum_2_0"];
+"pdf_bs_2_0" [ color=red, label="RooProdPdf
+pdf_bs_2_0"];
+"CB_bs_2_0" [ color=red, label="RooCBShape
+CB_bs_2_0"];
+"Mean_bs_2_0" [ color=blue, label="RooRealVar
+Mean_bs_2_0"];
+"Alpha_bs_2_0" [ color=blue, label="RooRealVar
+Alpha_bs_2_0"];
+"Enne_bs_2_0" [ color=blue, label="RooRealVar
+Enne_bs_2_0"];
+"SigmaRes_bs_2_0" [ color=red, label="RooFormulaVar
+SigmaRes_bs_2_0"];
+"PeeK_bs_2_0" [ color=blue, label="RooRealVar
+PeeK_bs_2_0"];
+"ReducedMassRes_pdf_bs_2_0" [ color=red, label="RooKeysPdf
+ReducedMassRes_pdf_bs_2_0"];
+"N_bs_formula_corr_2_0" [ color=red, label="RooFormulaVar
+N_bs_formula_corr_2_0"];
+"N_bu_2_0" [ color=blue, label="RooRealVar
+N_bu_2_0"];
+"effratio_bs_2_0" [ color=blue, label="RooRealVar
+effratio_bs_2_0"];
+"pdf_bd_2_0" [ color=red, label="RooProdPdf
+pdf_bd_2_0"];
+"CB_bd_2_0" [ color=red, label="RooCBShape
+CB_bd_2_0"];
+"Mean_bd_2_0" [ color=blue, label="RooRealVar
+Mean_bd_2_0"];
+"Alpha_bd_2_0" [ color=blue, label="RooRealVar
+Alpha_bd_2_0"];
+"Enne_bd_2_0" [ color=blue, label="RooRealVar
+Enne_bd_2_0"];
+"SigmaRes_bd_2_0" [ color=red, label="RooFormulaVar
+SigmaRes_bd_2_0"];
+"PeeK_bd_2_0" [ color=blue, label="RooRealVar
+PeeK_bd_2_0"];
+"ReducedMassRes_pdf_bd_2_0" [ color=red, label="RooKeysPdf
+ReducedMassRes_pdf_bd_2_0"];
+"N_bd_formula_corr_2_0" [ color=red, label="RooFormulaVar
+N_bd_formula_corr_2_0"];
+"effratio_bd_2_0" [ color=blue, label="RooRealVar
+effratio_bd_2_0"];
+"pdf_1comb_2_0" [ color=red, label="RooProdPdf
+pdf_1comb_2_0"];
+"mass_1comb_2_0" [ color=red, label="RooBernstein
+mass_1comb_2_0"];
+"B_1comb_2_0" [ color=blue, label="RooRealVar
+B_1comb_2_0"];
+"B_2comb_2_0" [ color=red, label="RooFormulaVar
+B_2comb_2_0"];
+"ReducedMassRes_pdf_comb_2_0" [ color=red, label="RooKeysPdf
+ReducedMassRes_pdf_comb_2_0"];
+"N_comb_2_0" [ color=blue, label="RooRealVar
+N_comb_2_0"];
+"pdf_semi_2_0" [ color=red, label="RooProdPdf
+pdf_semi_2_0"];
+"ReducedMassRes_pdf_semi_2_0" [ color=red, label="RooKeysPdf
+ReducedMassRes_pdf_semi_2_0"];
+"keys_semi_2_0" [ color=red, label="RooKeysPdf
+keys_semi_2_0"];
+"N_semi_2_0" [ color=blue, label="RooRealVar
+N_semi_2_0"];
+"pdf_peak_2_0" [ color=red, label="RooProdPdf
+pdf_peak_2_0"];
+"mass_peak_2_0" [ color=red, label="RooAddPdf
+mass_peak_2_0"];
+"Gau_peak_2_0" [ color=red, label="RooGaussian
+Gau_peak_2_0"];
+"Mean_peak_2_0" [ color=blue, label="RooRealVar
+Mean_peak_2_0"];
+"Sigma_peak_2_0" [ color=blue, label="RooRealVar
+Sigma_peak_2_0"];
+"CoeffGauss_peak_2_0" [ color=blue, label="RooRealVar
+CoeffGauss_peak_2_0"];
+"CB_peak_2_0" [ color=red, label="RooCBShape
+CB_peak_2_0"];
+"Sigma2_peak_2_0" [ color=blue, label="RooRealVar
+Sigma2_peak_2_0"];
+"Alpha_peak_2_0" [ color=blue, label="RooRealVar
+Alpha_peak_2_0"];
+"Enne_peak_2_0" [ color=blue, label="RooRealVar
+Enne_peak_2_0"];
+"ReducedMassRes_pdf_peak_2_0" [ color=red, label="RooKeysPdf
+ReducedMassRes_pdf_peak_2_0"];
+"N_peak_2_0" [ color=blue, label="RooRealVar
+N_peak_2_0"];
+"pdf_constraints_2_0" [ color=red, label="RooProdPdf
+pdf_constraints_2_0"];
+"N_bu_gau_2_0" [ color=red, label="RooGaussian
+N_bu_gau_2_0"];
+"128639" [ color=red, label="RooConstVar
+128639"];
+"6514" [ color=red, label="RooConstVar
+6514"];
+"effratio_gau_bs_2_0" [ color=red, label="RooGaussian
+effratio_gau_bs_2_0"];
+"4.28571" [ color=red, label="RooConstVar
+4.28571"];
+"0.367873" [ color=red, label="RooConstVar
+0.367873"];
+"N_peak_gau_2_0" [ color=red, label="RooLognormal
+N_peak_gau_2_0"];
+"0.981" [ color=red, label="RooConstVar
+0.981"];
+"1.73157" [ color=red, label="RooConstVar
+1.73157"];
+"N_semi_gau_2_0" [ color=red, label="RooGaussian
+N_semi_gau_2_0"];
+"87.632" [ color=red, label="RooConstVar
+87.632"];
+"79.3701" [ color=red, label="RooConstVar
+79.3701"];
+"effratio_gau_bd_2_0" [ color=red, label="RooGaussian
+effratio_gau_bd_2_0"];
+"pdf_ext_total_2_1" [ color=red, label="RooProdPdf
+pdf_ext_total_2_1"];
+"pdf_ext_sum_2_1" [ color=red, label="RooAddPdf
+pdf_ext_sum_2_1"];
+"pdf_bs_2_1" [ color=red, label="RooProdPdf
+pdf_bs_2_1"];
+"CB_bs_2_1" [ color=red, label="RooCBShape
+CB_bs_2_1"];
+"Mean_bs_2_1" [ color=blue, label="RooRealVar
+Mean_bs_2_1"];
+"Alpha_bs_2_1" [ color=blue, label="RooRealVar
+Alpha_bs_2_1"];
+"Enne_bs_2_1" [ color=blue, label="RooRealVar
+Enne_bs_2_1"];
+"SigmaRes_bs_2_1" [ color=red, label="RooFormulaVar
+SigmaRes_bs_2_1"];
+"PeeK_bs_2_1" [ color=blue, label="RooRealVar
+PeeK_bs_2_1"];
+"ReducedMassRes_pdf_bs_2_1" [ color=red, label="RooKeysPdf
+ReducedMassRes_pdf_bs_2_1"];
+"N_bs_formula_corr_2_1" [ color=red, label="RooFormulaVar
+N_bs_formula_corr_2_1"];
+"N_bu_2_1" [ color=blue, label="RooRealVar
+N_bu_2_1"];
+"effratio_bs_2_1" [ color=blue, label="RooRealVar
+effratio_bs_2_1"];
+"pdf_bd_2_1" [ color=red, label="RooProdPdf
+pdf_bd_2_1"];
+"CB_bd_2_1" [ color=red, label="RooCBShape
+CB_bd_2_1"];
+"Mean_bd_2_1" [ color=blue, label="RooRealVar
+Mean_bd_2_1"];
+"Alpha_bd_2_1" [ color=blue, label="RooRealVar
+Alpha_bd_2_1"];
+"Enne_bd_2_1" [ color=blue, label="RooRealVar
+Enne_bd_2_1"];
+"SigmaRes_bd_2_1" [ color=red, label="RooFormulaVar
+SigmaRes_bd_2_1"];
+"PeeK_bd_2_1" [ color=blue, label="RooRealVar
+PeeK_bd_2_1"];
+"ReducedMassRes_pdf_bd_2_1" [ color=red, label="RooKeysPdf
+ReducedMassRes_pdf_bd_2_1"];
+"N_bd_formula_corr_2_1" [ color=red, label="RooFormulaVar
+N_bd_formula_corr_2_1"];
+"effratio_bd_2_1" [ color=blue, label="RooRealVar
+effratio_bd_2_1"];
+"pdf_1comb_2_1" [ color=red, label="RooProdPdf
+pdf_1comb_2_1"];
+"mass_1comb_2_1" [ color=red, label="RooBernstein
+mass_1comb_2_1"];
+"B_1comb_2_1" [ color=blue, label="RooRealVar
+B_1comb_2_1"];
+"B_2comb_2_1" [ color=red, label="RooFormulaVar
+B_2comb_2_1"];
+"ReducedMassRes_pdf_comb_2_1" [ color=red, label="RooKeysPdf
+ReducedMassRes_pdf_comb_2_1"];
+"N_comb_2_1" [ color=blue, label="RooRealVar
+N_comb_2_1"];
+"pdf_semi_2_1" [ color=red, label="RooProdPdf
+pdf_semi_2_1"];
+"ReducedMassRes_pdf_semi_2_1" [ color=red, label="RooKeysPdf
+ReducedMassRes_pdf_semi_2_1"];
+"keys_semi_2_1" [ color=red, label="RooKeysPdf
+keys_semi_2_1"];
+"N_semi_2_1" [ color=blue, label="RooRealVar
+N_semi_2_1"];
+"pdf_peak_2_1" [ color=red, label="RooProdPdf
+pdf_peak_2_1"];
+"mass_peak_2_1" [ color=red, label="RooAddPdf
+mass_peak_2_1"];
+"Gau_peak_2_1" [ color=red, label="RooGaussian
+Gau_peak_2_1"];
+"Mean_peak_2_1" [ color=blue, label="RooRealVar
+Mean_peak_2_1"];
+"Sigma_peak_2_1" [ color=blue, label="RooRealVar
+Sigma_peak_2_1"];
+"CoeffGauss_peak_2_1" [ color=blue, label="RooRealVar
+CoeffGauss_peak_2_1"];
+"CB_peak_2_1" [ color=red, label="RooCBShape
+CB_peak_2_1"];
+"Sigma2_peak_2_1" [ color=blue, label="RooRealVar
+Sigma2_peak_2_1"];
+"Alpha_peak_2_1" [ color=blue, label="RooRealVar
+Alpha_peak_2_1"];
+"Enne_peak_2_1" [ color=blue, label="RooRealVar
+Enne_peak_2_1"];
+"ReducedMassRes_pdf_peak_2_1" [ color=red, label="RooKeysPdf
+ReducedMassRes_pdf_peak_2_1"];
+"N_peak_2_1" [ color=blue, label="RooRealVar
+N_peak_2_1"];
+"pdf_constraints_2_1" [ color=red, label="RooProdPdf
+pdf_constraints_2_1"];
+"N_bu_gau_2_1" [ color=red, label="RooGaussian
+N_bu_gau_2_1"];
+"138961" [ color=red, label="RooConstVar
+138961"];
+"6948.05" [ color=red, label="RooConstVar
+6948.05"];
+"effratio_gau_bs_2_1" [ color=red, label="RooGaussian
+effratio_gau_bs_2_1"];
+"3.52941" [ color=red, label="RooConstVar
+3.52941"];
+"0.302954" [ color=red, label="RooConstVar
+0.302954"];
+"N_peak_gau_2_1" [ color=red, label="RooLognormal
+N_peak_gau_2_1"];
+"0.826" [ color=red, label="RooConstVar
+0.826"];
+"1.7305" [ color=red, label="RooConstVar
+1.7305"];
+"N_semi_gau_2_1" [ color=red, label="RooGaussian
+N_semi_gau_2_1"];
+"71.203" [ color=red, label="RooConstVar
+71.203"];
+"63.1743" [ color=red, label="RooConstVar
+63.1743"];
+"effratio_gau_bd_2_1" [ color=red, label="RooGaussian
+effratio_gau_bd_2_1"];
+"pdf_ext_total_2_2" [ color=red, label="RooProdPdf
+pdf_ext_total_2_2"];
+"pdf_ext_sum_2_2" [ color=red, label="RooAddPdf
+pdf_ext_sum_2_2"];
+"pdf_bs_2_2" [ color=red, label="RooProdPdf
+pdf_bs_2_2"];
+"CB_bs_2_2" [ color=red, label="RooCBShape
+CB_bs_2_2"];
+"Mean_bs_2_2" [ color=blue, label="RooRealVar
+Mean_bs_2_2"];
+"Alpha_bs_2_2" [ color=blue, label="RooRealVar
+Alpha_bs_2_2"];
+"Enne_bs_2_2" [ color=blue, label="RooRealVar
+Enne_bs_2_2"];
+"SigmaRes_bs_2_2" [ color=red, label="RooFormulaVar
+SigmaRes_bs_2_2"];
+"PeeK_bs_2_2" [ color=blue, label="RooRealVar
+PeeK_bs_2_2"];
+"ReducedMassRes_pdf_bs_2_2" [ color=red, label="RooKeysPdf
+ReducedMassRes_pdf_bs_2_2"];
+"N_bs_formula_corr_2_2" [ color=red, label="RooFormulaVar
+N_bs_formula_corr_2_2"];
+"N_bu_2_2" [ color=blue, label="RooRealVar
+N_bu_2_2"];
+"effratio_bs_2_2" [ color=blue, label="RooRealVar
+effratio_bs_2_2"];
+"pdf_bd_2_2" [ color=red, label="RooProdPdf
+pdf_bd_2_2"];
+"CB_bd_2_2" [ color=red, label="RooCBShape
+CB_bd_2_2"];
+"Mean_bd_2_2" [ color=blue, label="RooRealVar
+Mean_bd_2_2"];
+"Alpha_bd_2_2" [ color=blue, label="RooRealVar
+Alpha_bd_2_2"];
+"Enne_bd_2_2" [ color=blue, label="RooRealVar
+Enne_bd_2_2"];
+"SigmaRes_bd_2_2" [ color=red, label="RooFormulaVar
+SigmaRes_bd_2_2"];
+"PeeK_bd_2_2" [ color=blue, label="RooRealVar
+PeeK_bd_2_2"];
+"ReducedMassRes_pdf_bd_2_2" [ color=red, label="RooKeysPdf
+ReducedMassRes_pdf_bd_2_2"];
+"N_bd_formula_corr_2_2" [ color=red, label="RooFormulaVar
+N_bd_formula_corr_2_2"];
+"effratio_bd_2_2" [ color=blue, label="RooRealVar
+effratio_bd_2_2"];
+"pdf_1comb_2_2" [ color=red, label="RooProdPdf
+pdf_1comb_2_2"];
+"mass_1comb_2_2" [ color=red, label="RooBernstein
+mass_1comb_2_2"];
+"B_1comb_2_2" [ color=blue, label="RooRealVar
+B_1comb_2_2"];
+"B_2comb_2_2" [ color=red, label="RooFormulaVar
+B_2comb_2_2"];
+"ReducedMassRes_pdf_comb_2_2" [ color=red, label="RooKeysPdf
+ReducedMassRes_pdf_comb_2_2"];
+"N_comb_2_2" [ color=blue, label="RooRealVar
+N_comb_2_2"];
+"pdf_semi_2_2" [ color=red, label="RooProdPdf
+pdf_semi_2_2"];
+"ReducedMassRes_pdf_semi_2_2" [ color=red, label="RooKeysPdf
+ReducedMassRes_pdf_semi_2_2"];
+"keys_semi_2_2" [ color=red, label="RooKeysPdf
+keys_semi_2_2"];
+"N_semi_2_2" [ color=blue, label="RooRealVar
+N_semi_2_2"];
+"pdf_peak_2_2" [ color=red, label="RooProdPdf
+pdf_peak_2_2"];
+"mass_peak_2_2" [ color=red, label="RooAddPdf
+mass_peak_2_2"];
+"Gau_peak_2_2" [ color=red, label="RooGaussian
+Gau_peak_2_2"];
+"Mean_peak_2_2" [ color=blue, label="RooRealVar
+Mean_peak_2_2"];
+"Sigma_peak_2_2" [ color=blue, label="RooRealVar
+Sigma_peak_2_2"];
+"CoeffGauss_peak_2_2" [ color=blue, label="RooRealVar
+CoeffGauss_peak_2_2"];
+"CB_peak_2_2" [ color=red, label="RooCBShape
+CB_peak_2_2"];
+"Sigma2_peak_2_2" [ color=blue, label="RooRealVar
+Sigma2_peak_2_2"];
+"Alpha_peak_2_2" [ color=blue, label="RooRealVar
+Alpha_peak_2_2"];
+"Enne_peak_2_2" [ color=blue, label="RooRealVar
+Enne_peak_2_2"];
+"ReducedMassRes_pdf_peak_2_2" [ color=red, label="RooKeysPdf
+ReducedMassRes_pdf_peak_2_2"];
+"N_peak_2_2" [ color=blue, label="RooRealVar
+N_peak_2_2"];
+"pdf_constraints_2_2" [ color=red, label="RooProdPdf
+pdf_constraints_2_2"];
+"N_bu_gau_2_2" [ color=red, label="RooGaussian
+N_bu_gau_2_2"];
+"159845" [ color=red, label="RooConstVar
+159845"];
+"7992.25" [ color=red, label="RooConstVar
+7992.25"];
+"effratio_gau_bs_2_2" [ color=red, label="RooGaussian
+effratio_gau_bs_2_2"];
+"3.17073" [ color=red, label="RooConstVar
+3.17073"];
+"0.272166" [ color=red, label="RooConstVar
+0.272166"];
+"N_peak_gau_2_2" [ color=red, label="RooLognormal
+N_peak_gau_2_2"];
+"0.814" [ color=red, label="RooConstVar
+0.814"];
+"1.73147" [ color=red, label="RooConstVar
+1.73147"];
+"N_semi_gau_2_2" [ color=red, label="RooGaussian
+N_semi_gau_2_2"];
+"55.897" [ color=red, label="RooConstVar
+55.897"];
+"47.6281" [ color=red, label="RooConstVar
+47.6281"];
+"effratio_gau_bd_2_2" [ color=red, label="RooGaussian
+effratio_gau_bd_2_2"];
+"3.41463" [ color=red, label="RooConstVar
+3.41463"];
+"0.293102" [ color=red, label="RooConstVar
+0.293102"];
+"pdf_ext_total_2_3" [ color=red, label="RooProdPdf
+pdf_ext_total_2_3"];
+"pdf_ext_sum_2_3" [ color=red, label="RooAddPdf
+pdf_ext_sum_2_3"];
+"pdf_bs_2_3" [ color=red, label="RooProdPdf
+pdf_bs_2_3"];
+"CB_bs_2_3" [ color=red, label="RooCBShape
+CB_bs_2_3"];
+"Mean_bs_2_3" [ color=blue, label="RooRealVar
+Mean_bs_2_3"];
+"Alpha_bs_2_3" [ color=blue, label="RooRealVar
+Alpha_bs_2_3"];
+"Enne_bs_2_3" [ color=blue, label="RooRealVar
+Enne_bs_2_3"];
+"SigmaRes_bs_2_3" [ color=red, label="RooFormulaVar
+SigmaRes_bs_2_3"];
+"PeeK_bs_2_3" [ color=blue, label="RooRealVar
+PeeK_bs_2_3"];
+"ReducedMassRes_pdf_bs_2_3" [ color=red, label="RooKeysPdf
+ReducedMassRes_pdf_bs_2_3"];
+"N_bs_formula_corr_2_3" [ color=red, label="RooFormulaVar
+N_bs_formula_corr_2_3"];
+"N_bu_2_3" [ color=blue, label="RooRealVar
+N_bu_2_3"];
+"effratio_bs_2_3" [ color=blue, label="RooRealVar
+effratio_bs_2_3"];
+"pdf_bd_2_3" [ color=red, label="RooProdPdf
+pdf_bd_2_3"];
+"CB_bd_2_3" [ color=red, label="RooCBShape
+CB_bd_2_3"];
+"Mean_bd_2_3" [ color=blue, label="RooRealVar
+Mean_bd_2_3"];
+"Alpha_bd_2_3" [ color=blue, label="RooRealVar
+Alpha_bd_2_3"];
+"Enne_bd_2_3" [ color=blue, label="RooRealVar
+Enne_bd_2_3"];
+"SigmaRes_bd_2_3" [ color=red, label="RooFormulaVar
+SigmaRes_bd_2_3"];
+"PeeK_bd_2_3" [ color=blue, label="RooRealVar
+PeeK_bd_2_3"];
+"ReducedMassRes_pdf_bd_2_3" [ color=red, label="RooKeysPdf
+ReducedMassRes_pdf_bd_2_3"];
+"N_bd_formula_corr_2_3" [ color=red, label="RooFormulaVar
+N_bd_formula_corr_2_3"];
+"effratio_bd_2_3" [ color=blue, label="RooRealVar
+effratio_bd_2_3"];
+"pdf_1comb_2_3" [ color=red, label="RooProdPdf
+pdf_1comb_2_3"];
+"mass_1comb_2_3" [ color=red, label="RooBernstein
+mass_1comb_2_3"];
+"B_1comb_2_3" [ color=blue, label="RooRealVar
+B_1comb_2_3"];
+"B_2comb_2_3" [ color=red, label="RooFormulaVar
+B_2comb_2_3"];
+"ReducedMassRes_pdf_comb_2_3" [ color=red, label="RooKeysPdf
+ReducedMassRes_pdf_comb_2_3"];
+"N_comb_2_3" [ color=blue, label="RooRealVar
+N_comb_2_3"];
+"pdf_semi_2_3" [ color=red, label="RooProdPdf
+pdf_semi_2_3"];
+"ReducedMassRes_pdf_semi_2_3" [ color=red, label="RooKeysPdf
+ReducedMassRes_pdf_semi_2_3"];
+"keys_semi_2_3" [ color=red, label="RooKeysPdf
+keys_semi_2_3"];
+"N_semi_2_3" [ color=blue, label="RooRealVar
+N_semi_2_3"];
+"pdf_peak_2_3" [ color=red, label="RooProdPdf
+pdf_peak_2_3"];
+"mass_peak_2_3" [ color=red, label="RooAddPdf
+mass_peak_2_3"];
+"Gau_peak_2_3" [ color=red, label="RooGaussian
+Gau_peak_2_3"];
+"Mean_peak_2_3" [ color=blue, label="RooRealVar
+Mean_peak_2_3"];
+"Sigma_peak_2_3" [ color=blue, label="RooRealVar
+Sigma_peak_2_3"];
+"CoeffGauss_peak_2_3" [ color=blue, label="RooRealVar
+CoeffGauss_peak_2_3"];
+"CB_peak_2_3" [ color=red, label="RooCBShape
+CB_peak_2_3"];
+"Sigma2_peak_2_3" [ color=blue, label="RooRealVar
+Sigma2_peak_2_3"];
+"Alpha_peak_2_3" [ color=blue, label="RooRealVar
+Alpha_peak_2_3"];
+"Enne_peak_2_3" [ color=blue, label="RooRealVar
+Enne_peak_2_3"];
+"ReducedMassRes_pdf_peak_2_3" [ color=red, label="RooKeysPdf
+ReducedMassRes_pdf_peak_2_3"];
+"N_peak_2_3" [ color=blue, label="RooRealVar
+N_peak_2_3"];
+"pdf_constraints_2_3" [ color=red, label="RooProdPdf
+pdf_constraints_2_3"];
+"N_bu_gau_2_3" [ color=red, label="RooGaussian
+N_bu_gau_2_3"];
+"192746" [ color=red, label="RooConstVar
+192746"];
+"9647" [ color=red, label="RooConstVar
+9647"];
+"effratio_gau_bs_2_3" [ color=red, label="RooGaussian
+effratio_gau_bs_2_3"];
+"2.5" [ color=red, label="RooConstVar
+2.5"];
+"0.214593" [ color=red, label="RooConstVar
+0.214593"];
+"N_peak_gau_2_3" [ color=red, label="RooLognormal
+N_peak_gau_2_3"];
+"0.709" [ color=red, label="RooConstVar
+0.709"];
+"1.73077" [ color=red, label="RooConstVar
+1.73077"];
+"N_semi_gau_2_3" [ color=red, label="RooGaussian
+N_semi_gau_2_3"];
+"28.981" [ color=red, label="RooConstVar
+28.981"];
+"23.4488" [ color=red, label="RooConstVar
+23.4488"];
+"effratio_gau_bd_2_3" [ color=red, label="RooGaussian
+effratio_gau_bd_2_3"];
+"2.69231" [ color=red, label="RooConstVar
+2.69231"];
+"0.2311" [ color=red, label="RooConstVar
+0.2311"];
+"pdf_ext_total_3_0" [ color=red, label="RooProdPdf
+pdf_ext_total_3_0"];
+"pdf_ext_sum_3_0" [ color=red, label="RooAddPdf
+pdf_ext_sum_3_0"];
+"pdf_bs_3_0" [ color=red, label="RooProdPdf
+pdf_bs_3_0"];
+"CB_bs_3_0" [ color=red, label="RooCBShape
+CB_bs_3_0"];
+"Mean_bs_3_0" [ color=blue, label="RooRealVar
+Mean_bs_3_0"];
+"Alpha_bs_3_0" [ color=blue, label="RooRealVar
+Alpha_bs_3_0"];
+"Enne_bs_3_0" [ color=blue, label="RooRealVar
+Enne_bs_3_0"];
+"SigmaRes_bs_3_0" [ color=red, label="RooFormulaVar
+SigmaRes_bs_3_0"];
+"PeeK_bs_3_0" [ color=blue, label="RooRealVar
+PeeK_bs_3_0"];
+"ReducedMassRes_pdf_bs_3_0" [ color=red, label="RooKeysPdf
+ReducedMassRes_pdf_bs_3_0"];
+"N_bs_formula_corr_3_0" [ color=red, label="RooFormulaVar
+N_bs_formula_corr_3_0"];
+"N_bu_3_0" [ color=blue, label="RooRealVar
+N_bu_3_0"];
+"effratio_bs_3_0" [ color=blue, label="RooRealVar
+effratio_bs_3_0"];
+"pdf_bd_3_0" [ color=red, label="RooProdPdf
+pdf_bd_3_0"];
+"CB_bd_3_0" [ color=red, label="RooCBShape
+CB_bd_3_0"];
+"Mean_bd_3_0" [ color=blue, label="RooRealVar
+Mean_bd_3_0"];
+"Alpha_bd_3_0" [ color=blue, label="RooRealVar
+Alpha_bd_3_0"];
+"Enne_bd_3_0" [ color=blue, label="RooRealVar
+Enne_bd_3_0"];
+"SigmaRes_bd_3_0" [ color=red, label="RooFormulaVar
+SigmaRes_bd_3_0"];
+"PeeK_bd_3_0" [ color=blue, label="RooRealVar
+PeeK_bd_3_0"];
+"ReducedMassRes_pdf_bd_3_0" [ color=red, label="RooKeysPdf
+ReducedMassRes_pdf_bd_3_0"];
+"N_bd_formula_corr_3_0" [ color=red, label="RooFormulaVar
+N_bd_formula_corr_3_0"];
+"effratio_bd_3_0" [ color=blue, label="RooRealVar
+effratio_bd_3_0"];
+"pdf_1comb_3_0" [ color=red, label="RooProdPdf
+pdf_1comb_3_0"];
+"mass_1comb_3_0" [ color=red, label="RooBernstein
+mass_1comb_3_0"];
+"B_1comb_3_0" [ color=blue, label="RooRealVar
+B_1comb_3_0"];
+"B_2comb_3_0" [ color=red, label="RooFormulaVar
+B_2comb_3_0"];
+"ReducedMassRes_pdf_comb_3_0" [ color=red, label="RooKeysPdf
+ReducedMassRes_pdf_comb_3_0"];
+"N_comb_3_0" [ color=blue, label="RooRealVar
+N_comb_3_0"];
+"pdf_semi_3_0" [ color=red, label="RooProdPdf
+pdf_semi_3_0"];
+"ReducedMassRes_pdf_semi_3_0" [ color=red, label="RooKeysPdf
+ReducedMassRes_pdf_semi_3_0"];
+"keys_semi_3_0" [ color=red, label="RooKeysPdf
+keys_semi_3_0"];
+"N_semi_3_0" [ color=blue, label="RooRealVar
+N_semi_3_0"];
+"pdf_peak_3_0" [ color=red, label="RooProdPdf
+pdf_peak_3_0"];
+"mass_peak_3_0" [ color=red, label="RooAddPdf
+mass_peak_3_0"];
+"Gau_peak_3_0" [ color=red, label="RooGaussian
+Gau_peak_3_0"];
+"Mean_peak_3_0" [ color=blue, label="RooRealVar
+Mean_peak_3_0"];
+"Sigma_peak_3_0" [ color=blue, label="RooRealVar
+Sigma_peak_3_0"];
+"CoeffGauss_peak_3_0" [ color=blue, label="RooRealVar
+CoeffGauss_peak_3_0"];
+"CB_peak_3_0" [ color=red, label="RooCBShape
+CB_peak_3_0"];
+"Sigma2_peak_3_0" [ color=blue, label="RooRealVar
+Sigma2_peak_3_0"];
+"Alpha_peak_3_0" [ color=blue, label="RooRealVar
+Alpha_peak_3_0"];
+"Enne_peak_3_0" [ color=blue, label="RooRealVar
+Enne_peak_3_0"];
+"ReducedMassRes_pdf_peak_3_0" [ color=red, label="RooKeysPdf
+ReducedMassRes_pdf_peak_3_0"];
+"N_peak_3_0" [ color=blue, label="RooRealVar
+N_peak_3_0"];
+"pdf_constraints_3_0" [ color=red, label="RooProdPdf
+pdf_constraints_3_0"];
+"N_bu_gau_3_0" [ color=red, label="RooGaussian
+N_bu_gau_3_0"];
+"24325" [ color=red, label="RooConstVar
+24325"];
+"1216.25" [ color=red, label="RooConstVar
+1216.25"];
+"effratio_gau_bs_3_0" [ color=red, label="RooGaussian
+effratio_gau_bs_3_0"];
+"7.5" [ color=red, label="RooConstVar
+7.5"];
+"0.657053" [ color=red, label="RooConstVar
+0.657053"];
+"N_peak_gau_3_0" [ color=red, label="RooLognormal
+N_peak_gau_3_0"];
+"0.272" [ color=red, label="RooConstVar
+0.272"];
+"1.72928" [ color=red, label="RooConstVar
+1.72928"];
+"N_semi_gau_3_0" [ color=red, label="RooGaussian
+N_semi_gau_3_0"];
+"21.221" [ color=red, label="RooConstVar
+21.221"];
+"18.6352" [ color=red, label="RooConstVar
+18.6352"];
+"effratio_gau_bd_3_0" [ color=red, label="RooGaussian
+effratio_gau_bd_3_0"];
+"pdf_ext_total_3_1" [ color=red, label="RooProdPdf
+pdf_ext_total_3_1"];
+"pdf_ext_sum_3_1" [ color=red, label="RooAddPdf
+pdf_ext_sum_3_1"];
+"pdf_bs_3_1" [ color=red, label="RooProdPdf
+pdf_bs_3_1"];
+"CB_bs_3_1" [ color=red, label="RooCBShape
+CB_bs_3_1"];
+"Mean_bs_3_1" [ color=blue, label="RooRealVar
+Mean_bs_3_1"];
+"Alpha_bs_3_1" [ color=blue, label="RooRealVar
+Alpha_bs_3_1"];
+"Enne_bs_3_1" [ color=blue, label="RooRealVar
+Enne_bs_3_1"];
+"SigmaRes_bs_3_1" [ color=red, label="RooFormulaVar
+SigmaRes_bs_3_1"];
+"PeeK_bs_3_1" [ color=blue, label="RooRealVar
+PeeK_bs_3_1"];
+"ReducedMassRes_pdf_bs_3_1" [ color=red, label="RooKeysPdf
+ReducedMassRes_pdf_bs_3_1"];
+"N_bs_formula_corr_3_1" [ color=red, label="RooFormulaVar
+N_bs_formula_corr_3_1"];
+"N_bu_3_1" [ color=blue, label="RooRealVar
+N_bu_3_1"];
+"effratio_bs_3_1" [ color=blue, label="RooRealVar
+effratio_bs_3_1"];
+"pdf_bd_3_1" [ color=red, label="RooProdPdf
+pdf_bd_3_1"];
+"CB_bd_3_1" [ color=red, label="RooCBShape
+CB_bd_3_1"];
+"Mean_bd_3_1" [ color=blue, label="RooRealVar
+Mean_bd_3_1"];
+"Alpha_bd_3_1" [ color=blue, label="RooRealVar
+Alpha_bd_3_1"];
+"Enne_bd_3_1" [ color=blue, label="RooRealVar
+Enne_bd_3_1"];
+"SigmaRes_bd_3_1" [ color=red, label="RooFormulaVar
+SigmaRes_bd_3_1"];
+"PeeK_bd_3_1" [ color=blue, label="RooRealVar
+PeeK_bd_3_1"];
+"ReducedMassRes_pdf_bd_3_1" [ color=red, label="RooKeysPdf
+ReducedMassRes_pdf_bd_3_1"];
+"N_bd_formula_corr_3_1" [ color=red, label="RooFormulaVar
+N_bd_formula_corr_3_1"];
+"effratio_bd_3_1" [ color=blue, label="RooRealVar
+effratio_bd_3_1"];
+"pdf_1comb_3_1" [ color=red, label="RooProdPdf
+pdf_1comb_3_1"];
+"mass_1comb_3_1" [ color=red, label="RooBernstein
+mass_1comb_3_1"];
+"B_1comb_3_1" [ color=blue, label="RooRealVar
+B_1comb_3_1"];
+"B_2comb_3_1" [ color=red, label="RooFormulaVar
+B_2comb_3_1"];
+"ReducedMassRes_pdf_comb_3_1" [ color=red, label="RooKeysPdf
+ReducedMassRes_pdf_comb_3_1"];
+"N_comb_3_1" [ color=blue, label="RooRealVar
+N_comb_3_1"];
+"pdf_semi_3_1" [ color=red, label="RooProdPdf
+pdf_semi_3_1"];
+"ReducedMassRes_pdf_semi_3_1" [ color=red, label="RooKeysPdf
+ReducedMassRes_pdf_semi_3_1"];
+"keys_semi_3_1" [ color=red, label="RooKeysPdf
+keys_semi_3_1"];
+"N_semi_3_1" [ color=blue, label="RooRealVar
+N_semi_3_1"];
+"pdf_peak_3_1" [ color=red, label="RooProdPdf
+pdf_peak_3_1"];
+"mass_peak_3_1" [ color=red, label="RooAddPdf
+mass_peak_3_1"];
+"Gau_peak_3_1" [ color=red, label="RooGaussian
+Gau_peak_3_1"];
+"Mean_peak_3_1" [ color=blue, label="RooRealVar
+Mean_peak_3_1"];
+"Sigma_peak_3_1" [ color=blue, label="RooRealVar
+Sigma_peak_3_1"];
+"CoeffGauss_peak_3_1" [ color=blue, label="RooRealVar
+CoeffGauss_peak_3_1"];
+"CB_peak_3_1" [ color=red, label="RooCBShape
+CB_peak_3_1"];
+"Sigma2_peak_3_1" [ color=blue, label="RooRealVar
+Sigma2_peak_3_1"];
+"Alpha_peak_3_1" [ color=blue, label="RooRealVar
+Alpha_peak_3_1"];
+"Enne_peak_3_1" [ color=blue, label="RooRealVar
+Enne_peak_3_1"];
+"ReducedMassRes_pdf_peak_3_1" [ color=red, label="RooKeysPdf
+ReducedMassRes_pdf_peak_3_1"];
+"N_peak_3_1" [ color=blue, label="RooRealVar
+N_peak_3_1"];
+"pdf_constraints_3_1" [ color=red, label="RooProdPdf
+pdf_constraints_3_1"];
+"N_bu_gau_3_1" [ color=red, label="RooGaussian
+N_bu_gau_3_1"];
+"37388" [ color=red, label="RooConstVar
+37388"];
+"2208" [ color=red, label="RooConstVar
+2208"];
+"effratio_gau_bs_3_1" [ color=red, label="RooGaussian
+effratio_gau_bs_3_1"];
+"6" [ color=red, label="RooConstVar
+6"];
+"0.525642" [ color=red, label="RooConstVar
+0.525642"];
+"N_peak_gau_3_1" [ color=red, label="RooLognormal
+N_peak_gau_3_1"];
+"0.332" [ color=red, label="RooConstVar
+0.332"];
+"1.7247" [ color=red, label="RooConstVar
+1.7247"];
+"N_semi_gau_3_1" [ color=red, label="RooGaussian
+N_semi_gau_3_1"];
+"23.76" [ color=red, label="RooConstVar
+23.76"];
+"20.3178" [ color=red, label="RooConstVar
+20.3178"];
+"effratio_gau_bd_3_1" [ color=red, label="RooGaussian
+effratio_gau_bd_3_1"];
+"pdf_ext_total_3_2" [ color=red, label="RooProdPdf
+pdf_ext_total_3_2"];
+"pdf_ext_sum_3_2" [ color=red, label="RooAddPdf
+pdf_ext_sum_3_2"];
+"pdf_bs_3_2" [ color=red, label="RooProdPdf
+pdf_bs_3_2"];
+"CB_bs_3_2" [ color=red, label="RooCBShape
+CB_bs_3_2"];
+"Mean_bs_3_2" [ color=blue, label="RooRealVar
+Mean_bs_3_2"];
+"Alpha_bs_3_2" [ color=blue, label="RooRealVar
+Alpha_bs_3_2"];
+"Enne_bs_3_2" [ color=blue, label="RooRealVar
+Enne_bs_3_2"];
+"SigmaRes_bs_3_2" [ color=red, label="RooFormulaVar
+SigmaRes_bs_3_2"];
+"PeeK_bs_3_2" [ color=blue, label="RooRealVar
+PeeK_bs_3_2"];
+"ReducedMassRes_pdf_bs_3_2" [ color=red, label="RooKeysPdf
+ReducedMassRes_pdf_bs_3_2"];
+"N_bs_formula_corr_3_2" [ color=red, label="RooFormulaVar
+N_bs_formula_corr_3_2"];
+"N_bu_3_2" [ color=blue, label="RooRealVar
+N_bu_3_2"];
+"effratio_bs_3_2" [ color=blue, label="RooRealVar
+effratio_bs_3_2"];
+"pdf_bd_3_2" [ color=red, label="RooProdPdf
+pdf_bd_3_2"];
+"CB_bd_3_2" [ color=red, label="RooCBShape
+CB_bd_3_2"];
+"Mean_bd_3_2" [ color=blue, label="RooRealVar
+Mean_bd_3_2"];
+"Alpha_bd_3_2" [ color=blue, label="RooRealVar
+Alpha_bd_3_2"];
+"Enne_bd_3_2" [ color=blue, label="RooRealVar
+Enne_bd_3_2"];
+"SigmaRes_bd_3_2" [ color=red, label="RooFormulaVar
+SigmaRes_bd_3_2"];
+"PeeK_bd_3_2" [ color=blue, label="RooRealVar
+PeeK_bd_3_2"];
+"ReducedMassRes_pdf_bd_3_2" [ color=red, label="RooKeysPdf
+ReducedMassRes_pdf_bd_3_2"];
+"N_bd_formula_corr_3_2" [ color=red, label="RooFormulaVar
+N_bd_formula_corr_3_2"];
+"effratio_bd_3_2" [ color=blue, label="RooRealVar
+effratio_bd_3_2"];
+"pdf_1comb_3_2" [ color=red, label="RooProdPdf
+pdf_1comb_3_2"];
+"mass_1comb_3_2" [ color=red, label="RooBernstein
+mass_1comb_3_2"];
+"B_1comb_3_2" [ color=blue, label="RooRealVar
+B_1comb_3_2"];
+"B_2comb_3_2" [ color=red, label="RooFormulaVar
+B_2comb_3_2"];
+"ReducedMassRes_pdf_comb_3_2" [ color=red, label="RooKeysPdf
+ReducedMassRes_pdf_comb_3_2"];
+"N_comb_3_2" [ color=blue, label="RooRealVar
+N_comb_3_2"];
+"pdf_semi_3_2" [ color=red, label="RooProdPdf
+pdf_semi_3_2"];
+"ReducedMassRes_pdf_semi_3_2" [ color=red, label="RooKeysPdf
+ReducedMassRes_pdf_semi_3_2"];
+"keys_semi_3_2" [ color=red, label="RooKeysPdf
+keys_semi_3_2"];
+"N_semi_3_2" [ color=blue, label="RooRealVar
+N_semi_3_2"];
+"pdf_peak_3_2" [ color=red, label="RooProdPdf
+pdf_peak_3_2"];
+"mass_peak_3_2" [ color=red, label="RooAddPdf
+mass_peak_3_2"];
+"Gau_peak_3_2" [ color=red, label="RooGaussian
+Gau_peak_3_2"];
+"Mean_peak_3_2" [ color=blue, label="RooRealVar
+Mean_peak_3_2"];
+"Sigma_peak_3_2" [ color=blue, label="RooRealVar
+Sigma_peak_3_2"];
+"CoeffGauss_peak_3_2" [ color=blue, label="RooRealVar
+CoeffGauss_peak_3_2"];
+"CB_peak_3_2" [ color=red, label="RooCBShape
+CB_peak_3_2"];
+"Sigma2_peak_3_2" [ color=blue, label="RooRealVar
+Sigma2_peak_3_2"];
+"Alpha_peak_3_2" [ color=blue, label="RooRealVar
+Alpha_peak_3_2"];
+"Enne_peak_3_2" [ color=blue, label="RooRealVar
+Enne_peak_3_2"];
+"ReducedMassRes_pdf_peak_3_2" [ color=red, label="RooKeysPdf
+ReducedMassRes_pdf_peak_3_2"];
+"N_peak_3_2" [ color=blue, label="RooRealVar
+N_peak_3_2"];
+"pdf_constraints_3_2" [ color=red, label="RooProdPdf
+pdf_constraints_3_2"];
+"N_bu_gau_3_2" [ color=red, label="RooGaussian
+N_bu_gau_3_2"];
+"36775" [ color=red, label="RooConstVar
+36775"];
+"1852" [ color=red, label="RooConstVar
+1852"];
+"effratio_gau_bs_3_2" [ color=red, label="RooGaussian
+effratio_gau_bs_3_2"];
+"5.45455" [ color=red, label="RooConstVar
+5.45455"];
+"0.477857" [ color=red, label="RooConstVar
+0.477857"];
+"N_peak_gau_3_2" [ color=red, label="RooLognormal
+N_peak_gau_3_2"];
+"0.274" [ color=red, label="RooConstVar
+0.274"];
+"1.73171" [ color=red, label="RooConstVar
+1.73171"];
+"N_semi_gau_3_2" [ color=red, label="RooGaussian
+N_semi_gau_3_2"];
+"14.968" [ color=red, label="RooConstVar
+14.968"];
+"12.2239" [ color=red, label="RooConstVar
+12.2239"];
+"effratio_gau_bd_3_2" [ color=red, label="RooGaussian
+effratio_gau_bd_3_2"];
+"pdf_ext_total_3_3" [ color=red, label="RooProdPdf
+pdf_ext_total_3_3"];
+"pdf_ext_sum_3_3" [ color=red, label="RooAddPdf
+pdf_ext_sum_3_3"];
+"pdf_bs_3_3" [ color=red, label="RooProdPdf
+pdf_bs_3_3"];
+"CB_bs_3_3" [ color=red, label="RooCBShape
+CB_bs_3_3"];
+"Mean_bs_3_3" [ color=blue, label="RooRealVar
+Mean_bs_3_3"];
+"Alpha_bs_3_3" [ color=blue, label="RooRealVar
+Alpha_bs_3_3"];
+"Enne_bs_3_3" [ color=blue, label="RooRealVar
+Enne_bs_3_3"];
+"SigmaRes_bs_3_3" [ color=red, label="RooFormulaVar
+SigmaRes_bs_3_3"];
+"PeeK_bs_3_3" [ color=blue, label="RooRealVar
+PeeK_bs_3_3"];
+"ReducedMassRes_pdf_bs_3_3" [ color=red, label="RooKeysPdf
+ReducedMassRes_pdf_bs_3_3"];
+"N_bs_formula_corr_3_3" [ color=red, label="RooFormulaVar
+N_bs_formula_corr_3_3"];
+"N_bu_3_3" [ color=blue, label="RooRealVar
+N_bu_3_3"];
+"effratio_bs_3_3" [ color=blue, label="RooRealVar
+effratio_bs_3_3"];
+"pdf_bd_3_3" [ color=red, label="RooProdPdf
+pdf_bd_3_3"];
+"CB_bd_3_3" [ color=red, label="RooCBShape
+CB_bd_3_3"];
+"Mean_bd_3_3" [ color=blue, label="RooRealVar
+Mean_bd_3_3"];
+"Alpha_bd_3_3" [ color=blue, label="RooRealVar
+Alpha_bd_3_3"];
+"Enne_bd_3_3" [ color=blue, label="RooRealVar
+Enne_bd_3_3"];
+"SigmaRes_bd_3_3" [ color=red, label="RooFormulaVar
+SigmaRes_bd_3_3"];
+"PeeK_bd_3_3" [ color=blue, label="RooRealVar
+PeeK_bd_3_3"];
+"ReducedMassRes_pdf_bd_3_3" [ color=red, label="RooKeysPdf
+ReducedMassRes_pdf_bd_3_3"];
+"N_bd_formula_corr_3_3" [ color=red, label="RooFormulaVar
+N_bd_formula_corr_3_3"];
+"effratio_bd_3_3" [ color=blue, label="RooRealVar
+effratio_bd_3_3"];
+"pdf_1comb_3_3" [ color=red, label="RooProdPdf
+pdf_1comb_3_3"];
+"mass_1comb_3_3" [ color=red, label="RooBernstein
+mass_1comb_3_3"];
+"B_1comb_3_3" [ color=blue, label="RooRealVar
+B_1comb_3_3"];
+"B_2comb_3_3" [ color=red, label="RooFormulaVar
+B_2comb_3_3"];
+"ReducedMassRes_pdf_comb_3_3" [ color=red, label="RooKeysPdf
+ReducedMassRes_pdf_comb_3_3"];
+"N_comb_3_3" [ color=blue, label="RooRealVar
+N_comb_3_3"];
+"pdf_semi_3_3" [ color=red, label="RooProdPdf
+pdf_semi_3_3"];
+"ReducedMassRes_pdf_semi_3_3" [ color=red, label="RooKeysPdf
+ReducedMassRes_pdf_semi_3_3"];
+"keys_semi_3_3" [ color=red, label="RooKeysPdf
+keys_semi_3_3"];
+"N_semi_3_3" [ color=blue, label="RooRealVar
+N_semi_3_3"];
+"pdf_peak_3_3" [ color=red, label="RooProdPdf
+pdf_peak_3_3"];
+"mass_peak_3_3" [ color=red, label="RooAddPdf
+mass_peak_3_3"];
+"Gau_peak_3_3" [ color=red, label="RooGaussian
+Gau_peak_3_3"];
+"Mean_peak_3_3" [ color=blue, label="RooRealVar
+Mean_peak_3_3"];
+"Sigma_peak_3_3" [ color=blue, label="RooRealVar
+Sigma_peak_3_3"];
+"CoeffGauss_peak_3_3" [ color=blue, label="RooRealVar
+CoeffGauss_peak_3_3"];
+"CB_peak_3_3" [ color=red, label="RooCBShape
+CB_peak_3_3"];
+"Sigma2_peak_3_3" [ color=blue, label="RooRealVar
+Sigma2_peak_3_3"];
+"Alpha_peak_3_3" [ color=blue, label="RooRealVar
+Alpha_peak_3_3"];
+"Enne_peak_3_3" [ color=blue, label="RooRealVar
+Enne_peak_3_3"];
+"ReducedMassRes_pdf_peak_3_3" [ color=red, label="RooKeysPdf
+ReducedMassRes_pdf_peak_3_3"];
+"N_peak_3_3" [ color=blue, label="RooRealVar
+N_peak_3_3"];
+"pdf_constraints_3_3" [ color=red, label="RooProdPdf
+pdf_constraints_3_3"];
+"N_bu_gau_3_3" [ color=red, label="RooGaussian
+N_bu_gau_3_3"];
+"47910" [ color=red, label="RooConstVar
+47910"];
+"2407" [ color=red, label="RooConstVar
+2407"];
+"effratio_gau_bs_3_3" [ color=red, label="RooGaussian
+effratio_gau_bs_3_3"];
+"4" [ color=red, label="RooConstVar
+4"];
+"0.350428" [ color=red, label="RooConstVar
+0.350428"];
+"N_peak_gau_3_3" [ color=red, label="RooLognormal
+N_peak_gau_3_3"];
+"0.25" [ color=red, label="RooConstVar
+0.25"];
+"1.72958" [ color=red, label="RooConstVar
+1.72958"];
+"N_semi_gau_3_3" [ color=red, label="RooGaussian
+N_semi_gau_3_3"];
+"8.586" [ color=red, label="RooConstVar
+8.586"];
+"6.64393" [ color=red, label="RooConstVar
+6.64393"];
+"effratio_gau_bd_3_3" [ color=red, label="RooGaussian
+effratio_gau_bd_3_3"];
+"pdf_bs_0_0" -> "ReducedMassRes_pdf_bs_0_0";
+"pdf_bs_0_0" -> "CB_bs_0_0";
+"ReducedMassRes_pdf_bs_3_0" -> "ReducedMassRes";
+"ReducedMassRes_pdf_semi_0_0" -> "ReducedMassRes";
+"ReducedMassRes_pdf_bs_0_0" -> "ReducedMassRes";
+"CB_bs_0_0" -> "SigmaRes_bs_0_0";
+"CB_bs_0_0" -> "Mass";
+"CB_bs_0_0" -> "Mean_bs_0_0";
+"CB_bs_0_0" -> "Alpha_bs_0_0";
+"CB_bs_0_0" -> "Enne_bs_0_0";
+"SigmaRes_bs_0_0" -> "Mass";
+"SigmaRes_bs_0_0" -> "ReducedMassRes";
+"SigmaRes_bs_0_0" -> "PeeK_bs_0_0";
+"keys_semi_0_0" -> "Mass";
+"pdf_semi_0_0" -> "ReducedMassRes_pdf_semi_0_0";
+"pdf_semi_0_0" -> "keys_semi_0_0";
+"pdf_bd_0_0" -> "ReducedMassRes_pdf_bd_0_0";
+"pdf_bd_0_0" -> "CB_bd_0_0";
+"ReducedMassRes_pdf_bd_0_0" -> "ReducedMassRes";
+"CB_bd_0_0" -> "SigmaRes_bd_0_0";
+"CB_bd_0_0" -> "Mass";
+"CB_bd_0_0" -> "Mean_bd_0_0";
+"CB_bd_0_0" -> "Alpha_bd_0_0";
+"CB_bd_0_0" -> "Enne_bd_0_0";
+"SigmaRes_bd_0_0" -> "Mass";
+"SigmaRes_bd_0_0" -> "ReducedMassRes";
+"SigmaRes_bd_0_0" -> "PeeK_bd_0_0";
+"ReducedMassRes_pdf_peak_0_0" -> "ReducedMassRes";
+"pdf_peak_0_0" -> "ReducedMassRes_pdf_peak_0_0";
+"pdf_peak_0_0" -> "mass_peak_0_0";
+"mass_peak_0_0" -> "Gau_peak_0_0";
+"mass_peak_0_0" -> "CB_peak_0_0";
+"mass_peak_0_0" -> "CoeffGauss_peak_0_0";
+"Gau_peak_0_0" -> "Mass";
+"Gau_peak_0_0" -> "Mean_peak_0_0";
+"Gau_peak_0_0" -> "Sigma_peak_0_0";
+"CB_peak_0_0" -> "Mass";
+"CB_peak_0_0" -> "Mean_peak_0_0";
+"CB_peak_0_0" -> "Sigma2_peak_0_0";
+"CB_peak_0_0" -> "Alpha_peak_0_0";
+"CB_peak_0_0" -> "Enne_peak_0_0";
+"ReducedMassRes_pdf_comb_0_0" -> "ReducedMassRes";
+"ReducedMassRes_pdf_bs_0_1" -> "ReducedMassRes";
+"pdf_bs_0_1" -> "ReducedMassRes_pdf_bs_0_1";
+"pdf_bs_0_1" -> "CB_bs_0_1";
+"CB_bs_0_1" -> "SigmaRes_bs_0_1";
+"CB_bs_0_1" -> "Mass";
+"CB_bs_0_1" -> "Mean_bs_0_1";
+"CB_bs_0_1" -> "Alpha_bs_0_1";
+"CB_bs_0_1" -> "Enne_bs_0_1";
+"SigmaRes_bs_0_1" -> "Mass";
+"SigmaRes_bs_0_1" -> "ReducedMassRes";
+"SigmaRes_bs_0_1" -> "PeeK_bs_0_1";
+"ReducedMassRes_pdf_bd_0_1" -> "ReducedMassRes";
+"pdf_bd_0_1" -> "ReducedMassRes_pdf_bd_0_1";
+"pdf_bd_0_1" -> "CB_bd_0_1";
+"CB_bd_0_1" -> "SigmaRes_bd_0_1";
+"CB_bd_0_1" -> "Mass";
+"CB_bd_0_1" -> "Mean_bd_0_1";
+"CB_bd_0_1" -> "Alpha_bd_0_1";
+"CB_bd_0_1" -> "Enne_bd_0_1";
+"SigmaRes_bd_0_1" -> "Mass";
+"SigmaRes_bd_0_1" -> "ReducedMassRes";
+"SigmaRes_bd_0_1" -> "PeeK_bd_0_1";
+"ReducedMassRes_pdf_peak_0_1" -> "ReducedMassRes";
+"pdf_peak_0_1" -> "ReducedMassRes_pdf_peak_0_1";
+"pdf_peak_0_1" -> "mass_peak_0_1";
+"mass_peak_0_1" -> "Gau_peak_0_1";
+"mass_peak_0_1" -> "CB_peak_0_1";
+"mass_peak_0_1" -> "CoeffGauss_peak_0_1";
+"Gau_peak_0_1" -> "Mass";
+"Gau_peak_0_1" -> "Mean_peak_0_1";
+"Gau_peak_0_1" -> "Sigma_peak_0_1";
+"CB_peak_0_1" -> "Mass";
+"CB_peak_0_1" -> "Mean_peak_0_1";
+"CB_peak_0_1" -> "Sigma2_peak_0_1";
+"CB_peak_0_1" -> "Alpha_peak_0_1";
+"CB_peak_0_1" -> "Enne_peak_0_1";
+"ReducedMassRes_pdf_semi_0_1" -> "ReducedMassRes";
+"pdf_semi_0_1" -> "ReducedMassRes_pdf_semi_0_1";
+"pdf_semi_0_1" -> "keys_semi_0_1";
+"keys_semi_0_1" -> "Mass";
+"ReducedMassRes_pdf_comb_0_1" -> "ReducedMassRes";
+"ReducedMassRes_pdf_bs_1_0" -> "ReducedMassRes";
+"pdf_bs_1_0" -> "ReducedMassRes_pdf_bs_1_0";
+"pdf_bs_1_0" -> "CB_bs_1_0";
+"CB_bs_1_0" -> "SigmaRes_bs_1_0";
+"CB_bs_1_0" -> "Mass";
+"CB_bs_1_0" -> "Mean_bs_1_0";
+"CB_bs_1_0" -> "Alpha_bs_1_0";
+"CB_bs_1_0" -> "Enne_bs_1_0";
+"SigmaRes_bs_1_0" -> "Mass";
+"SigmaRes_bs_1_0" -> "ReducedMassRes";
+"SigmaRes_bs_1_0" -> "PeeK_bs_1_0";
+"ReducedMassRes_pdf_bd_1_0" -> "ReducedMassRes";
+"pdf_bd_1_0" -> "ReducedMassRes_pdf_bd_1_0";
+"pdf_bd_1_0" -> "CB_bd_1_0";
+"CB_bd_1_0" -> "SigmaRes_bd_1_0";
+"CB_bd_1_0" -> "Mass";
+"CB_bd_1_0" -> "Mean_bd_1_0";
+"CB_bd_1_0" -> "Alpha_bd_1_0";
+"CB_bd_1_0" -> "Enne_bd_1_0";
+"SigmaRes_bd_1_0" -> "Mass";
+"SigmaRes_bd_1_0" -> "ReducedMassRes";
+"SigmaRes_bd_1_0" -> "PeeK_bd_1_0";
+"ReducedMassRes_pdf_peak_1_0" -> "ReducedMassRes";
+"pdf_peak_1_0" -> "ReducedMassRes_pdf_peak_1_0";
+"pdf_peak_1_0" -> "mass_peak_1_0";
+"mass_peak_1_0" -> "Gau_peak_1_0";
+"mass_peak_1_0" -> "CB_peak_1_0";
+"mass_peak_1_0" -> "CoeffGauss_peak_1_0";
+"Gau_peak_1_0" -> "Mass";
+"Gau_peak_1_0" -> "Mean_peak_1_0";
+"Gau_peak_1_0" -> "Sigma_peak_1_0";
+"CB_peak_1_0" -> "Mass";
+"CB_peak_1_0" -> "Mean_peak_1_0";
+"CB_peak_1_0" -> "Sigma2_peak_1_0";
+"CB_peak_1_0" -> "Alpha_peak_1_0";
+"CB_peak_1_0" -> "Enne_peak_1_0";
+"ReducedMassRes_pdf_semi_1_0" -> "ReducedMassRes";
+"pdf_semi_1_0" -> "ReducedMassRes_pdf_semi_1_0";
+"pdf_semi_1_0" -> "keys_semi_1_0";
+"keys_semi_1_0" -> "Mass";
+"ReducedMassRes_pdf_comb_1_0" -> "ReducedMassRes";
+"ReducedMassRes_pdf_bs_1_1" -> "ReducedMassRes";
+"pdf_bs_1_1" -> "ReducedMassRes_pdf_bs_1_1";
+"pdf_bs_1_1" -> "CB_bs_1_1";
+"CB_bs_1_1" -> "SigmaRes_bs_1_1";
+"CB_bs_1_1" -> "Mass";
+"CB_bs_1_1" -> "Mean_bs_1_1";
+"CB_bs_1_1" -> "Alpha_bs_1_1";
+"CB_bs_1_1" -> "Enne_bs_1_1";
+"SigmaRes_bs_1_1" -> "Mass";
+"SigmaRes_bs_1_1" -> "ReducedMassRes";
+"SigmaRes_bs_1_1" -> "PeeK_bs_1_1";
+"ReducedMassRes_pdf_bd_1_1" -> "ReducedMassRes";
+"pdf_bd_1_1" -> "ReducedMassRes_pdf_bd_1_1";
+"pdf_bd_1_1" -> "CB_bd_1_1";
+"CB_bd_1_1" -> "SigmaRes_bd_1_1";
+"CB_bd_1_1" -> "Mass";
+"CB_bd_1_1" -> "Mean_bd_1_1";
+"CB_bd_1_1" -> "Alpha_bd_1_1";
+"CB_bd_1_1" -> "Enne_bd_1_1";
+"SigmaRes_bd_1_1" -> "Mass";
+"SigmaRes_bd_1_1" -> "ReducedMassRes";
+"SigmaRes_bd_1_1" -> "PeeK_bd_1_1";
+"ReducedMassRes_pdf_peak_1_1" -> "ReducedMassRes";
+"pdf_peak_1_1" -> "ReducedMassRes_pdf_peak_1_1";
+"pdf_peak_1_1" -> "mass_peak_1_1";
+"mass_peak_1_1" -> "Gau_peak_1_1";
+"mass_peak_1_1" -> "CB_peak_1_1";
+"mass_peak_1_1" -> "CoeffGauss_peak_1_1";
+"Gau_peak_1_1" -> "Mass";
+"Gau_peak_1_1" -> "Mean_peak_1_1";
+"Gau_peak_1_1" -> "Sigma_peak_1_1";
+"CB_peak_1_1" -> "Mass";
+"CB_peak_1_1" -> "Mean_peak_1_1";
+"CB_peak_1_1" -> "Sigma2_peak_1_1";
+"CB_peak_1_1" -> "Alpha_peak_1_1";
+"CB_peak_1_1" -> "Enne_peak_1_1";
+"ReducedMassRes_pdf_semi_1_1" -> "ReducedMassRes";
+"pdf_semi_1_1" -> "ReducedMassRes_pdf_semi_1_1";
+"pdf_semi_1_1" -> "keys_semi_1_1";
+"keys_semi_1_1" -> "Mass";
+"ReducedMassRes_pdf_comb_1_1" -> "ReducedMassRes";
+"pdf_bs_3_0" -> "ReducedMassRes_pdf_bs_3_0";
+"pdf_bs_3_0" -> "CB_bs_3_0";
+"CB_bs_3_0" -> "SigmaRes_bs_3_0";
+"CB_bs_3_0" -> "Mass";
+"CB_bs_3_0" -> "Mean_bs_3_0";
+"CB_bs_3_0" -> "Alpha_bs_3_0";
+"CB_bs_3_0" -> "Enne_bs_3_0";
+"SigmaRes_bs_3_0" -> "Mass";
+"SigmaRes_bs_3_0" -> "ReducedMassRes";
+"SigmaRes_bs_3_0" -> "PeeK_bs_3_0";
+"pdf_bd_3_0" -> "ReducedMassRes_pdf_bd_3_0";
+"pdf_bd_3_0" -> "CB_bd_3_0";
+"ReducedMassRes_pdf_bs_2_0" -> "ReducedMassRes";
+"pdf_bs_2_0" -> "ReducedMassRes_pdf_bs_2_0";
+"pdf_bs_2_0" -> "CB_bs_2_0";
+"CB_bs_2_0" -> "SigmaRes_bs_2_0";
+"CB_bs_2_0" -> "Mass";
+"CB_bs_2_0" -> "Mean_bs_2_0";
+"CB_bs_2_0" -> "Alpha_bs_2_0";
+"CB_bs_2_0" -> "Enne_bs_2_0";
+"SigmaRes_bs_2_0" -> "Mass";
+"SigmaRes_bs_2_0" -> "ReducedMassRes";
+"SigmaRes_bs_2_0" -> "PeeK_bs_2_0";
+"ReducedMassRes_pdf_bd_2_0" -> "ReducedMassRes";
+"pdf_bd_2_0" -> "ReducedMassRes_pdf_bd_2_0";
+"pdf_bd_2_0" -> "CB_bd_2_0";
+"CB_bd_2_0" -> "SigmaRes_bd_2_0";
+"CB_bd_2_0" -> "Mass";
+"CB_bd_2_0" -> "Mean_bd_2_0";
+"CB_bd_2_0" -> "Alpha_bd_2_0";
+"CB_bd_2_0" -> "Enne_bd_2_0";
+"SigmaRes_bd_2_0" -> "Mass";
+"SigmaRes_bd_2_0" -> "ReducedMassRes";
+"SigmaRes_bd_2_0" -> "PeeK_bd_2_0";
+"ReducedMassRes_pdf_peak_2_0" -> "ReducedMassRes";
+"pdf_peak_2_0" -> "ReducedMassRes_pdf_peak_2_0";
+"pdf_peak_2_0" -> "mass_peak_2_0";
+"mass_peak_2_0" -> "Gau_peak_2_0";
+"mass_peak_2_0" -> "CB_peak_2_0";
+"mass_peak_2_0" -> "CoeffGauss_peak_2_0";
+"Gau_peak_2_0" -> "Mass";
+"Gau_peak_2_0" -> "Mean_peak_2_0";
+"Gau_peak_2_0" -> "Sigma_peak_2_0";
+"CB_peak_2_0" -> "Mass";
+"CB_peak_2_0" -> "Mean_peak_2_0";
+"CB_peak_2_0" -> "Sigma2_peak_2_0";
+"CB_peak_2_0" -> "Alpha_peak_2_0";
+"CB_peak_2_0" -> "Enne_peak_2_0";
+"ReducedMassRes_pdf_semi_2_0" -> "ReducedMassRes";
+"pdf_semi_2_0" -> "ReducedMassRes_pdf_semi_2_0";
+"pdf_semi_2_0" -> "keys_semi_2_0";
+"keys_semi_2_0" -> "Mass";
+"ReducedMassRes_pdf_comb_2_0" -> "ReducedMassRes";
+"ReducedMassRes_pdf_bs_2_1" -> "ReducedMassRes";
+"pdf_bs_2_1" -> "ReducedMassRes_pdf_bs_2_1";
+"pdf_bs_2_1" -> "CB_bs_2_1";
+"CB_bs_2_1" -> "SigmaRes_bs_2_1";
+"CB_bs_2_1" -> "Mass";
+"CB_bs_2_1" -> "Mean_bs_2_1";
+"CB_bs_2_1" -> "Alpha_bs_2_1";
+"CB_bs_2_1" -> "Enne_bs_2_1";
+"SigmaRes_bs_2_1" -> "Mass";
+"SigmaRes_bs_2_1" -> "ReducedMassRes";
+"SigmaRes_bs_2_1" -> "PeeK_bs_2_1";
+"ReducedMassRes_pdf_bd_2_1" -> "ReducedMassRes";
+"pdf_bd_2_1" -> "ReducedMassRes_pdf_bd_2_1";
+"pdf_bd_2_1" -> "CB_bd_2_1";
+"CB_bd_2_1" -> "SigmaRes_bd_2_1";
+"CB_bd_2_1" -> "Mass";
+"CB_bd_2_1" -> "Mean_bd_2_1";
+"CB_bd_2_1" -> "Alpha_bd_2_1";
+"CB_bd_2_1" -> "Enne_bd_2_1";
+"SigmaRes_bd_2_1" -> "Mass";
+"SigmaRes_bd_2_1" -> "ReducedMassRes";
+"SigmaRes_bd_2_1" -> "PeeK_bd_2_1";
+"ReducedMassRes_pdf_peak_2_1" -> "ReducedMassRes";
+"pdf_peak_2_1" -> "ReducedMassRes_pdf_peak_2_1";
+"pdf_peak_2_1" -> "mass_peak_2_1";
+"mass_peak_2_1" -> "Gau_peak_2_1";
+"mass_peak_2_1" -> "CB_peak_2_1";
+"mass_peak_2_1" -> "CoeffGauss_peak_2_1";
+"Gau_peak_2_1" -> "Mass";
+"Gau_peak_2_1" -> "Mean_peak_2_1";
+"Gau_peak_2_1" -> "Sigma_peak_2_1";
+"CB_peak_2_1" -> "Mass";
+"CB_peak_2_1" -> "Mean_peak_2_1";
+"CB_peak_2_1" -> "Sigma2_peak_2_1";
+"CB_peak_2_1" -> "Alpha_peak_2_1";
+"CB_peak_2_1" -> "Enne_peak_2_1";
+"ReducedMassRes_pdf_semi_2_1" -> "ReducedMassRes";
+"pdf_semi_2_1" -> "ReducedMassRes_pdf_semi_2_1";
+"pdf_semi_2_1" -> "keys_semi_2_1";
+"keys_semi_2_1" -> "Mass";
+"ReducedMassRes_pdf_comb_2_1" -> "ReducedMassRes";
+"ReducedMassRes_pdf_bs_2_2" -> "ReducedMassRes";
+"pdf_bs_2_2" -> "ReducedMassRes_pdf_bs_2_2";
+"pdf_bs_2_2" -> "CB_bs_2_2";
+"CB_bs_2_2" -> "SigmaRes_bs_2_2";
+"CB_bs_2_2" -> "Mass";
+"CB_bs_2_2" -> "Mean_bs_2_2";
+"CB_bs_2_2" -> "Alpha_bs_2_2";
+"CB_bs_2_2" -> "Enne_bs_2_2";
+"SigmaRes_bs_2_2" -> "Mass";
+"SigmaRes_bs_2_2" -> "ReducedMassRes";
+"SigmaRes_bs_2_2" -> "PeeK_bs_2_2";
+"ReducedMassRes_pdf_bd_2_2" -> "ReducedMassRes";
+"pdf_bd_2_2" -> "ReducedMassRes_pdf_bd_2_2";
+"pdf_bd_2_2" -> "CB_bd_2_2";
+"CB_bd_2_2" -> "SigmaRes_bd_2_2";
+"CB_bd_2_2" -> "Mass";
+"CB_bd_2_2" -> "Mean_bd_2_2";
+"CB_bd_2_2" -> "Alpha_bd_2_2";
+"CB_bd_2_2" -> "Enne_bd_2_2";
+"SigmaRes_bd_2_2" -> "Mass";
+"SigmaRes_bd_2_2" -> "ReducedMassRes";
+"SigmaRes_bd_2_2" -> "PeeK_bd_2_2";
+"ReducedMassRes_pdf_peak_2_2" -> "ReducedMassRes";
+"pdf_peak_2_2" -> "ReducedMassRes_pdf_peak_2_2";
+"pdf_peak_2_2" -> "mass_peak_2_2";
+"mass_peak_2_2" -> "Gau_peak_2_2";
+"mass_peak_2_2" -> "CB_peak_2_2";
+"mass_peak_2_2" -> "CoeffGauss_peak_2_2";
+"Gau_peak_2_2" -> "Mass";
+"Gau_peak_2_2" -> "Mean_peak_2_2";
+"Gau_peak_2_2" -> "Sigma_peak_2_2";
+"CB_peak_2_2" -> "Mass";
+"CB_peak_2_2" -> "Mean_peak_2_2";
+"CB_peak_2_2" -> "Sigma2_peak_2_2";
+"CB_peak_2_2" -> "Alpha_peak_2_2";
+"CB_peak_2_2" -> "Enne_peak_2_2";
+"ReducedMassRes_pdf_semi_2_2" -> "ReducedMassRes";
+"pdf_semi_2_2" -> "ReducedMassRes_pdf_semi_2_2";
+"pdf_semi_2_2" -> "keys_semi_2_2";
+"keys_semi_2_2" -> "Mass";
+"ReducedMassRes_pdf_comb_2_2" -> "ReducedMassRes";
+"ReducedMassRes_pdf_bs_2_3" -> "ReducedMassRes";
+"pdf_bs_2_3" -> "ReducedMassRes_pdf_bs_2_3";
+"pdf_bs_2_3" -> "CB_bs_2_3";
+"CB_bs_2_3" -> "SigmaRes_bs_2_3";
+"CB_bs_2_3" -> "Mass";
+"CB_bs_2_3" -> "Mean_bs_2_3";
+"CB_bs_2_3" -> "Alpha_bs_2_3";
+"CB_bs_2_3" -> "Enne_bs_2_3";
+"SigmaRes_bs_2_3" -> "Mass";
+"SigmaRes_bs_2_3" -> "ReducedMassRes";
+"SigmaRes_bs_2_3" -> "PeeK_bs_2_3";
+"ReducedMassRes_pdf_bd_2_3" -> "ReducedMassRes";
+"pdf_bd_2_3" -> "ReducedMassRes_pdf_bd_2_3";
+"pdf_bd_2_3" -> "CB_bd_2_3";
+"CB_bd_2_3" -> "SigmaRes_bd_2_3";
+"CB_bd_2_3" -> "Mass";
+"CB_bd_2_3" -> "Mean_bd_2_3";
+"CB_bd_2_3" -> "Alpha_bd_2_3";
+"CB_bd_2_3" -> "Enne_bd_2_3";
+"SigmaRes_bd_2_3" -> "Mass";
+"SigmaRes_bd_2_3" -> "ReducedMassRes";
+"SigmaRes_bd_2_3" -> "PeeK_bd_2_3";
+"ReducedMassRes_pdf_peak_2_3" -> "ReducedMassRes";
+"pdf_peak_2_3" -> "ReducedMassRes_pdf_peak_2_3";
+"pdf_peak_2_3" -> "mass_peak_2_3";
+"mass_peak_2_3" -> "Gau_peak_2_3";
+"mass_peak_2_3" -> "CB_peak_2_3";
+"mass_peak_2_3" -> "CoeffGauss_peak_2_3";
+"Gau_peak_2_3" -> "Mass";
+"Gau_peak_2_3" -> "Mean_peak_2_3";
+"Gau_peak_2_3" -> "Sigma_peak_2_3";
+"CB_peak_2_3" -> "Mass";
+"CB_peak_2_3" -> "Mean_peak_2_3";
+"CB_peak_2_3" -> "Sigma2_peak_2_3";
+"CB_peak_2_3" -> "Alpha_peak_2_3";
+"CB_peak_2_3" -> "Enne_peak_2_3";
+"ReducedMassRes_pdf_semi_2_3" -> "ReducedMassRes";
+"pdf_semi_2_3" -> "ReducedMassRes_pdf_semi_2_3";
+"pdf_semi_2_3" -> "keys_semi_2_3";
+"keys_semi_2_3" -> "Mass";
+"ReducedMassRes_pdf_comb_2_3" -> "ReducedMassRes";
+"N_bs_formula_corr_1_0" -> "fs_over_fu";
+"N_bs_formula_corr_1_0" -> "effratio_bs_1_0";
+"N_bs_formula_corr_1_0" -> "N_bu_1_0";
+"N_bs_formula_corr_1_0" -> "one_over_BRBR";
+"N_bs_formula_corr_1_0" -> "R_bs";
+"N_bs_formula_corr_1_0" -> "BF_bs_SM";
+"N_bd_formula_corr_3_0" -> "one_over_BRBR";
+"N_bd_formula_corr_3_0" -> "N_bu_3_0";
+"N_bd_formula_corr_3_0" -> "effratio_bd_3_0";
+"N_bd_formula_corr_3_0" -> "R_bd_over_bs";
+"N_bd_formula_corr_3_0" -> "R_bs";
+"N_bd_formula_corr_3_0" -> "BF_bd_SM";
+"N_bs_formula_corr_3_1" -> "fs_over_fu";
+"N_bs_formula_corr_3_1" -> "one_over_BRBR";
+"N_bs_formula_corr_3_1" -> "effratio_bs_3_1";
+"N_bs_formula_corr_3_1" -> "N_bu_3_1";
+"N_bs_formula_corr_3_1" -> "R_bs";
+"N_bs_formula_corr_3_1" -> "BF_bs_SM";
+"N_bd_formula_corr_3_1" -> "one_over_BRBR";
+"N_bd_formula_corr_3_1" -> "N_bu_3_1";
+"N_bd_formula_corr_3_1" -> "effratio_bd_3_1";
+"N_bd_formula_corr_3_1" -> "R_bd_over_bs";
+"N_bd_formula_corr_3_1" -> "R_bs";
+"N_bd_formula_corr_3_1" -> "BF_bd_SM";
+"N_bs_formula_corr_3_2" -> "fs_over_fu";
+"N_bs_formula_corr_3_2" -> "one_over_BRBR";
+"N_bs_formula_corr_3_2" -> "effratio_bs_3_2";
+"N_bs_formula_corr_3_2" -> "N_bu_3_2";
+"N_bs_formula_corr_3_2" -> "R_bs";
+"N_bs_formula_corr_3_2" -> "BF_bs_SM";
+"N_bd_formula_corr_3_2" -> "one_over_BRBR";
+"N_bd_formula_corr_3_2" -> "N_bu_3_2";
+"N_bd_formula_corr_3_2" -> "effratio_bd_3_2";
+"N_bd_formula_corr_3_2" -> "R_bd_over_bs";
+"N_bd_formula_corr_3_2" -> "R_bs";
+"N_bd_formula_corr_3_2" -> "BF_bd_SM";
+"N_bs_formula_corr_3_3" -> "fs_over_fu";
+"N_bs_formula_corr_3_3" -> "one_over_BRBR";
+"N_bs_formula_corr_3_3" -> "effratio_bs_3_3";
+"N_bs_formula_corr_3_3" -> "N_bu_3_3";
+"N_bs_formula_corr_3_3" -> "R_bs";
+"N_bs_formula_corr_3_3" -> "BF_bs_SM";
+"N_bd_formula_corr_1_0" -> "N_bu_1_0";
+"N_bd_formula_corr_1_0" -> "effratio_bd_1_0";
+"N_bd_formula_corr_1_0" -> "one_over_BRBR";
+"N_bd_formula_corr_1_0" -> "R_bd_over_bs";
+"N_bd_formula_corr_1_0" -> "R_bs";
+"N_bd_formula_corr_1_0" -> "BF_bd_SM";
+"N_bs_formula_corr_1_1" -> "fs_over_fu";
+"N_bs_formula_corr_1_1" -> "one_over_BRBR";
+"N_bs_formula_corr_1_1" -> "effratio_bs_1_1";
+"N_bs_formula_corr_1_1" -> "N_bu_1_1";
+"N_bs_formula_corr_1_1" -> "R_bs";
+"N_bs_formula_corr_1_1" -> "BF_bs_SM";
+"N_bd_formula_corr_1_1" -> "one_over_BRBR";
+"N_bd_formula_corr_1_1" -> "N_bu_1_1";
+"N_bd_formula_corr_1_1" -> "effratio_bd_1_1";
+"N_bd_formula_corr_1_1" -> "R_bd_over_bs";
+"N_bd_formula_corr_1_1" -> "R_bs";
+"N_bd_formula_corr_1_1" -> "BF_bd_SM";
+"N_bs_formula_corr_2_0" -> "fs_over_fu";
+"N_bs_formula_corr_2_0" -> "one_over_BRBR";
+"N_bs_formula_corr_2_0" -> "effratio_bs_2_0";
+"N_bs_formula_corr_2_0" -> "N_bu_2_0";
+"N_bs_formula_corr_2_0" -> "R_bs";
+"N_bs_formula_corr_2_0" -> "BF_bs_SM";
+"N_bd_formula_corr_2_0" -> "one_over_BRBR";
+"N_bd_formula_corr_2_0" -> "N_bu_2_0";
+"N_bd_formula_corr_2_0" -> "effratio_bd_2_0";
+"N_bd_formula_corr_2_0" -> "R_bd_over_bs";
+"N_bd_formula_corr_2_0" -> "R_bs";
+"N_bd_formula_corr_2_0" -> "BF_bd_SM";
+"N_bs_formula_corr_2_1" -> "fs_over_fu";
+"N_bs_formula_corr_2_1" -> "one_over_BRBR";
+"N_bs_formula_corr_2_1" -> "effratio_bs_2_1";
+"N_bs_formula_corr_2_1" -> "N_bu_2_1";
+"N_bs_formula_corr_2_1" -> "R_bs";
+"N_bs_formula_corr_2_1" -> "BF_bs_SM";
+"N_bs_formula_corr_0_0" -> "effratio_bs_0_0";
+"N_bs_formula_corr_0_0" -> "N_bu_0_0";
+"N_bs_formula_corr_0_0" -> "fs_over_fu";
+"N_bs_formula_corr_0_0" -> "one_over_BRBR";
+"N_bs_formula_corr_0_0" -> "R_bs";
+"N_bs_formula_corr_0_0" -> "BF_bs_SM";
+"N_bu_gau_0_0" -> "N_bu_0_0";
+"N_bu_gau_0_0" -> "50690";
+"N_bu_gau_0_0" -> "2558";
+"N_bd_formula_corr_2_1" -> "one_over_BRBR";
+"N_bd_formula_corr_2_1" -> "N_bu_2_1";
+"N_bd_formula_corr_2_1" -> "effratio_bd_2_1";
+"N_bd_formula_corr_2_1" -> "R_bd_over_bs";
+"N_bd_formula_corr_2_1" -> "R_bs";
+"N_bd_formula_corr_2_1" -> "BF_bd_SM";
+"N_bd_formula_corr_0_0" -> "N_bu_0_0";
+"N_bd_formula_corr_0_0" -> "effratio_bd_0_0";
+"N_bd_formula_corr_0_0" -> "one_over_BRBR";
+"N_bd_formula_corr_0_0" -> "R_bd_over_bs";
+"N_bd_formula_corr_0_0" -> "R_bs";
+"N_bd_formula_corr_0_0" -> "BF_bd_SM";
+"N_bs_formula_corr_0_1" -> "N_bu_0_1";
+"N_bs_formula_corr_0_1" -> "effratio_bs_0_1";
+"N_bs_formula_corr_0_1" -> "fs_over_fu";
+"N_bs_formula_corr_0_1" -> "one_over_BRBR";
+"N_bs_formula_corr_0_1" -> "R_bs";
+"N_bs_formula_corr_0_1" -> "BF_bs_SM";
+"N_bd_formula_corr_0_1" -> "effratio_bd_0_1";
+"N_bd_formula_corr_0_1" -> "N_bu_0_1";
+"N_bd_formula_corr_0_1" -> "one_over_BRBR";
+"N_bd_formula_corr_0_1" -> "R_bd_over_bs";
+"N_bd_formula_corr_0_1" -> "R_bs";
+"N_bd_formula_corr_0_1" -> "BF_bd_SM";
+"ReducedMassRes_pdf_bd_3_0" -> "ReducedMassRes";
+"CB_bd_3_0" -> "SigmaRes_bd_3_0";
+"CB_bd_3_0" -> "Mass";
+"CB_bd_3_0" -> "Mean_bd_3_0";
+"CB_bd_3_0" -> "Alpha_bd_3_0";
+"CB_bd_3_0" -> "Enne_bd_3_0";
+"SigmaRes_bd_3_0" -> "Mass";
+"SigmaRes_bd_3_0" -> "ReducedMassRes";
+"SigmaRes_bd_3_0" -> "PeeK_bd_3_0";
+"ReducedMassRes_pdf_peak_3_0" -> "ReducedMassRes";
+"pdf_peak_3_0" -> "ReducedMassRes_pdf_peak_3_0";
+"pdf_peak_3_0" -> "mass_peak_3_0";
+"mass_peak_3_0" -> "Gau_peak_3_0";
+"mass_peak_3_0" -> "CB_peak_3_0";
+"mass_peak_3_0" -> "CoeffGauss_peak_3_0";
+"Gau_peak_3_0" -> "Mass";
+"Gau_peak_3_0" -> "Mean_peak_3_0";
+"Gau_peak_3_0" -> "Sigma_peak_3_0";
+"CB_peak_3_0" -> "Mass";
+"CB_peak_3_0" -> "Mean_peak_3_0";
+"CB_peak_3_0" -> "Sigma2_peak_3_0";
+"CB_peak_3_0" -> "Alpha_peak_3_0";
+"CB_peak_3_0" -> "Enne_peak_3_0";
+"ReducedMassRes_pdf_semi_3_0" -> "ReducedMassRes";
+"pdf_semi_3_0" -> "ReducedMassRes_pdf_semi_3_0";
+"pdf_semi_3_0" -> "keys_semi_3_0";
+"keys_semi_3_0" -> "Mass";
+"ReducedMassRes_pdf_comb_3_0" -> "ReducedMassRes";
+"ReducedMassRes_pdf_bs_3_1" -> "ReducedMassRes";
+"pdf_bs_3_1" -> "ReducedMassRes_pdf_bs_3_1";
+"pdf_bs_3_1" -> "CB_bs_3_1";
+"CB_bs_3_1" -> "SigmaRes_bs_3_1";
+"CB_bs_3_1" -> "Mass";
+"CB_bs_3_1" -> "Mean_bs_3_1";
+"CB_bs_3_1" -> "Alpha_bs_3_1";
+"CB_bs_3_1" -> "Enne_bs_3_1";
+"SigmaRes_bs_3_1" -> "Mass";
+"SigmaRes_bs_3_1" -> "ReducedMassRes";
+"SigmaRes_bs_3_1" -> "PeeK_bs_3_1";
+"ReducedMassRes_pdf_bd_3_1" -> "ReducedMassRes";
+"pdf_bd_3_1" -> "ReducedMassRes_pdf_bd_3_1";
+"pdf_bd_3_1" -> "CB_bd_3_1";
+"CB_bd_3_1" -> "SigmaRes_bd_3_1";
+"CB_bd_3_1" -> "Mass";
+"CB_bd_3_1" -> "Mean_bd_3_1";
+"CB_bd_3_1" -> "Alpha_bd_3_1";
+"CB_bd_3_1" -> "Enne_bd_3_1";
+"SigmaRes_bd_3_1" -> "Mass";
+"SigmaRes_bd_3_1" -> "ReducedMassRes";
+"SigmaRes_bd_3_1" -> "PeeK_bd_3_1";
+"ReducedMassRes_pdf_peak_3_1" -> "ReducedMassRes";
+"pdf_peak_3_1" -> "ReducedMassRes_pdf_peak_3_1";
+"pdf_peak_3_1" -> "mass_peak_3_1";
+"mass_peak_3_1" -> "Gau_peak_3_1";
+"mass_peak_3_1" -> "CB_peak_3_1";
+"mass_peak_3_1" -> "CoeffGauss_peak_3_1";
+"Gau_peak_3_1" -> "Mass";
+"Gau_peak_3_1" -> "Mean_peak_3_1";
+"Gau_peak_3_1" -> "Sigma_peak_3_1";
+"CB_peak_3_1" -> "Mass";
+"CB_peak_3_1" -> "Mean_peak_3_1";
+"CB_peak_3_1" -> "Sigma2_peak_3_1";
+"CB_peak_3_1" -> "Alpha_peak_3_1";
+"CB_peak_3_1" -> "Enne_peak_3_1";
+"ReducedMassRes_pdf_semi_3_1" -> "ReducedMassRes";
+"pdf_semi_3_1" -> "ReducedMassRes_pdf_semi_3_1";
+"pdf_semi_3_1" -> "keys_semi_3_1";
+"keys_semi_3_1" -> "Mass";
+"ReducedMassRes_pdf_comb_3_1" -> "ReducedMassRes";
+"ReducedMassRes_pdf_bs_3_2" -> "ReducedMassRes";
+"pdf_bs_3_2" -> "ReducedMassRes_pdf_bs_3_2";
+"pdf_bs_3_2" -> "CB_bs_3_2";
+"CB_bs_3_2" -> "SigmaRes_bs_3_2";
+"CB_bs_3_2" -> "Mass";
+"CB_bs_3_2" -> "Mean_bs_3_2";
+"CB_bs_3_2" -> "Alpha_bs_3_2";
+"CB_bs_3_2" -> "Enne_bs_3_2";
+"SigmaRes_bs_3_2" -> "Mass";
+"SigmaRes_bs_3_2" -> "ReducedMassRes";
+"SigmaRes_bs_3_2" -> "PeeK_bs_3_2";
+"ReducedMassRes_pdf_bd_3_2" -> "ReducedMassRes";
+"pdf_bd_3_2" -> "ReducedMassRes_pdf_bd_3_2";
+"pdf_bd_3_2" -> "CB_bd_3_2";
+"CB_bd_3_2" -> "SigmaRes_bd_3_2";
+"CB_bd_3_2" -> "Mass";
+"CB_bd_3_2" -> "Mean_bd_3_2";
+"CB_bd_3_2" -> "Alpha_bd_3_2";
+"CB_bd_3_2" -> "Enne_bd_3_2";
+"SigmaRes_bd_3_2" -> "Mass";
+"SigmaRes_bd_3_2" -> "ReducedMassRes";
+"SigmaRes_bd_3_2" -> "PeeK_bd_3_2";
+"ReducedMassRes_pdf_peak_3_2" -> "ReducedMassRes";
+"pdf_peak_3_2" -> "ReducedMassRes_pdf_peak_3_2";
+"pdf_peak_3_2" -> "mass_peak_3_2";
+"mass_peak_3_2" -> "Gau_peak_3_2";
+"mass_peak_3_2" -> "CB_peak_3_2";
+"mass_peak_3_2" -> "CoeffGauss_peak_3_2";
+"Gau_peak_3_2" -> "Mass";
+"Gau_peak_3_2" -> "Mean_peak_3_2";
+"Gau_peak_3_2" -> "Sigma_peak_3_2";
+"CB_peak_3_2" -> "Mass";
+"CB_peak_3_2" -> "Mean_peak_3_2";
+"CB_peak_3_2" -> "Sigma2_peak_3_2";
+"CB_peak_3_2" -> "Alpha_peak_3_2";
+"CB_peak_3_2" -> "Enne_peak_3_2";
+"ReducedMassRes_pdf_semi_3_2" -> "ReducedMassRes";
+"pdf_semi_3_2" -> "ReducedMassRes_pdf_semi_3_2";
+"pdf_semi_3_2" -> "keys_semi_3_2";
+"keys_semi_3_2" -> "Mass";
+"ReducedMassRes_pdf_comb_3_2" -> "ReducedMassRes";
+"ReducedMassRes_pdf_bs_3_3" -> "ReducedMassRes";
+"pdf_bs_3_3" -> "ReducedMassRes_pdf_bs_3_3";
+"pdf_bs_3_3" -> "CB_bs_3_3";
+"CB_bs_3_3" -> "SigmaRes_bs_3_3";
+"CB_bs_3_3" -> "Mass";
+"CB_bs_3_3" -> "Mean_bs_3_3";
+"CB_bs_3_3" -> "Alpha_bs_3_3";
+"CB_bs_3_3" -> "Enne_bs_3_3";
+"SigmaRes_bs_3_3" -> "Mass";
+"SigmaRes_bs_3_3" -> "ReducedMassRes";
+"SigmaRes_bs_3_3" -> "PeeK_bs_3_3";
+"ReducedMassRes_pdf_bd_3_3" -> "ReducedMassRes";
+"pdf_bd_3_3" -> "ReducedMassRes_pdf_bd_3_3";
+"pdf_bd_3_3" -> "CB_bd_3_3";
+"CB_bd_3_3" -> "SigmaRes_bd_3_3";
+"CB_bd_3_3" -> "Mass";
+"CB_bd_3_3" -> "Mean_bd_3_3";
+"CB_bd_3_3" -> "Alpha_bd_3_3";
+"CB_bd_3_3" -> "Enne_bd_3_3";
+"SigmaRes_bd_3_3" -> "Mass";
+"SigmaRes_bd_3_3" -> "ReducedMassRes";
+"SigmaRes_bd_3_3" -> "PeeK_bd_3_3";
+"ReducedMassRes_pdf_peak_3_3" -> "ReducedMassRes";
+"pdf_peak_3_3" -> "ReducedMassRes_pdf_peak_3_3";
+"pdf_peak_3_3" -> "mass_peak_3_3";
+"mass_peak_3_3" -> "Gau_peak_3_3";
+"mass_peak_3_3" -> "CB_peak_3_3";
+"mass_peak_3_3" -> "CoeffGauss_peak_3_3";
+"Gau_peak_3_3" -> "Mass";
+"Gau_peak_3_3" -> "Mean_peak_3_3";
+"Gau_peak_3_3" -> "Sigma_peak_3_3";
+"CB_peak_3_3" -> "Mass";
+"CB_peak_3_3" -> "Mean_peak_3_3";
+"CB_peak_3_3" -> "Sigma2_peak_3_3";
+"CB_peak_3_3" -> "Alpha_peak_3_3";
+"CB_peak_3_3" -> "Enne_peak_3_3";
+"ReducedMassRes_pdf_semi_3_3" -> "ReducedMassRes";
+"pdf_semi_3_3" -> "ReducedMassRes_pdf_semi_3_3";
+"pdf_semi_3_3" -> "keys_semi_3_3";
+"keys_semi_3_3" -> "Mass";
+"ReducedMassRes_pdf_comb_3_3" -> "ReducedMassRes";
+"N_bs_formula_corr_2_2" -> "fs_over_fu";
+"N_bs_formula_corr_2_2" -> "one_over_BRBR";
+"N_bs_formula_corr_2_2" -> "effratio_bs_2_2";
+"N_bs_formula_corr_2_2" -> "N_bu_2_2";
+"N_bs_formula_corr_2_2" -> "R_bs";
+"N_bs_formula_corr_2_2" -> "BF_bs_SM";
+"N_bd_formula_corr_2_2" -> "one_over_BRBR";
+"N_bd_formula_corr_2_2" -> "N_bu_2_2";
+"N_bd_formula_corr_2_2" -> "effratio_bd_2_2";
+"N_bd_formula_corr_2_2" -> "R_bd_over_bs";
+"N_bd_formula_corr_2_2" -> "R_bs";
+"N_bd_formula_corr_2_2" -> "BF_bd_SM";
+"N_bs_formula_corr_2_3" -> "fs_over_fu";
+"N_bs_formula_corr_2_3" -> "one_over_BRBR";
+"N_bs_formula_corr_2_3" -> "effratio_bs_2_3";
+"N_bs_formula_corr_2_3" -> "N_bu_2_3";
+"N_bs_formula_corr_2_3" -> "R_bs";
+"N_bs_formula_corr_2_3" -> "BF_bs_SM";
+"N_bd_formula_corr_2_3" -> "one_over_BRBR";
+"N_bd_formula_corr_2_3" -> "N_bu_2_3";
+"N_bd_formula_corr_2_3" -> "effratio_bd_2_3";
+"N_bd_formula_corr_2_3" -> "R_bd_over_bs";
+"N_bd_formula_corr_2_3" -> "R_bs";
+"N_bd_formula_corr_2_3" -> "BF_bd_SM";
+"N_bs_formula_corr_3_0" -> "fs_over_fu";
+"N_bs_formula_corr_3_0" -> "one_over_BRBR";
+"N_bs_formula_corr_3_0" -> "effratio_bs_3_0";
+"N_bs_formula_corr_3_0" -> "N_bu_3_0";
+"N_bs_formula_corr_3_0" -> "R_bs";
+"N_bs_formula_corr_3_0" -> "BF_bs_SM";
+"N_bd_formula_corr_3_3" -> "one_over_BRBR";
+"N_bd_formula_corr_3_3" -> "N_bu_3_3";
+"N_bd_formula_corr_3_3" -> "effratio_bd_3_3";
+"N_bd_formula_corr_3_3" -> "R_bd_over_bs";
+"N_bd_formula_corr_3_3" -> "R_bs";
+"N_bd_formula_corr_3_3" -> "BF_bd_SM";
+"pdf_1comb_1_0" -> "ReducedMassRes_pdf_comb_1_0";
+"pdf_1comb_1_0" -> "mass_1comb_1_0";
+"N_bu_gau_1_1" -> "N_bu_1_1";
+"N_bu_gau_1_1" -> "24133";
+"N_bu_gau_1_1" -> "1219";
+"mass_1comb_1_0" -> "B_2comb_1_0";
+"mass_1comb_1_0" -> "Mass";
+"mass_1comb_1_0" -> "B_1comb_1_0";
+"pdf_1comb_0_1" -> "ReducedMassRes_pdf_comb_0_1";
+"pdf_1comb_0_1" -> "mass_1comb_0_1";
+"N_bu_gau_1_0" -> "N_bu_1_0";
+"N_bu_gau_1_0" -> "15616";
+"N_bu_gau_1_0" -> "846";
+"mass_1comb_0_1" -> "B_2comb_0_1";
+"mass_1comb_0_1" -> "Mass";
+"mass_1comb_0_1" -> "B_1comb_0_1";
+"N_semi_gau_2_2" -> "N_semi_2_2";
+"N_semi_gau_2_2" -> "55.897";
+"N_semi_gau_2_2" -> "47.6281";
+"N_peak_gau_2_2" -> "N_peak_2_2";
+"N_peak_gau_2_2" -> "0.814";
+"N_peak_gau_2_2" -> "1.73147";
+"effratio_gau_bs_3_0" -> "effratio_bs_3_0";
+"effratio_gau_bs_3_0" -> "7.5";
+"effratio_gau_bs_3_0" -> "0.657053";
+"B_2comb_2_1" -> "B_1comb_2_1";
+"effratio_gau_bd_2_2" -> "effratio_bd_2_2";
+"effratio_gau_bd_2_2" -> "0.293102";
+"effratio_gau_bd_2_2" -> "3.41463";
+"B_2comb_2_0" -> "B_1comb_2_0";
+"mass_1comb_1_1" -> "B_2comb_1_1";
+"mass_1comb_1_1" -> "Mass";
+"mass_1comb_1_1" -> "B_1comb_1_1";
+"N_peak_gau_0_1" -> "N_peak_0_1";
+"N_peak_gau_0_1" -> "0.546";
+"N_peak_gau_0_1" -> "1.71978";
+"effratio_gau_bs_1_0" -> "effratio_bs_1_0";
+"effratio_gau_bs_1_0" -> "7.24138";
+"effratio_gau_bs_1_0" -> "0.834834";
+"N_semi_gau_0_1" -> "N_semi_0_1";
+"N_semi_gau_0_1" -> "27.184";
+"N_semi_gau_0_1" -> "23.0042";
+"N_bu_gau_2_0" -> "N_bu_2_0";
+"N_bu_gau_2_0" -> "128639";
+"N_bu_gau_2_0" -> "6514";
+"N_semi_gau_1_1" -> "N_semi_1_1";
+"N_semi_gau_1_1" -> "11.946";
+"N_semi_gau_1_1" -> "9.90706";
+"N_peak_gau_1_1" -> "N_peak_1_1";
+"N_peak_gau_1_1" -> "0.277";
+"N_peak_gau_1_1" -> "1.71994";
+"N_semi_gau_0_0" -> "N_semi_0_0";
+"N_semi_gau_0_0" -> "43.12";
+"N_semi_gau_0_0" -> "39.5348";
+"N_bu_gau_0_1" -> "N_bu_0_1";
+"N_bu_gau_0_1" -> "65819";
+"N_bu_gau_0_1" -> "7756";
+"N_peak_gau_0_0" -> "N_peak_0_0";
+"N_peak_gau_0_0" -> "0.572";
+"N_peak_gau_0_0" -> "1.72032";
+"effratio_gau_bs_0_1" -> "effratio_bs_0_1";
+"effratio_gau_bs_0_1" -> "3.11111";
+"effratio_gau_bs_0_1" -> "0.378483";
+"effratio_gau_bs_0_0" -> "effratio_bs_0_0";
+"effratio_gau_bs_0_0" -> "3.66197";
+"effratio_gau_bs_0_0" -> "0.445498";
+"pdf_ext_total_0_0" -> "pdf_ext_sum_0_0";
+"pdf_ext_total_0_0" -> "pdf_constraints_0_0";
+"pdf_ext_sum_0_0" -> "pdf_bs_0_0";
+"pdf_ext_sum_0_0" -> "pdf_semi_0_0";
+"pdf_ext_sum_0_0" -> "pdf_bd_0_0";
+"pdf_ext_sum_0_0" -> "pdf_peak_0_0";
+"pdf_ext_sum_0_0" -> "N_bs_formula_corr_0_0";
+"pdf_ext_sum_0_0" -> "N_bd_formula_corr_0_0";
+"pdf_ext_sum_0_0" -> "pdf_1comb_0_0";
+"pdf_ext_sum_0_0" -> "N_peak_0_0";
+"pdf_ext_sum_0_0" -> "N_semi_0_0";
+"pdf_ext_sum_0_0" -> "N_comb_0_0";
+"effratio_gau_bd_0_0" -> "effratio_bd_0_0";
+"effratio_gau_bd_0_0" -> "3.94366";
+"effratio_gau_bd_0_0" -> "0.479767";
+"pdf_1comb_0_0" -> "ReducedMassRes_pdf_comb_0_0";
+"pdf_1comb_0_0" -> "mass_1comb_0_0";
+"mass_1comb_0_0" -> "B_2comb_0_0";
+"mass_1comb_0_0" -> "Mass";
+"mass_1comb_0_0" -> "B_1comb_0_0";
+"B_2comb_0_0" -> "B_1comb_0_0";
+"B_2comb_1_1" -> "B_1comb_1_1";
+"effratio_gau_bd_2_0" -> "effratio_bd_2_0";
+"effratio_gau_bd_2_0" -> "4.28571";
+"effratio_gau_bd_2_0" -> "0.367873";
+"N_bu_gau_2_2" -> "N_bu_2_2";
+"N_bu_gau_2_2" -> "159845";
+"N_bu_gau_2_2" -> "7992.25";
+"N_semi_gau_2_0" -> "N_semi_2_0";
+"N_semi_gau_2_0" -> "79.3701";
+"N_semi_gau_2_0" -> "87.632";
+"N_bu_gau_2_1" -> "N_bu_2_1";
+"N_bu_gau_2_1" -> "138961";
+"N_bu_gau_2_1" -> "6948.05";
+"N_peak_gau_2_0" -> "N_peak_2_0";
+"N_peak_gau_2_0" -> "0.981";
+"N_peak_gau_2_0" -> "1.73157";
+"pdf_ext_total_0_1" -> "pdf_ext_sum_0_1";
+"pdf_ext_total_0_1" -> "pdf_constraints_0_1";
+"pdf_ext_sum_0_1" -> "pdf_bs_0_1";
+"pdf_ext_sum_0_1" -> "pdf_bd_0_1";
+"pdf_ext_sum_0_1" -> "pdf_peak_0_1";
+"pdf_ext_sum_0_1" -> "pdf_semi_0_1";
+"pdf_ext_sum_0_1" -> "N_bs_formula_corr_0_1";
+"pdf_ext_sum_0_1" -> "N_bd_formula_corr_0_1";
+"pdf_ext_sum_0_1" -> "pdf_1comb_0_1";
+"pdf_ext_sum_0_1" -> "N_peak_0_1";
+"pdf_ext_sum_0_1" -> "N_semi_0_1";
+"pdf_ext_sum_0_1" -> "N_comb_0_1";
+"N_semi_gau_1_0" -> "N_semi_1_0";
+"N_semi_gau_1_0" -> "17.968";
+"N_semi_gau_1_0" -> "15.9613";
+"N_peak_gau_1_0" -> "N_peak_1_0";
+"N_peak_gau_1_0" -> "0.264";
+"N_peak_gau_1_0" -> "1.72165";
+"pdf_ext_total_2_1" -> "pdf_ext_sum_2_1";
+"pdf_ext_total_2_1" -> "pdf_constraints_2_1";
+"pdf_ext_sum_2_1" -> "pdf_bs_2_1";
+"pdf_ext_sum_2_1" -> "pdf_bd_2_1";
+"pdf_ext_sum_2_1" -> "pdf_peak_2_1";
+"pdf_ext_sum_2_1" -> "pdf_semi_2_1";
+"pdf_ext_sum_2_1" -> "N_bs_formula_corr_2_1";
+"pdf_ext_sum_2_1" -> "N_bd_formula_corr_2_1";
+"pdf_ext_sum_2_1" -> "pdf_1comb_2_1";
+"pdf_ext_sum_2_1" -> "N_peak_2_1";
+"pdf_ext_sum_2_1" -> "N_semi_2_1";
+"pdf_ext_sum_2_1" -> "N_comb_2_1";
+"N_semi_gau_2_3" -> "N_semi_2_3";
+"N_semi_gau_2_3" -> "28.981";
+"N_semi_gau_2_3" -> "23.4488";
+"N_bu_gau_3_1" -> "N_bu_3_1";
+"N_bu_gau_3_1" -> "37388";
+"N_bu_gau_3_1" -> "2208";
+"N_peak_gau_2_3" -> "N_peak_2_3";
+"N_peak_gau_2_3" -> "0.709";
+"N_peak_gau_2_3" -> "1.73077";
+"B_2comb_2_2" -> "B_1comb_2_2";
+"effratio_gau_bd_2_3" -> "effratio_bd_2_3";
+"effratio_gau_bd_2_3" -> "2.69231";
+"effratio_gau_bd_2_3" -> "0.2311";
+"B_2comb_0_1" -> "B_1comb_0_1";
+"effratio_gau_bd_2_1" -> "effratio_bd_2_1";
+"effratio_gau_bd_2_1" -> "3.52941";
+"effratio_gau_bd_2_1" -> "0.302954";
+"effratio_gau_bs_2_3" -> "effratio_bs_2_3";
+"effratio_gau_bs_2_3" -> "2.5";
+"effratio_gau_bs_2_3" -> "0.214593";
+"pdf_ext_total_2_0" -> "pdf_ext_sum_2_0";
+"pdf_ext_total_2_0" -> "pdf_constraints_2_0";
+"pdf_ext_sum_2_0" -> "pdf_bs_2_0";
+"pdf_ext_sum_2_0" -> "pdf_bd_2_0";
+"pdf_ext_sum_2_0" -> "pdf_peak_2_0";
+"pdf_ext_sum_2_0" -> "pdf_semi_2_0";
+"pdf_ext_sum_2_0" -> "N_bs_formula_corr_2_0";
+"pdf_ext_sum_2_0" -> "N_bd_formula_corr_2_0";
+"pdf_ext_sum_2_0" -> "pdf_1comb_2_0";
+"pdf_ext_sum_2_0" -> "N_peak_2_0";
+"pdf_ext_sum_2_0" -> "N_semi_2_0";
+"pdf_ext_sum_2_0" -> "N_comb_2_0";
+"effratio_gau_bs_2_2" -> "effratio_bs_2_2";
+"effratio_gau_bs_2_2" -> "3.17073";
+"effratio_gau_bs_2_2" -> "0.272166";
+"pdf_ext_total_1_1" -> "pdf_ext_sum_1_1";
+"pdf_ext_total_1_1" -> "pdf_constraints_1_1";
+"pdf_1comb_2_3" -> "ReducedMassRes_pdf_comb_2_3";
+"pdf_1comb_2_3" -> "mass_1comb_2_3";
+"mass_1comb_2_3" -> "B_2comb_2_3";
+"mass_1comb_2_3" -> "Mass";
+"mass_1comb_2_3" -> "B_1comb_2_3";
+"N_bu_gau_3_0" -> "N_bu_3_0";
+"N_bu_gau_3_0" -> "24325";
+"N_bu_gau_3_0" -> "1216.25";
+"pdf_1comb_2_1" -> "ReducedMassRes_pdf_comb_2_1";
+"pdf_1comb_2_1" -> "mass_1comb_2_1";
+"pdf_1comb_2_0" -> "ReducedMassRes_pdf_comb_2_0";
+"pdf_1comb_2_0" -> "mass_1comb_2_0";
+"pdf_ext_sum_1_1" -> "pdf_bs_1_1";
+"pdf_ext_sum_1_1" -> "pdf_bd_1_1";
+"pdf_ext_sum_1_1" -> "pdf_peak_1_1";
+"pdf_ext_sum_1_1" -> "pdf_semi_1_1";
+"pdf_ext_sum_1_1" -> "N_bs_formula_corr_1_1";
+"pdf_ext_sum_1_1" -> "N_bd_formula_corr_1_1";
+"pdf_ext_sum_1_1" -> "pdf_1comb_1_1";
+"pdf_ext_sum_1_1" -> "N_peak_1_1";
+"pdf_ext_sum_1_1" -> "N_semi_1_1";
+"pdf_ext_sum_1_1" -> "N_comb_1_1";
+"pdf_ext_total_1_0" -> "pdf_ext_sum_1_0";
+"pdf_ext_total_1_0" -> "pdf_constraints_1_0";
+"pdf_ext_sum_1_0" -> "pdf_bs_1_0";
+"pdf_ext_sum_1_0" -> "pdf_bd_1_0";
+"pdf_ext_sum_1_0" -> "pdf_peak_1_0";
+"pdf_ext_sum_1_0" -> "pdf_semi_1_0";
+"pdf_ext_sum_1_0" -> "N_bs_formula_corr_1_0";
+"pdf_ext_sum_1_0" -> "N_bd_formula_corr_1_0";
+"pdf_ext_sum_1_0" -> "pdf_1comb_1_0";
+"pdf_ext_sum_1_0" -> "N_peak_1_0";
+"pdf_ext_sum_1_0" -> "N_semi_1_0";
+"pdf_ext_sum_1_0" -> "N_comb_1_0";
+"N_semi_gau_3_1" -> "N_semi_3_1";
+"N_semi_gau_3_1" -> "20.3178";
+"N_semi_gau_3_1" -> "23.76";
+"N_bu_gau_3_2" -> "N_bu_3_2";
+"N_bu_gau_3_2" -> "36775";
+"N_bu_gau_3_2" -> "1852";
+"N_peak_gau_3_1" -> "N_peak_3_1";
+"N_peak_gau_3_1" -> "0.332";
+"N_peak_gau_3_1" -> "1.7247";
+"effratio_gau_bs_2_0" -> "effratio_bs_2_0";
+"effratio_gau_bs_2_0" -> "4.28571";
+"effratio_gau_bs_2_0" -> "0.367873";
+"pdf_1comb_1_1" -> "ReducedMassRes_pdf_comb_1_1";
+"pdf_1comb_1_1" -> "mass_1comb_1_1";
+"effratio_gau_bs_2_1" -> "effratio_bs_2_1";
+"effratio_gau_bs_2_1" -> "3.52941";
+"effratio_gau_bs_2_1" -> "0.302954";
+"pdf_constraints_0_0" -> "N_bu_gau_0_0";
+"pdf_constraints_0_0" -> "N_semi_gau_0_0";
+"pdf_constraints_0_0" -> "N_peak_gau_0_0";
+"pdf_constraints_0_0" -> "effratio_gau_bs_0_0";
+"pdf_constraints_0_0" -> "effratio_gau_bd_0_0";
+"effratio_gau_bd_0_1" -> "effratio_bd_0_1";
+"effratio_gau_bd_0_1" -> "3.33333";
+"effratio_gau_bd_0_1" -> "0.405518";
+"B_2comb_1_0" -> "B_1comb_1_0";
+"pdf_constraints_0_1" -> "N_peak_gau_0_1";
+"pdf_constraints_0_1" -> "N_semi_gau_0_1";
+"pdf_constraints_0_1" -> "N_bu_gau_0_1";
+"pdf_constraints_0_1" -> "effratio_gau_bs_0_1";
+"pdf_constraints_0_1" -> "effratio_gau_bd_0_1";
+"effratio_gau_bd_1_0" -> "effratio_bd_1_0";
+"effratio_gau_bd_1_0" -> "7.24138";
+"effratio_gau_bd_1_0" -> "0.834834";
+"pdf_ext_total_2_2" -> "pdf_ext_sum_2_2";
+"pdf_ext_total_2_2" -> "pdf_constraints_2_2";
+"pdf_ext_sum_2_2" -> "pdf_bs_2_2";
+"pdf_ext_sum_2_2" -> "pdf_bd_2_2";
+"pdf_ext_sum_2_2" -> "pdf_peak_2_2";
+"pdf_ext_sum_2_2" -> "pdf_semi_2_2";
+"pdf_ext_sum_2_2" -> "N_bs_formula_corr_2_2";
+"pdf_ext_sum_2_2" -> "N_bd_formula_corr_2_2";
+"pdf_ext_sum_2_2" -> "pdf_1comb_2_2";
+"pdf_ext_sum_2_2" -> "N_peak_2_2";
+"pdf_ext_sum_2_2" -> "N_semi_2_2";
+"pdf_ext_sum_2_2" -> "N_comb_2_2";
+"pdf_1comb_3_1" -> "ReducedMassRes_pdf_comb_3_1";
+"pdf_1comb_3_1" -> "mass_1comb_3_1";
+"mass_1comb_3_1" -> "B_2comb_3_1";
+"mass_1comb_3_1" -> "Mass";
+"mass_1comb_3_1" -> "B_1comb_3_1";
+"effratio_gau_bs_3_2" -> "effratio_bs_3_2";
+"effratio_gau_bs_3_2" -> "5.45455";
+"effratio_gau_bs_3_2" -> "0.477857";
+"pdf_constraints_1_0" -> "N_bu_gau_1_0";
+"pdf_constraints_1_0" -> "effratio_gau_bs_1_0";
+"pdf_constraints_1_0" -> "N_semi_gau_1_0";
+"pdf_constraints_1_0" -> "N_peak_gau_1_0";
+"pdf_constraints_1_0" -> "effratio_gau_bd_1_0";
+"effratio_gau_bs_1_1" -> "effratio_bs_1_1";
+"effratio_gau_bs_1_1" -> "5.60976";
+"effratio_gau_bs_1_1" -> "0.64673";
+"effratio_gau_bd_1_1" -> "effratio_bd_1_1";
+"effratio_gau_bd_1_1" -> "5.36585";
+"effratio_gau_bd_1_1" -> "0.618611";
+"pdf_ext_total_3_1" -> "pdf_ext_sum_3_1";
+"pdf_ext_total_3_1" -> "pdf_constraints_3_1";
+"N_peak_gau_3_3" -> "N_peak_3_3";
+"N_peak_gau_3_3" -> "0.25";
+"N_peak_gau_3_3" -> "1.72958";
+"pdf_ext_sum_3_1" -> "N_bs_formula_corr_3_1";
+"pdf_ext_sum_3_1" -> "N_bd_formula_corr_3_1";
+"pdf_ext_sum_3_1" -> "pdf_bs_3_1";
+"pdf_ext_sum_3_1" -> "pdf_bd_3_1";
+"pdf_ext_sum_3_1" -> "pdf_peak_3_1";
+"pdf_ext_sum_3_1" -> "pdf_semi_3_1";
+"pdf_ext_sum_3_1" -> "pdf_1comb_3_1";
+"pdf_ext_sum_3_1" -> "N_peak_3_1";
+"pdf_ext_sum_3_1" -> "N_semi_3_1";
+"pdf_ext_sum_3_1" -> "N_comb_3_1";
+"pdf_constraints_1_1" -> "N_bu_gau_1_1";
+"pdf_constraints_1_1" -> "N_semi_gau_1_1";
+"pdf_constraints_1_1" -> "N_peak_gau_1_1";
+"pdf_constraints_1_1" -> "effratio_gau_bs_1_1";
+"pdf_constraints_1_1" -> "effratio_gau_bd_1_1";
+"N_semi_gau_2_1" -> "N_semi_2_1";
+"N_semi_gau_2_1" -> "63.1743";
+"N_semi_gau_2_1" -> "71.203";
+"N_peak_gau_2_1" -> "N_peak_2_1";
+"N_peak_gau_2_1" -> "0.826";
+"N_peak_gau_2_1" -> "1.7305";
+"effratio_gau_bd_3_0" -> "effratio_bd_3_0";
+"effratio_gau_bd_3_0" -> "7.5";
+"effratio_gau_bd_3_0" -> "0.657053";
+"mass_1comb_2_0" -> "B_2comb_2_0";
+"mass_1comb_2_0" -> "Mass";
+"mass_1comb_2_0" -> "B_1comb_2_0";
+"pdf_constraints_2_0" -> "N_bu_gau_2_0";
+"pdf_constraints_2_0" -> "effratio_gau_bd_2_0";
+"pdf_constraints_2_0" -> "N_semi_gau_2_0";
+"pdf_constraints_2_0" -> "N_peak_gau_2_0";
+"pdf_constraints_2_0" -> "effratio_gau_bs_2_0";
+"pdf_1comb_2_2" -> "ReducedMassRes_pdf_comb_2_2";
+"pdf_1comb_2_2" -> "mass_1comb_2_2";
+"mass_1comb_2_2" -> "B_2comb_2_2";
+"mass_1comb_2_2" -> "Mass";
+"mass_1comb_2_2" -> "B_1comb_2_2";
+"N_bu_gau_2_3" -> "N_bu_2_3";
+"N_bu_gau_2_3" -> "192746";
+"N_bu_gau_2_3" -> "9647";
+"mass_1comb_2_1" -> "B_2comb_2_1";
+"mass_1comb_2_1" -> "Mass";
+"mass_1comb_2_1" -> "B_1comb_2_1";
+"pdf_constraints_2_1" -> "N_bu_gau_2_1";
+"pdf_constraints_2_1" -> "effratio_gau_bd_2_1";
+"pdf_constraints_2_1" -> "effratio_gau_bs_2_1";
+"pdf_constraints_2_1" -> "N_semi_gau_2_1";
+"pdf_constraints_2_1" -> "N_peak_gau_2_1";
+"pdf_1comb_3_0" -> "ReducedMassRes_pdf_comb_3_0";
+"pdf_1comb_3_0" -> "mass_1comb_3_0";
+"B_2comb_3_0" -> "B_1comb_3_0";
+"pdf_ext_total_2_3" -> "pdf_ext_sum_2_3";
+"pdf_ext_total_2_3" -> "pdf_constraints_2_3";
+"pdf_ext_sum_2_3" -> "pdf_bs_2_3";
+"pdf_ext_sum_2_3" -> "pdf_bd_2_3";
+"pdf_ext_sum_2_3" -> "pdf_peak_2_3";
+"pdf_ext_sum_2_3" -> "pdf_semi_2_3";
+"pdf_ext_sum_2_3" -> "N_bs_formula_corr_2_3";
+"pdf_ext_sum_2_3" -> "N_bd_formula_corr_2_3";
+"pdf_ext_sum_2_3" -> "pdf_1comb_2_3";
+"pdf_ext_sum_2_3" -> "N_peak_2_3";
+"pdf_ext_sum_2_3" -> "N_semi_2_3";
+"pdf_ext_sum_2_3" -> "N_comb_2_3";
+"pdf_constraints_2_2" -> "N_semi_gau_2_2";
+"pdf_constraints_2_2" -> "N_peak_gau_2_2";
+"pdf_constraints_2_2" -> "effratio_gau_bd_2_2";
+"pdf_constraints_2_2" -> "N_bu_gau_2_2";
+"pdf_constraints_2_2" -> "effratio_gau_bs_2_2";
+"N_semi_gau_3_0" -> "N_semi_3_0";
+"N_semi_gau_3_0" -> "21.221";
+"N_semi_gau_3_0" -> "18.6352";
+"N_peak_gau_3_0" -> "N_peak_3_0";
+"N_peak_gau_3_0" -> "0.272";
+"N_peak_gau_3_0" -> "1.72928";
+"B_2comb_2_3" -> "B_1comb_2_3";
+"pdf_ext_total_3_0" -> "pdf_ext_sum_3_0";
+"pdf_ext_total_3_0" -> "pdf_constraints_3_0";
+"pdf_ext_sum_3_0" -> "pdf_bs_3_0";
+"pdf_ext_sum_3_0" -> "pdf_bd_3_0";
+"pdf_ext_sum_3_0" -> "N_bd_formula_corr_3_0";
+"pdf_ext_sum_3_0" -> "pdf_peak_3_0";
+"pdf_ext_sum_3_0" -> "pdf_semi_3_0";
+"pdf_ext_sum_3_0" -> "N_bs_formula_corr_3_0";
+"pdf_ext_sum_3_0" -> "pdf_1comb_3_0";
+"pdf_ext_sum_3_0" -> "N_peak_3_0";
+"pdf_ext_sum_3_0" -> "N_semi_3_0";
+"pdf_ext_sum_3_0" -> "N_comb_3_0";
+"effratio_gau_bs_3_1" -> "effratio_bs_3_1";
+"effratio_gau_bs_3_1" -> "6";
+"effratio_gau_bs_3_1" -> "0.525642";
+"effratio_gau_bd_3_1" -> "effratio_bd_3_1";
+"effratio_gau_bd_3_1" -> "6";
+"effratio_gau_bd_3_1" -> "0.525642";
+"pdf_constraints_2_3" -> "N_semi_gau_2_3";
+"pdf_constraints_2_3" -> "N_peak_gau_2_3";
+"pdf_constraints_2_3" -> "effratio_gau_bd_2_3";
+"pdf_constraints_2_3" -> "effratio_gau_bs_2_3";
+"pdf_constraints_2_3" -> "N_bu_gau_2_3";
+"N_bu_gau_3_3" -> "N_bu_3_3";
+"N_bu_gau_3_3" -> "47910";
+"N_bu_gau_3_3" -> "2407";
+"N_peak_gau_3_2" -> "N_peak_3_2";
+"N_peak_gau_3_2" -> "1.73171";
+"N_peak_gau_3_2" -> "0.274";
+"pdf_1comb_3_2" -> "ReducedMassRes_pdf_comb_3_2";
+"pdf_1comb_3_2" -> "mass_1comb_3_2";
+"mass_1comb_3_2" -> "B_2comb_3_2";
+"mass_1comb_3_2" -> "Mass";
+"mass_1comb_3_2" -> "B_1comb_3_2";
+"mass_1comb_3_0" -> "B_2comb_3_0";
+"mass_1comb_3_0" -> "Mass";
+"mass_1comb_3_0" -> "B_1comb_3_0";
+"pdf_constraints_3_0" -> "effratio_gau_bs_3_0";
+"pdf_constraints_3_0" -> "N_bu_gau_3_0";
+"pdf_constraints_3_0" -> "effratio_gau_bd_3_0";
+"pdf_constraints_3_0" -> "N_semi_gau_3_0";
+"pdf_constraints_3_0" -> "N_peak_gau_3_0";
+"effratio_gau_bd_3_2" -> "effratio_bd_3_2";
+"effratio_gau_bd_3_2" -> "5.45455";
+"effratio_gau_bd_3_2" -> "0.477857";
+"N_semi_gau_3_2" -> "N_semi_3_2";
+"N_semi_gau_3_2" -> "14.968";
+"N_semi_gau_3_2" -> "12.2239";
+"B_2comb_3_1" -> "B_1comb_3_1";
+"pdf_ext_total_3_2" -> "pdf_ext_sum_3_2";
+"pdf_ext_total_3_2" -> "pdf_constraints_3_2";
+"pdf_ext_sum_3_2" -> "N_bs_formula_corr_3_2";
+"pdf_ext_sum_3_2" -> "N_bd_formula_corr_3_2";
+"pdf_ext_sum_3_2" -> "pdf_bs_3_2";
+"pdf_ext_sum_3_2" -> "pdf_bd_3_2";
+"pdf_ext_sum_3_2" -> "pdf_peak_3_2";
+"pdf_ext_sum_3_2" -> "pdf_semi_3_2";
+"pdf_ext_sum_3_2" -> "pdf_1comb_3_2";
+"pdf_ext_sum_3_2" -> "N_peak_3_2";
+"pdf_ext_sum_3_2" -> "N_semi_3_2";
+"pdf_ext_sum_3_2" -> "N_comb_3_2";
+"pdf_1comb_3_3" -> "ReducedMassRes_pdf_comb_3_3";
+"pdf_1comb_3_3" -> "mass_1comb_3_3";
+"effratio_gau_bs_3_3" -> "effratio_bs_3_3";
+"effratio_gau_bs_3_3" -> "4";
+"effratio_gau_bs_3_3" -> "0.350428";
+"pdf_constraints_3_1" -> "N_bu_gau_3_1";
+"pdf_constraints_3_1" -> "N_semi_gau_3_1";
+"pdf_constraints_3_1" -> "N_peak_gau_3_1";
+"pdf_constraints_3_1" -> "effratio_gau_bs_3_1";
+"pdf_constraints_3_1" -> "effratio_gau_bd_3_1";
+"effratio_gau_bd_3_3" -> "effratio_bd_3_3";
+"effratio_gau_bd_3_3" -> "4";
+"effratio_gau_bd_3_3" -> "0.350428";
+"N_semi_gau_3_3" -> "N_semi_3_3";
+"N_semi_gau_3_3" -> "6.64393";
+"N_semi_gau_3_3" -> "8.586";
+"B_2comb_3_2" -> "B_1comb_3_2";
+"pdf_ext_total_3_3" -> "pdf_ext_sum_3_3";
+"pdf_ext_total_3_3" -> "pdf_constraints_3_3";
+"pdf_ext_sum_3_3" -> "N_bs_formula_corr_3_3";
+"pdf_ext_sum_3_3" -> "pdf_bs_3_3";
+"pdf_ext_sum_3_3" -> "pdf_bd_3_3";
+"pdf_ext_sum_3_3" -> "pdf_peak_3_3";
+"pdf_ext_sum_3_3" -> "pdf_semi_3_3";
+"pdf_ext_sum_3_3" -> "N_bd_formula_corr_3_3";
+"pdf_ext_sum_3_3" -> "pdf_1comb_3_3";
+"pdf_ext_sum_3_3" -> "N_peak_3_3";
+"pdf_ext_sum_3_3" -> "N_semi_3_3";
+"pdf_ext_sum_3_3" -> "N_comb_3_3";
+"pdf_constraints_3_2" -> "N_bu_gau_3_2";
+"pdf_constraints_3_2" -> "effratio_gau_bs_3_2";
+"pdf_constraints_3_2" -> "N_peak_gau_3_2";
+"pdf_constraints_3_2" -> "effratio_gau_bd_3_2";
+"pdf_constraints_3_2" -> "N_semi_gau_3_2";
+"mass_1comb_3_3" -> "B_2comb_3_3";
+"mass_1comb_3_3" -> "Mass";
+"mass_1comb_3_3" -> "B_1comb_3_3";
+"B_2comb_3_3" -> "B_1comb_3_3";
+"pdf_constraints_3_3" -> "N_peak_gau_3_3";
+"pdf_constraints_3_3" -> "N_bu_gau_3_3";
+"pdf_constraints_3_3" -> "effratio_gau_bs_3_3";
+"pdf_constraints_3_3" -> "effratio_gau_bd_3_3";
+"pdf_constraints_3_3" -> "N_semi_gau_3_3";
+"pdf_ext_simul" -> "allcat";
+"pdf_ext_simul" -> "pdf_ext_total_0_0";
+"pdf_ext_simul" -> "pdf_ext_total_0_1";
+"pdf_ext_simul" -> "pdf_ext_total_2_1";
+"pdf_ext_simul" -> "pdf_ext_total_2_0";
+"pdf_ext_simul" -> "pdf_ext_total_1_1";
+"pdf_ext_simul" -> "pdf_ext_total_1_0";
+"pdf_ext_simul" -> "pdf_ext_total_2_2";
+"pdf_ext_simul" -> "pdf_ext_total_3_1";
+"pdf_ext_simul" -> "pdf_ext_total_2_3";
+"pdf_ext_simul" -> "pdf_ext_total_3_0";
+"pdf_ext_simul" -> "pdf_ext_total_3_2";
+"pdf_ext_simul" -> "pdf_ext_total_3_3";
+}

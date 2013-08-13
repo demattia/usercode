@@ -1,0 +1,5 @@
+N_rare_0	10.52
+peakfrac_rare_0	0.2624
+####
+N_rare_1	3.36
+peakfrac_rare_1 0.2857
