@@ -154,27 +154,27 @@ void TMVAClassificationApplication( const TString & inputFileName, const TString
    reader->AddVariable( "iso",       			&iso );
    reader->AddVariable( "m1iso",     			&m1iso );
    reader->AddVariable( "m2iso",     			&m2iso );
-   if(barrel) {
-     reader->AddVariable( "docatrk",   			&docatrk );
-   } else {
-     reader->AddVariable( "closetrk",                   &closetrk);
-     reader->AddVariable( "pt",                         &pt );
-   }
    reader->AddVariable( "chi2dof",   			&chi2dof );
-   reader->AddVariable( "eta",       			&eta );
+   if(barrel) {
+     reader->AddVariable( "eta",       			&eta );
+     reader->AddVariable( "maxdoca",                    &maxdoca );
+   } else {
+     reader->AddVariable( "pt",                         &pt );
+     reader->AddVariable( "pvip",      			&pvip );
+   }
+   reader->AddVariable( "docatrk",   			&docatrk );
 
    /*
-     reader->AddVariable( "maxdoca",                    &maxdoca );
 
      reader->AddVariable( "fls3d",                      &fls3d );
      reader->AddVariable( "alpha",     			&alpha );
      reader->AddVariable( "pvips",     			&pvips );
+     reader->AddVariable( "closetrk",                   &closetrk);
      reader->AddVariable( "iso",       			&iso );
      reader->AddVariable( "m1iso",     			&m1iso );
      reader->AddVariable( "m2iso",     			&m2iso );
      reader->AddVariable( "chi2dof",   			&chi2dof );
      reader->AddVariable( "pt",                         &pt );
-     reader->AddVariable( "pvip",      			&pvip );
      reader->AddVariable( "docatrk",   			&docatrk );
    */
 
@@ -360,6 +360,8 @@ void TMVAClassificationApplication( const TString & inputFileName, const TString
 
    TH1F *histMass = new TH1F("mass", "mass", 40, 4.9, 5.9);
    TH1F *histPt = new TH1F("pt", "pt", 50, 0., 50.);
+   TH1F *histMu1Iso = new TH1F("m1iso", "m1iso", 50, 0., 1.);
+   TH1F *histMu2Iso = new TH1F("m2iso", "m2iso", 50, 0., 1.);
    TH1F *histEta = new TH1F("eta", "eta", 24, -2.4, 2.4);
    TH1F *histFls3d = new TH1F("fls3d", "fls3d", 100, 0., 100.);
    TH1F *histAlpha = new TH1F("alpha", "alpha", 30, 0., 0.3);
@@ -509,6 +511,8 @@ void TMVAClassificationApplication( const TString & inputFileName, const TString
 	   nSelCutsSA++;
 	   histMass->Fill(mass);
 	   histPt->Fill(pt);
+	   histMu1Iso->Fill(m1iso);
+	   histMu2Iso->Fill(m2iso);
 	   histEta->Fill(eta);
 	   histFls3d->Fill(fls3d);
 	   histAlpha->Fill(alpha);
@@ -541,6 +545,8 @@ void TMVAClassificationApplication( const TString & inputFileName, const TString
 	if (reader->EvaluateMVA( "MLP method"           ) > cutValue) {
 	   histMass->Fill(mass);
 	   histPt->Fill(pt);
+	   histMu1Iso->Fill(m1iso);
+	   histMu2Iso->Fill(m2iso);
 	   histEta->Fill(eta);
 	   histFls3d->Fill(fls3d);
 	   histAlpha->Fill(alpha);
@@ -563,6 +569,8 @@ void TMVAClassificationApplication( const TString & inputFileName, const TString
 	if (reader->EvaluateMVA( "BDT method"           ) > cutValue) {
 	   histMass->Fill(mass);
 	   histPt->Fill(pt);
+	   histMu1Iso->Fill(m1iso);
+	   histMu2Iso->Fill(m2iso);
 	   histEta->Fill(eta);
 	   histFls3d->Fill(fls3d);
 	   histAlpha->Fill(alpha);
@@ -673,6 +681,8 @@ void TMVAClassificationApplication( const TString & inputFileName, const TString
 
    histMass->Write();
    histPt->Write();
+   histMu1Iso->Write();
+   histMu2Iso->Write();
    histEta->Write();
    histFls3d->Write();
    histAlpha->Write();

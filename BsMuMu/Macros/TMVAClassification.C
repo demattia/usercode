@@ -1,4 +1,4 @@
-// @(#)root/tmva $Id: TMVAClassification.C,v 1.10 2013/05/29 00:10:31 zhenhu Exp $
+// @(#)root/tmva $Id: TMVAClassification.C,v 1.11 2013/06/19 06:07:12 demattia Exp $
 /**********************************************************************************
  * Project   : TMVA - a ROOT-integrated toolkit for multivariate data analysis    *
  * Package   : TMVA                                                               *
@@ -233,18 +233,18 @@ void TMVAClassification( TString eventsToTrain = "0", const TString & region = "
    factory->AddVariable( "iso",        "iso", "", 'F' );
    factory->AddVariable( "m1iso",      "m1iso", "", 'F' );
    factory->AddVariable( "m2iso",      "m2iso", "", 'F' );
+   factory->AddVariable( "chi2dof",    "chi2/dof", "", 'F' );
    if( region == "barrel" ) {
-     factory->AddVariable( "docatrk",    "docatrk", "cm", 'F' );
+     factory->AddVariable( "eta",      "eta", "", 'F' );
+     factory->AddVariable( "maxdoca",  "maxdoca", "cm", 'F' );
    }
    else {
-     factory->AddVariable( "closetrk",   "closetrk", "", 'I' );
-     factory->AddVariable( "pt",         "pt", "GeV/c", 'F' );
+     factory->AddVariable( "pt",       "pt", "GeV/c", 'F' );
+     factory->AddVariable( "pvip",     "pvip", "cm", 'F' );
    }
-   factory->AddVariable( "chi2dof",    "chi2/dof", "", 'F' );
-   factory->AddVariable( "eta",        "eta", "", 'F' );
-   // factory->AddVariable( "maxdoca",    "maxdoca", "cm", 'F' );
+   factory->AddVariable( "docatrk",    "docatrk", "cm", 'F' );
    // factory->AddVariable( "pt",         "pt", "GeV/c", 'F' );
-   // factory->AddVariable( "pvip",                  "pvip", "cm", 'F' );
+   // factory->AddVariable( "closetrk",   "closetrk", "", 'I' );
    // factory->AddVariable( "y",                              "y", "", 'F' );
    // factory->AddVariable( "l3d",                            "l3d", "cm", 'F' );
    // factory->AddVariable( "cosAlphaXY",                     "cosAlphaXY", "", 'F' );
