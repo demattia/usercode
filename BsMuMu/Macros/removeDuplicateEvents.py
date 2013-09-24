@@ -22,6 +22,8 @@ def checkRunLumi(inputRun, inputLumi):
 # checkRunLumi(208307, 761)
 
 outputFile = ROOT.TFile("Trees/Run2012D/cleaned.root", "RECREATE")
+dir = outputFile.mkdir("detailedDimuonTree")
+dir.cd()
 newtree = tree.CloneTree(0);
 
 
