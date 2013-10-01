@@ -1,0 +1,88 @@
+#!/usr/bin/env perl
+
+#  ./link 0 1293
+
+use Getopt::Std;
+getopts('a:A:cn:');
+
+# -- single file copy for $opt_A
+if ($opt_A) {
+    system("/bin/cp ../../tmva/TMVA-$opt_A-combined.root ."); 
+    system("/bin/cp ../../tmva/TMVA-$opt_A-Events?.root ."); 
+    system("/bin/cp ../../tmva/TMVA-$opt_A.log ."); 
+    system("/bin/cp ../../tmva/weights/TMVA-$opt_A-Events?_BDT.weights.xml ."); 
+    die "that's it for starters\n";
+}
+
+# -- copy all four files, starting from $opt_a
+if ($opt_a) {
+    for ($i = $opt_a; $i < $opt_a + 4; $i++) {
+	if ($opt_C && $i != $opt_C) {next;}
+	system("/bin/cp ../../tmva/TMVA-$i-combined.root ."); 
+	system("/bin/cp ../../tmva/TMVA-$i-Events?.root ."); 
+	system("/bin/cp ../../tmva/TMVA-$i.log ."); 
+	system("/bin/cp ../../tmva/weights/TMVA-$i-Events?_BDT.weights.xml ."); 
+	$base = $i-$opt_a;
+	system("./link $base $i"); 
+    }
+    die "that's it for starters\n";
+}
+
+if ($#ARGV < 1) {
+    die "usage: ./link 0 1293\n";
+}
+
+$link = shift; 
+$numb = shift; 
+
+my $defaultN = 3; 
+if (!$opt_n) {
+    $opt_n = $defaultN;
+}
+
+
+print "link: $link .. numb: $numb\n";
+if ($numb < 2) {
+    die "usage: ./link 0 1293\n";
+}
+
+if ($opt_n == 2) {
+    @types = ("even", "odd"); 
+} elsif ($opt_n == 3) {
+    @types = ("Events0", "Events1", "Events2"); 
+} else {
+    die "modify source code\n";
+}
+
+my $doRootFiles = 0; 
+
+foreach $type (@types) {
+    
+    $xmlfile0  = "TMVA-".$link."-".$type."_BDT.weights.xml"; 
+    $xmlfile1  = "TMVA-".$numb."-".$type."_BDT.weights.xml"; 
+    
+    $rootfile0 = "TMVA-".$link."-".$type.".root"; 
+    $rootfile1 = "TMVA-".$numb."-".$type.".root"; 
+   
+    print "ln -s $xmlfile1 $xmlfile0\n";
+    
+    system("rm -f $xmlfile0 $rootfile0 ");
+    if ($opt_c) {
+	system("cp $xmlfile1 $xmlfile0");
+    } else {
+	system("ln -s $xmlfile1 $xmlfile0");
+    }
+    if (-e $rootfile1) {
+	print "ln -s $rootfile1 $rootfile0\n";    
+	$doRootFiles = 1; 
+	system("ln -s $rootfile1 $rootfile0");
+    }
+}
+
+if ($doRootFiles) {
+    $combined0 = "TMVA-".$link."-combined.root"; 
+    $combined1 = "TMVA-".$numb."-combined.root"; 
+    system("rm -f $combined0 ");
+    print "ln -s $combined1 $combined0\n";
+    system("ln -s $combined1 $combined0");
+}

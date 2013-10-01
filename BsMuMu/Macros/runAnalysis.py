@@ -24,7 +24,7 @@ def main():
 
     print "doing mva comparisons..."
     #doComparisons()
-    doComparisonsExtra()
+    #doComparisonsExtra()
 
     print "mva significance optimization..."
     #doSignificance()
@@ -34,8 +34,33 @@ def main():
 
     print "drawing mva output and mass"
     #doDrawMVA()
+
+    print "make root files of BDT analysis"
+    #doRootFiles()
+
+    print "make BDT plots"
+    #doBDTPlots()
+
     print "...ending analysis"
 
+
+def doBDTPlots():
+    for region in regions:
+        os.system("python compTreeBdt.py blind compareMainVsMain "+region)
+        os.system("python compTreeBdt.py unblind compareMainVsXcheck "+region)
+
+    os.system("python applyMainBDT.py blind runOnXcheckData 0 doRunComp")
+    os.system("python applyMainBDT.py blind runOnXcheckData 2 doRunComp") 
+    os.system("python applyMainBDT.py unblind runOnXcheckData 0 NoRunComp doPlots")
+    os.system("python applyMainBDT.py blind runOnXcheckData 1 NoRunComp NoPlots doSeqBdt") 
+    os.system("python applyMainBDT.py unblind runOnXcheckData 1 NoRunComp NoPlots doSeqBdt") 
+
+
+def doRootFiles():
+    for BDTCut in range(0,3) :
+        os.system("python applyMainBDT.py blind runOnMainData "+str(BDTCut) )
+        os.system("python applyMainBDT.py blind runOnXcheckData "+str(BDTCut) )
+        os.system("python applyMainBDT.py unblind runOnXcheckData "+str(BDTCut) )
 
 
 def doSelection(mcMatched):
