@@ -797,8 +797,8 @@ def applySelectionAndSplit(inputTrees, splitting, maxRun, blindData = True, cut_
     
     for tree in inputTrees:
         #cut_based = False
-        data = True
-        if tree.find("MC") != -1: data = False
+        data = "true"
+        if tree.find("MC") != -1: data = "false"
         # if data == "0": append = appendNameMC
         # NO SPACES IN THE ROOT COMMAND
         for regidx, region in enumerate(regions):
@@ -809,10 +809,10 @@ def applySelectionAndSplit(inputTrees, splitting, maxRun, blindData = True, cut_
             else:
                 # print "Applying analysis cuts"
                 outputTree += '.root'
-            blinding = False
+            blinding = "false"
             if data:
                 if blindData:
-                    blinding = True
+                    blinding = "true"
                 else:
                     outputTree = outputTree.split(".")[0]+"_unblinded.root"
             if cut_based:
@@ -820,4 +820,4 @@ def applySelectionAndSplit(inputTrees, splitting, maxRun, blindData = True, cut_
             outputTree = rootDir + outputTree
             # print 'root -l -b -q cutTree_BsMuMu.C\(\\"'+tree+'\\",\\"'+outputTree+'\\",'+str(regionIndex)+','+data+','+cut_based+','+blinding+','+str(splitting)+','+maxRun+'\)'
             # print "applying selection and creating:", outputTree
-            os.system(rootExecutable+' -l -b -q cutTree_BsMuMu.C\(\\"'+tree+'\\",\\"'+outputTree+'\\",'+str(regidx)+','+str(data)+','+str(mc_matched)+','+str(cut_based)+','+str(blinding)+','+str(splitting)+','+maxRun+'\)')
+            os.system(rootExecutable+' -l -b -q cutTree_BsMuMu.C+\(\\"'+tree+'\\",\\"'+outputTree+'\\",'+str(regidx)+','+data+','+str(mc_matched).lower()+','+str(cut_based).lower()+','+blinding+','+str(splitting)+','+maxRun+'\)')

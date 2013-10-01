@@ -38,5 +38,5 @@ TString rootDir("rootfiles/");
 TString figuresDira("BsMuMuLatex/Figures/bdt/");
 TString figuresDirb("BsMuMuLatex/Figures/mlp/");
 TString figuresDirc("BsMuMuLatex/Figures/cnt/");
-TString figuresDird("BsMuMuLatex/Figures/mainAnaSel/");
+TString figuresDird("BsMuMuLatex/Figures/mainSel/");
 typedef float mytype;

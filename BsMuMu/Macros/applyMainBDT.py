@@ -15,14 +15,38 @@ cutValue = -999
 
 runOnMainData = False
 looseBdtCut = 0 #1:no cut, #2:zero
-
 doRunComp = False #run comparisons only 
+doPlots = False
 doSeqBdt = False 
 doSeqCnt = False 
-doPlots = True
+
+if len(sys.argv) > 1: 
+    if sys.argv[1] == "unblind": unblind = True
+    else : unblind = False 
+if len(sys.argv) > 2:
+    if sys.argv[2] == "runOnMainData": runOnMainData = True
+    else : runOnMainData = False
+if len(sys.argv) > 3:
+    looseBdtCut = int(sys.argv[3]) 
+if len(sys.argv) > 4:
+    if sys.argv[4] == "doRunComp": doRunComp = True
+    else : doRunComp = False
+if len(sys.argv) > 5:
+    if sys.argv[5] == "doPlots": doPlots = True
+    else : doPlots = False
+if len(sys.argv) > 6:
+    if sys.argv[6] == "doSeqBdt": doSeqBdt = True
+    else : doSeqBdt = False
+if len(sys.argv) > 7:
+    if sys.argv[7] == "doSeqCnt": doSeqCnt = True
+    else : doSeqCnt = False 
+
 
 tree_name = "probe_tree"
-if runOnMainData: tree_name = "events"
+anaType = "xcheck"
+if runOnMainData: 
+    tree_name = "events"
+    anaType = "main"
 
 with open("setdirs.h", "a") as myfile:
     if runOnMainData: 
@@ -150,6 +174,7 @@ def main():
     mainBdtCut = { "barrel":0.360, "endcaps":0.38 }
 
     if looseBdtCut:
+        print looseBdtCut
         if looseBdtCut == 1:
             bdtv=-999
         elif  looseBdtCut == 2:
@@ -191,7 +216,7 @@ def main():
             else:                  outputfilelistE += " " + outputFile
 
             print isample, Region, mainWeightFile, inputFile, outputFile
-            os.system("root -l -b -q TMVAClassificationApplication_main.C+\(\\\""+inputFile+"\\\",\\\""+outputFile+"\\\",\\\""+mainWeightFile+"\\\","+str(cutValue)+",\\\""+method+"\\\",\\\""+region+"\\\",\\\""+tree_name+"\\\"\)")
+            os.system("root -l -b -q TMVAClassificationApplication_main.C+\(\\\""+inputFile+"\\\",\\\""+outputFile+"\\\",\\\""+mainWeightFile+"\\\","+str(cutValue)+",\\\""+method+"\\\",\\\""+region+"\\\",\\\""+tree_name+"\\\",\\\""+anaType+"\\\"\)")
 
 
     cmd = "hadd -f "+rootDir+"all"+strname__+outputfilelist
