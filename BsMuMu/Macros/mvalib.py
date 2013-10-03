@@ -172,11 +172,11 @@ def prepareMultiTable(region, rankingType):
 
     outputFileBase.write("    \\hline \n")
     outputFileBase.write("  \\end{tabular} \n")
-    outputFileBase.write("  \\label{tab:datasets"+region+rankingType+"} \n")
     if rankingType == "IdTransformation":
         outputFileBase.write("  \\caption{Variable ranking for events of the three different event samples in the "+region+" before training.} \n")
     else:
         outputFileBase.write("  \\caption{Variable ranking for events of the three different event samples in the "+region+" after "+rankingType+" training.} \n")
+    outputFileBase.write("  \\label{tab:datasets"+region+rankingType+"} \n")
     outputFileBase.write("\\end{table} \n")
     outputFileBase.close()
     print "created table:", outputFileBase.name
@@ -227,8 +227,8 @@ def getNumEvtTable():
     # Closing the table
     tableFile.write("    \\hline \n")
     tableFile.write("  \\end{tabular} \n")
-    tableFile.write("  \\label{tab:numCandidates} \n")
     tableFile.write("  \\caption{Number of events per type for signal and background events in the barrel and endcap.} \n")
+    tableFile.write("  \\label{tab:numCandidates} \n")
     tableFile.write("\\end{table} \n")
     tableFile.close()
     print "created table:", tableFile.name
