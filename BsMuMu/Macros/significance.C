@@ -239,7 +239,7 @@ void significance(const double & nsig, const double & nbkg, TString method="BDT"
    tm->SetMarkerColor(2);
    tm->Draw("same");
    c2.SaveAs(TString(plotsDir+name+"_roc"+ext));
-   c2.SaveAs(TString(lpath+name+"_roc.pdf"));
+   c2.SaveAs(TString(lpath+name+"_roc.png"));
 
    TCanvas c3;
    roc->GetXaxis()->SetRangeUser(0.,1);
@@ -248,7 +248,7 @@ void significance(const double & nsig, const double & nbkg, TString method="BDT"
    //tp->Draw("same");
    tm->Draw("same");
    c3.SaveAs(TString(plotsDir+name+"_roc_zoom"+ext));
-   c3.SaveAs(TString(lpath+name+"_roc_zoom.pdf"));
+   c3.SaveAs(TString(lpath+name+"_roc_zoom.png"));
 
    TGraph* mark = new TGraph(1);
    mark->SetPoint(1,sig_max_effS,1.-sig_max_effB);
