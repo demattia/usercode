@@ -1,4 +1,4 @@
-#from setdirs import *
+from setdirs import *
 from ROOT import TROOT, TLine, TGraphErrors, TLatex
 from ROOT import TFile, TH1F, TH2F, TCanvas, THStack, TLegend
 from ROOT import gBenchmark, gStyle, gROOT
@@ -6,19 +6,29 @@ from ROOT import gBenchmark, gStyle, gROOT
 
 
 ## script knobs
-#region = "barrel"
-region = "endcaps"
+region = "barrel"
+#region = "endcaps"
 
-unblind = False
+unblind = True
 
-compareMainVsXcheck = False
+compareMainVsXcheck = True
 
 
-looseBdtCut = 1 #1:no cut, #2:zero
+looseBdtCut = 0 #1:no cut, #2:zero
 
 mainBdtCut = { "barrel":0.36, "endcaps":0.38 }
 #mainBdtCut = { "barrel":0., "endcaps":0. }
 
+if len(sys.argv) > 1: 
+    if sys.argv[1] == "unblind": unblind = True
+    else : unblind = False
+if len(sys.argv) > 2:
+    if sys.argv[2] == "compareMainVsXcheck": compareMainVsXcheck = True
+    else : compareMainVsXcheck = False
+if len(sys.argv) > 3:
+    region = sys.argv[3]
+if len(sys.argv) > 4:
+    looseBdtCut = int(sys.argv[4])
 
 figuresDird = "BsMuMuLatex/Figures/mainSel/"
 plotsDir="plots/"

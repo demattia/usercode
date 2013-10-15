@@ -63,7 +63,7 @@ inputTrees = [
     'Trees/Run2012DRereco/selection_test.root',
     'Trees/Run2012C2/selection_test.root',
 #    'trees-run2012dcleaned/selection_test.root',
-#    'Trees/BsMC/selection_test.root',
+    'Trees/BsMC/selection_test.root',
               ]
 #runlistA = ["Run2012A","Run2012ARecover","Run2012B","Run2012C1","Run2012DRereco","Run2012C2","Run2012D"]
 runlist = []

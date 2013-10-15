@@ -30,13 +30,16 @@ Int_t TMVAClassificationApplication_main( const TString inputFileName =
 					  "/home/nuno/TMVA-2-Events0_BDT.weights.xml",
 					  const float cutValue=0.35, TString myMethodList = "BDT", TString region = "barrel", 
 					 //TString tree_name = "probe_tree" 
-					 TString tree_name = "events" 
+					 TString tree_name = "events", TString anaType = "main" 
 					 ) {   
   
   bool barrel = false;
   //  if(outputFileName.Contains("arrel"))
   if(region=="barrel")
     barrel = true;
+  bool main = false;
+  if(anaType=="main")
+    main = true;
 
   /*
   bool mainData = false;
@@ -322,22 +325,29 @@ Int_t TMVAClassificationApplication_main( const TString inputFileName =
 
    // read extra variables
 
-     mytype me, pvw8, closetrk, m1pt, m2pt, m1eta,m2eta, fl3d, pvlip, pvlips;
-     int evtnum;
+     mytype me, pvw8, m1pt, m2pt, m1eta,m2eta, fl3d, pvlip, pvlips;
+     UInt_t evtnum_xcheck; mytype closetrk_xcheck;  //xcheck
+	 Long64_t evtnum; Int_t closetrk;
      //lxysig, flsxy, .. these names differ for main and xcheck
 
-     //theTree->SetBranchAddress( "evt",                            &evtnum ); //main
-     theTree->SetBranchAddress( "event",                            &evtnum ); //xcheck
+     if (main) {
+       theTree->SetBranchAddress( "evt",                            &evtnum ); //main
+       theTree->SetBranchAddress( "pvlips",                              &pvlips ); //main
+       theTree->SetBranchAddress( "closetrk",                              &closetrk ); //main
+     }
+     else {
+       theTree->SetBranchAddress( "event",                            &evtnum_xcheck ); //xcheck
+       theTree->SetBranchAddress( "pvlipErr",                              &pvlips ); //xcheck
+       theTree->SetBranchAddress( "closetrk",                              &closetrk_xcheck ); //xcheck
+     }     
      theTree->SetBranchAddress( "me",                            &me );
      theTree->SetBranchAddress( "pvw8",                              &pvw8 );
-     theTree->SetBranchAddress( "closetrk",                              &closetrk );
      theTree->SetBranchAddress( "m1pt",                              &m1pt );
      theTree->SetBranchAddress( "m2pt",                              &m2pt );
      theTree->SetBranchAddress( "m1eta",                              &m1eta );
      theTree->SetBranchAddress( "m2eta",                              &m2eta );
      theTree->SetBranchAddress( "fl3d",                              &fl3d );
      theTree->SetBranchAddress( "pvlip",                              &pvlip );
-     theTree->SetBranchAddress( "pvlips",                              &pvlips );
       
    /// END INPUT TREE
 
@@ -488,7 +498,10 @@ Int_t TMVAClassificationApplication_main( const TString inputFileName =
       //if(ievt>4000) continue;
 
       theTree->GetEntry(ievt);
-
+      if (!main) {  
+        evtnum = (Long64_t)evtnum_xcheck;
+        closetrk = (Int_t)closetrk_xcheck;
+      }
       /*
       new_m = m;  
       bdt_v = 10.2;

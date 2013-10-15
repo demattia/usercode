@@ -32,6 +32,7 @@ for event in tree:
     if checkRunLumi(event.run, event.lumi):
         newtree.Fill()
 
+newtree.Write()
 outputFile.Close()
 
 #     i += 1

@@ -172,11 +172,11 @@ def prepareMultiTable(region, rankingType):
 
     outputFileBase.write("    \\hline \n")
     outputFileBase.write("  \\end{tabular} \n")
-    outputFileBase.write("  \\label{tab:datasets"+region+rankingType+"} \n")
     if rankingType == "IdTransformation":
         outputFileBase.write("  \\caption{Variable ranking for events of the three different event samples in the "+region+" before training.} \n")
     else:
         outputFileBase.write("  \\caption{Variable ranking for events of the three different event samples in the "+region+" after "+rankingType+" training.} \n")
+    outputFileBase.write("  \\label{tab:datasets"+region+rankingType+"} \n")
     outputFileBase.write("\\end{table} \n")
     outputFileBase.close()
     print "created table:", outputFileBase.name
@@ -227,8 +227,8 @@ def getNumEvtTable():
     # Closing the table
     tableFile.write("    \\hline \n")
     tableFile.write("  \\end{tabular} \n")
-    tableFile.write("  \\label{tab:numCandidates} \n")
     tableFile.write("  \\caption{Number of events per type for signal and background events in the barrel and endcap.} \n")
+    tableFile.write("  \\label{tab:numCandidates} \n")
     tableFile.write("\\end{table} \n")
     tableFile.close()
     print "created table:", tableFile.name
@@ -291,20 +291,20 @@ def estimateSignal(region):
     sigma = 173.57
     genFilterEff = 0.002514
     # in /pb
-    runA = 805.116
-    runARecover = 82.136
-    runB = 4429.
-    runC1 = 495.003
-    runCEcalRecover = 134.242
-    runC2 = 6397.
-    runD = 7483.
+    runA = 851.261 #  805.116
+    runARecover = 82.590 # 82.136
+    runB = 4828. # 4429.
+    runC1 = 501.878 # 495.003
+    # runCEcalRecover = 134.242
+    runC2 = 6801. # 6397.
+    runD = 7576. # 7483.
     
     # Full 2012 data
     # integratedLuminosity = runA+runARecover+runB+runC1+runCEcalRecover+runC2+runD
     # Same data as reference AN
     # integratedLuminosity = runA+runARecover+runB+runC1+runCEcalRecover+runC2
     # In /pb
-    integratedLuminosity = 18620
+    integratedLuminosity = 20641 # 18620
 
     expectedEvents = sigma*genFilterEff*integratedLuminosity
 
@@ -319,19 +319,20 @@ def estimateSignal(region):
     inputFile = TFile(countersDir+"counters.root")
     histoDir = inputFile.Get("counterReader")
     totEvents = histoDir.Get("numProcessedEvents").GetBinContent(1)
-    prefilterEvents = histoDir.Get("numEventsPassingFilter").GetBinContent(1)
-    prefilterEfficiency = prefilterEvents/totEvents
-    if printit:
-        print "processed events =", int(totEvents)
-        print "events passing filters =", int(prefilterEvents)
-        print "prefilter efficiency =", prefilterEfficiency
+    #prefilterEvents = histoDir.Get("numEventsPassingFilter").GetBinContent(1)
+    #prefilterEfficiency = prefilterEvents/totEvents
+    #if printit:
+    #    print "processed events =", int(totEvents)
+    #    print "events passing filters =", int(prefilterEvents)
+    #    print "prefilter efficiency =", prefilterEfficiency
 
     # Take number of signal events from tree before trigger and muon-id
-    preselectedEvents = numEvents(countersDir+"selection_test.root", "detailedDimuonTree")
+    prefilterEvents = numEvents(countersDir+"selection_test.root", "detailedDimuonTree")
+    prefilterEfficiency = prefilterEvents/totEvents
     selectedSignalBarrel = numEvents(rootDir+"BsMC12_barrel_preselection.root")
     selectedSignalEndcaps = numEvents(rootDir+"BsMC12_endcaps_preselection.root")
-    effBarrel = selectedSignalBarrel/float(preselectedEvents)
-    effEndcaps = selectedSignalEndcaps/float(preselectedEvents)
+    effBarrel = selectedSignalBarrel/float(prefilterEvents)
+    effEndcaps = selectedSignalEndcaps/float(prefilterEvents)
     if printit:
         print "efficiency in the barrel after trigger and muon-id =", effBarrel*prefilterEfficiency
         print "efficiency in the endcaps after trigger and muon-id =", effEndcaps*prefilterEfficiency
@@ -797,8 +798,8 @@ def applySelectionAndSplit(inputTrees, splitting, maxRun, blindData = True, cut_
     
     for tree in inputTrees:
         #cut_based = False
-        data = True
-        if tree.find("MC") != -1: data = False
+        data = "true"
+        if tree.find("MC") != -1: data = "false"
         # if data == "0": append = appendNameMC
         # NO SPACES IN THE ROOT COMMAND
         for regidx, region in enumerate(regions):
@@ -809,10 +810,10 @@ def applySelectionAndSplit(inputTrees, splitting, maxRun, blindData = True, cut_
             else:
                 # print "Applying analysis cuts"
                 outputTree += '.root'
-            blinding = False
+            blinding = "false"
             if data:
                 if blindData:
-                    blinding = True
+                    blinding = "true"
                 else:
                     outputTree = outputTree.split(".")[0]+"_unblinded.root"
             if cut_based:
@@ -820,4 +821,4 @@ def applySelectionAndSplit(inputTrees, splitting, maxRun, blindData = True, cut_
             outputTree = rootDir + outputTree
             # print 'root -l -b -q cutTree_BsMuMu.C\(\\"'+tree+'\\",\\"'+outputTree+'\\",'+str(regionIndex)+','+data+','+cut_based+','+blinding+','+str(splitting)+','+maxRun+'\)'
             # print "applying selection and creating:", outputTree
-            os.system(rootExecutable+' -l -b -q cutTree_BsMuMu.C\(\\"'+tree+'\\",\\"'+outputTree+'\\",'+str(regidx)+','+str(data)+','+str(mc_matched)+','+str(cut_based)+','+str(blinding)+','+str(splitting)+','+maxRun+'\)')
+            os.system(rootExecutable+' -l -b -q cutTree_BsMuMu.C+\(\\"'+tree+'\\",\\"'+outputTree+'\\",'+str(regidx)+','+data+','+str(mc_matched).lower()+','+str(cut_based).lower()+','+blinding+','+str(splitting)+','+maxRun+'\)')
