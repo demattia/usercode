@@ -1,5 +1,7 @@
 #include "Analysis/RootTreeProducers/interface/Track.h"
 #include "Analysis/RootTreeProducers/interface/GenParticle.h"
+#include <map>
+#include <string>
 
 #ifdef __CINT__
 #pragma link off all globals;
@@ -9,4 +11,5 @@
 #pragma link C++ class std::vector<Track>+;
 #pragma link C++ class GenParticle+;
 #pragma link C++ class std::vector<GenParticle>+;
+#pragma link C++ class std::map<std::string,std::vector<Track> >+;
 #endif
