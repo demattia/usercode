@@ -29,8 +29,12 @@ public:
   int cscStationsWithValidHits;
   int trackAlgorithm;
   bool trackQuality;
+  double isolation;
+  double trackerLayersWithMeasurement;
+  double pixelLayersWithMeasurement;
+  double numberOfValidStripLayersWithMonoAndStereo;
 
-  ClassDef(Track, 1)
+  ClassDef(Track, 2)
 };
 ClassImp(Track)
 
