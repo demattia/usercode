@@ -109,12 +109,14 @@ private:
 
   TString outputName_;
   edm::InputTag muonCollection_;
+  edm::InputTag standAloneMuonCollection_;
   // edm::InputTag triggerMuonCollection_;
   edm::InputTag trackCollectionName_;
   const reco::TrackCollection * trackCollection_;
   boost::shared_ptr<RootTreeHandler> treeHandler_;
   std::vector<Track> tracks_;
   std::vector<Track> muons_;
+  std::vector<Track> standAloneMuons_;
   // std::vector<Track> triggerMuons_;
   std::vector<GenParticle> genParticles_;
   std::vector<std::string> selectedTriggerNames_;
@@ -123,22 +125,26 @@ private:
   std::map<std::string, std::vector<Track> > triggerFilterObjectsMap_;
   double minTrackPt_;
   double minMuonPt_;
+  double minStandAloneMuonPt_;
 };
 
 TagAndProbeTreeWriter::TagAndProbeTreeWriter(const edm::ParameterSet& iConfig) :
   useMCtruth_(iConfig.getParameter<bool>("UseMCtruth")),
   outputName_(iConfig.getParameter<std::string>("OutputName")),
   muonCollection_(iConfig.getParameter<edm::InputTag>("MuonCollection")),
+  standAloneMuonCollection_(iConfig.getParameter<edm::InputTag>("StandAloneMuonCollection")),
   // triggerMuonCollection_(iConfig.getParameter<edm::InputTag>("TriggerMuonCollection")),
   trackCollectionName_(iConfig.getParameter<edm::InputTag>("TrackCollection")),
   selectedTriggerNames_(iConfig.getParameter<std::vector<std::string> >("TriggerNames")),
   selectedFilterNames_(iConfig.getParameter<std::vector<std::string> >("FilterNames")),
   minTrackPt_(iConfig.getParameter<double>("MinTrackPt")),
-  minMuonPt_(iConfig.getParameter<double>("MinMuonPt"))
+  minMuonPt_(iConfig.getParameter<double>("MinMuonPt")),
+  minStandAloneMuonPt_(iConfig.getParameter<double>("MinStandAloneMuonPt"))
 {
   treeHandler_.reset(new RootTreeHandler(outputName_, "MuonsTree"));
   treeHandler_->addBranch("tracks", "std::vector<Track>", &tracks_);
   treeHandler_->addBranch("muons", "std::vector<Track>", &muons_);
+  treeHandler_->addBranch("refittedStandAloneMuons", "std::vector<Track>", &standAloneMuons_);
   treeHandler_->addBranch("triggerFilterObjectsMap", "std::map<std::string, std::vector<Track> >", &triggerFilterObjectsMap_);
   treeHandler_->addBranch("genParticles", "std::vector<GenParticle>", &genParticles_);
   treeHandler_->addBranch("triggerNames", "std::vector<std::string> >", &triggerNamesPassed_);
@@ -220,6 +226,16 @@ void TagAndProbeTreeWriter::analyze(const edm::Event& iEvent, const edm::EventSe
     std::cerr << ex;
   }
 
+  // Fill the standAloneMuons
+  try {
+    edm::Handle<reco::TrackCollection> standAloneMuons;
+    iEvent.getByLabel(standAloneMuonCollection_, standAloneMuons);
+    fillTreeTracks(*(standAloneMuons.product()), standAloneMuons_, minStandAloneMuonPt_);
+  }
+  catch (cms::Exception & ex) {
+    std::cerr << ex;
+  }
+
 
   // Gen Particles. Note: selecting stable muons only
   edm::Handle<reco::GenParticleCollection> genParticles;
@@ -236,6 +252,7 @@ void TagAndProbeTreeWriter::analyze(const edm::Event& iEvent, const edm::EventSe
   treeHandler_->saveToTree(iEvent.id().event(), iEvent.run());
   tracks_.clear();
   muons_.clear();
+  standAloneMuons_.clear();
   genParticles_.clear();
   triggerNamesPassed_.clear();
   triggerFilterObjectsMap_.clear();

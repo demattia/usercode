@@ -47,18 +47,19 @@ process.source.duplicateCheckMode = cms.untracked.string('noDuplicateCheck')
 
 process.demo = cms.EDAnalyzer('TagAndProbeTreeWriter',
                               UseMCtruth = cms.bool(True),
-                              # MuonCollection = cms.InputTag("standAloneMuons"),
                               MuonCollection = cms.InputTag("globalMuons"),
+                              StandAloneMuonCollection = cms.InputTag("refittedStandAloneMuons"),
                               # Note: this collection is also used for the track-based isolation
                               TrackCollection = cms.InputTag("generalTracks"),
                               # TriggerMuonCollection = cms.InputTag("L2Muons"),
                               OutputName = cms.string("tagAndProbe.root"),
                               # Give a substring of the trigger or the full name. Do not use a *.
-                              TriggerNames = cms.vstring("HLT_L2DoubleMu23_NoVertex_2Cha_Angle2p5_v", "HLT_L2DoubleMu23_NoVertex_v"),
+                              TriggerNames = cms.vstring("IsoMu24_v", "HLT_L2DoubleMu23_NoVertex_2Cha_Angle2p5_v", "HLT_L2DoubleMu23_NoVertex_v"),
                               # They must correspond to the names given in the TriggerNames parameter
-                              FilterNames = cms.vstring("hltL2DoubleMu23NoVertexL2Filtered2ChaAngle2p5", "hltL2DoubleMu23NoVertexL2PreFiltered"),
+                              FilterNames = cms.vstring("----ISOMU24FILTER----", "hltL2DoubleMu23NoVertexL2Filtered2ChaAngle2p5", "hltL2DoubleMu23NoVertexL2PreFiltered"),
                               MinTrackPt = cms.double(25.),
-                              MinMuonPt = cms.double(25.)
+                              MinMuonPt = cms.double(25.),
+                              MinStandAloneMuonPt = cms.double(25)
                               )
 
 process.p = cms.Path(process.demo)
