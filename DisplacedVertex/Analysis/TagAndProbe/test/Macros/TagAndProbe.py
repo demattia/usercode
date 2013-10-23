@@ -4,7 +4,7 @@ from utils import *
 from ROOT import RooRealVar, RooFormulaVar, RooVoigtian, RooChebychev, RooArgList, RooArgSet, \
     RooAddPdf, RooDataSet, RooCategory, RooSimultaneous, RooGenericPdf, RooWorkspace
 import Workspace
-ROOT.gROOT.LoadMacro("/Users/demattia/CMSSH/soft/Releases/CMSSW_5_3_8/src/Loader.C+")
+ROOT.gROOT.LoadMacro("Loader.C+")
 
 
 
@@ -19,7 +19,7 @@ MC = True
 
 # Define binning
 # ptBins = [26, 30, 35, 40, 45, 50, 60, 80]
-ptBins = [30, 50]
+ptBins = [26, 30, 50]
 
 
 # Define cuts and some useful variables
@@ -34,7 +34,7 @@ newTrigger = "HLT_L2DoubleMu23_NoVertex_2Cha_Angle2p5_v"
 
 # Load the input file
 tree = ROOT.TChain("T")
-tree.Add("/Users/demattia/CMSSH/soft/Releases/CMSSW_5_3_8/src/Analysis/TagAndProbe/test/TagAndProbe_ZMuMu.root")
+tree.Add("/afs/cern.ch/user/d/demattia/public/TagAndProbe/TagAndProbe_ZMuMu.root")
 
 
 # Prepare the workspace
@@ -150,10 +150,14 @@ def plotResults(ptBin1, ptBin2, combData, canvas2, canvas3):
     canvas2.cd(find_position(ptBin1, ptBin2, ptBins)+1)
     frame1.GetYaxis().SetTitleOffset(1.4)
     frame1.Draw()
+    frame1.SetName(buildNamePars("fitAll_", ptBin1, ptBin1+1, ptBin2, ptBin2+1, ptBins))
+    frame1.SaveAs(buildNamePars("fitAll_", ptBin1, ptBin1+1, ptBin2, ptBin2+1, ptBins)+".root")
 
     canvas3.cd(find_position(ptBin1, ptBin2, ptBins)+1)
     frame2.GetYaxis().SetTitleOffset(1.4)
     frame2.Draw()
+    frame2.SetName(buildNamePars("fitPass_", ptBin1, ptBin1+1, ptBin2, ptBin2+1, ptBins))
+    frame2.SaveAs(buildNamePars("fitPass_", ptBin1, ptBin1+1, ptBin2, ptBin2+1, ptBins)+".root")
 
 
 # After filling the datasets, build the combined dataset
