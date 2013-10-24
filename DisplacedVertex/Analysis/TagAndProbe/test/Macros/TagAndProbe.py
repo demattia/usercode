@@ -12,7 +12,7 @@ ROOT.gROOT.LoadMacro("Loader.C+")
 
 
 MC = True
-
+NoBkgd = True
 
 # --------#
 
@@ -27,7 +27,7 @@ ptBinsY = [20, 10000]
 triggerMatchDeltaR = 0.1
 minMass = 70
 maxMass = 110
-p = Properties(minMass, maxMass, ptBinsX, ptBinsY, triggerMatchDeltaR)
+p = Properties(minMass, maxMass, ptBinsX, ptBinsY, triggerMatchDeltaR, NoBkgd)
 
 # Trigger efficiency for new trigger over old trigger
 oldTrigger = "HLT_L2DoubleMu23_NoVertex_v"
@@ -35,8 +35,11 @@ newTrigger = "HLT_L2DoubleMu23_NoVertex_2Cha_Angle2p5_v"
 
 # Load the input file
 tree = ROOT.TChain("T")
-tree.Add("/afs/cern.ch/user/d/demattia/public/TagAndProbe/TagAndProbe_ZMuMu.root")
-
+#tree.Add("/afs/cern.ch/user/d/demattia/public/TagAndProbe/TagAndProbe_ZMuMu.root")
+tree.Add("/afs/cern.ch/user/d/demattia/public/TagAndProbe/TagAndProbe_Run2012A.root")
+tree.Add("/afs/cern.ch/user/d/demattia/public/TagAndProbe/TagAndProbe_Run2012B.root")
+tree.Add("/afs/cern.ch/user/d/demattia/public/TagAndProbe/TagAndProbe_Run2012C.root")
+tree.Add("/afs/cern.ch/user/d/demattia/public/TagAndProbe/TagAndProbe_Run2012D.root")
 
 # Prepare the workspace
 ws = RooWorkspace("ws", "workspace")
@@ -69,8 +72,8 @@ passCandidates = 0
 
 processedEvents = 0
 
-#totEvents = 10000
-totEvents = tree.GetEntries()
+totEvents = 2000000
+#totEvents = tree.GetEntries()
 progress = 0
 
 

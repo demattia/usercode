@@ -37,8 +37,8 @@ def buildPdf(ws, p):
     sigAll = RooRealVar("sigAll", "sigAll", 2000, 0, 100000)
     bkgAll = RooRealVar("bkgAll", "bkgAll", 100, 0, 10000)
     modelAll = RooAddPdf("modelAll", "modelAll", RooArgList(signalAll, backgroundAll), RooArgList(sigAll, bkgAll))
-    # if MC:
-    #     modelAll = RooAddPdf("modelAll", "modelAll", RooArgList(signalAll), RooArgList(sigAll))
+    if p.NoBkgd:
+        modelAll = RooAddPdf("modelAll", "modelAll", RooArgList(signalAll), RooArgList(sigAll))
 
     # Define pdf for all probes
 
@@ -65,8 +65,8 @@ def buildPdf(ws, p):
     bkgPass = RooRealVar("bkgPass", "bkgPass", 100, 0, 10000)
     #bkgPass = RooFormulaVar("bkgPass", "@0*@1", RooArgList(bkgAll, efficiency))
     modelPass = RooAddPdf("modelPass", "modelPass", RooArgList(signalPass, backgroundPass), RooArgList(sigPass, bkgPass))
-    # if MC:
-    #     modelPass = RooAddPdf("modelPass", "modelPass", RooArgList(signalPass), RooArgList(sigPass))
+    if p.NoBkgd:
+        modelPass = RooAddPdf("modelPass", "modelPass", RooArgList(signalPass), RooArgList(sigPass))
 
     frac = RooRealVar("frac", "frac", 0.8, 0., 1.)
 
