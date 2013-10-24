@@ -2,9 +2,9 @@ import ROOT
 from utils import *
 
 # Define binning
-ptBinsX = [26, 30, 35, 40, 45, 50, 60, 80]
-ptBinsY = [26, 30, 35, 40, 45, 50, 60, 80]
-#ptBins = [26, 30, 50]
+ptBinsX = [26, 30, 35, 40, 45, 50, 60, 70]
+#ptBinsY = [26, 30, 35, 40, 45, 50, 60, 80]
+ptBinsY = [20, 10000]
 
 
 # Plot the fit results
@@ -23,11 +23,12 @@ def plotResults(ptBin1, ptBin2, canvas2, canvas3):
 
 from array import array
 hEff = ROOT.TH2D("hEff", "hEff", len(ptBinsX)-1, array('d',ptBinsX), len(ptBinsY)-1, array('d',ptBinsY))
+hEff1D = ROOT.TH1D("hEff1D", "hEff1D", len(ptBinsX)-1, array('d',ptBinsX))
 
 # Canvases for fit results
-canvas2 = ROOT.TCanvas("RooFitCanvas", "RooFitCanvas", 800, 800)
+canvas2 = ROOT.TCanvas("RooFitCanvas", "RooFitCanvas", 1600, 400)
 canvas2.Divide(len(ptBinsX),len(ptBinsY))
-canvas3 = ROOT.TCanvas("RooFitCanvasPass", "RooFitCanvasPass", 800, 800)
+canvas3 = ROOT.TCanvas("RooFitCanvasPass", "RooFitCanvasPass", 1600, 400)
 canvas3.Divide(len(ptBinsX),len(ptBinsY))
 
 # Construct combined dataset in (x,sample) and perform simultaneous fit
@@ -40,13 +41,26 @@ for ptBin1 in range(0, len(ptBinsX)-1):
             if line.find("efficiency") != -1: 
                 eff = float(line.split()[2])
                 effErr = float(line.split()[4])
-                print "eff["+str(ptBinsX[ptBin1])+"_"+str(ptBinsX[ptBin1+1])+", "+str(ptBinsY[ptBin1])+"_"+str(ptBinsY[ptBin1+1])+"] = ", eff, "+/-", effErr
+                print "eff["+str(ptBinsX[ptBin1])+"_"+str(ptBinsX[ptBin1+1])+", "+str(ptBinsY[ptBin2])+"_"+str(ptBinsY[ptBin2+1])+"] = ", eff, "+/-", effErr
         hEff.SetBinContent(ptBin1+1, ptBin2+1, eff)
         hEff.SetBinError(ptBin1+1, ptBin2+1, effErr)
+        hEff1D.SetBinContent(ptBin1+1, eff)
+        hEff1D.SetBinError(ptBin1+1, effErr)
+
 
 canvas2.Print("RooFitCanvas_updated.pdf")
+canvas2.Print("RooFitCanvas_updated.png")
 canvas3.Print("RooFitCanvasPass_updated.pdf")
+canvas3.Print("RooFitCanvasPass_updated.png")
 
 canvas4 = ROOT.TCanvas("efficiency", "efficiency", 800, 800)
 hEff.Draw("COLZTEXTE")
 canvas4.Print("Efficiency_updated.pdf")
+canvas4.Print("Efficiency_updated.png")
+
+canvas5 = ROOT.TCanvas("efficiency1D", "efficiency1D", 600, 600)
+hEff1D.GetXaxis().SetTitle("muon p_{T} [GeV/c]")
+hEff1D.GetYaxis().SetTitle("new trigger eff / old trigger eff")
+hEff1D.Draw()
+canvas5.Print("Efficiency1D_updated.pdf")
+canvas5.Print("Efficiency1D_updated.png")

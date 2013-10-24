@@ -18,10 +18,10 @@ MC = True
 
 
 # Define binning
-ptBinsX = [26, 30, 35, 40, 45, 50, 60, 80]
-ptBinsY = [26, 30, 35, 40, 45, 50, 60, 80]
-#ptBinsX = [45, 50]
-#ptBinsY = [50, 60]
+ptBinsX = [26, 30, 35, 40, 45, 50, 60, 70]
+#ptBinsY = [26, 30, 35, 40, 45, 50, 60, 70]
+#ptBinsX = [26, 80]
+ptBinsY = [20, 10000]
 
 # Define cuts and some useful variables
 triggerMatchDeltaR = 0.1
@@ -46,7 +46,7 @@ mass = ws.var("mass")
 sample = ws.cat("sample")
 simPdf = ws.pdf("simPdf")
 efficiency = ws.var("efficiency")
-
+meanB = ws.var("meanB")
 
 # prepare_datasets(ws, p)
 
@@ -75,8 +75,8 @@ progress = 0
 
 
 for event in tree:
-    #if processedEvents > totEvents:
-    #    break
+    if processedEvents > totEvents:
+        break
     processedEvents += 1
 
     if int(float(processedEvents)/float(totEvents)*100) % 10 == 0 and int(float(processedEvents)/float(totEvents)*100) > progress:
@@ -167,6 +167,7 @@ frMap = {}
 
 from array import array
 hEff = ROOT.TH2D("hEff", "hEff", len(ptBinsX)-1, array('d',ptBinsX), len(ptBinsY)-1, array('d',ptBinsY))
+hEff1D = ROOT.TH1D("hEff1D", "hEff1D", len(ptBinsX)-1, array('d',ptBinsX))
 
 # Canvases for fit results
 canvas2 = ROOT.TCanvas("RooFitCanvas", "RooFitCanvas", 800, 800)
@@ -183,12 +184,16 @@ for ptBin1 in range(0, len(ptBinsX)-1):
                                                    RooArgSet(mass),ROOT.RooFit.Index(sample),
                                                    ROOT.RooFit.Import("all",datasetAllMap[(ptBin1, ptBin2)]),
                                                    ROOT.RooFit.Import("pass",datasetPassMap[(ptBin1, ptBin2)]))
+        #meanB.setRange(ptBinsX[ptBin1]+ptBinsY[ptBin2], ptBinsX[ptBin1+1]+ptBinsY[ptBin2+1])
+        #meanB.setVal((ptBinsX[ptBin1]+ptBinsY[ptBin2]+ptBinsX[ptBin1+1]+ptBinsY[ptBin2+1])/2)
         frMap[(ptBin1, ptBin2)] = simPdf.fitTo(combDataMap[(ptBin1,ptBin2)], ROOT.RooFit.Save(ROOT.kTRUE), ROOT.RooFit.Extended(ROOT.kTRUE), ROOT.RooFit.NumCPU(4))
         # Use this for minos (better error estimate, but takes longer)
         frMap[(ptBin1, ptBin2)].Print("v")
         simPdf.getParameters(combDataMap[(ptBin1, ptBin2)]).writeToFile(buildNamePars("parameters_", ptBin1, ptBin1+1, ptBin2, ptBin2+1, ptBinsX, ptBinsY)+".txt")
         hEff.SetBinContent(ptBin1+1, ptBin2+1, efficiency.getVal())
         hEff.SetBinError(ptBin1+1, ptBin2+1, efficiency.getError())
+        hEff1D.SetBinContent(ptBin1+1, efficiency.getVal())
+        hEff1D.SetBinError(ptBin1+1, efficiency.getError())
         plotResults(ptBin1, ptBin2, combDataMap[(ptBin1,ptBin2)], canvas2, canvas3)
 
 canvas2.Print("RooFitCanvas.pdf")
@@ -197,3 +202,7 @@ canvas3.Print("RooFitCanvasPass.pdf")
 canvas4 = ROOT.TCanvas("efficiency", "efficiency", 800, 800)
 hEff.Draw("COLZTEXTE")
 canvas4.Print("Efficiency.pdf")
+canvas5 = ROOT.TCanvas("efficiency1D", "efficiency1D", 600, 600)
+hEff1D.Draw()
+canvas5.Print("Efficiency1D.pdf")
+
