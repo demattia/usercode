@@ -8,12 +8,13 @@ muMass = 0.1057
 
 class Properties:
     """Stores the min and max mass and the binning in pt"""
-    def __init__(self, minMass, maxMass, ptBinsX, ptBinsY, triggerMatchDeltaR):
+    def __init__(self, minMass, maxMass, ptBinsX, ptBinsY, triggerMatchDeltaR, NoBkgd):
         self.minMass = minMass
         self.maxMass = maxMass
         self.ptBinsX = ptBinsX
         self.ptBinsY = ptBinsY
         self.triggerMatchDeltaR = triggerMatchDeltaR
+        self.NoBkgd = NoBkgd
 
 
 def deltaPhi(phi1, phi2):

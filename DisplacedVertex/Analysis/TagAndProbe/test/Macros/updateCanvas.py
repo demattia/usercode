@@ -26,9 +26,9 @@ hEff = ROOT.TH2D("hEff", "hEff", len(ptBinsX)-1, array('d',ptBinsX), len(ptBinsY
 hEff1D = ROOT.TH1D("hEff1D", "hEff1D", len(ptBinsX)-1, array('d',ptBinsX))
 
 # Canvases for fit results
-canvas2 = ROOT.TCanvas("RooFitCanvas", "RooFitCanvas", 1600, 400)
+canvas2 = ROOT.TCanvas("RooFitCanvas", "RooFitCanvas", 1400, 200)
 canvas2.Divide(len(ptBinsX)-1,len(ptBinsY)-1)
-canvas3 = ROOT.TCanvas("RooFitCanvasPass", "RooFitCanvasPass", 1600, 400)
+canvas3 = ROOT.TCanvas("RooFitCanvasPass", "RooFitCanvasPass", 1400, 200)
 canvas3.Divide(len(ptBinsX)-1,len(ptBinsY)-1)
 
 # Construct combined dataset in (x,sample) and perform simultaneous fit
