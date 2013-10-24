@@ -50,7 +50,7 @@ def computeCosineAndMass(mu1, mu2):
 
 def fillTriggerMatchedTrack(track, triggerObjects, matchedTracks, p):
     for triggerMuon in triggerObjects:
-        if deltaR(triggerMuon.phi, triggerMuon.eta, track.phi, track.eta) < p.triggerMatchDeltaR and passSelection(track):
+        if (deltaR(triggerMuon.phi, triggerMuon.eta, track.phi, track.eta) < p.triggerMatchDeltaR) and passSelection(track):
             matchedTracks.append(track)
 
 def fillSingleCandidate(mass, p, track1, track2, histoMap, datasetMap):
@@ -60,17 +60,20 @@ def fillSingleCandidate(mass, p, track1, track2, histoMap, datasetMap):
     mass.setVal(cosineAndMass[1])
     bins = find_bins(track1.pt, track2.pt, p.ptBinsX, p.ptBinsY)
     if bins[0] == -1 or bins[1] == -1: return False
+    if track1.charge == track2.charge: return False
     histoMap[bins].Fill(mass.getVal())
+    #print bins, cosineAndMass[1], track1.pt, track2.pt
     datasetMap[bins].add(RooArgSet(mass))
     return True
 
 def fillCandidates(mass, properties, matchedTracks, histoMap, datasetMap):
     if len(matchedTracks) == 2:
         fillSingleCandidate(mass, properties, matchedTracks[0], matchedTracks[1], histoMap, datasetMap)
-    elif len(matchedTracks) > 2:
-        for i in range(0, len(matchedTracks)):
-            for j in range(i+1, len(matchedTracks)):
-                fillSingleCandidate(mass, properties, matchedTracks[i], matchedTracks[j], histoMap, datasetMap)
+    #elif len(matchedTracks) > 2:
+    #    print len(matchedTracks)
+    #    for i in range(0, len(matchedTracks)):
+    #        for j in range(i+1, len(matchedTracks)):
+    #            fillSingleCandidate(mass, properties, matchedTracks[i], matchedTracks[j], histoMap, datasetMap)
 
 def find_bins(pt1, pt2, ptBinsX, ptBinsY):
     return (bisect.bisect_right(ptBinsX, pt1)-1, bisect.bisect_right(ptBinsY, pt2)-1)
