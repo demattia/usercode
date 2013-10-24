@@ -82,6 +82,9 @@ def find_bins(pt1, pt2, ptBinsX, ptBinsY):
 def find_position(bin1, bin2, ptBinsX):
     return bin1+len(ptBinsX)*bin2
 
+def find_position_NoOverflow(bin1, bin2, ptBinsX):
+    return bin1+(len(ptBinsX)-1)*bin2
+
 def buildName(baseName, ptBin1, ptBin2, ptBinsX, ptBinsY):
     return baseName+str(ptBinsX[ptBin1])+"_"+str(ptBinsY[ptBin2])
 

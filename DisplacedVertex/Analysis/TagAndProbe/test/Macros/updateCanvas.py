@@ -3,19 +3,19 @@ from utils import *
 
 # Define binning
 ptBinsX = [26, 30, 35, 40, 45, 50, 60, 70]
-#ptBinsY = [26, 30, 35, 40, 45, 50, 60, 80]
+#ptBinsY = [26, 30, 35, 40, 45, 50, 60, 70]
 ptBinsY = [20, 10000]
 
 
 # Plot the fit results
 
 def plotResults(ptBin1, ptBin2, canvas2, canvas3):
-    canvas2.cd(find_position(ptBin1, ptBin2, ptBinsX)+1)
+    canvas2.cd(find_position_NoOverflow(ptBin1, ptBin2, ptBinsX)+1)
     inputAll = ROOT.TFile.Open(buildNamePars("fitAll_", ptBin1, ptBin1+1, ptBin2, ptBin2+1, ptBinsX, ptBinsY)+".root")
     frame1 = inputAll.FindObjectAny(buildNamePars("fitAll_", ptBin1, ptBin1+1, ptBin2, ptBin2+1, ptBinsX, ptBinsY))
     frame1.Draw()
 
-    canvas3.cd(find_position(ptBin1, ptBin2, ptBinsX)+1)
+    canvas3.cd(find_position_NoOverflow(ptBin1, ptBin2, ptBinsX)+1)
     inputPass= ROOT.TFile.Open(buildNamePars("fitPass_", ptBin1, ptBin1+1, ptBin2, ptBin2+1, ptBinsX, ptBinsY)+".root")
     frame2 = inputPass.FindObjectAny(buildNamePars("fitPass_", ptBin1, ptBin1+1, ptBin2, ptBin2+1, ptBinsX, ptBinsY))
     frame2.Draw()
