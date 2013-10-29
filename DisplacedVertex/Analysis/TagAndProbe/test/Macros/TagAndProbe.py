@@ -35,11 +35,11 @@ newTrigger = "HLT_L2DoubleMu23_NoVertex_2Cha_Angle2p5_v"
 
 # Load the input file
 tree = ROOT.TChain("T")
-#tree.Add("/afs/cern.ch/user/d/demattia/public/TagAndProbe/TagAndProbe_ZMuMu.root")
-tree.Add("/afs/cern.ch/user/d/demattia/public/TagAndProbe/TagAndProbe_Run2012A.root")
-tree.Add("/afs/cern.ch/user/d/demattia/public/TagAndProbe/TagAndProbe_Run2012B.root")
-tree.Add("/afs/cern.ch/user/d/demattia/public/TagAndProbe/TagAndProbe_Run2012C.root")
-tree.Add("/afs/cern.ch/user/d/demattia/public/TagAndProbe/TagAndProbe_Run2012D.root")
+tree.Add("/afs/cern.ch/user/d/demattia/public/TagAndProbe/TagAndProbe_ZMuMu.root")
+#tree.Add("/afs/cern.ch/user/d/demattia/public/TagAndProbe/TagAndProbe_Run2012A.root")
+#tree.Add("/afs/cern.ch/user/d/demattia/public/TagAndProbe/TagAndProbe_Run2012B.root")
+#tree.Add("/afs/cern.ch/user/d/demattia/public/TagAndProbe/TagAndProbe_Run2012C.root")
+#tree.Add("/afs/cern.ch/user/d/demattia/public/TagAndProbe/TagAndProbe_Run2012D.root")
 
 # Prepare the workspace
 ws = RooWorkspace("ws", "workspace")
@@ -72,7 +72,7 @@ passCandidates = 0
 
 processedEvents = 0
 
-totEvents = 2000000
+totEvents = 10000
 #totEvents = tree.GetEntries()
 progress = 0
 
