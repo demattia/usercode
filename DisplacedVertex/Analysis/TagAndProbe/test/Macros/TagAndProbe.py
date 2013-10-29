@@ -27,7 +27,8 @@ ptBinsY = [26, 30, 35, 40, 45, 50, 60, 70]
 triggerMatchDeltaR = 0.1
 minMass = 70
 maxMass = 110
-p = Properties(minMass, maxMass, ptBinsX, ptBinsY, triggerMatchDeltaR, NoBkgd)
+minDeltaR = 0.2
+p = Properties(minMass, maxMass, ptBinsX, ptBinsY, triggerMatchDeltaR, NoBkgd, minDeltaR)
 
 # Trigger efficiency for new trigger over old trigger
 tagTrigger = "IsoMu24_v"
