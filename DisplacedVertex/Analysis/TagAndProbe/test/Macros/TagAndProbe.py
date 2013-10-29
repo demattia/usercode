@@ -114,7 +114,7 @@ for event in tree:
     # Find a matching trigger object in DeltaR
         fillTriggerMatchedTrack(standalonemuon, probeTriggerObjects, passingMuonsProbe, p) 
         allMuonsProbe.append(standalonemuon)
-#        fillTriggerMatchedTrack(track, newTriggerObjects, matchedTracksNewTrigger, p)
+
 
     for name in event.triggerNames:
         if name.find(probeTrigger) != -1: probeTriggerFired = True
