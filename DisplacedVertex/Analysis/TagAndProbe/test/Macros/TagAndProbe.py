@@ -91,7 +91,7 @@ for event in tree:
 
     # Get the trigger outcome for this event
     tagTriggerFired = False
-#    probeTriggerFired = False
+    probeTriggerFired = False
     for name in event.triggerNames:
         if name.find(tagTrigger) != -1: tagTriggerFired = True
 #        if name.find(newTrigger) != -1: newTriggerFired = True
@@ -122,9 +122,15 @@ for event in tree:
         fillTriggerMatchedTrack(muon, tagTriggerObjects, matchedMuonsTagTrigger, p)
 #check input        
     for standalonemuon in event.standalonemuons:
-        # Find a matching trigger object in DeltaR
+    # Find a matching trigger object in DeltaR
         fillTriggerMatchedTrack(standalonemuon, probeTriggerObjects, matchedMuonsProbeTrigger, p)    
 #        fillTriggerMatchedTrack(track, newTriggerObjects, matchedTracksNewTrigger, p)
+
+    for name in event.triggerNames:
+        if name.find(probeTrigger) != -1: probeTriggerFired = True
+    
+    if probeTriggerFired :
+        fillCandidates_tnp(mass, p, matchedMuonsTagTrigger, matchedMuonsProbeTrigger, hPassMap, datasetPassMap)
     
 #    if tagTriggerFired:
 #        fillCandidates(mass, p, matchedMuonsTagTrigger, hAllMap, datasetAllMap)
