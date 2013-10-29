@@ -100,20 +100,22 @@ for event in tree:
     if not tagTriggerFired :
         continue
 
-    for name in event.triggerNames:
+#we will get back to there later...
+
+#    for name in event.triggerNames:
         if name.find(probeTrigger) != -1: probeTriggerFired = True
 #        if name.find(newTrigger) != -1: newTriggerFired = True
     
     # If none of the two triggers fired we can skip the event
-    if not probeTriggerFired :
-        continue
+#    if not probeTriggerFired :
+#        continue
 
 
     tagTriggerObjects = event.triggerFilterObjectsMap["hltL3crIsoL1sMu16L1f0L2f16QL3f24QL3crIsoRhoFiltered0p15"]
-#    newTriggerObjects = event.triggerFilterObjectsMap["hltL2DoubleMu23NoVertexL2Filtered2ChaAngle2p5"]
+    probeTriggerObjects = event.triggerFilterObjectsMap["hltL2DoubleMu23NoVertexL2PreFiltered"]
     
     matchedMuonsTagTrigger = []
-#    matchedTracksNewTrigger = []
+    matchedMuonsProbeTrigger = []
 #check your input trees...
     for muon in event.muons:
         # Find a matching trigger object in DeltaR
