@@ -116,6 +116,7 @@ for event in tree:
     
     matchedMuonsTagTrigger = []
     matchedMuonsProbeTrigger = []
+    allMuonsProbeTrigger = []
 #check your input trees...
     for muon in event.muons:
         # Find a matching trigger object in DeltaR
@@ -123,7 +124,8 @@ for event in tree:
 #check input        
     for standalonemuon in event.standalonemuons:
     # Find a matching trigger object in DeltaR
-        fillTriggerMatchedTrack(standalonemuon, probeTriggerObjects, matchedMuonsProbeTrigger, p)    
+        fillTriggerMatchedTrack(standalonemuon, probeTriggerObjects, matchedMuonsProbeTrigger, p) 
+        allMuonsProbeTrigger.append(standalonemuon)
 #        fillTriggerMatchedTrack(track, newTriggerObjects, matchedTracksNewTrigger, p)
 
     for name in event.triggerNames:
@@ -131,7 +133,7 @@ for event in tree:
     
     if probeTriggerFired :
         fillCandidates_tnp(mass, p, matchedMuonsTagTrigger, matchedMuonsProbeTrigger, hPassMap, datasetPassMap)
-    
+    fillCandidates_tnp(mass, p, matchedMuonsTagTrigger, allMuonsProbeTrigger, hAllMap, datasetAllMap)
 #    if tagTriggerFired:
 #        fillCandidates(mass, p, matchedMuonsTagTrigger, hAllMap, datasetAllMap)
 
