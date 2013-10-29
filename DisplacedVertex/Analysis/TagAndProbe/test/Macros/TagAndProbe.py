@@ -30,8 +30,8 @@ maxMass = 110
 p = Properties(minMass, maxMass, ptBinsX, ptBinsY, triggerMatchDeltaR, NoBkgd)
 
 # Trigger efficiency for new trigger over old trigger
-oldTrigger = "HLT_L2DoubleMu23_NoVertex_v"
-newTrigger = "HLT_L2DoubleMu23_NoVertex_2Cha_Angle2p5_v"
+tagTrigger = "IsoMu24_v"
+#newTrigger = "HLT_L2DoubleMu23_NoVertex_2Cha_Angle2p5_v"
 
 # Load the input file
 tree = ROOT.TChain("T")
@@ -90,14 +90,14 @@ for event in tree:
 
 
     # Get the trigger outcome for this event
-    oldTriggerFired = False
-    newTriggerFired = False
+    tagTriggerFired = False
+#    newTriggerFired = False
     for name in event.triggerNames:
-        if name.find(oldTrigger) != -1: oldTriggerFired = True
-        if name.find(newTrigger) != -1: newTriggerFired = True
+        if name.find(tagTrigger) != -1: tagTriggerFired = True
+#        if name.find(newTrigger) != -1: newTriggerFired = True
     
     # If none of the two triggers fired we can skip the event
-    if not oldTriggerFired and not newTriggerFired:
+    if not tagTriggerFired :
         continue
 
     oldTriggerObjects = event.triggerFilterObjectsMap["hltL2DoubleMu23NoVertexL2PreFiltered"]
