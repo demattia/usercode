@@ -31,7 +31,7 @@ p = Properties(minMass, maxMass, ptBinsX, ptBinsY, triggerMatchDeltaR, NoBkgd)
 
 # Trigger efficiency for new trigger over old trigger
 tagTrigger = "IsoMu24_v"
-#newTrigger = "HLT_L2DoubleMu23_NoVertex_2Cha_Angle2p5_v"
+probeTrigger = "HLT_L2DoubleMu23_NoVertex_v"
 
 # Load the input file
 tree = ROOT.TChain("T")
@@ -91,7 +91,7 @@ for event in tree:
 
     # Get the trigger outcome for this event
     tagTriggerFired = False
-#    newTriggerFired = False
+    probeTriggerFired = False
     for name in event.triggerNames:
         if name.find(tagTrigger) != -1: tagTriggerFired = True
 #        if name.find(newTrigger) != -1: newTriggerFired = True
@@ -99,6 +99,15 @@ for event in tree:
     # If none of the two triggers fired we can skip the event
     if not tagTriggerFired :
         continue
+
+    for name in event.triggerNames:
+        if name.find(probeTrigger) != -1: probeTriggerFired = True
+#        if name.find(newTrigger) != -1: newTriggerFired = True
+    
+    # If none of the two triggers fired we can skip the event
+    if not probeTriggerFired :
+        continue
+
 
     tagTriggerObjects = event.triggerFilterObjectsMap["hltL3crIsoL1sMu16L1f0L2f16QL3f24QL3crIsoRhoFiltered0p15"]
 #    newTriggerObjects = event.triggerFilterObjectsMap["hltL2DoubleMu23NoVertexL2Filtered2ChaAngle2p5"]
