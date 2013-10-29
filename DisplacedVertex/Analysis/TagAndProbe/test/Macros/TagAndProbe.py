@@ -115,8 +115,8 @@ for event in tree:
 #check root file if it is generaltracks...
     for standAloneMuon in event.standAloneMuons:
     # Find a matching trigger object in DeltaR
-        if passSelection(standAloneMuon):
-            fillTriggerMatchedTrack(standAloneMuon, probeTriggerObjects, passingMuonsProbe, p) 
+        if passSelectionStandAlone(standAloneMuon):
+            fillTriggerMatchedStandAlone(standAloneMuon, probeTriggerObjects, passingMuonsProbe, p) 
             allMuonsProbe.append(standAloneMuon)
 
 
