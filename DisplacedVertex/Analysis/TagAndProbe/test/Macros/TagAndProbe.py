@@ -112,15 +112,13 @@ for event in tree:
 #check input        
     for standalonemuon in event.standalonemuons:
     # Find a matching trigger object in DeltaR
-        fillTriggerMatchedTrack(standalonemuon, probeTriggerObjects, passingMuonsProbe, p) 
-        allMuonsProbe.append(standalonemuon)
+        if passSelection(standalonemuon):
+            fillTriggerMatchedTrack(standalonemuon, probeTriggerObjects, passingMuonsProbe, p) 
+            allMuonsProbe.append(standalonemuon)
 
 
-    for name in event.triggerNames:
-        if name.find(probeTrigger) != -1: probeTriggerFired = True
-    
-    if probeTriggerFired :
-        fillCandidates_tnp(mass, p, matchedMuonsTagTrigger, passingMuonsProbe, hPassMap, datasetPassMap)
+
+    fillCandidates_tnp(mass, p, matchedMuonsTagTrigger, passingMuonsProbe, hPassMap, datasetPassMap)
     fillCandidates_tnp(mass, p, matchedMuonsTagTrigger, allMuonsProbe, hAllMap, datasetAllMap)
 
 print "all candidates =", hAllMap[1,1].GetEntries()
