@@ -100,8 +100,8 @@ for event in tree:
     if not tagTriggerFired :
         continue
 
-    oldTriggerObjects = event.triggerFilterObjectsMap["hltL2DoubleMu23NoVertexL2PreFiltered"]
-    newTriggerObjects = event.triggerFilterObjectsMap["hltL2DoubleMu23NoVertexL2Filtered2ChaAngle2p5"]
+    tagTriggerObjects = event.triggerFilterObjectsMap["hltL3crIsoL1sMu16L1f0L2f16QL3f24QL3crIsoRhoFiltered0p15"]
+#    newTriggerObjects = event.triggerFilterObjectsMap["hltL2DoubleMu23NoVertexL2Filtered2ChaAngle2p5"]
     
     matchedTracksOldTrigger = []
     matchedTracksNewTrigger = []
