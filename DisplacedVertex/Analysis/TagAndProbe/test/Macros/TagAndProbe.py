@@ -91,7 +91,7 @@ for event in tree:
 
     # Get the trigger outcome for this event
     tagTriggerFired = False
-    probeTriggerFired = False
+#    probeTriggerFired = False
     for name in event.triggerNames:
         if name.find(tagTrigger) != -1: tagTriggerFired = True
 #        if name.find(newTrigger) != -1: newTriggerFired = True
@@ -103,7 +103,7 @@ for event in tree:
 #we will get back to there later...
 
 #    for name in event.triggerNames:
-        if name.find(probeTrigger) != -1: probeTriggerFired = True
+#        if name.find(probeTrigger) != -1: probeTriggerFired = True
 #        if name.find(newTrigger) != -1: newTriggerFired = True
     
     # If none of the two triggers fired we can skip the event
@@ -122,12 +122,12 @@ for event in tree:
         fillTriggerMatchedTrack(muon, tagTriggerObjects, matchedMuonsTagTrigger, p)
 #        fillTriggerMatchedTrack(track, newTriggerObjects, matchedTracksNewTrigger, p)
     
-    if tagTriggerFired:
-        fillCandidates(mass, p, matchedMuonsTagTrigger, hAllMap, datasetAllMap)
+#    if tagTriggerFired:
+#        fillCandidates(mass, p, matchedMuonsTagTrigger, hAllMap, datasetAllMap)
 
     # Note: we require both triggers. This is only needed in data because the old trigger is prescaled. In MC the old trigger always fires if the new one fires.
-    if oldTriggerFired and newTriggerFired:
-        fillCandidates(mass, p, matchedTracksNewTrigger, hPassMap, datasetPassMap)
+#    if oldTriggerFired and newTriggerFired:
+#        fillCandidates(mass, p, matchedTracksNewTrigger, hPassMap, datasetPassMap)
 
 print "all candidates =", hAllMap[1,1].GetEntries()
 print "pass candidates =", hPassMap[1,1].GetEntries()
