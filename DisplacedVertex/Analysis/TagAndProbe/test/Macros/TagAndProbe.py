@@ -19,9 +19,9 @@ NoBkgd = True
 
 # Define binning
 ptBinsX = [26, 30, 35, 40, 45, 50, 60, 70]
-#ptBinsY = [26, 30, 35, 40, 45, 50, 60, 70]
+ptBinsY = [26, 30, 35, 40, 45, 50, 60, 70]
 #ptBinsX = [26, 80]
-ptBinsY = [20, 10000]
+#ptBinsY = [20, 10000]
 
 # Define cuts and some useful variables
 triggerMatchDeltaR = 0.1
