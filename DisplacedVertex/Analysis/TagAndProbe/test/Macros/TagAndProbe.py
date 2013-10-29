@@ -94,29 +94,17 @@ for event in tree:
     probeTriggerFired = False
     for name in event.triggerNames:
         if name.find(tagTrigger) != -1: tagTriggerFired = True
-#        if name.find(newTrigger) != -1: newTriggerFired = True
-    
     # If none of the two triggers fired we can skip the event
     if not tagTriggerFired :
         continue
-
-#we will get back to there later...
-
-#    for name in event.triggerNames:
-#        if name.find(probeTrigger) != -1: probeTriggerFired = True
-#        if name.find(newTrigger) != -1: newTriggerFired = True
-    
-    # If none of the two triggers fired we can skip the event
-#    if not probeTriggerFired :
-#        continue
 
 
     tagTriggerObjects = event.triggerFilterObjectsMap["hltL3crIsoL1sMu16L1f0L2f16QL3f24QL3crIsoRhoFiltered0p15"]
     probeTriggerObjects = event.triggerFilterObjectsMap["hltL2DoubleMu23NoVertexL2PreFiltered"]
     
     matchedMuonsTagTrigger = []
-    matchedMuonsProbeTrigger = []
-    allMuonsProbeTrigger = []
+    passingMuonsProbe = []
+    allMuonsProbe = []
 #check your input trees...
     for muon in event.muons:
         # Find a matching trigger object in DeltaR
@@ -124,22 +112,16 @@ for event in tree:
 #check input        
     for standalonemuon in event.standalonemuons:
     # Find a matching trigger object in DeltaR
-        fillTriggerMatchedTrack(standalonemuon, probeTriggerObjects, matchedMuonsProbeTrigger, p) 
-        allMuonsProbeTrigger.append(standalonemuon)
+        fillTriggerMatchedTrack(standalonemuon, probeTriggerObjects, passingMuonsProbe, p) 
+        allMuonsProbe.append(standalonemuon)
 #        fillTriggerMatchedTrack(track, newTriggerObjects, matchedTracksNewTrigger, p)
 
     for name in event.triggerNames:
         if name.find(probeTrigger) != -1: probeTriggerFired = True
     
     if probeTriggerFired :
-        fillCandidates_tnp(mass, p, matchedMuonsTagTrigger, matchedMuonsProbeTrigger, hPassMap, datasetPassMap)
-    fillCandidates_tnp(mass, p, matchedMuonsTagTrigger, allMuonsProbeTrigger, hAllMap, datasetAllMap)
-#    if tagTriggerFired:
-#        fillCandidates(mass, p, matchedMuonsTagTrigger, hAllMap, datasetAllMap)
-
-    # Note: we require both triggers. This is only needed in data because the old trigger is prescaled. In MC the old trigger always fires if the new one fires.
-#    if oldTriggerFired and newTriggerFired:
-#        fillCandidates(mass, p, matchedTracksNewTrigger, hPassMap, datasetPassMap)
+        fillCandidates_tnp(mass, p, matchedMuonsTagTrigger, passingMuonsProbe, hPassMap, datasetPassMap)
+    fillCandidates_tnp(mass, p, matchedMuonsTagTrigger, allMuonsProbe, hAllMap, datasetAllMap)
 
 print "all candidates =", hAllMap[1,1].GetEntries()
 print "pass candidates =", hPassMap[1,1].GetEntries()
