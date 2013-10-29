@@ -109,12 +109,15 @@ for event in tree:
     for muon in event.muons:
         # Find a matching trigger object in DeltaR
         fillTriggerMatchedTrack(muon, tagTriggerObjects, matchedMuonsTagTrigger, p)
-#check input        
-    for standalonemuon in event.standalonemuons:
+#check input  
+#replace standalonemuon by standAloneMuon
+#replace tracks by standAloneMuons later
+#check root file if it is generaltracks...
+    for standAloneMuon in event.standAloneMuons:
     # Find a matching trigger object in DeltaR
-        if passSelection(standalonemuon):
-            fillTriggerMatchedTrack(standalonemuon, probeTriggerObjects, passingMuonsProbe, p) 
-            allMuonsProbe.append(standalonemuon)
+        if passSelection(standAloneMuon):
+            fillTriggerMatchedTrack(standAloneMuon, probeTriggerObjects, passingMuonsProbe, p) 
+            allMuonsProbe.append(standAloneMuon)
 
 
 
