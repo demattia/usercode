@@ -103,14 +103,15 @@ for event in tree:
     tagTriggerObjects = event.triggerFilterObjectsMap["hltL3crIsoL1sMu16L1f0L2f16QL3f24QL3crIsoRhoFiltered0p15"]
 #    newTriggerObjects = event.triggerFilterObjectsMap["hltL2DoubleMu23NoVertexL2Filtered2ChaAngle2p5"]
     
-    matchedTracksOldTrigger = []
-    matchedTracksNewTrigger = []
-    for track in event.tracks:
+    matchedMuonsTagTrigger = []
+#    matchedTracksNewTrigger = []
+#check your input trees...
+    for muon in event.muons:
         # Find a matching trigger object in DeltaR
-        fillTriggerMatchedTrack(track, oldTriggerObjects, matchedTracksOldTrigger, p)
-        fillTriggerMatchedTrack(track, newTriggerObjects, matchedTracksNewTrigger, p)
+        fillTriggerMatchedTrack(muon, tagTriggerObjects, matchedMuonsTagTrigger, p)
+#        fillTriggerMatchedTrack(track, newTriggerObjects, matchedTracksNewTrigger, p)
     
-    if oldTriggerFired:
+    if tagTriggerFired:
         fillCandidates(mass, p, matchedTracksOldTrigger, hAllMap, datasetAllMap)
 
     # Note: we require both triggers. This is only needed in data because the old trigger is prescaled. In MC the old trigger always fires if the new one fires.
