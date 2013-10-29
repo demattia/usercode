@@ -112,7 +112,7 @@ for event in tree:
 #        fillTriggerMatchedTrack(track, newTriggerObjects, matchedTracksNewTrigger, p)
     
     if tagTriggerFired:
-        fillCandidates(mass, p, matchedTracksOldTrigger, hAllMap, datasetAllMap)
+        fillCandidates(mass, p, matchedMuonsTagTrigger, hAllMap, datasetAllMap)
 
     # Note: we require both triggers. This is only needed in data because the old trigger is prescaled. In MC the old trigger always fires if the new one fires.
     if oldTriggerFired and newTriggerFired:
