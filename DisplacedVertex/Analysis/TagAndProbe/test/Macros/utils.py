@@ -8,11 +8,13 @@ muMass = 0.1057
 
 class Properties:
     """Stores the min and max mass and the binning in pt"""
-    def __init__(self, minMass, maxMass, ptBins, triggerMatchDeltaR):
+    def __init__(self, minMass, maxMass, ptBinsX, ptBinsY, triggerMatchDeltaR, NoBkgd):
         self.minMass = minMass
         self.maxMass = maxMass
-        self.ptBins = ptBins
+        self.ptBinsX = ptBinsX
+        self.ptBinsY = ptBinsY
         self.triggerMatchDeltaR = triggerMatchDeltaR
+        self.NoBkgd = NoBkgd
 
 
 def deltaPhi(phi1, phi2):
@@ -49,7 +51,7 @@ def computeCosineAndMass(mu1, mu2):
 
 def fillTriggerMatchedTrack(track, triggerObjects, matchedTracks, p):
     for triggerMuon in triggerObjects:
-        if deltaR(triggerMuon.phi, triggerMuon.eta, track.phi, track.eta) < p.triggerMatchDeltaR and passSelection(track):
+        if (deltaR(triggerMuon.phi, triggerMuon.eta, track.phi, track.eta) < p.triggerMatchDeltaR) and passSelection(track):
             matchedTracks.append(track)
 
 def fillSingleCandidate(mass, p, track1, track2, histoMap, datasetMap):
@@ -57,31 +59,38 @@ def fillSingleCandidate(mass, p, track1, track2, histoMap, datasetMap):
     if not passDileptonSelection(track1, track2, cosineAndMass[0]): return False
     if cosineAndMass[1] < p.minMass or cosineAndMass[1] > p.maxMass: return False
     mass.setVal(cosineAndMass[1])
-    bins = find_bins(track1.pt, track2.pt, p.ptBins)
+    bins = find_bins(track1.pt, track2.pt, p.ptBinsX, p.ptBinsY)
     if bins[0] == -1 or bins[1] == -1: return False
+    if track1.charge == track2.charge: return False
     histoMap[bins].Fill(mass.getVal())
+    #print bins, cosineAndMass[1], track1.pt, track2.pt
     datasetMap[bins].add(RooArgSet(mass))
     return True
 
 def fillCandidates(mass, properties, matchedTracks, histoMap, datasetMap):
     if len(matchedTracks) == 2:
         fillSingleCandidate(mass, properties, matchedTracks[0], matchedTracks[1], histoMap, datasetMap)
-    elif len(matchedTracks) > 2:
-        for i in range(0, len(matchedTracks)):
-            for j in range(i+1, len(matchedTracks)):
-                fillSingleCandidate(mass, properties, matchedTracks[i], matchedTracks[j], histoMap, datasetMap)
+    #elif len(matchedTracks) > 2:
+    #    print len(matchedTracks)
+    #    for i in range(0, len(matchedTracks)):
+    #        for j in range(i+1, len(matchedTracks)):
+    #            fillSingleCandidate(mass, properties, matchedTracks[i], matchedTracks[j], histoMap, datasetMap)
 
-def find_bins(pt1, pt2, ptBins):
-    return (bisect.bisect_right(ptBins, pt1)-1, bisect.bisect_right(ptBins, pt2)-1)
+def find_bins(pt1, pt2, ptBinsX, ptBinsY):
+    return (bisect.bisect_right(ptBinsX, pt1)-1, bisect.bisect_right(ptBinsY, pt2)-1)
 
-def find_position(bin1, bin2, ptBins):
-    return bin1+len(ptBins)*bin2
+def find_position(bin1, bin2, ptBinsX):
+    return bin1+len(ptBinsX)*bin2
 
-def buildName(baseName, ptBin1, ptBin2, ptBins):
-    return baseName+str(ptBins[ptBin1])+"_"+str(ptBins[ptBin2])
+def find_position_NoOverflow(bin1, bin2, ptBinsX):
+    return bin1+(len(ptBinsX)-1)*bin2
 
-def buildNamePars(baseName, ptBin1, ptBin12, ptBin2, ptBin22, ptBins):
-    return baseName+str(ptBins[ptBin1])+"_"+str(ptBins[ptBin12])+"_"+str(ptBins[ptBin2])+"_"+str(ptBins[ptBin22])
+def buildName(baseName, ptBin1, ptBin2, ptBinsX, ptBinsY):
+    return baseName+str(ptBinsX[ptBin1])+"_"+str(ptBinsY[ptBin2])
+
+def buildNamePars(baseName, ptBin1, ptBin12, ptBin2, ptBin22, ptBinsX, ptBinsY):
+    return baseName+str(ptBinsX[ptBin1])+"_"+str(ptBinsX[ptBin12])+"_"+str(ptBinsY[ptBin2])+"_"+str(ptBinsY[ptBin22])
+
 
 def progressCounter(progress):
     output = ""

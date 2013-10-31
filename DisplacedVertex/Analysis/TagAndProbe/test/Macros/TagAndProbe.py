@@ -4,7 +4,7 @@ from utils import *
 from ROOT import RooRealVar, RooFormulaVar, RooVoigtian, RooChebychev, RooArgList, RooArgSet, \
     RooAddPdf, RooDataSet, RooCategory, RooSimultaneous, RooGenericPdf, RooWorkspace
 import Workspace
-ROOT.gROOT.LoadMacro("/Users/demattia/CMSSH/soft/Releases/CMSSW_5_3_8/src/Loader.C+")
+ROOT.gROOT.LoadMacro("Loader.C+")
 
 
 
@@ -12,21 +12,22 @@ ROOT.gROOT.LoadMacro("/Users/demattia/CMSSH/soft/Releases/CMSSW_5_3_8/src/Loader
 
 
 MC = True
-
+NoBkgd = True
 
 # --------#
 
 
 # Define binning
-# ptBins = [26, 30, 35, 40, 45, 50, 60, 80]
-ptBins = [30, 50]
-
+ptBinsX = [26, 30, 35, 40, 45, 50, 60, 70]
+#ptBinsY = [26, 30, 35, 40, 45, 50, 60, 70]
+#ptBinsX = [26, 80]
+ptBinsY = [20, 10000]
 
 # Define cuts and some useful variables
 triggerMatchDeltaR = 0.1
 minMass = 70
 maxMass = 110
-p = Properties(minMass, maxMass, ptBins, triggerMatchDeltaR)
+p = Properties(minMass, maxMass, ptBinsX, ptBinsY, triggerMatchDeltaR, NoBkgd)
 
 # Trigger efficiency for new trigger over old trigger
 oldTrigger = "HLT_L2DoubleMu23_NoVertex_v"
@@ -34,8 +35,11 @@ newTrigger = "HLT_L2DoubleMu23_NoVertex_2Cha_Angle2p5_v"
 
 # Load the input file
 tree = ROOT.TChain("T")
-tree.Add("/Users/demattia/CMSSH/soft/Releases/CMSSW_5_3_8/src/Analysis/TagAndProbe/test/TagAndProbe_ZMuMu.root")
-
+#tree.Add("/afs/cern.ch/user/d/demattia/public/TagAndProbe/TagAndProbe_ZMuMu.root")
+tree.Add("/afs/cern.ch/user/d/demattia/public/TagAndProbe/TagAndProbe_Run2012A.root")
+tree.Add("/afs/cern.ch/user/d/demattia/public/TagAndProbe/TagAndProbe_Run2012B.root")
+tree.Add("/afs/cern.ch/user/d/demattia/public/TagAndProbe/TagAndProbe_Run2012C.root")
+tree.Add("/afs/cern.ch/user/d/demattia/public/TagAndProbe/TagAndProbe_Run2012D.root")
 
 # Prepare the workspace
 ws = RooWorkspace("ws", "workspace")
@@ -45,7 +49,7 @@ mass = ws.var("mass")
 sample = ws.cat("sample")
 simPdf = ws.pdf("simPdf")
 efficiency = ws.var("efficiency")
-
+meanB = ws.var("meanB")
 
 # prepare_datasets(ws, p)
 
@@ -54,12 +58,12 @@ datasetAllMap = {}
 datasetPassMap = {}
 hAllMap = {}
 hPassMap = {}
-for ptBin1 in range(0, len(ptBins)):
-    for ptBin2 in range(0, len(ptBins)):
-        datasetAllMap[(ptBin1, ptBin2)] = RooDataSet(buildName("datasetAll_", ptBin1, ptBin2, ptBins), buildName("datasetAll_", ptBin1, ptBin2, ptBins), RooArgSet(mass))
-        datasetPassMap[(ptBin1, ptBin2)] = RooDataSet(buildName("datasetPass_", ptBin1, ptBin2, ptBins), buildName("datasetPass_", ptBin1, ptBin2, ptBins), RooArgSet(mass))
-        hAllMap[(ptBin1,ptBin2)] = ROOT.TH1F(buildName("hAll_", ptBin1, ptBin2, ptBins), buildName("All events passing old trigger ", ptBin1, ptBin2, ptBins), 100, 60, 120)
-        hPassMap[(ptBin1,ptBin2)] = ROOT.TH1F(buildName("hPass_", ptBin1, ptBin2, ptBins), buildName("All events passing old trigger and new trigger ", ptBin1, ptBin2, ptBins), 100, 60, 120)
+for ptBin1 in range(0, len(ptBinsX)):
+    for ptBin2 in range(0, len(ptBinsY)):
+        datasetAllMap[(ptBin1, ptBin2)] = RooDataSet(buildName("datasetAll_", ptBin1, ptBin2, ptBinsX, ptBinsY), buildName("datasetAll_", ptBin1, ptBin2, ptBinsX, ptBinsY), RooArgSet(mass))
+        datasetPassMap[(ptBin1, ptBin2)] = RooDataSet(buildName("datasetPass_", ptBin1, ptBin2, ptBinsX, ptBinsY), buildName("datasetPass_", ptBin1, ptBin2, ptBinsX, ptBinsY), RooArgSet(mass))
+        hAllMap[(ptBin1,ptBin2)] = ROOT.TH1F(buildName("hAll_", ptBin1, ptBin2, ptBinsX, ptBinsY), buildName("All events passing old trigger ", ptBin1, ptBin2, ptBinsX, ptBinsY), 100, 60, 120)
+        hPassMap[(ptBin1,ptBin2)] = ROOT.TH1F(buildName("hPass_", ptBin1, ptBin2, ptBinsX, ptBinsY), buildName("All events passing old trigger and new trigger ", ptBin1, ptBin2, ptBinsX, ptBinsY), 100, 60, 120)
 
 
 # Event loop
@@ -68,8 +72,8 @@ passCandidates = 0
 
 processedEvents = 0
 
-totEvents = 10000
-# totEvents = tree.GetEntries()
+totEvents = 2000000
+#totEvents = tree.GetEntries()
 progress = 0
 
 
@@ -117,11 +121,11 @@ print "all candidates =", hAllMap[1,1].GetEntries()
 print "pass candidates =", hPassMap[1,1].GetEntries()
 
 
-canvas = ROOT.TCanvas("AllAndPassCanvas", "AllAndPassCanvas", 800, 400)
-canvas.Divide(len(ptBins),len(ptBins))
-for ptBin1 in range(0, len(ptBins)):
-    for ptBin2 in range(0, len(ptBins)):
-        canvas.cd(find_position(ptBin1, ptBin2, ptBins)+1)
+canvas = ROOT.TCanvas("AllAndPassCanvas", "AllAndPassCanvas", 800, 800)
+canvas.Divide(len(ptBinsX),len(ptBinsY))
+for ptBin1 in range(0, len(ptBinsX)):
+    for ptBin2 in range(0, len(ptBinsY)):
+        canvas.cd(find_position(ptBin1, ptBin2, ptBinsX)+1)
         hAllMap[(ptBin1, ptBin2)].Draw()
         hPassMap[(ptBin1, ptBin2)].Draw("same")
         hPassMap[(ptBin1, ptBin2)].SetLineColor(2)
@@ -147,13 +151,17 @@ def plotResults(ptBin1, ptBin2, combData, canvas2, canvas3):
     simPdf.plotOn(frame2,ROOT.RooFit.Slice(sample,"pass"),ROOT.RooFit.ProjWData(RooArgSet(sample),combData))
     simPdf.plotOn(frame2,ROOT.RooFit.Slice(sample,"pass"),ROOT.RooFit.Components("backgroundPass"),ROOT.RooFit.ProjWData(RooArgSet(sample),combData),ROOT.RooFit.LineStyle(ROOT.kDashed))
 
-    canvas2.cd(find_position(ptBin1, ptBin2, ptBins)+1)
+    canvas2.cd(find_position(ptBin1, ptBin2, ptBinsX)+1)
     frame1.GetYaxis().SetTitleOffset(1.4)
     frame1.Draw()
+    frame1.SetName(buildNamePars("fitAll_", ptBin1, ptBin1+1, ptBin2, ptBin2+1, ptBinsX, ptBinsY))
+    frame1.SaveAs(buildNamePars("fitAll_", ptBin1, ptBin1+1, ptBin2, ptBin2+1, ptBinsX, ptBinsY)+".root")
 
-    canvas3.cd(find_position(ptBin1, ptBin2, ptBins)+1)
+    canvas3.cd(find_position(ptBin1, ptBin2, ptBinsX)+1)
     frame2.GetYaxis().SetTitleOffset(1.4)
     frame2.Draw()
+    frame2.SetName(buildNamePars("fitPass_", ptBin1, ptBin1+1, ptBin2, ptBin2+1, ptBinsX, ptBinsY))
+    frame2.SaveAs(buildNamePars("fitPass_", ptBin1, ptBin1+1, ptBin2, ptBin2+1, ptBinsX, ptBinsY)+".root")
 
 
 # After filling the datasets, build the combined dataset
@@ -161,29 +169,34 @@ combDataMap = {}
 frMap = {}
 
 from array import array
-hEff = ROOT.TH2D("hEff", "hEff", len(ptBins)-1, array('d',ptBins), len(ptBins)-1, array('d',ptBins))
+hEff = ROOT.TH2D("hEff", "hEff", len(ptBinsX)-1, array('d',ptBinsX), len(ptBinsY)-1, array('d',ptBinsY))
+hEff1D = ROOT.TH1D("hEff1D", "hEff1D", len(ptBinsX)-1, array('d',ptBinsX))
 
 # Canvases for fit results
 canvas2 = ROOT.TCanvas("RooFitCanvas", "RooFitCanvas", 800, 800)
-canvas2.Divide(len(ptBins),len(ptBins))
+canvas2.Divide(len(ptBinsX),len(ptBinsY))
 canvas3 = ROOT.TCanvas("RooFitCanvasPass", "RooFitCanvasPass", 800, 800)
-canvas3.Divide(len(ptBins),len(ptBins))
+canvas3.Divide(len(ptBinsX),len(ptBinsY))
 
 # Construct combined dataset in (x,sample) and perform simultaneous fit
 # Skip the last, overflow, bin from fitting to save time. It does not appear in the final plots.
 # Note that the following code assumes an extra bin to build the name of the output file.
-for ptBin1 in range(0, len(ptBins)-1):
-    for ptBin2 in range(0, len(ptBins)-1):
+for ptBin1 in range(0, len(ptBinsX)-1):
+    for ptBin2 in range(0, len(ptBinsY)-1):
         combDataMap[(ptBin1, ptBin2)] = RooDataSet("combData"+"_"+str(ptBin1)+"_"+str(ptBin2),"combined data "+str(ptBin1)+"_"+str(ptBin2),
                                                    RooArgSet(mass),ROOT.RooFit.Index(sample),
                                                    ROOT.RooFit.Import("all",datasetAllMap[(ptBin1, ptBin2)]),
                                                    ROOT.RooFit.Import("pass",datasetPassMap[(ptBin1, ptBin2)]))
+        #meanB.setRange(ptBinsX[ptBin1]+ptBinsY[ptBin2], ptBinsX[ptBin1+1]+ptBinsY[ptBin2+1])
+        #meanB.setVal((ptBinsX[ptBin1]+ptBinsY[ptBin2]+ptBinsX[ptBin1+1]+ptBinsY[ptBin2+1])/2)
         frMap[(ptBin1, ptBin2)] = simPdf.fitTo(combDataMap[(ptBin1,ptBin2)], ROOT.RooFit.Save(ROOT.kTRUE), ROOT.RooFit.Extended(ROOT.kTRUE), ROOT.RooFit.NumCPU(4))
         # Use this for minos (better error estimate, but takes longer)
         frMap[(ptBin1, ptBin2)].Print("v")
-        simPdf.getParameters(combDataMap[(ptBin1, ptBin2)]).writeToFile(buildNamePars("parameters_", ptBin1, ptBin1+1, ptBin2, ptBin2+1, ptBins)+".txt")
+        simPdf.getParameters(combDataMap[(ptBin1, ptBin2)]).writeToFile(buildNamePars("parameters_", ptBin1, ptBin1+1, ptBin2, ptBin2+1, ptBinsX, ptBinsY)+".txt")
         hEff.SetBinContent(ptBin1+1, ptBin2+1, efficiency.getVal())
         hEff.SetBinError(ptBin1+1, ptBin2+1, efficiency.getError())
+        hEff1D.SetBinContent(ptBin1+1, efficiency.getVal())
+        hEff1D.SetBinError(ptBin1+1, efficiency.getError())
         plotResults(ptBin1, ptBin2, combDataMap[(ptBin1,ptBin2)], canvas2, canvas3)
 
 canvas2.Print("RooFitCanvas.pdf")
@@ -192,3 +205,7 @@ canvas3.Print("RooFitCanvasPass.pdf")
 canvas4 = ROOT.TCanvas("efficiency", "efficiency", 800, 800)
 hEff.Draw("COLZTEXTE")
 canvas4.Print("Efficiency.pdf")
+canvas5 = ROOT.TCanvas("efficiency1D", "efficiency1D", 600, 600)
+hEff1D.Draw()
+canvas5.Print("Efficiency1D.pdf")
+
