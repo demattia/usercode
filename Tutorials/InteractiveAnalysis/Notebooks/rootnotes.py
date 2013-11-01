@@ -29,7 +29,7 @@ def canvas(name="icanvas", size=(800, 600)):
     """Helper method for creating canvas"""
 
     # Check if icanvas already exists
-    canvas = ROOT.gROOT.FindObject(name)
+    # canvas = ROOT.gROOT.FindObject(name)
     assert len(size) == 2
     #if canvas:
     #    return canvas

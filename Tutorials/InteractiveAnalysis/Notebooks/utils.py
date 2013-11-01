@@ -37,8 +37,9 @@ class RootMagics(Magics):
         with tempfile.NamedTemporaryFile() as tmpFile:
 
             ROOT.gSystem.RedirectOutput(tmpFile.name, "w")
-            ns = {}
-            exec cell in self.shell.user_ns, ns
+            # ns = {}
+            # exec cell in self.shell.user_ns, ns
+            exec cell in self.shell.user_ns
             ROOT.gROOT.ProcessLine("gSystem->RedirectOutput(0);")
             print tmpFile.read()
 
