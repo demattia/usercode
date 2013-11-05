@@ -1,0 +1,6 @@
+
+You can see the content of the BDT directory with:
+
+%%rootprint
+dirBDT = tmvaFile.Get("Method_BDT").Get("BDT")
+dirBDT.ls()
