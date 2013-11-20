@@ -1,0 +1,11 @@
+
+You can add the following code to create a handle:
+
+handle_stand = Handle ('std::vector<reco::Track>')
+label_stand = ("standAloneMuons")
+
+
+And this to the event loop to load the collection
+
+event.getByLabel (label_stand, handle_stand)
+SAmuons = handle_stand.product()
