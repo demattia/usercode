@@ -8,14 +8,13 @@ muMass = 0.1057
 
 class Properties:
     """Stores the min and max mass and the binning in pt"""
-    def __init__(self, minMass, maxMass, ptBinsX, ptBinsY, triggerMatchDeltaR, NoBkgd, minDeltaR):
+    def __init__(self, minMass, maxMass, ptBinsX, ptBinsY, triggerMatchDeltaR, NoBkgd):
         self.minMass = minMass
         self.maxMass = maxMass
         self.ptBinsX = ptBinsX
         self.ptBinsY = ptBinsY
         self.triggerMatchDeltaR = triggerMatchDeltaR
         self.NoBkgd = NoBkgd
-        self.minDeltaR = minDeltaR
 
 
 def deltaPhi(phi1, phi2):
@@ -24,26 +23,15 @@ def deltaPhi(phi1, phi2):
     if result <= -math.pi: result += 2*math.pi
     return result
 
-def delta_R(v1, v2):
+def deltaR(v1, v2):
     return math.sqrt(deltaPhi(v1.phi(), v2.phi())**2 + (v1.eta()-v2.eta())**2)
 
 def deltaR(phi1, eta1, phi2, eta2):
     return math.sqrt(deltaPhi(phi1, phi2)**2 + (eta1-eta2)**2)
 
-def passSelectionGlobalMuon(track):
-    if ( track.pt > 26 and abs(track.eta) < 2) and track.isolation/track.pt < 0.1 and track.trackerLayersWithMeasurement >= 6  and track.dxy < 30. and track.dz < 30.:
-#and track.trackQuality:
-        return True
-
-#Pass selection for tracks...
 def passSelection(track):
-    if ( track.pt > 26 and abs(track.eta) < 2) and track.isolation/track.pt < 0.1 and track.trackerLayersWithMeasurement >= 6 and track.dxy < 30. and track.dz < 30 and track.trackQuality:
-        return True
-
-
-# We need to check this later..
-def passSelectionStandAlone(track):
-    if ( track.pt > 17) and abs(track.eta) < 2.4 :
+    if ( track.pt > 26 and abs(track.eta) < 2 and track.isolation/track.pt < 0.1 and track.trackerLayersWithMeasurement >= 6
+         and track.trackQuality and track.dxy < 30. and track.dz < 30. ):
         return True
 
 def passDileptonSelection(track1, track2, cosine):
@@ -65,23 +53,8 @@ def fillTriggerMatchedTrack(track, triggerObjects, matchedTracks, p):
     for triggerMuon in triggerObjects:
         if (deltaR(triggerMuon.phi, triggerMuon.eta, track.phi, track.eta) < p.triggerMatchDeltaR) and passSelection(track):
             matchedTracks.append(track)
-            return True
 
-def fillTriggerMatchedStandAlone(track, triggerObjects, matchedTracks, p):
-#    print "**********enter loop for trigger match************"
-    for triggerMuon in triggerObjects:
-#        print deltaR(triggerMuon.phi, triggerMuon.eta, track.phi, track.eta)
-        if (deltaR(triggerMuon.phi, triggerMuon.eta, track.phi, track.eta) < p.triggerMatchDeltaR) and passSelectionStandAlone(track):
- #       if (deltaR(triggerMuon.phi, triggerMuon.eta, track.phi, track.eta) < 999) and passSelectionStandAlone(track):
-            matchedTracks.append(track)
-            return True
-
-def fillTriggerMatchedGlobalMuon(track, triggerObjects, matchedTracks, p):
-    for triggerMuon in triggerObjects:
-        if (deltaR(triggerMuon.phi, triggerMuon.eta, track.phi, track.eta) < p.triggerMatchDeltaR) and passSelectionGlobalMuon(track):
-            matchedTracks.append(track)
-            return True
-def fillSingleCandidate(mass, p, track1, track2, histoMap, datasetMap, gen_counting):
+def fillSingleCandidate(mass, p, track1, track2, histoMap, datasetMap):
     cosineAndMass = computeCosineAndMass(track1, track2)
     if not passDileptonSelection(track1, track2, cosineAndMass[0]): return False
     if cosineAndMass[1] < p.minMass or cosineAndMass[1] > p.maxMass: return False
@@ -89,12 +62,9 @@ def fillSingleCandidate(mass, p, track1, track2, histoMap, datasetMap, gen_count
     bins = find_bins(track1.pt, track2.pt, p.ptBinsX, p.ptBinsY)
     if bins[0] == -1 or bins[1] == -1: return False
     if track1.charge == track2.charge: return False
-    if track1.charge > 0 : return False
-#    if mass.getVal() > 70 :
     histoMap[bins].Fill(mass.getVal())
     #print bins, cosineAndMass[1], track1.pt, track2.pt
     datasetMap[bins].add(RooArgSet(mass))
-    gen_counting.Fill(track1.pt)
     return True
 
 def fillCandidates(mass, properties, matchedTracks, histoMap, datasetMap):
@@ -105,12 +75,6 @@ def fillCandidates(mass, properties, matchedTracks, histoMap, datasetMap):
     #    for i in range(0, len(matchedTracks)):
     #        for j in range(i+1, len(matchedTracks)):
     #            fillSingleCandidate(mass, properties, matchedTracks[i], matchedTracks[j], histoMap, datasetMap)
-
-def fillCandidates_tnp(mass, properties, matchedTags, probes, histoMap, datasetMap, gen_counting):
-    for tag in matchedTags:
-        for probe in probes:
-            if deltaR(tag.phi,tag.eta, probe.phi, probe.eta) > properties.minDeltaR :
-                fillSingleCandidate(mass, properties, probe, tag, histoMap, datasetMap, gen_counting)
 
 def find_bins(pt1, pt2, ptBinsX, ptBinsY):
     return (bisect.bisect_right(ptBinsX, pt1)-1, bisect.bisect_right(ptBinsY, pt2)-1)

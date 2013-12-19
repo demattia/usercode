@@ -1,0 +1,14 @@
+
+Add the following to the cell defining the BDT method to define also the MLP:
+
+methodMLP = factory.BookMethod(ROOT.TMVA.Types.kMLP, "MLP",
+                   ":".join([
+                       "H",
+                       "!V",
+                       "NeuronType=tanh",
+                       "VarTransform=N",
+                       "NCycles=600",
+                       "HiddenLayers=N+5",
+                       "TestRate=5",
+                       "!UseRegulator"
+                       ]))
