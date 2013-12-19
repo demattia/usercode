@@ -1,3 +1,4 @@
+
 __author__ = 'demattia'
 
 import ROOT
@@ -11,9 +12,9 @@ def buildPdf(ws, p):
     getattr(ws,'import')(mass)
 
     # Construct signal pdf
-    mean = RooRealVar("mean", "mean", 90, 80, 100)
-    width = RooRealVar("width", "width", 2.4952, 1, 3)
-    width.setConstant(ROOT.kTRUE)
+    mean = RooRealVar("mean", "mean", 60, 0, 130)
+    width = RooRealVar("width", "width", 10, 1, 40)
+#    width.setConstant(ROOT.kTRUE)
     sigma = RooRealVar("sigma", "sigma", 1.2, 0.2, 2)
     signalAll = RooVoigtian("signalAll", "signalAll", mass, mean, width, sigma)
     # Construct background pdf
@@ -30,8 +31,8 @@ def buildPdf(ws, p):
     bkg_a2 = RooRealVar("bkg_a2", "bkg_a2", 0., -2., 2.)
     #backgroundAll = RooChebychev("backgroundAll", "backgroundAll", mass, RooArgList(bkg_a1, bkg_a2))
     #backgroundAll = RooGenericPdf("backgroundAll","backgroundAll", "exp(-@0/@3)*(TMath::Erf((@0-@1)/@2)+1)", RooArgList(mass, turnOnAll, widthAll_bkg, decayAll_bkg))
-    #backgroundAll = RooGenericPdf("backgroundAll","backgroundAll","exp(-@0/@1)",RooArgList(mass, decayAll_bkg))
-    backgroundAll = RooGaussian("backgroundAll", "backgroundAll", mass, meanB, sigmaB)
+    backgroundAll = RooGenericPdf("backgroundAll","backgroundAll","exp(-@0/@1)",RooArgList(mass, decayAll_bkg))
+    #backgroundAll = RooGaussian("backgroundAll", "backgroundAll", mass, meanB, sigmaB)
 
     # Construct composite pdf
     sigAll = RooRealVar("sigAll", "sigAll", 2000, 0, 100000)
@@ -52,15 +53,16 @@ def buildPdf(ws, p):
 
     # turnOnPass = RooRealVar("turnOnPass","turnOnPass", 80., 50., 150.)
     # widthPass_bkg = RooRealVar("widthPass","widthPass", 2., 0., 50.)
-    # decayPass_bkg = RooRealVar("decayPass","decayPass", 80., 50., 150.)
+    decayPass_bkg = RooRealVar("decayPass","decayPass", 80., 20., 150.)
     #backgroundPass = RooChebychev("backgroundPass", "backgroundPass", mass, RooArgList(bkg_a1, bkg_a2))
     #backgroundPass = RooGenericPdf("backgroundPass","backgroundPass", "exp(-@0/@3)*(TMath::Erf((@0-@1)/@2)+1)", RooArgList(mass, turnOnPass, widthPass_bkg, decayPass_bkg));
     #backgroundPass = RooGenericPdf("backgroundPass","backgroundPass", "exp(-@0/@3)*(TMath::Erf((@0-@1)/@2)+1)", RooArgList(mass, turnOnAll, widthAll_bkg, decayAll_bkg));
-    #backgroundPass = RooGenericPdf("backgroundPass","backgroundPass","exp(-@0/@1)",RooArgList(mass, decayAll_bkg))
-    backgroundPass = RooGaussian("backgroundPass", "backgroundPass", mass, meanB, sigmaB)
+    backgroundPass = RooGenericPdf("backgroundPass","backgroundPass","exp(-@0/@1)",RooArgList(mass, decayPass_bkg))
+    #backgroundPass = RooGaussian("backgroundPass", "backgroundPass", mass, meanB, sigmaB)
 
     # Construct the composite model
-    efficiency = RooRealVar("efficiency","efficiency",0.9,0.5,1.)
+    efficiency = RooRealVar("efficiency","efficiency",0.9,0.1,1.)
+#    sigPass = RooFormulaVar("sigPass", "@0*@1*0.05", RooArgList(sigAll, efficiency))
     sigPass = RooFormulaVar("sigPass", "@0*@1", RooArgList(sigAll, efficiency))
     bkgPass = RooRealVar("bkgPass", "bkgPass", 100, 0, 10000)
     #bkgPass = RooFormulaVar("bkgPass", "@0*@1", RooArgList(bkgAll, efficiency))
@@ -84,4 +86,12 @@ def buildPdf(ws, p):
     simPdf.addPdf(modelPass,"pass")
     # ws.import(simPdf)
     getattr(ws,'import')(simPdf)
+
+
+
+
+
+
+
+
 
