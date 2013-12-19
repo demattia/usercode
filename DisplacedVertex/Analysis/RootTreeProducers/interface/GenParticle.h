@@ -20,7 +20,7 @@ public:
   double dxy, dxyError, dz, dzError; // They have an error because they are the result of a propagation.
   double referencePointRadius, referencePointZ;
   double vx, vy, vz;
-  int pid;
+  int pid, motherid;
 
   ClassDef(GenParticle, 1)
 };

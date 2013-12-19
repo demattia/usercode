@@ -336,6 +336,7 @@ GenParticle TagAndProbeTreeWriter::fillGenParticle(const T & it)
   p.vy = it->vertex().y();
   p.vz = it->vertex().z();
   p.pid = it->pdgId();
+  p.motherid = it->mother()->mother()->pdgId();
   return p;
 }
 
