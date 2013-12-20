@@ -39,8 +39,8 @@ probeTrigger = "HLT_L2DoubleMu23_NoVertex_v"
 
 # Load the input file
 tree = ROOT.TChain("T")
-tree.Add("Z_mu_mu_tagAndProbe_MC.root")
-#tree.Add("Run_2012B.root")
+#tree.Add("Z_mu_mu_tagAndProbe_MC.root")
+tree.Add("Run_2012B.root")
 #tree.Add("Z_mumu_Data_tag_and_probe_Run2012A.root")
 # Prepare the workspace
 ws = RooWorkspace("ws", "workspace")
@@ -79,7 +79,7 @@ passCandidates = 0
 
 processedEvents = 0
 
-totEvents = 1000000
+totEvents = 10000000
 #totEvents = tree.GetEntries()
 progress = 0
 
