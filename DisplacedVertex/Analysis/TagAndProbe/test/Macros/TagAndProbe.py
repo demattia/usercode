@@ -1,4 +1,3 @@
-
 import ROOT
 from utils import *
 # import math
@@ -7,7 +6,7 @@ from ROOT import RooRealVar, RooFormulaVar, RooVoigtian, RooChebychev, RooArgLis
 import Workspace
 from array import array 
 ROOT.gROOT.LoadMacro("Loader.C++")
-
+ROOT.gROOT.SetBatch(True)
 
 
 # --------#
@@ -16,13 +15,21 @@ ROOT.gROOT.LoadMacro("Loader.C++")
 MC = True
 NoBkgd = True
 
+# Use this for data to take into account the prescale of the trigger
+if MC:
+    scaleFactor = 1
+else:
+    scaleFactor = 0.05
+
+
 # --------#
 
 
 # Define binning
 ptBinsX = [15, 20, 23, 26, 30, 35, 40, 45, 50, 60, 70]
+#ptBinsX = [50, 55, 60, 65, 70]
 #ptBinsY = [26, 30, 35, 40, 45, 50, 60, 70]
-#ptBinsX = [15, 70]
+# ptBinsX = [15, 70]
 ptBinsY = [20, 10000]
 
 # Define cuts and some useful variables
@@ -30,18 +37,17 @@ triggerMatchDeltaR = 0.1
 minMass = 10
 maxMass = 150
 minDeltaR = 0.2
-p = Properties(minMass, maxMass, ptBinsX, ptBinsY, triggerMatchDeltaR, NoBkgd, minDeltaR)
+p = Properties(minMass, maxMass, ptBinsX, ptBinsY, triggerMatchDeltaR, NoBkgd, minDeltaR, scaleFactor)
 
 
 # Trigger efficiency for new trigger over old trigger
-tagTrigger = "IsoMu24_v"
+tagTrigger = "IsoMu24"
 probeTrigger = "HLT_L2DoubleMu23_NoVertex_v"
 
 # Load the input file
 tree = ROOT.TChain("T")
-#tree.Add("Z_mu_mu_tagAndProbe_MC.root")
-tree.Add("Run_2012B.root")
-#tree.Add("Z_mumu_Data_tag_and_probe_Run2012A.root")
+tree.Add("/afs/cern.ch/user/d/demattia/work/DisplacedLeptons/TagAndProbe/CMSSW_5_3_8/src/Analysis/TagAndProbe/test/crab_0_140222_011555/res/tagAndProbeA.root")
+
 # Prepare the workspace
 ws = RooWorkspace("ws", "workspace")
 Workspace.buildPdf(ws, p)
@@ -51,8 +57,6 @@ sample = ws.cat("sample")
 simPdf = ws.pdf("simPdf")
 efficiency = ws.var("efficiency")
 meanB = ws.var("meanB")
-
-# prepare_datasets(ws, p)
 
 # Prepare datasets
 datasetAllMap = {}
@@ -79,8 +83,9 @@ passCandidates = 0
 
 processedEvents = 0
 
-totEvents = 10000000
-#totEvents = tree.GetEntries()
+totEvents = 50000
+# totEvents = tree.GetEntries()
+print "total number of events analyzed is", totEvents
 progress = 0
 
 
@@ -106,87 +111,38 @@ for event in tree:
     if not tagTriggerFired :
         continue
 
+    # IsoMu24 filter name
+    tagTriggerObjects = event.hltL3crIsoL1sMu16L1f0L2f16QL3f24QL3crIsoRhoFiltered0p15Objects
+    # DoubelMu23NoVertex filter name
+    probeTriggerObjects = event.hltL2DoubleMu23NoVertexL2PreFilteredObjects
 
-    tagTriggerObjects = event.triggerFilterObjectsMap["hltL3crIsoL1sMu16L1f0L2f16QL3f24QL3crIsoRhoFiltered0p15"]
-    probeTriggerObjects = event.triggerFilterObjectsMap["hltL2DoubleMu23NoVertexL2PreFiltered"]
-    
     matchedMuonsTagTrigger = []
     passingMuonsProbe = []
     allMuonsProbe = []
-#check your input trees...
+
     for muon in event.muons:
         # Find a matching trigger object in DeltaR
-#The boolean variable to check if matching between muon or track objects and trigger objects...
-#        min_deltaRTag = 1
-#        for genParticle in event.genParticles:
-#            deltaRTag = deltaR(muon.phi, muon.eta, genParticle.phi, genParticle.eta) 
-#            hDeltaRTag.Fill(deltaRTag)
-#            if (deltaRTag < min_deltaRTag): min_deltaRTag = deltaRTag 
-#            if deltaR(muon.phi(), muon.eta(), genParticle.phi(), genParticle.eta()) < 0.2: 
-#        if min_deltaRTag < 0.2:
-        fillTriggerMatchedGlobalMuon(muon, tagTriggerObjects, matchedMuonsTagTrigger, p)
-#check input
-#replace standalonemuon by standAloneMuon
-#replace tracks by standAloneMuons later
-#check root file if it is generaltracks...
-    
-#    for standAloneMuon in event.genParticles:
-#        min_deltaRProbe = 1
-    for standAloneMuon in event.refittedStandAloneMuons:
-#The boolean variable to check if matching between muon or track objects and trigger objects...
-    # Find a matching trigger object in DeltaR
-#        min_deltaRProbe = 1
-#        for genParticle in event.genParticles:
-#            deltaRProbe = deltaR(standAloneMuon.phi, standAloneMuon.eta, genParticle.phi, genParticle.eta) 
-#            if deltaRProbe < min_deltaRProbe and genParticle.motherid == 23 : min_deltaRProbe = deltaRProbe 
-#        if passSelectionStandAlone(standAloneMuon) and  min_deltaRProbe < 0.2 :
-#        if passSelectionStandAlone(standAloneMuon) and standAloneMuon.motherid == 23 :
-        if passSelectionStandAlone(standAloneMuon) :
-            fillTriggerMatchedStandAlone(standAloneMuon, probeTriggerObjects, passingMuonsProbe, p)
-            allMuonsProbe.append(standAloneMuon)
+        if passSelectionGlobalMuon(muon):
+            fillTriggerMatchedTrack(muon, tagTriggerObjects, matchedMuonsTagTrigger, p)
 
-#    for track in event.tracks:
-    # Find a matching trigger object in DeltaR
-#        if passSelection(track):
-#            fillTriggerMatchedTrack(track, probeTriggerObjects, passingMuonsProbe, p)
-#            allMuonsProbe.append(track)
+    for standAloneMuon in event.refittedStandAloneMuons:
+        if passSelectionStandAlone(standAloneMuon):
+            fillTriggerMatchedTrack(standAloneMuon, probeTriggerObjects, passingMuonsProbe, p)
+            allMuonsProbe.append(standAloneMuon)
 
 
     fillCandidates_tnp(mass, p, matchedMuonsTagTrigger, passingMuonsProbe, hPassMap, datasetPassMap, counting_pass)
     fillCandidates_tnp(mass, p, matchedMuonsTagTrigger, allMuonsProbe, hAllMap, datasetAllMap, counting_all)
 
-print "all candidates =", hAllMap[1,1].GetEntries()
-print "pass candidates =", hPassMap[1,1].GetEntries()
+#print "all candidates =", hAllMap[1,1].GetEntries()
+# print "pass candidates =", hPassMap[1,1].GetEntries()
+for i in range(0, len(ptBinsX)):
+    print "all candidates =", hAllMap[i,0].GetEntries()
+    print "pass candidates =", hPassMap[i,0].GetEntries()
+# print "all candidates =", hAllMap[0,0].GetEntries()
+# print "pass candidates =", hPassMap[0,0].GetEntries()
 
 #Define a canvas to see superimposed deltaR distribution...
-
-#deltacanvas = ROOT.TCanvas("deltacanvas","deltacanvas", 800, 400)
-#deltacanvas.Divide(2,1)
-#deltacanvas.cd(1)
-#hDeltaRTag.Draw()
-#deltacanvas.cd(2)
-#hDeltaRProbe.Draw()
-#deltacanvas.Print("deltaRcanvas.png")
-
-counting_eff.Divide(counting_pass, counting_all, 1.0, 1.0)
-
-#counting_canvas_pass = ROOT.TCanvas("counting_canvas_pass","counting_canvas_pass", 800, 400)
-#counting_pass.Draw()
-#counting_canvas_pass.Print("counting_canvas_pass.png")
-
-#counting_canvas_all = ROOT.TCanvas("counting_canvas_all","counting_canvas_all", 800, 400)
-#counting_all.Draw()
-#counting_canvas_all.Print("counting_canvas_all.png")
-
-#counting_canvas_eff = ROOT.TCanvas("counting_canvas_eff","counting_canvas_eff", 800, 400)
-#counting_eff.Draw()
-#counting_canvas_eff.Print("counting_canvas_eff.png")
-#Save canvas_eff histo in a root file which updateCanvas_Melih.py will make use of
-
-#output = ROOT.TFile("output_tnp_histos.root","UPDATE")
-#counting_eff.Write()
-#output.Close()
-
 canvas = ROOT.TCanvas("AllAndPassCanvas", "AllAndPassCanvas", 800, 800)
 canvas.Divide(len(ptBinsX),len(ptBinsY))
 for ptBin1 in range(0, len(ptBinsX)):
@@ -274,11 +230,3 @@ canvas4.Print("Efficiency.pdf")
 canvas5 = ROOT.TCanvas("efficiency1D", "efficiency1D", 600, 600)
 hEff1D.Draw()
 canvas5.Print("Efficiency1D.pdf")
-
-
-
-
-
-
-
-

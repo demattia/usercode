@@ -3,7 +3,7 @@ __author__ = 'demattia'
 
 import ROOT
 from ROOT import RooRealVar, RooFormulaVar, RooVoigtian, RooChebychev, RooArgList, RooArgSet, \
-    RooAddPdf, RooDataSet, RooCategory, RooSimultaneous, RooGenericPdf, RooGaussian, RooWorkspace
+    RooAddPdf, RooDataSet, RooCategory, RooSimultaneous, RooGenericPdf, RooGaussian, RooWorkspace, RooCBShape
 
 def buildPdf(ws, p):
 
@@ -14,10 +14,15 @@ def buildPdf(ws, p):
     # Construct signal pdf
     mean = RooRealVar("mean", "mean", 60, 0, 130)
     width = RooRealVar("width", "width", 10, 1, 40)
+#    alpha = RooRealVar("alpha", "#alpha", -0.1, -10.0, -0.1)
+#    npow = RooRealVar("npow", "n_{CB}", 2.3, 0.1, 10.)
 #    width.setConstant(ROOT.kTRUE)
-    sigma = RooRealVar("sigma", "sigma", 1.2, 0.2, 2)
+    sigma = RooRealVar("sigma", "sigma", 1.2, 0.2, 40)
+#    minusMass = RooFormulaVar("minusMass", "@0*-1", RooArgList(mass))
+#    signalAll = RooCBShape("signalAll", "signalAll", mass, mean, width, alpha, npow);
     signalAll = RooVoigtian("signalAll", "signalAll", mass, mean, width, sigma)
-    # Construct background pdf
+ 
+   # Construct background pdf
     # a0_all = RooRealVar("a0_all","a0_all",-0.1,-1,1)
     # a1_all = RooRealVar("a1_all","a1_all",0.004,-1,1)
     # backgroundAll = RooChebychev("backgroundAll","backgroundAll",mass,RooArgList(a0_all,a1_all))
@@ -35,8 +40,8 @@ def buildPdf(ws, p):
     #backgroundAll = RooGaussian("backgroundAll", "backgroundAll", mass, meanB, sigmaB)
 
     # Construct composite pdf
-    sigAll = RooRealVar("sigAll", "sigAll", 2000, 0, 100000)
-    bkgAll = RooRealVar("bkgAll", "bkgAll", 100, 0, 10000)
+    sigAll = RooRealVar("sigAll", "sigAll", 2000, 0, 10000000)
+    bkgAll = RooRealVar("bkgAll", "bkgAll", 100, 0, 1000000)
     modelAll = RooAddPdf("modelAll", "modelAll", RooArgList(signalAll, backgroundAll), RooArgList(sigAll, bkgAll))
     if p.NoBkgd:
         modelAll = RooAddPdf("modelAll", "modelAll", RooArgList(signalAll), RooArgList(sigAll))
@@ -46,6 +51,7 @@ def buildPdf(ws, p):
     # Construct signal pdf.
     # NOTE that sigma is shared with the signal sample model
     signalPass = RooVoigtian("signalPass","signalPass",mass,mean,width,sigma)
+#    signalPass = RooCBShape("signalPass", "signalPass", mass, mean, width, alpha, npow);
     # Construct the background pdf
     # a0_pass = RooRealVar("a0_pass","a0_pass",-0.1,-1,1)
     # a1_pass = RooRealVar("a1_pass","a1_pass",0.5,-0.1,1)
@@ -62,10 +68,10 @@ def buildPdf(ws, p):
 
     # Construct the composite model
     efficiency = RooRealVar("efficiency","efficiency",0.9,0.1,1.)
-#    sigPass = RooFormulaVar("sigPass", "@0*@1*0.05", RooArgList(sigAll, efficiency))
-    sigPass = RooFormulaVar("sigPass", "@0*@1", RooArgList(sigAll, efficiency))
-    bkgPass = RooRealVar("bkgPass", "bkgPass", 100, 0, 10000)
-    #bkgPass = RooFormulaVar("bkgPass", "@0*@1", RooArgList(bkgAll, efficiency))
+    # Use it only analyzing the data prescaling value set to be 20
+    sigPass = RooFormulaVar("sigPass", "@0*@1*"+str(p.scaleFactor), RooArgList(sigAll, efficiency))
+    bkgPass = RooRealVar("bkgPass", "bkgPass", 100, 0, 1000000)
+    # bkgPass = RooFormulaVar("bkgPass", "@0*@1", RooArgList(bkgAll, efficiency))
     modelPass = RooAddPdf("modelPass", "modelPass", RooArgList(signalPass, backgroundPass), RooArgList(sigPass, bkgPass))
     if p.NoBkgd:
         modelPass = RooAddPdf("modelPass", "modelPass", RooArgList(signalPass), RooArgList(sigPass))

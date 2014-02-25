@@ -29,9 +29,6 @@ process.load("Configuration.StandardSequences.MagneticField_AutoFromDBCurrent_cf
 # process.load('Configuration.StandardSequences.MagneticField_cff')
 
 # Careful, this needs to be changed for the data
-#This is for MC
-#process.GlobalTag.globaltag = 'FT_53_V6C_AN3::All'
-#This is for data
 process.GlobalTag.globaltag = 'FT_53_V6C_AN3::All'
 
 # process.load("MagneticField.Engine.uniformMagneticField_cfi")
@@ -42,7 +39,7 @@ process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )
 
 process.source = cms.Source('PoolSource',
                             fileNames = cms.untracked.vstring( *(
-    "/store/mc/Summer12_DR53X/DYJetsToLL_M-50_TuneZ2Star_8TeV-madgraph-tarball/AODSIM/PU_S10_START53_V7A-v1/0000/7CCFB834-02D2-E111-BAFE-001E67397F35.root",
+    "file:B281755E-29D2-E111-A29E-001E67397701.root",
     ) )
                             )
 
@@ -55,14 +52,14 @@ process.demo = cms.EDAnalyzer('TagAndProbeTreeWriter',
                               # Note: this collection is also used for the track-based isolation
                               TrackCollection = cms.InputTag("generalTracks"),
                               # TriggerMuonCollection = cms.InputTag("L2Muons"),
-                              OutputName = cms.string("tagAndProbe_MC.root"),
+                              OutputName = cms.string("tagAndProbe.root"),
                               # Give a substring of the trigger or the full name. Do not use a *.
-                              TriggerNames = cms.vstring("IsoMu24_v", "HLT_L2DoubleMu23_NoVertex_2Cha_Angle2p5_v", "HLT_L2DoubleMu23_NoVertex_v"),
+                              TriggerNames = cms.vstring("IsoMu24", "HLT_L2DoubleMu23_NoVertex_2Cha_Angle2p5_v", "HLT_L2DoubleMu23_NoVertex_v"),
                               # They must correspond to the names given in the TriggerNames parameter
                               FilterNames = cms.vstring("hltL3crIsoL1sMu16L1f0L2f16QL3f24QL3crIsoRhoFiltered0p15", "hltL2DoubleMu23NoVertexL2Filtered2ChaAngle2p5", "hltL2DoubleMu23NoVertexL2PreFiltered"),
-                              MinTrackPt = cms.double(15.),
-                              MinMuonPt = cms.double(15.),
-                              MinStandAloneMuonPt = cms.double(15)
+                              MinTrackPt = cms.double(25.),
+                              MinMuonPt = cms.double(25.),
+                              MinStandAloneMuonPt = cms.double(25)
                               )
 
 process.p = cms.Path(process.demo)
