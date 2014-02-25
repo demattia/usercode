@@ -110,14 +110,12 @@ private:
   TString outputName_;
   edm::InputTag muonCollection_;
   edm::InputTag standAloneMuonCollection_;
-  // edm::InputTag triggerMuonCollection_;
   edm::InputTag trackCollectionName_;
   const reco::TrackCollection * trackCollection_;
   boost::shared_ptr<RootTreeHandler> treeHandler_;
   std::vector<Track> tracks_;
   std::vector<Track> muons_;
   std::vector<Track> standAloneMuons_;
-  // std::vector<Track> triggerMuons_;
   std::vector<GenParticle> genParticles_;
   std::vector<std::string> selectedTriggerNames_;
   std::vector<std::string> triggerNamesPassed_;
@@ -145,9 +143,15 @@ TagAndProbeTreeWriter::TagAndProbeTreeWriter(const edm::ParameterSet& iConfig) :
   treeHandler_->addBranch("tracks", "std::vector<Track>", &tracks_);
   treeHandler_->addBranch("muons", "std::vector<Track>", &muons_);
   treeHandler_->addBranch("refittedStandAloneMuons", "std::vector<Track>", &standAloneMuons_);
-  treeHandler_->addBranch("triggerFilterObjectsMap", "std::map<std::string, std::vector<Track> >", &triggerFilterObjectsMap_);
   treeHandler_->addBranch("genParticles", "std::vector<GenParticle>", &genParticles_);
   treeHandler_->addBranch("triggerNames", "std::vector<std::string> >", &triggerNamesPassed_);
+
+  // Create a separate collection for each triggerFilter. We were doing it with a map<string, vector<Track> >,
+  // but had to change to a simpler way due to unpredictable ROOT behavior.
+  for( auto filterName = selectedFilterNames_.begin(); filterName != selectedFilterNames_.end(); ++filterName ) {
+    triggerFilterObjectsMap_.insert(std::make_pair(*filterName, std::vector<Track>()));
+    treeHandler_->addBranch(*filterName+"Objects", "std::vector<Track>", &(triggerFilterObjectsMap_.at(*filterName)));
+  }
 }
 
 TagAndProbeTreeWriter::~TagAndProbeTreeWriter()
@@ -169,7 +173,6 @@ void TagAndProbeTreeWriter::analyze(const edm::Event& iEvent, const edm::EventSe
     for( auto name = selectedTriggerNames_.begin(); name != selectedTriggerNames_.end(); ++name ) {
       if( it->find(*name) != std::string::npos ) {
         if( trigResults->accept(trigNames.triggerIndex(*it)) ) {
-          // std::cout << "trigger name = " << *it << std::endl;
           triggerNamesPassed_.push_back(*name);
         }
       }
@@ -181,10 +184,7 @@ void TagAndProbeTreeWriter::analyze(const edm::Event& iEvent, const edm::EventSe
   edm::Handle<trigger::TriggerEvent> trigEvent;
   iEvent.getByLabel(trigEventTag, trigEvent);
 
-  // std::string filterName("HLT_L2DoubleMu23_NoVertex_2Cha_Angle2p5_v2");
-
   for( auto filterName = selectedFilterNames_.begin(); filterName != selectedFilterNames_.end(); ++filterName ) {
-    triggerFilterObjectsMap_.insert(std::make_pair(*filterName, std::vector<Track>()));
     trigger::size_type filterIndex = trigEvent->filterIndex(edm::InputTag(*filterName,"",trigEventTag.process()));
     if(filterIndex<trigEvent->sizeFilters()){
       const trigger::Keys& trigKeys = trigEvent->filterKeys(filterIndex);
@@ -196,14 +196,6 @@ void TagAndProbeTreeWriter::analyze(const edm::Event& iEvent, const edm::EventSe
       }
     }
   }
-
-//  for( auto it = triggerFilterObjectsMap_.begin(); it != triggerFilterObjectsMap_.end(); ++it ) {
-//    std::cout << "for filter: " << it->first << std::endl;
-//    for( auto it2 = it->second.begin(); it2 != it->second.end(); ++it2 ) {
-//      std::cout << "triggerObject pt = " << it2->pt << std::endl;
-//    }
-//  }
-
 
   // Fill the tracks
   try {
@@ -255,7 +247,9 @@ void TagAndProbeTreeWriter::analyze(const edm::Event& iEvent, const edm::EventSe
   standAloneMuons_.clear();
   genParticles_.clear();
   triggerNamesPassed_.clear();
-  triggerFilterObjectsMap_.clear();
+  for( auto filterName = selectedFilterNames_.begin(); filterName != selectedFilterNames_.end(); ++filterName ) {
+    triggerFilterObjectsMap_.at(*filterName).clear();
+  }
 }
 
 // ------------ method called once each job just before starting event loop  ------------
@@ -336,7 +330,6 @@ GenParticle TagAndProbeTreeWriter::fillGenParticle(const T & it)
   p.vy = it->vertex().y();
   p.vz = it->vertex().z();
   p.pid = it->pdgId();
-  p.motherid = it->mother()->mother()->pdgId();
   return p;
 }
 
