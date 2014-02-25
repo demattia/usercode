@@ -12,9 +12,9 @@ def checkAndResubmit(crabDir):
     # p = subprocess.Popen(["crab", "-status -getoutput -c "+crabDir], stdout=subprocess.PIPE)
     # out, err = p.communicate()
     # print out
-    os.system("crab -status -getoutput -c "+crabDir+" >&! monitorTmpLog.txt")
+    os.system("crab -status -getoutput -c "+crabDir+" > monitorTmpLog.txt")
 
-    p = subprocess.Popen(["crab", "-status -c "+crabDir], stdout=subprocess.PIPE)
+    p = subprocess.Popen(["crab", "-status", "-c", crabDir], stdout=subprocess.PIPE)
     out, err = p.communicate()
     # print out
 
@@ -103,10 +103,7 @@ def checkAndResubmit(crabDir):
     print "Jobs in status running:"
     print runningList
     print ""
-    if totalJobs == 0:
-        print "Error: 0 jobs submitted!"
-    else:
-        print "Percentange of successfully completed jobs: "+str(int(float(jobsWithExitCodeZero)/float(totalJobs)*100))+"%"
+    print "Percentange of successfully completed jobs: "+str(int(float(jobsWithExitCodeZero)/float(totalJobs)*100))+"%"
     if totalJobs == jobsWithExitCodeZero:
         print "All jobs completed sucessfully!"
     # Leave an empty line at the end
@@ -115,4 +112,35 @@ def checkAndResubmit(crabDir):
 
 # Running
 while True:
-    # checkAndResubmit("crabDir/")
+    # checkAndResubmit("workdirs/DYJets10_pat_20130203/crabDir")
+    # checkAndResubmit("workdirs/DYJets50_pat_20130203/crabDir")
+    # checkAndResubmit("workdirs/QCDem170_pat_20130203/crabDir")
+    # checkAndResubmit("workdirs/QCDem20_pat_20130203/crabDir")
+    # checkAndResubmit("workdirs/QCDem250_pat_20130203/crabDir")
+    # checkAndResubmit("workdirs/QCDem30_pat_20130203/crabDir")
+    # checkAndResubmit("workdirs/QCDem350_pat_20130203/crabDir")
+    # checkAndResubmit("workdirs/QCDem80_pat_20130203/crabDir")
+    # checkAndResubmit("workdirs/QCDmu15_pat_20130203/crabDir")
+    # checkAndResubmit("workdirs/QCDmu20_pat_20130203/crabDir")
+    # checkAndResubmit("workdirs/TTJets_FullLept_pat_20130203/crabDir")
+    # checkAndResubmit("workdirs/WW_pat_20130203/crabDir")
+    # checkAndResubmit("workdirs/WZ_pat_20130203/crabDir")
+    # checkAndResubmit("workdirs/ZZ_pat_20130203/crabDir")
+    # checkAndResubmit("workdirs/WJetsToLNu_pat_20130220/crabDir")
+    # checkAndResubmit("workdirs/HTo2LongLivedTo4F_MH1000_MFF150_CTau10To1000_pat_20140211/crabDir")
+    # checkAndResubmit("workdirs/HTo2LongLivedTo4F_MH125_MFF50_CTau50To5000_pat_20140211/crabDir")
+    # checkAndResubmit("workdirs/HTo2LongLivedTo4F_MH1000_MFF20_CTau1p5To150_pat_20140211/crabDir")
+    # checkAndResubmit("workdirs/HTo2LongLivedTo4F_MH200_MFF20_CTau7To700_pat_20140211/crabDir")
+    # checkAndResubmit("workdirs/HTo2LongLivedTo4F_MH200_MFF50_CTau20To2000_pat_20140211/crabDir")
+    # checkAndResubmit("workdirs/HTo2LongLivedTo4F_MH400_MFF150_CTau40To4000_pat_20140211/crabDir")
+    # checkAndResubmit("workdirs/HTo2LongLivedTo4F_MH400_MFF20_CTau4To400_pat_20140211/crabDir")
+    # checkAndResubmit("workdirs/HTo2LongLivedTo4F_MH400_MFF50_CTau8To800_pat_20140211/crabDir")
+    # checkAndResubmit("workdirs/Chi0ToNuLL_MSquark120_MChi48_pat_20140218/crabDir")
+    # checkAndResubmit("workdirs/Chi0ToNuLL_MSquark1000_MChi148_pat_20140218/crabDir")
+    # checkAndResubmit("workdirs/Chi0ToNuLL_MSquark1500_MChi494_pat_20140218/crabDir")
+    # checkAndResubmit("workdirs/Chi0ToNuLL_MSquark350_MChi148_pat_20140218/crabDir")
+    # checkAndResubmit("workdirs/HTo2LongLivedTo4F_MH125_MFF20_CTau13To1300_pat_20140219/crabDir")
+    # checkAndResubmit("workdirs/Data_Mu_Run2012A22Jan_pat_20140218/crabDir")
+    # checkAndResubmit("workdirs/Data_Mu_Run2012B22Jan_pat_20140219/crabDir")
+    # checkAndResubmit("workdirs/Data_Mu_Run2012C22Jan_pat_20140219/crabDir")
+    checkAndResubmit("workdirs/Data_Mu_Run2012D22Jan_pat_20140219/crabDir")
