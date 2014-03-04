@@ -1,49 +1,79 @@
 Tracking Efficiency from Cosmics
 
-The code produces a tree containing Track and GenParticle objects (same names but different objects than the ones in CMSSW).
-These objects have all the information needed for the measurement that can be done using a simple root macro.
+The code produces a tree containing Track and GenParticle objects (same names but different objects than the ones in CMSSW). These objects have all the information needed for the measurement that can be done using a simple root macro.
+
+********** Step 1 : setup code **********
 
 To setup the code:
 
-cmsrel CMSSW_4_2_3
-cd CMSSW_4_2_3/src
+cmsrel CMSSW_5_3_6
+cd CMSSW_5_3_6/src
 cmsenv
-cvs co -d Analysis UserCode/DeMattia/DisplacedVertex/Analysis/
+svn co svn+ssh://svn.cern.ch/reps/displacedfermions/trunk/Systematics
+mv Systematics/Cosmics/Analysis ./
 scramv1 b -j 4
 
-the cfg to run the code is in:
+********** Step 2 : rereco **********
+
+Since there is no "generalTracks" in the original cosmic reco files, we have to do a private rereco ourselves. 
+The input files for the rereco are RAW datasets on DBS: https://cmsweb.cern.ch/das/request?view=list&limit=10&instance=cms_dbs_prod_global&input=dataset%3D/Cosmics/Run2012*-v1/RAW
+The example cmssw and crab config files for rereco are in
+Analysis/Rereco/*
+The output files have been produced and saved at Fermilab dcache: 
+/pnfs/cms/WAX/11/store/user/msolmaz/Cosmics/
+/pnfs/cms/WAX/11/store/user/msolmaz/CosmicsRun2012B/ 
+
+********** Step 3 : make tree **********
+
+The template cfg to run the code is in:
 Analysis/TrackingEfficiencyFromCosmics/test/CosmicMuonTreeWriter_cfg.py
-
 It will produce a tree named after the muon collection, e.g.:
+   MuonCollection = cms.InputTag("cosmicMuons1Leg"),
+   will produce a output root file cosmicMuons1Leg.root.
+This tree contains all the reco tracks (default collection in the cfg is generalTracks), muons (default cosmicMuons1Leg collection) and, if UseMCtruth = cms.bool(True) the GenParticle collection will be filled with all the generated muons of status == 1 (stable) in the event.
 
-MuonCollection = cms.InputTag("cosmicMuons1Leg"),
-
-will produce cosmicMuons1Leg.root.
-
-The tree will contain all the reco tracks (default collection in the cfg is generalTracks), muons (default cosmicMuons1Leg
-collection) and, if UseMCtruth = cms.bool(True) the GenParticle collection will be filled with all the generated muons of
-status == 1 (stable) in the event.
-
-Note that the producer can also be used to save hlt muons as the code is already protected from missing collections (the hlt
-collections are not saved when they are empty and will give an exception).
-
+Note that the producer can also be used to save hlt muons as the code is already protected from missing collections (the hlt collections are not saved when they are empty and will give an exception).
 It is sufficient to set:
-
 MuonCollection = cms.InputTag("hltL2Muons"),
 
+We also have to select good lumi for "peak" mode. So the following files contain different "lumiSecs" blocks for different runs:
+Analysis/TrackingEfficiencyFromCosmics/test/CosmicMuonTreeWriter_Run2012A_cfg.py
+Analysis/TrackingEfficiencyFromCosmics/test/CosmicMuonTreeWriter_Run2012B_cfg.py
+Analysis/TrackingEfficiencyFromCosmics/test/CosmicMuonTreeWriter_Run2012C_cfg.py
 
-The output tree can be analyzed with the macro:
+The example condor job configs for RunA is in:
+Analysis/TrackingEfficiencyFromCosmics/test/CondorJobs_RunA
+The example crab job configs for MC is in:
+Analysis/TrackingEfficiencyFromCosmics/test/CrabJobs_MC
 
+We have already produced all the MC trees and Data trees, which are located in Fermilab Dcache:
+/pnfs/cms/WAX/11/store/user/zhenhu/cosmicsTrees/*
+or CERN:
+/afs/cern.ch/work/z/zhenhu/public/Displaced/rootfiles/*
+
+********** Step 4 : analyze tree **********
+
+These output trees can be analyzed with the macro:
 Analysis/TrackingEfficiencyFromCosmics/test/Macros/TreeAnalyzers/CosmicMuonAnalyzer.C
+the file CosmicMuonAnalyzer.h file in the same dir must be edited to point to the tree root files (search for .root). 
+Note that this file includes the .h files in Analysis/RootTreeProducers/interface/ defining the Track and GenParticle object. If moved the includes must be changed accordingly to point to the correct location.
+The macro will produce plots showing the tracking efficiency as measured from cosmics and from MC truth (selected via a bool MC = true; defined in the .h file) vs transverse impact parameter and some other plots.
 
-the file CosmicMuonAnalyzer.h file in the same dir must be edited to point to the tree root file (search for .root).
+It will apply the analysis cuts on tracks and selection cuts on the muons. The cuts to be applied are explained in the analysis note. Some selections will also be applied on the generated muons (e.g. eta range).
 
-Note that this file includes the .h files in Analysis/RootTreeProducers/interface/ defining the Track and GenParticle object.
-If moved the includes must be changed accordingly to point to the correct location.
+To run on both data and MC do:
+./runDataMC.sh
 
-The macro will produce plots showing the tracking efficiency as measured from cosmics and from MC truth (selected via a
-bool MC = true; defined in the .h file) vs transverse impact parameter and some other plots.
+You can see inside this script how to run on each of them.
 
-It will apply the analysis cuts on tracks and selection cuts on the muons.
+********** Step 5 : make plots **********
 
-Some selections will also be applied on the generated muons (e.g. eta range).
+In order to make plots easily, we prepared a script Compare_new.C. It reads the output of CosmicMuonAnalyzer.C and generates styled plots. Please selection different functions according to your own needs to make different plots. 
+
+To run it do:
+root -l Compare_new.C\(i\)
+where i is:
+- 0 for efficiency vs d0 plot
+- 1 for efficiency vs z0 plot
+- 2 for comparison plots before muon cuts
+- 3 for comparison plots after muon cuts
