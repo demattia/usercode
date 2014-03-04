@@ -13,7 +13,7 @@
 //
 // Original Author:  Marco De Mattia,42 R-23,
 //         Created:  Mon Aug 3 16:20:0 CEST 2011
-// $Id: EfficiencyMerger.cc,v 1.4 2011/08/02 16:20:0 demattia Exp $
+// $Id: EfficiencyMerger.cc,v 1.1 2011/08/11 10:37:05 demattia Exp $
 //
 //
 

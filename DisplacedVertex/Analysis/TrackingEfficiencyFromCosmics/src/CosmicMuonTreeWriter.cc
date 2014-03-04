@@ -13,7 +13,7 @@
 //
 // Original Author:  Marco De Mattia,40 1-A11,
 //         Created:  Thu Mar 29 13:29:00 CEST 2012
-// $Id: CosmicMuonTreeWriter.cc,v 1.3 2012/04/02 11:06:20 demattia Exp $
+// $Id: CosmicMuonTreeWriter.cc,v 1.4 2012/04/02 15:07:33 demattia Exp $
 //
 //
 
@@ -31,6 +31,9 @@
 #include "DataFormats/TrackReco/interface/Track.h"
 #include "DataFormats/TrackReco/interface/TrackFwd.h"
 #include "FWCore/MessageLogger/interface/MessageLogger.h"
+
+#include "DataFormats/MuonReco/interface/Muon.h"
+#include "DataFormats/MuonReco/interface/MuonFwd.h"
 
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
 #include "DataFormats/Math/interface/deltaR.h"
@@ -99,6 +102,7 @@ private:
 
   AlgebraicSymMatrix55 nullCovariance_;
   bool recomputeIP_;
+  edm::InputTag outputName_;
   edm::InputTag muonCollection_;
   edm::InputTag trackCollection_;
   edm::ESHandle<TransientTrackBuilder> theB_;
@@ -112,6 +116,7 @@ private:
 CosmicMuonTreeWriter::CosmicMuonTreeWriter(const edm::ParameterSet& iConfig) :
   useMCtruth_(iConfig.getParameter<bool>("UseMCtruth")),
   recomputeIP_(iConfig.getParameter<bool>("RecomputeIP")),
+  outputName_(iConfig.getParameter<edm::InputTag>("OutPutName")),
   muonCollection_(iConfig.getParameter<edm::InputTag>("MuonCollection")),
   trackCollection_(iConfig.getParameter<edm::InputTag>("TrackCollection"))
 {
@@ -123,9 +128,11 @@ CosmicMuonTreeWriter::CosmicMuonTreeWriter(const edm::ParameterSet& iConfig) :
   }
   smartPropIP_ = 0;
 
-  treeHandler_.reset(new RootTreeHandler(muonCollection_.label()+".root", "MuonsTree"));
+  //treeHandler_.reset(new RootTreeHandler(muonCollection_.label()+".root", "MuonsTree"));
+  treeHandler_.reset(new RootTreeHandler(outputName_.label()+".root", "MuonsTree"));
   treeHandler_->addBranch("tracks", "std::vector<Track>", &tracks_);
   treeHandler_->addBranch("muons", "std::vector<Track>", &muons_);
+  //treeHandler_->addBranch("muons", "std::vector<Muon>", &muons_);
   treeHandler_->addBranch("genParticles", "std::vector<GenParticle>", &genParticles_);
 }
 
@@ -152,6 +159,7 @@ void CosmicMuonTreeWriter::analyze(const edm::Event& iEvent, const edm::EventSet
   try {
     edm::Handle<reco::TrackCollection> allTracks;
     iEvent.getByLabel(trackCollection_, allTracks);
+    // fillTreeTracks(*(allTracks.product()), vertex, tracks_);
     fillTreeTracks(*(allTracks.product()), vertex, tracks_);
   }
   catch (cms::Exception & ex) {
@@ -294,26 +302,40 @@ void CosmicMuonTreeWriter::fillTrackToTreeTrack( Track & treeTrack, const reco::
   treeTrack.phi = track.phi();
   treeTrack.phiError = track.phiError();
   treeTrack.charge = track.charge();
-  treeTrack.vx = track.vx();
-  treeTrack.vy = track.vy();
-  treeTrack.vz = track.vz();
+  // treeTrack.vx = track.vx();
+  // treeTrack.vy = track.vy();
+  // treeTrack.vz = track.vz();
+  std::cout << "chi2" << std::endl;
   treeTrack.chi2 = track.chi2();
   treeTrack.normalizedChi2 = track.normalizedChi2();
+  std::cout << "referencePoint" << std::endl;
   treeTrack.referencePointRadius = std::sqrt(std::pow(track.referencePoint().x(),2)+std::pow(track.referencePoint().y(),2));
   treeTrack.referencePointZ = track.referencePoint().z();
+  std::cout << "nHits" << std::endl;
   treeTrack.nHits = track.recHitsSize();
+  std::cout << "found" << std::endl;
   treeTrack.nValidHits = track.found();
+  std::cout << "valid" << std::endl;
   treeTrack.nValidPlusInvalidHits = track.found()+track.lost();
-  treeTrack.innermostHitRadius = track.innerPosition().r();
-  treeTrack.innermostHitZ = track.innerPosition().z();
+  std::cout << "algo" << std::endl;
   treeTrack.trackAlgorithm = track.algo();
   reco::TrackBase::TrackQuality trackQualityHighPurity = reco::TrackBase::qualityByName("highPurity");
   treeTrack.trackQuality = track.quality(trackQualityHighPurity);
-  treeTrack.muonStationsWithAnyHits = track.hitPattern().muonStationsWithAnyHits();
-  // treeTrack.dtStationsWithAnyHits = track.hitPattern().dtStationsWithAnyHits();
-  // treeTrack.cscStationsWithAnyHits = track.hitPattern().cscStationsWithAnyHits();
-  treeTrack.dtStationsWithValidHits = track.hitPattern().dtStationsWithValidHits();
-  treeTrack.cscStationsWithValidHits = track.hitPattern().cscStationsWithValidHits();
+  std::cout << "hit pattern" << std::endl;
+  try {
+    treeTrack.innermostHitRadius = track.innerPosition().r();
+    treeTrack.innermostHitZ = track.innerPosition().z();
+    treeTrack.muonStationsWithAnyHits = track.hitPattern().muonStationsWithAnyHits();
+    // treeTrack.dtStationsWithAnyHits = track.hitPattern().dtStationsWithAnyHits();
+    // treeTrack.cscStationsWithAnyHits = track.hitPattern().cscStationsWithAnyHits();
+    treeTrack.dtStationsWithValidHits = track.hitPattern().dtStationsWithValidHits();
+    treeTrack.cscStationsWithValidHits = track.hitPattern().cscStationsWithValidHits();
+  }
+  catch (cms::Exception & ex) {
+    // Not present in AOD
+    // std::cerr << ex;
+  }
+  std::cout << "dxy" << std::endl;
   treeTrack.dxy = track.dxy();
   treeTrack.dxyError = track.dxyError();
   treeTrack.dz = track.dz();

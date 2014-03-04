@@ -13,7 +13,7 @@
 //
 // Original Author:  Marco De Mattia,42 R-23,
 //         Created:  Mon Jul 4 18:38:0 CEST 2011
-// $Id: EfficiencyRatioProducer.cc,v 1.3 2011/07/18 14:37:11 demattia Exp $
+// $Id: EfficiencyRatioProducer.cc,v 1.4 2011/10/18 16:18:24 demattia Exp $
 //
 //
 

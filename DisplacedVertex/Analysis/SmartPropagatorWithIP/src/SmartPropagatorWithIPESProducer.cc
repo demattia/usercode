@@ -1,7 +1,7 @@
 /** \class SmartPropagatorWithIPESProducer
  *  ES producer needed to put the SmartPropagatorWithIP inside the EventSetup
  *
- *  $Date: 2011/10/31 13:48:07 $
+ *  $Date: 2012/03/07 14:16:58 $
  *  $Revision: 1.1 $
  *  \author M. De Mattia - <m.de.mattia@cern.ch>
  */

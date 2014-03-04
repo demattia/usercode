@@ -29,7 +29,7 @@ process.load("Configuration.StandardSequences.MagneticField_AutoFromDBCurrent_cf
 # process.load('Configuration.StandardSequences.MagneticField_cff')
 
 # Careful, this needs to be changed for the data
-process.GlobalTag.globaltag = 'START42_V11::All'
+process.GlobalTag.globaltag = 'FT_53_V6C_AN3::All'
 
 # process.load("MagneticField.Engine.uniformMagneticField_cfi")
 
